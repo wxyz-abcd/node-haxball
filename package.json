@@ -1,0 +1,45 @@
+{
+  "name": "node-haxball",
+  "version": "0.8.2",
+  "description": "A powerful API library for interacting with the Haxball Client",
+  "main": "src/index.js",
+  "private": false,
+  "scripts": {
+    "test": "node test/createRoomTests.js",
+    "ctest": "node test/createRoomTests.js",
+    "jtest": "node test/joinRoomTests.js"
+  },
+  "contributors": [
+    "wxyz-abcd <mail.api.test.1.1.1@gmail.com>",
+    "mertushka <mertushkaonline@gmail.com>"
+  ],
+  "keywords": [
+    "haxball",
+    "api",
+    "bot",
+    "client",
+    "node",
+    "headless"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wxyz-abcd/node-haxball.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wxyz-abcd/node-haxball/issues"
+  },
+  "homepage": "https://github.com/wxyz-abcd/node-haxball",
+  "dependencies": {
+    "@koush/wrtc": "^0.5.3",
+    "@peculiar/webcrypto": "^1.4.0",
+    "jsdom": "^20.0.1",
+    "json5": "^2.2.1",
+    "pako": "^2.0.4",
+    "vm": "^0.1.0",
+    "ws": "^8.9.0",
+    "xhr2": "^0.2.1"
+  },
+  "engines": {
+    "node": ">=16.9.0"
+  }
+}
