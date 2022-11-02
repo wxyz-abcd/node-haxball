@@ -4341,7 +4341,7 @@ function Haxball(options){
         if (null != e) {
           if (d) {
             var f = this.Ic.zn(e.pa);
-            console.log(f); // ban
+            // console.log(f); // ban
             this.Kj.set(a, f);
           }
           a = w.ha();
@@ -4548,7 +4548,7 @@ function Haxball(options){
         }
       },
       xk: function (a, b) {
-        window.console.log(b);
+        //window.console.log(b);
         this.Ie["delete"](a.$);
         D.remove(this.ac, a);
         a.yg && null != this.$k && this.$k(a.$);
@@ -4691,7 +4691,6 @@ function Haxball(options){
     M.b = !0;
     M.Pl = function (a, b, c, d, e) {
       return new Promise(function (f, g) {
-        //console.log("http request hazırlanıyor", a, b, c, d, e);
         var k = new XMLHttpRequest();
         k.open(b, a);
         k.responseType = c;
@@ -5470,7 +5469,6 @@ function Haxball(options){
     u.qp = function () {
       mc.ts();
       x.fj(function () {
-        //console.log("assetsler yüklendi");
         u.jk(u.xq);
         haxball.emit("ready");
       });
@@ -5910,7 +5908,7 @@ function Haxball(options){
     x.ks = function () {
       try {
         //return window.self != window.top;
-        return true; // nickname çıkması için bypass
+        return true;
       } catch (a) {
         return !0;
       }
@@ -6003,7 +6001,7 @@ function Haxball(options){
       ) {
         var f = c[e];
         ++e;
-        //b[f] || d.push(f); // modernizr'in özellik kontrol etmesi
+        //b[f] || d.push(f);
       }
       0 != d.length
         ? ((window.document.body.innerHTML = ""),

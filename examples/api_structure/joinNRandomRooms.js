@@ -12,13 +12,13 @@ haxBall.on("ready", () => {
     var idx = [];
     for (var i=0;i<N;){
       var n = Math.floor(Math.random()*list.length);
-      if (!list[n].vb.Ib && !idx.includes(n)){ // vb.Ib is room password (true/false), we want to join N different random rooms without passwords.
+      if (!list[n].vd.Ib && !idx.includes(n)){ // vd.Ib is room password (true/false), we want to join N different random rooms without passwords.
         idx.push(n);
         i++;
       }
     }
     idx.forEach((x)=>{
-      joinRoom(list[x].$, list[x].vb.w); // $ is room id, vb.w is room name
+      joinRoom(list[x].$, list[x].vd.w); // $ is room id, vd.w is room name
     })
   });
 });
@@ -30,20 +30,22 @@ function joinRoom(roomId, roomName){
     avatar: "👽",
   });
 
-  _haxBall.joinRoom({
-    id: roomId
-  }).then(roomCallback, () => {
-    console.log("Unable to join room...");
-  });
+  _haxBall.on("ready", () => {
+    _haxBall.joinRoom({
+      id: roomId
+    }).then(roomCallback, () => {
+      console.log("Unable to join room...");
+    });
 
-  _haxBall.on("roomLeave", function (str) {
-    console.log("Bot has left the room:", str);
-    joinRoom(roomId, roomName); // try to rejoin as soon as you left the room.
+    _haxBall.on("roomLeave", function (str) {
+      console.log("Bot has left the room:", str);
+      joinRoom(roomId, roomName); // try to rejoin as soon as you left the room.
+    });
+    
+    function roomCallback(room){ // "roomCallbacks" examples start from here.
+      console.log("joined room " + roomName);
+    }
   });
-  
-  function roomCallback(room){ // "roomCallbacks" examples start from here.
-    console.log("joined room " + roomName);
-  }
 
 }
 
