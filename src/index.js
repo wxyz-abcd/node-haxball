@@ -214,7 +214,7 @@ function Haxball(options){
     teamColorsObj: null,
     announcementObj: null,
     adminChangerObj: null,
-    roomCreatorObj: null,
+    createRoom: null,
     kickerObj: null,
     mapObj: null,
     mapStorageObj: null,
@@ -295,9 +295,8 @@ function Haxball(options){
       };
       haxball.once("roomLeave", fLeaveRoom);
       haxball.once("createRoomSucceeded", fCreateRoomSucceeded);
-      internalData.roomJoinerObj.xb(); // open room list screen
-      var b = internalData.roomJoinerObj.oo(); // press create room to create a create room object
-      b.Jp({
+      //internalData.roomJoinerObj.xb(); // open room list screen
+      internalData.createRoom({
         name: obj.name,
         password: (obj.password == "") ? null : obj.password,
         qs: obj.maxPlayerCount.toString(),
@@ -369,6 +368,7 @@ function Haxball(options){
       Error.captureStackTrace && Error.captureStackTrace(this, q);
     }
     internalData.StadiumSyntaxError = q;
+    /*
     function Wa(a) {
       this.g = v.Ga(Wa.N);
       v.Ea(this.g).get("features").textContent = a.join(", ");
@@ -382,6 +382,7 @@ function Haxball(options){
       this.wo = a.get("fps");
       //v.xe(a.get("graph"), this.nl.g);
     }
+    */
     function P(a, b, c) {
       var d = this;
       this.g = v.Ga(P.N);
@@ -407,6 +408,7 @@ function Haxball(options){
       this.Vd.textContent = b;
       f.textContent = a;
     }
+    /*
     function aa(a) {
       function b(a) {
         var b = window.document.createElement("div");
@@ -598,6 +600,7 @@ function Haxball(options){
         A.i(k.qb);
       };
     }
+    */
     function Ya(a) {
       this.fk = !1;
       this.qm = new za(p.Ia);
@@ -621,9 +624,11 @@ function Haxball(options){
       this.qf = c.get("score-limit-sel");
       this.rm = c.get("stadium-name");
       this.sm = c.get("stadium-pick");
+      /*
       this.sm.onclick = function () {
         A.i(b.Xp);
       };
+      */
       this.Th(c.get("red-list"), this.Hl, p.fa, a);
       this.Th(c.get("blue-list"), this.Lj, p.xa, a);
       this.Th(c.get("spec-list"), this.qm, p.Ia, a);
@@ -656,18 +661,21 @@ function Haxball(options){
       this.Fl.onclick = function () {
         A.i(b.Qp);
       };
+      /*
       d.onclick = function () {
         A.i(b.Wp);
       };
       e.onclick = function () {
         A.i(b.de);
       };
+      */
       f.onclick = function () {
         A.i(b.Pp);
       };
       this.Bj(!1);
       this.Cj(!1);
     }
+    /*
     function Za() {
       var a = this;
       this.g = v.Ga(Za.N);
@@ -689,6 +697,7 @@ function Haxball(options){
       };
       this.C();
     }
+    */
     function $a(a) {
       this.Xk = a.get("notice");
       this.$n = a.get("notice-contents");
@@ -721,6 +730,7 @@ function Haxball(options){
       this.Tm = d.get("join");
       a = d.get("create");
       this.cs = d.get("count");
+      /*
       a.onclick = function () {
         A.i(c.ws);
       };
@@ -742,6 +752,7 @@ function Haxball(options){
           b.readAsArrayBuffer(a);
         }
       };
+      */
       this.fs = b("fil-full");
       this.zs = b("fil-pass");
       this.ns = d.get("listscroll");
@@ -755,7 +766,6 @@ function Haxball(options){
         null != c.Od && y.i(c.Ym, c.Od.Fs);
       };
       this.Om();
-      //haxBall.emit("ready");
     }
     function ab(a) {
       this.Ja = v.Ga(ab.tj, "tbody");
@@ -776,6 +786,7 @@ function Haxball(options){
       } catch (k) {}
       9 > a.vd.Id && this.Ja.classList.add("old");
     }
+    /*
     function bb() {
       this.gk = null;
       var a = this;
@@ -860,6 +871,7 @@ function Haxball(options){
         A.i(c.de);
       };
     }
+    */
     function Q(a) {
       var b = this,
         c = new P("Only humans", "", []);
@@ -929,12 +941,15 @@ function Haxball(options){
       this.g.ondragstart = function (a) {
         a.dataTransfer.setData("player", K.ye(b.$));
       };
+      /*
       this.g.oncontextmenu = function (a) {
         a.preventDefault();
         y.i(b.ff, b.$);
       };
+      */
       this.em(a.cb);
     }
+    /*
     function db(a, b) {
       var c = this;
       this.g = v.Ga(db.N);
@@ -958,7 +973,6 @@ function Haxball(options){
       this.Hf.disabled = !b || 0 == this.Nb;
       this.Qe.disabled = !b || 0 == this.Nb;
     }
-    /*
     function Qb() {
       this.Ah = 0;
       this.vp = 400;
@@ -977,7 +991,6 @@ function Haxball(options){
       this.g.appendChild(this.Qf);
       this.g.className = "graph";
     }
-    */
     function eb() {
       this.jb = null;
       var a = this;
@@ -1076,10 +1089,11 @@ function Haxball(options){
       this.Ze.textContent = "Kick " + a.w;
       this.Aj(!1);
     }
+    */
     function ja(a) {
       this.Fb = new hb();
       this.Gd = !1;
-      this.pe = new Xa();
+      //this.pe = new Xa();
       this.Qa = new Da();
       var b = this;
       this.Wa = new Ya(a);
@@ -1090,12 +1104,13 @@ function Haxball(options){
       this.hf = a.get("popups");
       this.hf.style.display = "none";
       v.xe(a.get("chatbox"), this.Qa.g);
-      v.xe(a.get("stats"), this.pe.g);
+      //v.xe(a.get("stats"), this.pe.g);
       this.bi = a.get("menu");
       this.bi.onclick = function () {
         b.me(!b.Gd);
         b.bi.blur();
       };
+      /*
       a.get("settings").onclick = function () {
         var a = new aa();
         a.qb = function () {
@@ -1103,7 +1118,9 @@ function Haxball(options){
         };
         b.bb(a.g);
       };
+      */
       this.Jh.appendChild(this.Fb.g);
+      /*
       this.Wa.de = function () {
         var a = new fb();
         a.qb = function (a) {
@@ -1130,6 +1147,7 @@ function Haxball(options){
         };
         b.bb(a.g);
       };
+      */
     }
     function Rb() {
       this.Da = 0;
@@ -1155,6 +1173,7 @@ function Haxball(options){
       v.xe(a.get("timer"), this.xc.g);
       //v.xe(a.get("canvas"), this.Eb.sa);
     }
+    /*
     function Ka(a, b) {
       var c = this;
       this.g = v.Ga(Ka.N);
@@ -1213,152 +1232,152 @@ function Haxball(options){
       this.ai.selectedIndex = 10;
       this.Fj(!1);
       this.C();
-      // create room inserted here:
-      this.Jp = function (b) {
-        var a = n.A.fe.L(); // inserted here to get current nick
-        var cpc = b.cpc;
-        function c() { // update & synchronize room data with haxball main server via websocket.
-          if (!b.Ks) {
-            var a = new Fb();
-            a.Id = 9;
-            a.w = g.jc;
-            a.I = (cpc!=null) ? cpc : g.I.length;
-            a.Xe = l.fg + 1;
-            a.ub = f.ub;
-            a.Ib = null != l.Ib;
-            a.Ec = f.Ec;
-            a.Gc = f.Gc;
-            var c = w.ha(16);
-            a.ga(c);
-            a = c.Kg();
-            l.Fi(a);
-          }
+    }
+    */
+    internalData.createRoom = /*this.Jp = */function (b) {
+      var a = n.A.fe.L(); // inserted here to get current nick
+      var cpc = b.cpc;
+      function c() { // update & synchronize room data with haxball main server via websocket.
+        if (!b.Ks) {
+          var a = new Fb();
+          a.Id = 9;
+          a.w = g.jc;
+          a.I = (cpc!=null) ? cpc : g.I.length;
+          a.Xe = l.fg + 1;
+          a.ub = f.ub;
+          a.Ib = null != l.Ib;
+          a.Ec = f.Ec;
+          a.Gc = f.Gc;
+          var c = w.ha(16);
+          a.ga(c);
+          a = c.Kg();
+          l.Fi(a);
         }
-        x.La(new P("Creating room", "Connecting...", []).g);
-        var e = null,
-          f = null, // n.A.Lh(),
-          g = new fa();
-        function parseGeo(geo){
-          var geoData = n.A.Lh();
-          return T.Rf({
-            lat: (geo && geo.lat) || geoData.Ec,
-            lon: (geo && geo.lon) || geoData.Gc,
-            code: (geo && geo.flag) ? geo.flag : geoData.ub,
-          });
-        }
-        var f = parseGeo(b.geo);
-        g.jc = b.name;
-        var k = new ea();
-        k.w = a;
-        k.cb = !0;
-        k.Kd = f.ub;
-        k.Xb = n.A.sh.L();
-        g.I.push(k);
-        var l = new Lb({
-          iceServers: n.Vf,
-          ij: n.Ee + "api/host",
-          state: g,
-          version: 9,
-          gn: b.t // token
+      }
+      x.La(new P("Creating room", "Connecting...", []).g);
+      var e = null,
+        f = null, // n.A.Lh(),
+        g = new fa();
+      function parseGeo(geo){
+        var geoData = n.A.Lh();
+        return T.Rf({
+          lat: (geo && geo.lat) || geoData.Ec,
+          lon: (geo && geo.lon) || geoData.Gc,
+          code: (geo && geo.flag) ? geo.flag : geoData.ub,
         });
-        l.upc = b.upc;
-        l.fg = b.qs - 1;
-        l.Ib = b.password;
+      }
+      var f = parseGeo(b.geo);
+      g.jc = b.name;
+      var k = new ea();
+      k.w = a;
+      k.cb = !0;
+      k.Kd = f.ub;
+      k.Xb = n.A.sh.L();
+      g.I.push(k);
+      var l = new Lb({
+        iceServers: n.Vf,
+        ij: n.Ee + "api/host",
+        state: g,
+        version: 9,
+        gn: b.t // token
+      });
+      l.upc = b.upc;
+      l.fg = b.qs - 1;
+      l.Ib = b.password;
+      c();
+      var t = new ba(l),
+        h = !1;
+      l.ef = function (a, b) {
+        u.kk(a, function (a) {
+          b(a);
+          x.La(t.j.g);
+          return (h = !0);
+        });
+      };
+      var m = window.setInterval(function () {
+        var a = la.la(l);
+        l.ra(a);
+      }, 3e3);
+      l.$k = function (a) {
+        null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), l.ra(a));
+      };
+      l.Hp = function (a, b, conn, auth) { // receive conn & auth data
+        var d = b.ic();
+        if (25 < d.length) throw new q("name too long");
+        var e = b.ic();
+        if (3 < e.length) throw new q("country too long");
+        var f = b.zb();
+        if (null != f && 2 < f.length) throw new q("avatar too long");
+        var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
+        if (!newPlayerData)
+          throw "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth;
+        [d, e, f] = newPlayerData;
+        d = oa.la(a, d, e, f, conn, auth);
+        l.ra(d);
         c();
-        var t = new ba(l),
-          h = !1;
-        l.ef = function (a, b) {
-          u.kk(a, function (a) {
-            b(a);
-            x.La(t.j.g);
-            return (h = !0);
-          });
-        };
-        var m = window.setInterval(function () {
-          var a = la.la(l);
-          l.ra(a);
-        }, 3e3);
-        l.$k = function (a) {
-          null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), l.ra(a));
-        };
-        l.Hp = function (a, b, conn, auth) { // receive conn & auth data
-          var d = b.ic();
-          if (25 < d.length) throw new q("name too long");
-          var e = b.ic();
-          if (3 < e.length) throw new q("country too long");
-          var f = b.zb();
-          if (null != f && 2 < f.length) throw new q("avatar too long");
-          var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
-          if (!newPlayerData)
-            throw "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth;
-          [d, e, f] = newPlayerData;
-          d = oa.la(a, d, e, f, conn, auth);
-          l.ra(d);
-          c();
-        };
-        l.Ip = function (a) {
-          null != g.na(a) && ((a = Y.la(a, null, !1)), l.ra(a));
-        };
-        l.kg = function (a) {
-          e = a;
-          t.Bg = u.$h(a, null != l.Ib);
-          h || ((h = !0), x.La(t.j.g));
-          haxball.room._onRoomLink(t.Bg);
-        };
-        t.Ih.Np = function (a, b, c, d) {
-          l.to(a, b, c, d);
-        };
-        t.Ih.Op = function () {
-          c();
-        };
-        t.j.de = function () {
-          l.ia();
-          t.ia();
-          u.xb();
-          window.clearInterval(m);
-          if (internalData.isHost)
-            haxball.emit("roomLeave");
-        };
-        t.Of.Fg = function (a) {
-          l.Ib = a;
+      };
+      l.Ip = function (a) {
+        null != g.na(a) && ((a = Y.la(a, null, !1)), l.ra(a));
+      };
+      l.kg = function (a) {
+        e = a;
+        t.Bg = u.$h(a, null != l.Ib);
+        h || ((h = !0), x.La(t.j.g));
+        haxball.room._onRoomLink(t.Bg);
+      };
+      t.Ih.Np = function (a, b, c, d) {
+        l.to(a, b, c, d);
+      };
+      t.Ih.Op = function () {
+        c();
+      };
+      t.j.de = function () {
+        l.ia();
+        t.ia();
+        u.xb();
+        window.clearInterval(m);
+        if (internalData.isHost)
+          haxball.emit("roomLeave");
+      };
+      t.Of.Fg = function (a) {
+        l.Ib = a;
+        c();
+        null != e && (t.Bg = u.$h(e, null != l.Ib));
+      };
+      t.Of.jm = function (a) {
+        l.Ei(a);
+      };
+      t.Of.Ud = G(l, l.Ud);
+      t.Of.__srp__ = function (a) {
+        if (!a)
+          return;
+        if (a.hasOwnProperty("name"))
+          g.jc = a.name || "";
+        if (a.hasOwnProperty("password")){
+          l.Ib = a.password;
           c();
           null != e && (t.Bg = u.$h(e, null != l.Ib));
-        };
-        t.Of.jm = function (a) {
-          l.Ei(a);
-        };
-        t.Of.Ud = G(l, l.Ud);
-        t.Of.__srp__ = function (a) {
-          if (!a)
-            return;
-          if (a.hasOwnProperty("name"))
-            g.jc = a.name || "";
-          if (a.hasOwnProperty("password")){
-            l.Ib = a.password;
-            c();
-            null != e && (t.Bg = u.$h(e, null != l.Ib));
-          }
-          if (a.hasOwnProperty("geo")){
-            f = parseGeo(a.geo);
-            k.Kd = f.ub;
-          }
-          if (a.hasOwnProperty("playerCount"))
-            cpc = a.playerCount;
-          if (a.hasOwnProperty("maxPlayerCount"))
-            l.fg = (a.maxPlayerCount==null) ? null : (a.maxPlayerCount - 1);
-          c();
-        };
-        t.Of.__supc__ = function (a) {
-          l.upc = a;
-        };
-
-        internalData.isHost = true;
-        internalData.roomObj = t;
-        internalData.roomPhysicsObj = g;
-        haxball.emit("createRoomSucceeded");
+        }
+        if (a.hasOwnProperty("geo")){
+          f = parseGeo(a.geo);
+          k.Kd = f.ub;
+        }
+        if (a.hasOwnProperty("playerCount"))
+          cpc = a.playerCount;
+        if (a.hasOwnProperty("maxPlayerCount"))
+          l.fg = (a.maxPlayerCount==null) ? null : (a.maxPlayerCount - 1);
+        c();
       };
-    }
-    internalData.roomCreatorObj = ib;
+      t.Of.__supc__ = function (a) {
+        l.upc = a;
+      };
+
+      internalData.isHost = true;
+      internalData.roomObj = t;
+      internalData.roomPhysicsObj = g;
+      haxball.emit("createRoomSucceeded");
+    };
+    /*
     function jb() {
       this.g = v.Ga(jb.N);
       var a = v.Ea(this.g);
@@ -1382,13 +1401,12 @@ function Haxball(options){
       this.Cb.onkeydown = function (a) {
         13 == a.keyCode && b();
       };
-      /*
       setTimeout(() => {
         b();
       }, 1000);
-      */
       this.C();
     }
+    */
     function lb(a, b) {
       this.Hj = [];
       this.Iq = /[#@][^\s@#]*$/;
@@ -1444,6 +1462,7 @@ function Haxball(options){
         b.Bc.Hn(b.gb.value, b.gb.selectionStart);
       };
     }
+    /*
     function mb() {
       this.rf = null;
       var a = this;
@@ -1464,6 +1483,7 @@ function Haxball(options){
         c.update();
       }, 0);
     }
+    */
     function Ea() {
       this.Xf = !1;
       this.w = "";
@@ -1759,8 +1779,8 @@ function Haxball(options){
       c.loop = !0;
       c.start();
     }
+    /*
     function Ub(a) {
-      /*
       function b(b) {
         return new Promise(function (d, f) {
           var e = a.file(b).asArrayBuffer();
@@ -1800,15 +1820,17 @@ function Haxball(options){
           c.Xj.connect(c.ag);
         }),
       ]).catch(console.log);
-      */
     }
+    */
     function Z() {}
     function va() {}
     internalData.roomListGetterObj = va;
     function Fb() {}
+    /*
     function Vb(a) {
       this.$c = window.performance.now();
-      this.sd = this.De = 0;
+      //this.sd = 0;
+      this.De = 0;
       var b = this;
       this.ya = a;
       this.j = new ja(a.uc);
@@ -1817,10 +1839,12 @@ function Haxball(options){
       window.document.addEventListener("keydown", G(this, this.Bd));
       window.document.addEventListener("keyup", G(this, this.Cd));
       window.requestAnimationFrame(G(this, this.bf));
+
       this.Gh = window.setInterval(function () {
         b.j.pe.hm(b.sd);
         b.sd = 0;
       }, 1e3);
+
       this.uf(n.A.Tb.L());
       this.j.g.classList.add("replayer");
       this.je = new ha(a);
@@ -1836,6 +1860,7 @@ function Haxball(options){
       };
       this.j.g.appendChild(this.je.g);
     }
+    */
     function x() {}
     function u() {}
     internalData.roomJoinerObj = u;
@@ -1994,7 +2019,7 @@ function Haxball(options){
       this.ob = new Ra();
       this.Bg = "Waiting for link";
       this.xi = this.am = !1;
-      this.sd = 0;
+      //this.sd = 0;
       var b = this;
       this.Of = new ub(a, function (a) {
         b.j.Qa.Gb(a);
@@ -2053,6 +2078,7 @@ function Haxball(options){
         b = pa.la(b);
         a.ra(b);
       };
+      /*
       this.j.Wa.ff = function (c) {
         var d = a.T.na(c);
         if (null != d) {
@@ -2081,6 +2107,7 @@ function Haxball(options){
           a.nr(b.Bg);
         });
       };
+      */
       this.j.Wa.Qp = function () {
         if (null == b.Ed) b.zr();
         else {
@@ -2091,10 +2118,12 @@ function Haxball(options){
         b.j.Wa.rr(null != b.Ed);
       };
       window.requestAnimationFrame(G(this, this.bf));
+      /*
       this.Gh = window.setInterval(function () {
         b.j.pe.hm(b.sd);
         b.sd = 0;
       }, 1e3);
+      */
       this.Qr = window.setInterval(function () {
         a.C();
       }, 50);
@@ -2132,6 +2161,7 @@ function Haxball(options){
     function Ib(a) {
       this.Yb = a.slice();
     }
+    /*
     function Jb(a, b, c) {
       this.Vk = [];
       this.pl = 5;
@@ -2152,6 +2182,7 @@ function Haxball(options){
       this.Wh = window.performance.now();
       this.uc = -1;
     }
+    */
     function Kb(a) {
       this.Id = a;
     }
@@ -4595,6 +4626,7 @@ function Haxball(options){
     Zb.b = !0;
     Kb.b = !0;
     Kb.prototype = { f: Kb };
+    /*
     Jb.b = !0;
     Jb.ma = V;
     Jb.prototype = C(V.prototype, {
@@ -4661,6 +4693,7 @@ function Haxball(options){
       },
       f: Jb,
     });
+    */
     Ib.b = !0;
     Ib.prototype = {
       eval: function (a) {
@@ -5021,6 +5054,7 @@ function Haxball(options){
       zr: function () {
         this.Ed = new ac(this.ya, 3);
       },
+      /*
       vr: function (a) {
         var b = this;
         a = new gb(a);
@@ -5033,13 +5067,14 @@ function Haxball(options){
         };
         this.j.bb(a.g);
       },
+      */
       ia: function () {
         window.document.removeEventListener("keydown", G(this, this.Bd));
         window.document.removeEventListener("keyup", G(this, this.Cd));
         window.onbeforeunload = null;
         //window.cancelAnimationFrame(this.De);
         this.ob.ia();
-        window.clearInterval(this.Gh);
+        //window.clearInterval(this.Gh);
         window.clearInterval(this.Qr);
         window.clearTimeout(this.Nf);
       },
@@ -5061,7 +5096,7 @@ function Haxball(options){
         var a = window.performance.now();
         (1 == n.A.Fh.L() && 28.333333333333336 > a - this.$c) ||
           ((this.$c = a),
-          this.sd++,
+          //this.sd++,
           this.uf(),
           (a = this.ya.T.na(this.ya.uc)),
           null != a && (this.xi = a.cb),
@@ -5469,7 +5504,7 @@ function Haxball(options){
     u.qp = function () {
       mc.ts();
       x.fj(function () {
-        u.jk(u.xq);
+        //u.jk(u.xq);
         haxball.emit("ready");
       });
       u.hp();
@@ -5498,6 +5533,7 @@ function Haxball(options){
       var a = Xb.Pm();
       return null != a ? null != a.getItem("crappy_router") : !1;
     };
+    /*
     u.jk = function (a) {
       var b = new kb(n.A.fe.L());
       b.cl = function (b) {
@@ -5508,6 +5544,7 @@ function Haxball(options){
       x.La(b.g);
       b.Cb.focus();
     };
+    */
     u.kk = function (a, b) {
       var c = new Q(a);
       c.Va = b;
@@ -5517,11 +5554,15 @@ function Haxball(options){
     };
     u.no = function (a, b) {
       function c() {
+        console.log("Failed");
+        u.xb();
+        /*
         var a = new Ka("Failed", null);
         a.Va = function () {
           u.xb();
         };
         x.La(a.g);
+        */
       }
       function d(b) {
         b = b.sitekey;
@@ -5559,7 +5600,7 @@ function Haxball(options){
         b = a.get("c"),
         c = a.get("p");
       a.get("v");
-      null != b ? (null != c ? u.Dh(b) : u.Pf(b)) : u.xb();
+      null != b ? (/*null != c ? u.Dh(b) : */u.Pf(b)) : u.xb();
     };
     u.xb = function () {
       var a = new Aa(n.A.Lh());
@@ -5580,8 +5621,9 @@ function Haxball(options){
             x.La(a.Ja);
             return (d.Va = null);
           };
-        } else b.vd.Ib ? u.Dh(b.$) : u.Pf(b.$);
+        } else /*b.vd.Ib ? u.Dh(b.$) : */u.Pf(b.$);
       };
+      /*
       a.ws = function () {
         u.oo();
       };
@@ -5594,7 +5636,9 @@ function Haxball(options){
       a.xs = function (a) {
         u.po(a);
       };
+      */
     };
+    /*
     u.mk = function () {
       var a = new aa(!0),
         b = window.document.createElement("div");
@@ -5615,9 +5659,11 @@ function Haxball(options){
         });
       };
     };
+    */
     u.$h = function (a, b) {
       return "" + window.location.origin + "/play?c=" + a + (b ? "&p=1" : "");
     };
+    /*
     u.oo = function () {
       var a = n.A.fe.L(),
         b = new ib("" + a + "'s room");
@@ -5625,7 +5671,7 @@ function Haxball(options){
       b.ci = function () {
         u.xb();
       };
-      /*
+
       // try to insert this into ib's constructor so we will not need to open roomlist to reach this function from outside.
       b.Jp = function (b) {
         function c() {
@@ -5727,7 +5773,7 @@ function Haxball(options){
         internalData.roomPhysicsObj = g;
         haxball.emit("createRoomSucceeded");
       };
-      */
+
       return b; // we have to return this. cannot create this object outside because Jp is not defined in this object's constructor.
     };
     u.Dh = function (a) {
@@ -5778,6 +5824,7 @@ function Haxball(options){
         }
       }
     };
+    */
     u.Pf = function (a, b, c) {
       try {
         var d = u.Bo(),
@@ -5799,8 +5846,10 @@ function Haxball(options){
             cn: d,
             gn: c,
             ds: u.Je,
-          }),
-          h = new jb();
+          })/*,
+          h = new jb()*/;
+        console.log("Connecting to master...");
+        /*
         h.ba("Connecting to master...");
         h.vh.onclick = function () {
           t.Ad = null;
@@ -5809,12 +5858,17 @@ function Haxball(options){
           u.xb();
         };
         x.La(h.g);
+        */
         var m = function (a, b) {
+            console.log(a);
+            u.xb();
+            /*
             var c = new Ka(a, b);
             c.Va = function () {
               u.xb();
             };
             x.La(c.g);
+            */
           },
           p = function () {
             var a = new P("Connection Failed", "", ["Ok"]);
@@ -5870,7 +5924,7 @@ function Haxball(options){
                   });
                   break;
                 case 4101:
-                  null == b ? u.Dh(a) : m(xa.xh(c), null);
+                  /*null == b ? u.Dh(a) : */m(xa.xh(c), null);
                   break;
                 default:
                   m(xa.xh(c), null);
@@ -5883,17 +5937,20 @@ function Haxball(options){
         t.Ad = function (a) {
           switch (a) {
             case 1:
-              h.ba("Connecting to peer...");
+              console.log("Connecting to peer...");
+              //h.ba("Connecting to peer...");
               break;
             case 2:
-              h.ba("Awaiting state...");
+              console.log("Awaiting state...");
+              //h.ba("Awaiting state...");
               break;
             case 3:
               r();
           }
         };
         t.Sp = function () {
-          h.ba("Trying reverse connection...");
+          console.log("Trying reverse connection...");
+          //h.ba("Trying reverse connection...");
         };
       } catch (ic) {
         window.console.log(ic instanceof q ? ic.Ta : ic),
@@ -6028,6 +6085,7 @@ function Haxball(options){
       null != x.Vm && x.Vm.remove();
       null != a && (x.Pg.appendChild(a), (x.Vm = a));
     };
+    /*
     Vb.b = !0;
     Vb.prototype = {
       ia: function () {
@@ -6035,7 +6093,7 @@ function Haxball(options){
         window.document.removeEventListener("keyup", G(this, this.Cd));
         window.onbeforeunload = null;
         //window.cancelAnimationFrame(this.De);
-        window.clearInterval(this.Gh);
+        //window.clearInterval(this.Gh);
       },
       bf: function () {
         this.De = window.requestAnimationFrame(G(this, this.bf));
@@ -6047,7 +6105,7 @@ function Haxball(options){
         var a = window.performance.now();
         (1 == n.A.Fh.L() && 28.333333333333336 > a - this.$c) ||
           ((this.$c = a),
-          this.sd++,
+          //this.sd++,
           this.uf(n.A.Tb.L()),
           0 < this.ya.Fd || this.j.C(this.ya));
       },
@@ -6080,6 +6138,7 @@ function Haxball(options){
       Cd: function () {},
       f: Vb,
     };
+    */
     Fb.b = !0;
     Fb.prototype = {
       Pj: function () {
@@ -6308,22 +6367,24 @@ function Haxball(options){
           });
     };
     internalData.mapStorageObj = Z;
+    /*
     Ub.b = !0;
     Ub.prototype = {
       Tl: function () {
-        //this.c.resume();
+        this.c.resume();
       },
       cd: function (a) {
-        /*var b = this.c.createBufferSource();
+        var b = this.c.createBufferSource();
         b.buffer = a;
         b.connect(this.ag);
-        b.start();*/
+        b.start();
       },
       im: function (a) {
-        //this.ag.gain.value = a;
+        this.ag.gain.value = a;
       },
       f: Ub,
     };
+    */
     Tb.b = !0;
     Tb.prototype = {
       update: function () {
@@ -9899,7 +9960,6 @@ function Haxball(options){
       },
       f: Ea,
     };
-    */
     mb.b = !0;
     mb.prototype = {
       ki: function (a) {
@@ -9937,6 +9997,7 @@ function Haxball(options){
       },
       f: mb,
     };
+    */
     Da.b = !0;
     Da.Yo = function (a) {
       return a.parentElement.querySelector(":hover") == a;
@@ -10089,6 +10150,7 @@ function Haxball(options){
       },
       f: lb,
     };
+    /*
     kb.b = !0;
     kb.prototype = {
       Dc: function () {
@@ -10103,7 +10165,7 @@ function Haxball(options){
     jb.b = !0;
     jb.prototype = {
       ba: function (a) {
-        console.log(a);
+        //console.log(a);
         var b = window.document.createElement("p");
         b.textContent = a;
         this.dc.appendChild(b);
@@ -10127,6 +10189,7 @@ function Haxball(options){
     };
     Ka.b = !0;
     Ka.prototype = { f: Ka };
+    */
     hb.b = !0;
     hb.prototype = {
       Gg: function (a) {
@@ -10219,6 +10282,7 @@ function Haxball(options){
       },
       f: ja,
     };
+    /*
     gb.b = !0;
     gb.prototype = {
       Aj: function (a) {
@@ -10296,7 +10360,6 @@ function Haxball(options){
       },
       f: eb,
     };
-    /*
     Qb.b = !0;
     Qb.prototype = {
       tn: function (a) {
@@ -10317,7 +10380,6 @@ function Haxball(options){
       },
       f: Qb,
     };
-    */
     db.b = !0;
     db.prototype = {
       C: function (a, b) {
@@ -10342,6 +10404,7 @@ function Haxball(options){
       },
       f: db,
     };
+    */
     cb.b = !0;
     cb.prototype = {
       C: function (a, b) {
@@ -10375,9 +10438,9 @@ function Haxball(options){
             (g = this.xd.get(f.V)),
             null == g &&
               ((g = new cb(f)),
-              (g.ff = function (a) {
+              /*(g.ff = function (a) {
                 y.i(e.ff, a);
-              }),
+              }),*/
               this.xd.set(f.V, g),
               this.ab.appendChild(g.g)),
             g.C(f, d),
@@ -10399,6 +10462,7 @@ function Haxball(options){
     };
     Q.b = !0;
     Q.prototype = { f: Q };
+    /*
     ha.b = !0;
     ha.Wk = function (a) {
       a = (a / 1e3) | 0;
@@ -10419,6 +10483,7 @@ function Haxball(options){
       },
       f: bb,
     };
+    */
     ab.b = !0;
     ab.prototype = { f: ab };
     Aa.b = !0;
@@ -10518,6 +10583,7 @@ function Haxball(options){
       },
       f: $a,
     };
+    /*
     Za.b = !0;
     Za.prototype = {
       Dc: function () {
@@ -10529,6 +10595,7 @@ function Haxball(options){
       },
       f: Za,
     };
+    */
     Ya.b = !0;
     Ya.prototype = {
       Th: function (a, b, c, d) {
@@ -10543,9 +10610,9 @@ function Haxball(options){
         b.Kp = function (a) {
           ia.i(e.mg, d, a);
         };
-        b.ff = function (a) {
+        /*b.ff = function (a) {
           y.i(e.ff, a);
-        };
+        };*/
       },
       Tk: function (a) {
         for (var b = [], c = 0; c < a; ) {
@@ -10624,10 +10691,13 @@ function Haxball(options){
       },
       f: Ya,
     };
+    /*
     aa.b = !0;
     aa.prototype = { f: aa };
+    */
     P.b = !0;
     P.prototype = { f: P };
+    /*
     Xa.b = !0;
     Xa.prototype = {
       qr: function (a) {
@@ -10643,6 +10713,7 @@ function Haxball(options){
     };
     Wa.b = !0;
     Wa.prototype = { f: Wa };
+    */
     q.b = !0;
     q.ma = Error;
     q.prototype = C(Error.prototype, { f: q });
@@ -11834,11 +11905,12 @@ function Haxball(options){
     /*
     R.jn = new Ib([0, 0, 2, 1, 0, 0.35, 1, 0, 1, 0, 0.7, 1, 0, 0, 0, 1]);
     R.kn = new Ib([0, -1, 3, 0, 0, 0.35, 0, 0, 0, 0, 0.65, 0, 0, 1, 3, 1]);
-    */
     mb.N =
       "<div class='dialog change-location-view'><h1>Change Location</h1><div class='splitter'><div class='list' data-hook='list'></div><div class='buttons'><button data-hook='change'>Change</button><button data-hook='cancel'>Cancel</button></div></div></div>";
+    */
     Da.N =
       "<div class='chatbox-view'><div data-hook='log' class='log'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class='autocompletebox' data-hook='autocompletebox'></div><div class='input'><input data-hook='input' type='text' /><button data-hook='send'>Send</button></div></div>";
+    /*
     kb.N =
       "<div class='choose-nickname-view'><div class='dialog'><h1>Choose nickname</h1><div class='label-input'><label>Nick:</label><input data-hook='input' type='text' /></div><button data-hook='ok'>Ok</button></div></div>";
     jb.N =
@@ -11847,10 +11919,12 @@ function Haxball(options){
       "<div class='create-room-view'><div class='dialog'><h1>Create room</h1><div class='label-input'><label>Room name:</label><input data-hook='name' required /></div><div class='label-input'><label>Password:</label><input data-hook='pass' /></div><div class='label-input'><label>Max players:</label><select data-hook='max-pl'></select></div><button data-hook='unlisted'></button><div class='row'><button data-hook='cancel'>Cancel</button><button data-hook='create'>Create</button></div></div></div>";
     Ka.N =
       "<div class='disconnected-view'><div class='dialog basic-dialog'><h1>Disconnected</h1><p data-hook='reason'></p><div class='buttons'><button data-hook='ok'>Ok</button><button data-hook='replay'>Save replay</button></div></div></div>";
+    */
     hb.N =
       "<div class='game-state-view'><div class='bar-container'><div class='bar'><div class='scoreboard'><div class='teamicon red'></div><div class='score' data-hook='red-score'>0</div><div>-</div><div class='score' data-hook='blue-score'>0</div><div class='teamicon blue'></div></div><div data-hook='timer'></div></div></div></div></div>";//<div class='canvas' data-hook='canvas'></div></div>";
     ja.N =
       "<div class='game-view' tabindex='-1'><div class='top-section' data-hook='gameplay-section'></div><div class='bottom-section'><div data-hook='stats'></div><div data-hook='chatbox'></div><div class='buttons'><button data-hook='menu'><i class='icon-menu'></i>Menu<span class='tooltip'>Toggle room menu [Escape]</span></button><button data-hook='settings'><i class='icon-cog'></i>Settings</button></div></div><div data-hook='popups'></div></div>";
+    /*
     gb.N =
       "<div class='dialog kick-player-view'><h1 data-hook='title'></h1><div class=label-input><label>Reason: </label><input type='text' data-hook='reason' /></div><button data-hook='ban-btn'><i class='icon-block'></i>Ban from rejoining: <span data-hook='ban-text'></span></button><div class=\"row\"><button data-hook='close'>Cancel</button><button data-hook='kick'>Kick</button></div></div>";
     fb.N =
@@ -11859,31 +11933,40 @@ function Haxball(options){
       "<div class='dialog pick-stadium-view'><h1>Pick a stadium</h1><div class='splitter'><div class='list' data-hook='list'></div><div class='buttons'><button data-hook='pick'>Pick</button><button data-hook='delete'>Delete</button><div class='file-btn'><label for='stadfile'>Load</label><input id='stadfile' type='file' accept='.hbs' data-hook='file'/></div><button data-hook='export'>Export</button><div class='spacer'></div><button data-hook='cancel'>Cancel</button></div></div></div>";
     db.N =
       "<div class='dialog' style='min-width:200px'><h1 data-hook='name'></h1><button data-hook='admin'></button><button data-hook='kick'>Kick</button><button data-hook='close'>Close</button></div>";
+    */
     cb.N =
       "<div class='player-list-item'><div data-hook='flag' class='flagico'></div><div data-hook='name'></div><div data-hook='ping'></div></div>";
     za.N =
       "<div class='player-list-view'><div class='buttons'><button data-hook='join-btn'>Join</button><button data-hook='reset-btn' class='admin-only'></button></div><div class='list' data-hook='list'></div></div>";
+    /*
     ha.N =
       "<div class='replay-controls-view'><button data-hook='reset'><i class='icon-to-start'></i></button><button data-hook='play'><i data-hook='playicon'></i></button><div data-hook='spd'>1x</div><button data-hook='spddn'>-</button><button data-hook='spdup'>+</button><div data-hook='time'>00:00</div><div class='timebar' data-hook='timebar'><div class='barbg'><div class='bar' data-hook='progbar'></div></div><div class='timetooltip' data-hook='timetooltip'></div></div><button data-hook='leave'>Leave</button></div>";
     bb.N =
       "<div class='dialog basic-dialog room-link-view'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook='link' readonly></input><div class='buttons'><button data-hook='close'>Close</button><button data-hook='copy'>Copy to clipboard</button></div></div>";
+    */
     ab.tj =
       "<tr><td><span data-hook='tag'></span><span data-hook='name'></span></td><td data-hook='players'></td><td data-hook='pass'></td><td><div data-hook='flag' class='flagico'></div><span data-hook='distance'></span></td></tr>";
     Aa.tj =
       "<div class='roomlist-view'><div class='notice' data-hook='notice' hidden><div data-hook='notice-contents'>Testing the notice.</div><div data-hook='notice-close'><i class='icon-cancel'></i></div></div><div class='dialog'><h1>Room list</h1><p>Tip: Join rooms near you to reduce lag.</p><div class='splitter'><div class='list'><table class='header'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class='separator'></div><div class='content' data-hook='listscroll'><table><colgroup><col><col><col><col></colgroup><tbody data-hook='list'></tbody></table></div><div class='filters'><span class='bool' data-hook='fil-pass'>Show locked <i></i></span><span class='bool' data-hook='fil-full'>Show full <i></i></span></div></div><div class='buttons'><button data-hook='refresh'><i class='icon-cw'></i><div>Refresh</div></button><button data-hook='join'><i class='icon-login'></i><div>Join Room</div></button><button data-hook='create'><i class='icon-plus'></i><div>Create Room</div></button><div class='spacer'></div><div class='file-btn'><label for='replayfile'><i class='icon-play'></i><div>Replays</div></label><input id='replayfile' type='file' accept='.hbr2' data-hook='replayfile'/></div><button data-hook='settings'><i class='icon-cog'></i><div>Settings</div></button><button data-hook='changenick'><i class='icon-cw'></i><div>Change Nick</div></button></div></div><p data-hook='count'></p></div></div>";
+    /*
     Za.N =
       "<div class='room-password-view'><div class='dialog'><h1>Password required</h1><div class='label-input'><label>Password:</label><input data-hook='input' /></div><div class='buttons'><button data-hook='cancel'>Cancel</button><button data-hook='ok'>Ok</button></div></div></div>";
+    */
     Ya.N =
       "<div class='room-view'><div class='container'><h1 data-hook='room-name'></h1><div class='header-btns'><button data-hook='rec-btn'><i class='icon-circle'></i>Rec</button><button data-hook='link-btn'><i class='icon-link'></i>Link</button><button data-hook='leave-btn'><i class='icon-logout'></i>Leave</button></div><div class='teams'><div class='tools admin-only'><button data-hook='auto-btn'>Auto</button><button data-hook='rand-btn'>Rand</button><button data-hook='lock-btn'>Lock</button><button data-hook='reset-all-btn'>Reset</button></div><div data-hook='red-list'></div><div data-hook='spec-list'></div><div data-hook='blue-list'></div><div class='spacer admin-only'></div></div><div class='settings'><div><label class='lbl'>Time limit</label><select data-hook='time-limit-sel'></select></div><div><label class='lbl'>Score limit</label><select data-hook='score-limit-sel'></select></div><div><label class='lbl'>Stadium</label><label class='val' data-hook='stadium-name'>testing the stadium name</label><button class='admin-only' data-hook='stadium-pick'>Pick</button></div></div><div class='controls admin-only'><button data-hook='start-btn'><i class='icon-play'></i>Start game</button><button data-hook='stop-btn'><i class='icon-stop'></i>Stop game</button><button data-hook='pause-btn'><i class='icon-pause'></i>Pause</button></div></div></div>";
+    /*
     aa.N =
       "<div class='dialog settings-view'><h1>Settings</h1><button data-hook='close'>Close</button><div class='tabs'><button data-hook='soundbtn'>Sound</button><button data-hook='videobtn'>Video</button><button data-hook='inputbtn'>Input</button><button data-hook='miscbtn'>Misc</button></div><div data-hook='presskey' tabindex='-1'><div>Press a key</div></div><div class='tabcontents'><div class='section' data-hook='miscsec'><div class='loc' data-hook='loc'></div><div class='loc' data-hook='loc-ovr'></div><button data-hook='loc-ovr-btn'></button></div><div class='section' data-hook='soundsec'><div data-hook=\"tsound-main\">Sounds enabled</div><div data-hook=\"tsound-chat\">Chat sound enabled</div><div data-hook=\"tsound-highlight\">Nick highlight sound enabled</div><div data-hook=\"tsound-crowd\">Crowd sound enabled</div></div><div class='section' data-hook='inputsec'></div><div class='section' data-hook='videosec'><div>Viewport Mode:<select data-hook='viewmode'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook='fps'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook='resscale'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook=\"tvideo-teamcol\">Custom team colors enabled</div><div data-hook=\"tvideo-showindicators\">Show chat indicators</div><div data-hook=\"tvideo-showavatars\">Show player avatars</div></div></div></div>";
     aa.$l = 0;
+    */
     P.N =
       "<div class='simple-dialog-view'><div class='dialog basic-dialog'><h1 data-hook='title'></h1><p data-hook='content'></p><div class='buttons' data-hook='buttons'></div></div></div>";
+    /*
     Xa.N =
       "<div class='stats-view'><p>Ping: <span data-hook='ping'></span></p><p>Max Ping: <span data-hook='max-ping'></span></p><p>Fps: <span data-hook='fps'></span></p><div data-hook='graph'></div></div>";
     Wa.N =
       '<div class=\'unsupported-browser-view\'><div class=\'dialog\'><h1>Unsupported Browser</h1><p>Sorry! Your browser doesn\'t yet implement some features which are required for HaxBall to work.</p><p>The missing features are: <span data-hook=\'features\'></span></p><h2>Recommended browsers:</h2><div><a href="https://www.mozilla.org/firefox/new/"><img src="images/firefox-icon.png"/>Firefox</a></div><div><a href="https://www.google.com/chrome/"><img src="images/chrome-icon.png"/>Chrome</a></div><div><a href="http://www.opera.com/"><img src="images/opera-icon.png"/>Opera</a></div></div></div>';
+    */
     r.sn = {}.toString;
     u.qp();
   })(
@@ -12486,7 +12569,7 @@ function Room(internalData, plugins){
     }
   };
 
-  this.setCurrentStadium = function(stadium, onError){ // internalData.roomObj?.j?.Wa.Xp() needs update to remove jsdom dependency.
+  this.setCurrentStadium = function(stadium, onError){
     try {
       internalData.roomObj?.j?.og(stadium);
     } catch (k) {
