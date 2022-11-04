@@ -157,6 +157,7 @@ client.on("ready", () => {
     - setExtrapolation(extrapolation): sets the client's extrapolation value in msecs.
     - clearBans(): clears all bans. host-only.
     - setAvatar(avatar): sets the current player's avatar.
+    - setChatIndicatorActive(active): sets the current player's chat indicator status.
     - setTeamColors(team, clear, ...colors): sets the team colors for (team). team: "blue" | "red", clear: boolean, colors: minimum 2 parseable color parameters 
     - setUnlimitedPlayerCount(on): adds or removes player limit control. host-only. on: boolean
     - sendChat(msg, targetId): send chat message(msg) to player(targetId). targetId is null -> send to everyone. targetId is host-only.
@@ -200,7 +201,11 @@ client.on("ready", () => {
     - getPlayerDisc_exp(playerId): get a new and structured disc object for player(playerId). faster than getPlayerDisc, but experimental. use at your own risk.
     - getRoomDataOriginal(): get the most important original objects that has the current room data.
     - getRoomData(extrapolated = true): get a new and structured room data object that has some of the current room data.
+    - getCurrentMap(): get the original object of the current map.
+    - mapChecksum(map): calculate checksum for given map object. returns null for original maps.
     - setPluginActive(name, active): activate/deactivate the plugin(name).
+    - startRecording(): start recording replay data. returns true if succeeded, false otherwise. recording should not be started before calling this.
+    - stopRecording(): stop recording replay data. returns UIntArray8 data if succeeded, null otherwise. recordin should be started before calling this.
     
   - modifier callbacks:
     - \[dataArray, customData\] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth): set player's data just before player has joined the room. dataArray format should be \[modifiedNick, modifiedAvatar, modifiedFlag\]. if dataArray is null, player is not allowed to join. also prepares a custom data object to send to all plugins. customData=false means "don't call callbacks". host-only.
@@ -267,13 +272,23 @@ client.on("ready", () => {
       - onAfterGameStop(byId, customData): game was stopped by player(byId).
       - customData = onBeforePingData(array): ping values for all players was received. may only be triggered by host.
       - onAfterPingData(array, customData): ping values for all players was received. may only be triggered by host.
+      - customData = onBeforeExtrapolationChange(value): extrapolation was set to (value).
+      - onAfterExtrapolationChange(value, customData): extrapolation was set to (value).
+      - customData = onBeforeHandicapChange(value): handicap was set to (value).
+      - onAfterHandicapChange(value, customData): handicap was set to (value).
+      - customData = onBeforeBansClear(): all bans were cleared. host-only.
+      - onAfterBansClear(customData): all bans were cleared. host-only.
+      - customData = onBeforeRoomRecaptchaModeChange(on): room's recaptcha mode was set to (on). host-only.
+      - onAfterRoomRecaptchaModeChange(on, customData): room's recaptcha mode was set to (on). host-only.
+      - customData = onBeforeRoomPropertiesChange(props): room's properties(props) were changed. host-only.
+      - onAfterRoomPropertiesChange(props, customData): room's properties(props) were changed. host-only.
       - customData = onBeforeCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
       - onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
       - customData = onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId): a collision happened between disc(discId1, playerId1) and segment(segmentId).
       - onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
       - customData = onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId): a collision happened between disc(discId1, playerId1) and plane(planeId).
       - onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).
-      - onPluginActiveChange(plugin): a plugin was activated/deactivated.
+    - onPluginActiveChange(plugin): a plugin was activated/deactivated.
 
 - Plugin: A class that defines a plugin. Any plugin should be based on this class.
 
@@ -320,6 +335,11 @@ client.on("ready", () => {
       - onGameStart(byId, customData): game was started by player(byId).
       - onGameStop(byId, customData): game was stopped by player(byId).
       - onPingData(array, customData): ping values for all players was received. may only be triggered by host.
+      - onExtrapolationChange(value, customData): extrapolation was set to (value).
+      - onHandicapChange(value, customData): handicap was set to (value).
+      - onBansClear(customData): all bans were cleared. host-only.
+      - onRoomRecaptchaModeChange(on, customData): room's recaptcha mode was set to (on). host-only.
+      - onRoomPropertiesChange(props, customData): room's properties(props) were changed. host-only.
       - onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
       - onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
       - onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).

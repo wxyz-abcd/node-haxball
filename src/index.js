@@ -68,9 +68,9 @@ qb // ???? !!!NEVER USED!!! DELETE ?
 
 var allEvents = [
   new HaxballEvent(OperationType.SetAvatar, "ra", {value: "zb", ...allEventsCommon}),
-  new HaxballEvent(OperationType.SendChat, "Na", {text: "Tc", ...allEventsCommon}),
+  new HaxballEvent(OperationType.SendChat, "Na", {text: "Tc", targetId: "_TP", ...allEventsCommon}), // targetId can not be modified
   new HaxballEvent(OperationType.SendChatIndicator, "na", {value: "sj", ...allEventsCommon}),
-  new HaxballEvent(OperationType.SendAnnouncement, "rb", {msg: "Tc", color: "color", style: "style", sound: "fn", ...allEventsCommon}),
+  new HaxballEvent(OperationType.SendAnnouncement, "rb", {msg: "Tc", color: "color", style: "style", sound: "fn", targetId: "_TP", ...allEventsCommon}), // targetId can not be modified
   new HaxballEvent(OperationType.SendInput, "Ga", {input: "input", ...allEventsCommon}),
   new HaxballEvent(OperationType.SetStadium, "qa", {stadium: "Pd", ...allEventsCommon}),
   new HaxballEvent(OperationType.StartGame, "Ma", {...allEventsCommon}),
@@ -214,6 +214,8 @@ function Haxball(options){
     teamColorsObj: null,
     announcementObj: null,
     adminChangerObj: null,
+    chatIndicatorObj: null,
+    avatarChangerObj: null,
     createRoom: null,
     kickerObj: null,
     mapObj: null,
@@ -256,6 +258,13 @@ function Haxball(options){
       */
 
       return haxball.room._onOperationReceived(c/*oo[0]*/, msg);
+    },
+    execOperationReceivedOnHost: function(msg, targetId) {
+      if (!internalData.isHost)
+        return;
+      msg.P = 0;
+      msg._TP = targetId; // this can not be modified
+      internalData.onOperationReceived(msg);
     }
   };
 
@@ -382,7 +391,6 @@ function Haxball(options){
       this.wo = a.get("fps");
       //v.xe(a.get("graph"), this.nl.g);
     }
-    */
     function P(a, b, c) {
       var d = this;
       this.g = v.Ga(P.N);
@@ -408,7 +416,6 @@ function Haxball(options){
       this.Vd.textContent = b;
       f.textContent = a;
     }
-    /*
     function aa(a) {
       function b(a) {
         var b = window.document.createElement("div");
@@ -603,9 +610,11 @@ function Haxball(options){
     */
     function Ya(a) {
       this.fk = !1;
+      /*
       this.qm = new za(p.Ia);
       this.Lj = new za(p.xa);
       this.Hl = new za(p.fa);
+      */
       var b = this;
       this.g = v.Ga(Ya.N);
       var c = v.Ea(this.g);
@@ -628,10 +637,10 @@ function Haxball(options){
       this.sm.onclick = function () {
         A.i(b.Xp);
       };
-      */
       this.Th(c.get("red-list"), this.Hl, p.fa, a);
       this.Th(c.get("blue-list"), this.Lj, p.xa, a);
       this.Th(c.get("spec-list"), this.qm, p.Ia, a);
+      */
       this.Uk(this.wf, this.Tk(15));
       this.Uk(this.qf, this.Tk(15));
       this.wf.onchange = function () {
@@ -658,10 +667,10 @@ function Haxball(options){
       this.Rl.onclick = function () {
         null != b.ee && (b.ee(p.xa), b.ee(p.fa));
       };
+      /*
       this.Fl.onclick = function () {
         A.i(b.Qp);
       };
-      /*
       d.onclick = function () {
         A.i(b.Wp);
       };
@@ -697,7 +706,6 @@ function Haxball(options){
       };
       this.C();
     }
-    */
     function $a(a) {
       this.Xk = a.get("notice");
       this.$n = a.get("notice-contents");
@@ -730,7 +738,6 @@ function Haxball(options){
       this.Tm = d.get("join");
       a = d.get("create");
       this.cs = d.get("count");
-      /*
       a.onclick = function () {
         A.i(c.ws);
       };
@@ -752,7 +759,6 @@ function Haxball(options){
           b.readAsArrayBuffer(a);
         }
       };
-      */
       this.fs = b("fil-full");
       this.zs = b("fil-pass");
       this.ns = d.get("listscroll");
@@ -786,7 +792,6 @@ function Haxball(options){
       } catch (k) {}
       9 > a.vd.Id && this.Ja.classList.add("old");
     }
-    /*
     function bb() {
       this.gk = null;
       var a = this;
@@ -871,7 +876,6 @@ function Haxball(options){
         A.i(c.de);
       };
     }
-    */
     function Q(a) {
       var b = this,
         c = new P("Only humans", "", []);
@@ -941,15 +945,12 @@ function Haxball(options){
       this.g.ondragstart = function (a) {
         a.dataTransfer.setData("player", K.ye(b.$));
       };
-      /*
-      this.g.oncontextmenu = function (a) {
-        a.preventDefault();
-        y.i(b.ff, b.$);
-      };
-      */
+      //this.g.oncontextmenu = function (a) {
+        //a.preventDefault();
+        //y.i(b.ff, b.$);
+      //};
       this.em(a.cb);
     }
-    /*
     function db(a, b) {
       var c = this;
       this.g = v.Ga(db.N);
@@ -1091,26 +1092,26 @@ function Haxball(options){
     }
     */
     function ja(a) {
-      this.Fb = new hb();
+      //this.Fb = new hb();
       this.Gd = !1;
       //this.pe = new Xa();
-      this.Qa = new Da();
-      var b = this;
+      //this.Qa = new Da();
+      //var b = this;
       this.Wa = new Ya(a);
-      this.Fb.Nb = a;
+      //this.Fb.Nb = a;
       this.g = v.Ga(ja.N);
       a = v.Ea(this.g);
       this.Jh = a.get("gameplay-section");
       this.hf = a.get("popups");
       this.hf.style.display = "none";
-      v.xe(a.get("chatbox"), this.Qa.g);
+      //v.xe(a.get("chatbox"), this.Qa.g);
       //v.xe(a.get("stats"), this.pe.g);
       this.bi = a.get("menu");
+      /*
       this.bi.onclick = function () {
         b.me(!b.Gd);
         b.bi.blur();
       };
-      /*
       a.get("settings").onclick = function () {
         var a = new aa();
         a.qb = function () {
@@ -1118,9 +1119,7 @@ function Haxball(options){
         };
         b.bb(a.g);
       };
-      */
       this.Jh.appendChild(this.Fb.g);
-      /*
       this.Wa.de = function () {
         var a = new fb();
         a.qb = function (a) {
@@ -1149,6 +1148,7 @@ function Haxball(options){
       };
       */
     }
+    /*
     function Rb() {
       this.Da = 0;
       this.hk = this.ik = !1;
@@ -1164,16 +1164,15 @@ function Haxball(options){
     }
     function hb() {
       this.Nb = -1;
-      this.Eb = new N();
-      this.xc = new Rb();
+      //this.Eb = new N();
+      //this.xc = new Rb();
       this.g = v.Ga(hb.N);
       var a = v.Ea(this.g);
       this.Pb = new Db(a.get("red-score"), 0);
       this.Kb = new Db(a.get("blue-score"), 0);
-      v.xe(a.get("timer"), this.xc.g);
+      //v.xe(a.get("timer"), this.xc.g);
       //v.xe(a.get("canvas"), this.Eb.sa);
     }
-    /*
     function Ka(a, b) {
       var c = this;
       this.g = v.Ga(Ka.N);
@@ -1254,7 +1253,7 @@ function Haxball(options){
           l.Fi(a);
         }
       }
-      x.La(new P("Creating room", "Connecting...", []).g);
+      //x.La(new P("Creating room", "Connecting...", []).g);
       var e = null,
         f = null, // n.A.Lh(),
         g = new fa();
@@ -1288,18 +1287,22 @@ function Haxball(options){
       var t = new ba(l),
         h = !1;
       l.ef = function (a, b) {
+        throw new q("Recaptcha not implemented yet.");
+        /*
         u.kk(a, function (a) {
           b(a);
           x.La(t.j.g);
           return (h = !0);
         });
+        */
       };
       var m = window.setInterval(function () {
         var a = la.la(l);
         l.ra(a);
+        internalData.execOperationReceivedOnHost(a);
       }, 3e3);
       l.$k = function (a) {
-        null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), l.ra(a));
+        null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), l.ra(a), internalData.execOperationReceivedOnHost(a));
       };
       l.Hp = function (a, b, conn, auth) { // receive conn & auth data
         var d = b.ic();
@@ -1314,10 +1317,11 @@ function Haxball(options){
         [d, e, f] = newPlayerData;
         d = oa.la(a, d, e, f, conn, auth);
         l.ra(d);
+        internalData.execOperationReceivedOnHost(d);
         c();
       };
       l.Ip = function (a) {
-        null != g.na(a) && ((a = Y.la(a, null, !1)), l.ra(a));
+        null != g.na(a) && ((a = Y.la(a, null, !1)), l.ra(a), internalData.execOperationReceivedOnHost(a));
       };
       l.kg = function (a) {
         e = a;
@@ -1334,7 +1338,7 @@ function Haxball(options){
       t.j.de = function () {
         l.ia();
         t.ia();
-        u.xb();
+        //u.xb();
         window.clearInterval(m);
         if (internalData.isHost)
           haxball.emit("roomLeave");
@@ -1343,6 +1347,7 @@ function Haxball(options){
         l.Ib = a;
         c();
         null != e && (t.Bg = u.$h(e, null != l.Ib));
+        haxball.room._onRoomPropertiesChange({password: a});
       };
       t.Of.jm = function (a) {
         l.Ei(a);
@@ -1351,22 +1356,24 @@ function Haxball(options){
       t.Of.__srp__ = function (a) {
         if (!a)
           return;
+        var props = {};
         if (a.hasOwnProperty("name"))
-          g.jc = a.name || "";
-        if (a.hasOwnProperty("password")){
-          l.Ib = a.password;
-          c();
-          null != e && (t.Bg = u.$h(e, null != l.Ib));
-        }
+          props.name = g.jc = a.name || "";
+        if (a.hasOwnProperty("password"))
+          props.password = l.Ib = a.password;
         if (a.hasOwnProperty("geo")){
+          props.geo = a.geo;
           f = parseGeo(a.geo);
           k.Kd = f.ub;
         }
         if (a.hasOwnProperty("playerCount"))
-          cpc = a.playerCount;
+          props.playerCount = cpc = a.playerCount;
         if (a.hasOwnProperty("maxPlayerCount"))
-          l.fg = (a.maxPlayerCount==null) ? null : (a.maxPlayerCount - 1);
+          props.maxPlayerCount = l.fg = (a.maxPlayerCount==null) ? null : (a.maxPlayerCount - 1);
         c();
+        if (a.hasOwnProperty("password"))
+          null != e && (t.Bg = u.$h(e, null != l.Ib));
+        haxball.room._onRoomPropertiesChange(props);
       };
       t.Of.__supc__ = function (a) {
         l.upc = a;
@@ -1406,7 +1413,6 @@ function Haxball(options){
       }, 1000);
       this.C();
     }
-    */
     function lb(a, b) {
       this.Hj = [];
       this.Iq = /[#@][^\s@#]*$/;
@@ -1462,7 +1468,6 @@ function Haxball(options){
         b.Bc.Hn(b.gb.value, b.gb.selectionStart);
       };
     }
-    /*
     function mb() {
       this.rf = null;
       var a = this;
@@ -1483,23 +1488,19 @@ function Haxball(options){
         c.update();
       }, 0);
     }
-    */
     function Ea() {
       this.Xf = !1;
       this.w = "";
       this.uh = 0;
       this.Jf = "";
       this.kb = new ka();
-      /*
-      var a = window.document.createElement("canvas");
-      a.width = 64;
-      a.height = 64;
-      this.rb = a.getContext("2d", null);
-      */
+      //var a = window.document.createElement("canvas");
+      //a.width = 64;
+      //a.height = 64;
+      //this.rb = a.getContext("2d", null);
       //this.Ij = this.rb.createPattern(this.rb.canvas, "no-repeat");
       //this.fo();
     }
-    /*
     function Sb() {
       this.xc = 0;
       this.ab = [];
@@ -1514,7 +1515,6 @@ function Haxball(options){
       for (var c = [], d = 0; d < a.length; ) c.push(this.sp(a[d++], b));
       this.We = c;
     }
-    */
     function N() {
       this.$c = window.performance.now();
       this.Jg = new Map();
@@ -1525,16 +1525,15 @@ function Haxball(options){
       this.kf = 1.5;
       this.Ya = new H(0, 0);
       this.Dk = !1;
-      /*
       this.td = new Sb();
       this.sa = window.document.createElement("canvas");
       this.sa.mozOpaque = !0;
       this.c = this.sa.getContext("2d", { alpha: !1 });
-      */
-      /*this.Lo = this.c.createPattern(n.Ko, null);
+      this.Lo = this.c.createPattern(n.Ko, null);
       this.Wn = this.c.createPattern(n.Vn, null);
-      this.Un = this.c.createPattern(n.Tn, null);*/
+      this.Un = this.c.createPattern(n.Tn, null);
     }
+    */
     function B() {
       this.ud = 0;
       this.v = 32;
@@ -2022,43 +2021,50 @@ function Haxball(options){
       //this.sd = 0;
       var b = this;
       this.Of = new ub(a, function (a) {
-        b.j.Qa.Gb(a);
+        //b.j.Qa.Gb(a);
       });
       this.ya = a;
       a.T.ko = function (c) {
-        b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c));
+        b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c), internalData.execOperationReceivedOnHost(c));
       };
       this.j = new ja(a.uc);
       this.Ih = new Gb(this.j, a.T.na(a.uc).w);
       this.Ih.ri(a.T);
-      this.j.Qa.fl = G(this, this.Gp);
-      this.j.Qa.ig = G(this, this.Fp);
-      window.document.addEventListener("keydown", G(this, this.Bd));
-      window.document.addEventListener("keyup", G(this, this.Cd));
-      window.onbeforeunload = function () {
-        return "Are you sure you want to leave the room?";
-      };
+      //this.j.Qa.fl = G(this, this.Gp);
+      //this.j.Qa.ig = G(this, this.Fp);
+      //window.document.addEventListener("keydown", G(this, this.Bd));
+      //window.document.addEventListener("keyup", G(this, this.Cd));
+      //window.onbeforeunload = function () {
+        //return "Are you sure you want to leave the room?";
+      //};
       this.ob.ng = function (b) {
         a.ra(b);
-        //haxball.room?.onInputSent && haxball.room?.onInputSent();
+        internalData.execOperationReceivedOnHost(b);
       };
       this.j.Wa.aq = function (b) {
         b = da.la(1, b);
         a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
       };
       this.j.Wa.Tp = function (b) {
         b = da.la(0, b);
         a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
       };
       this.j.og = function (b) {
         b = qa.la(b);
         a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
       };
       this.j.Wa.Yp = function () {
-        a.ra(new Ma());
+        var msg = new Ma();
+        a.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
       };
       this.j.Wa.Zp = function () {
-        a.ra(new La());
+        var msg = new La();
+        a.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
       };
       this.j.Wa.Mp = function () {
         b.Bm();
@@ -2066,10 +2072,13 @@ function Haxball(options){
       this.j.Wa.mg = function (b, c) {
         var d = S.la(b, c);
         a.ra(d);
+        internalData.execOperationReceivedOnHost(d);
       };
-      this.j.Wa.ee = G(this, this.Wq);
+      this.j.Wa.ee = this.Wq.bind(this); // G(this, this.Wq);
       this.j.Wa.Dp = function () {
-        a.ra(new Qa());
+        var msg = new Qa();
+        a.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
       };
       this.j.Wa.Pp = function () {
         ba.Bq(a);
@@ -2077,6 +2086,7 @@ function Haxball(options){
       this.j.Wa.$p = function (b) {
         b = pa.la(b);
         a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
       };
       /*
       this.j.Wa.ff = function (c) {
@@ -2107,7 +2117,6 @@ function Haxball(options){
           a.nr(b.Bg);
         });
       };
-      */
       this.j.Wa.Qp = function () {
         if (null == b.Ed) b.zr();
         else {
@@ -2116,6 +2125,22 @@ function Haxball(options){
           ba.Yl(a);
         }
         b.j.Wa.rr(null != b.Ed);
+      };
+      */
+      this.j.Wa._Qp_ = function (start) {
+        if (start){
+          if (null != b.Ed)
+            return false;
+          b.zr();
+          return true;
+        }
+        else {
+          if (null == b.Ed)
+            return null;
+          var a = b.Ed.stop();
+          b.Ed = null;
+          return a;
+        }
       };
       window.requestAnimationFrame(G(this, this.bf));
       /*
@@ -2127,13 +2152,13 @@ function Haxball(options){
       this.Qr = window.setInterval(function () {
         a.C();
       }, 50);
-      this.uf();
+      //this.uf();
       var c = n.A.rd.L(),
         c = -200 > c ? -200 : 200 < c ? 200 : c;
       if (0 != c) {
         var d = n.A.rd.L();
         a.gm(d);
-        this.j.Qa.Gb("Extrapolation set to " + c + " msec");
+        //this.j.Qa.Gb("Extrapolation set to " + c + " msec");
       }
     }
     function Ha() {}
@@ -2363,7 +2388,7 @@ function Haxball(options){
       this.value = b;
       a.textContent = "" + b;
     }
-    function Ca() {}
+    //function Ca() {}
     function mc() {}
     function Ba() {}
     function Ja() {}
@@ -3127,6 +3152,7 @@ function Haxball(options){
         a.l(this.nf ? 1 : 0);
         this.X.send(a.Hd());
         this.dm = this.nf;
+        haxball.room._onRoomRecaptchaModeChange(this.nf);
       },
       Bi: function (a, b, c, d) {
         var e = w.ha(32, !1);
@@ -3773,6 +3799,7 @@ function Haxball(options){
         };
       }
     };
+    /*
     Ca.b = !0;
     Ca.ar = function (a, b) {
       Ca.Xl(new Blob([a], { type: "octet/stream" }), b);
@@ -3791,6 +3818,7 @@ function Haxball(options){
       URL.revokeObjectURL(d);
       c.remove();
     };
+    */
     Db.b = !0;
     Db.prototype = {
       set: function (a) {
@@ -4100,12 +4128,14 @@ function Haxball(options){
         return c;
       },
       kr: function (a) {
-        300 < a && (a = 300);
-        0 > a && (a = 0);
+        //300 < a && (a = 300);
+        //0 > a && (a = 0);
         this.bc = (this.Ac * a) | 0;
+        haxball.room._onHandicapChange(a);
       },
       gm: function (a) {
-        this.rd = this.Ac * (-200 > a ? -200 : 200 < a ? 200 : a);
+        this.rd = this.Ac * a;
+        haxball.room._onExtrapolationChange(a);
       },
       f: V,
     });
@@ -4388,6 +4418,7 @@ function Haxball(options){
       Ud: function () {
         this.Ic.Ud();
         this.Kj.clear();
+        haxball.room._onBansClear();
       },
       Fi: function (a) {
         this.Ic.Fi(a);
@@ -4824,6 +4855,7 @@ function Haxball(options){
     Hb.L = function () {
       return Hb.gf(window.location.search);
     };
+    /*
     ub.b = !0;
     ub.cq = function (a) {
       if (3 > a.length) throw new q("Not enough arguments");
@@ -4853,6 +4885,7 @@ function Haxball(options){
       }
       return b;
     };
+    */
     ub.__cq__ = function (team, clear, ...colors) {
       var b = new Pa(),
         c = new ka();
@@ -4882,6 +4915,7 @@ function Haxball(options){
       }
       return b;
     };
+    /*
     ub.prototype = {
       gf: function (a) {
         var b = this;
@@ -4917,7 +4951,7 @@ function Haxball(options){
             break;
           case "colors":
             try {
-              (d = ub.cq(a)), this.ya.ra(d);
+              (d = ub.cq(a)), this.ya.ra(d), internalData.execOperationReceivedOnHost(d);
             } catch (g) {
               (a = g instanceof q ? g.Ta : g), "string" == typeof a && this.ba(a);
             }
@@ -4925,7 +4959,7 @@ function Haxball(options){
           case "extrapolation":
             2 == a.length
               ? ((a = K.parseInt(a[1])),
-                null != a && -200 <= a && 200 >= a
+                null != a // && -200 <= a && 200 >= a
                   ? (n.A.rd.Xa(a),
                     this.ya.gm(a),
                     this.ba("Extrapolation set to " + a + " msec"))
@@ -4937,7 +4971,7 @@ function Haxball(options){
           case "handicap":
             2 == a.length
               ? ((a = K.parseInt(a[1])),
-                null != a && 0 <= a && 300 >= a
+                null != a // && 0 <= a && 300 >= a
                   ? (this.ya.kr(a),
                     this.ba("Ping handicap set to " + a + " msec"))
                   : this.ba(
@@ -4950,11 +4984,11 @@ function Haxball(options){
               this.ba("Usage: /kick_ratelimit <min> <rate> <burst>");
             else {
               var d = K.parseInt(a[1]),
-                e = K.parseInt(a[2]);
+                e = K.parseInt(a[2]), msg;
               a = K.parseInt(a[3]);
               null == d || null == e || null == a
                 ? this.ba("Invalid arguments")
-                : this.ya.ra(ma.la(d, e, a));
+                : (msg = ma.la(d, e, a), this.ya.ra(msg), internalData.execOperationReceivedOnHost(msg));
             }
             break;
           case "recaptcha":
@@ -5010,13 +5044,17 @@ function Haxball(options){
       fm: function (a) {
         null != a && (a = U.Qc(a, 2));
         n.A.sh.Xa(a);
-        this.ya.ra(ra.la(a));
+        var msg = ra.la(a);
+        this.ya.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
       },
       f: ub,
     };
+    */
     internalData.teamColorsObj = ub;
     Ha.b = !0;
     ba.b = !0;
+    /*
     ba.Yl = function (a) {
       var b = new Date();
       Ca.ar(
@@ -5034,6 +5072,7 @@ function Haxball(options){
           "m.hbr2"
       );
     };
+    */
     ba.Bq = function (a) {
       for (var b = a.T.I, c = [], d = 0, e = 0, f = 0; f < b.length; ) {
         var g = b[f];
@@ -5042,13 +5081,14 @@ function Haxball(options){
         g.ea == p.fa ? ++d : g.ea == p.xa && ++e;
       }
       f = c.length;
+      var msg;
       0 != f &&
         ((b = function () {
           return c.splice((Math.random() * c.length) | 0, 1)[0];
         }),
         e == d
-          ? 2 > f || (a.ra(S.la(b(), p.fa)), a.ra(S.la(b(), p.xa)))
-          : ((d = e > d ? p.fa : p.xa), a.ra(S.la(b(), d))));
+          ? 2 > f || (msg = S.la(b(), p.fa), a.ra(msg), internalData.execOperationReceivedOnHost(msg), msg = S.la(b(), p.xa), a.ra(msg), internalData.execOperationReceivedOnHost(msg))
+          : ((d = e > d ? p.fa : p.xa), msg = S.la(b(), d), a.ra(msg), internalData.execOperationReceivedOnHost(msg)));
     };
     ba.prototype = {
       zr: function () {
@@ -5069,9 +5109,9 @@ function Haxball(options){
       },
       */
       ia: function () {
-        window.document.removeEventListener("keydown", G(this, this.Bd));
-        window.document.removeEventListener("keyup", G(this, this.Cd));
-        window.onbeforeunload = null;
+        //window.document.removeEventListener("keydown", G(this, this.Bd));
+        //window.document.removeEventListener("keyup", G(this, this.Cd));
+        //window.onbeforeunload = null;
         //window.cancelAnimationFrame(this.De);
         this.ob.ia();
         //window.clearInterval(this.Gh);
@@ -5084,7 +5124,11 @@ function Haxball(options){
           ++c;
           e.ea == a && b.push(S.la(e.V, p.Ia));
         }
-        for (a = 0; a < b.length; ) this.ya.ra(b[a++]);
+        for (a = 0; a < b.length; ) {
+          var msg = b[a++];
+          this.ya.ra(msg);
+          internalData.execOperationReceivedOnHost(msg);
+        }
       },
       bf: function () {
         this.De = window.requestAnimationFrame(G(this, this.bf));
@@ -5097,11 +5141,12 @@ function Haxball(options){
         (1 == n.A.Fh.L() && 28.333333333333336 > a - this.$c) ||
           ((this.$c = a),
           //this.sd++,
-          this.uf(),
+          //this.uf(),
           (a = this.ya.T.na(this.ya.uc)),
           null != a && (this.xi = a.cb),
           this.j.C(this.ya));
       },
+      /*
       Gp: function (a) {
         var b = this;
         this.Of.gf(a) ||
@@ -5121,16 +5166,25 @@ function Haxball(options){
           }, 1e3)),
           this.bm(this.zh));
       },
+      */
       bm: function (a) {
-        a != this.Ik && (this.ya.ra(na.la(a ? 0 : 1)), (this.Ik = a));
+        var msg;
+        a != this.Ik && (
+          msg = na.la(a ? 0 : 1),
+          this.ya.ra(msg), 
+          (this.Ik = a),
+          internalData.execOperationReceivedOnHost(msg)
+        );
       },
       Bm: function () {
         if (null != this.ya.T.K) {
           var a = new Oa();
           a.Bf = 120 != this.ya.T.K.Oa;
           this.ya.ra(a);
+          internalData.execOperationReceivedOnHost(a);
         }
       },
+      /*
       Bd: function (a) {
         switch (a.keyCode) {
           case 9:
@@ -5179,10 +5233,12 @@ function Haxball(options){
       Cd: function (a) {
         this.ob.Cd(a.code);
       },
+      */
       f: ba,
     };
     Gb.b = !0;
     Gb.prototype = {
+      /*
       Ti: function (a) {
         var b = this.j.Qa.Bc,
           c = [],
@@ -5194,51 +5250,56 @@ function Haxball(options){
         }
         b.Hj = c;
       },
+      */
       ri: function (a) {
+        function xx(){}
+        /*
         function b(a) {
           return null == a ? "" : " by " + a.w;
         }
+        */
         var c = this;
-        this.Ti(a);
+        //this.Ti(a);
+        /*
         a.tl = function (b) {
-          c.j.Qa.Gb("" + b.w + " has joined");
+          //c.j.Qa.Gb("" + b.w + " has joined");
           //n.Na.cd(n.Na.$o);
-          c.Ti(a);
+          //c.Ti(a);
         };
+        */
         a.ul = function (d, e, f, g) {
           y.i(c.Op, d.V);
           null == e
-            ? (d = "" + d.w + " has left")
-            : (vb.i(c.Np, d.V, e, null != g ? g.w : null, f),
+            ? (xx()/*d = "" + d.w + " has left"*/)
+            : (vb.i(c.Np, d.V, e, null != g ? g.w : null, f)/*,
               (d =
                 "" +
                 d.w +
                 " was " +
                 (f ? "banned" : "kicked") +
                 b(g) +
-                ("" != e ? " (" + e + ")" : "")));
-          c.j.Qa.Gb(d);
+                ("" != e ? " (" + e + ")" : ""))*/);
+          //c.j.Qa.Gb(d);
           //n.Na.cd(n.Na.ep);
-          c.Ti(a);
+          //c.Ti(a);
         };
-        function xx(){}
+        /*
         a.rl = function (a, b) {
           var d = null != c.Rh && -1 != b.indexOf(c.Rh);
           c.j.Qa.ba("" + a.w + ": " + b, d ? "highlight" : null);
-          n.A.om.L() && d ? xx()/*n.Na.cd(n.Na.zk)*/ : n.A.Hi.L() && xx()/*n.Na.cd(n.Na.Rj)*/;
+          n.A.om.L() && d ? n.Na.cd(n.Na.zk) : n.A.Hi.L() && n.Na.cd(n.Na.Rj);
         };
         a.Vl = function (a, b, f, g) {
           c.j.Qa.pp(a, b, f);
           if (n.A.Hi.L())
             switch (g) {
               case 1:
-                /*n.Na.cd(n.Na.Rj);*/
+                n.Na.cd(n.Na.Rj);
                 break;
               case 2:
-                /*n.Na.cd(n.Na.zk);*/
+                n.Na.cd(n.Na.zk);
             }
         };
-        /*
         a.ji = function () {
           n.Na.cd(n.Na.bp);
         };
@@ -5252,19 +5313,16 @@ function Haxball(options){
           b.Pa(a == p.fa ? b.Gq : b.Cn);
           c.j.Qa.Gb("" + a.w + " team won the match");
         };
-        */
         a.ml = function (a, e, f) {
           e && !f && c.j.Qa.Gb("Game paused" + b(a));
         };
-        /*
         a.Pi = function () {
           var a = c.j.Fb.Eb.td;
           a.Pa(a.Ar);
         };
-        */
         a.Ki = function (a) {
           c.j.me(!1);
-          //c.j.Fb.Eb.td.Nn();
+          c.j.Fb.Eb.td.Nn();
           c.j.Qa.Gb("Game started" + b(a));
         };
         a.vf = function (a) {
@@ -5307,25 +5365,26 @@ function Haxball(options){
               b(a)
           );
         };
+        */
       },
       Lr: function (a) {
-        a.tl = null;
+        //a.tl = null;
         a.ul = null;
-        a.rl = null;
-        a.Vl = null;
+        //a.rl = null;
+        //a.Vl = null;
         //a.ji = null;
         //a.Ni = null;
         //a.Oi = null;
-        a.ml = null;
+        //a.ml = null;
         //a.Pi = null;
-        a.Ki = null;
-        a.vf = null;
-        a.Ii = null;
-        a.sl = null;
-        a.xl = null;
-        a.ii = null;
-        a.wl = null;
-        a.Hk = null;
+        //a.Ki = null;
+        //a.vf = null;
+        //a.Ii = null;
+        //a.sl = null;
+        //a.xl = null;
+        //a.ii = null;
+        //a.wl = null;
+        //a.Hk = null;
       },
       f: Gb,
     };
@@ -5359,12 +5418,12 @@ function Haxball(options){
           this.ng(b);
         }
       },
-      Bd: function (a) {
+      /*Bd: function (a) {
         this.$d |= Ra.Fk(a);
       },
       Cd: function (a) {
         this.$d &= ~Ra.Fk(a);
-      },
+      },*/
       al: function () {
         if (null != this.ng && 0 != this.Yf) {
           this.Yf = this.$d = 0;
@@ -5544,19 +5603,19 @@ function Haxball(options){
       x.La(b.g);
       b.Cb.focus();
     };
-    */
     u.kk = function (a, b) {
       var c = new Q(a);
       c.Va = b;
       x.La(c.g);
-/*      const solver = new CaptchaSolver('browser');
-      const codes = solver.solve();*/
+      //const solver = new CaptchaSolver('browser');
+      //const codes = solver.solve();
     };
+    */
     u.no = function (a, b) {
       function c() {
-        console.log("Failed");
-        u.xb();
+        //haxball.emit("joinRoomFailed", "Recaptcha Failed");
         /*
+        u.xb();
         var a = new Ka("Failed", null);
         a.Va = function () {
           u.xb();
@@ -5567,11 +5626,14 @@ function Haxball(options){
       function d(b) {
         b = b.sitekey;
         if (null == b) throw new q(null);
+        throw new q("Recaptcha not implemented yet.");
+        /*
         u.kk(b, function (b) {
           e(a, b);
         });
+        */
       }
-      x.La(new P("Connecting", "Connecting...", []).g);
+      //x.La(new P("Connecting", "Connecting...", []).g);
       var e;
       e = function (a, e) {
         M.zl(n.Ee + "api/client", "room=" + a + "&rcr=" + e, M.vj)
@@ -5600,8 +5662,9 @@ function Haxball(options){
         b = a.get("c"),
         c = a.get("p");
       a.get("v");
-      null != b ? (/*null != c ? u.Dh(b) : */u.Pf(b)) : u.xb();
+      null != b && (/*null != c ? u.Dh(b) : */u.Pf(b))/* : u.xb()*/;
     };
+    /*
     u.xb = function () {
       var a = new Aa(n.A.Lh());
       x.La(a.Ja);
@@ -5621,9 +5684,8 @@ function Haxball(options){
             x.La(a.Ja);
             return (d.Va = null);
           };
-        } else /*b.vd.Ib ? u.Dh(b.$) : */u.Pf(b.$);
+        } else b.vd.Ib ? u.Dh(b.$) : u.Pf(b.$);
       };
-      /*
       a.ws = function () {
         u.oo();
       };
@@ -5636,9 +5698,7 @@ function Haxball(options){
       a.xs = function (a) {
         u.po(a);
       };
-      */
     };
-    /*
     u.mk = function () {
       var a = new aa(!0),
         b = window.document.createElement("div");
@@ -5860,9 +5920,9 @@ function Haxball(options){
         x.La(h.g);
         */
         var m = function (a, b) {
-            console.log(a);
-            u.xb();
+          haxball.emit("joinRoomFailed", a);
             /*
+            u.xb();
             var c = new Ka(a, b);
             c.Va = function () {
               u.xb();
@@ -5871,6 +5931,7 @@ function Haxball(options){
             */
           },
           p = function () {
+            /*
             var a = new P("Connection Failed", "", ["Ok"]);
             a.Vd.innerHTML =
               "<p>Failed to connect to room host.</p><p>If this problem persists please see the <a href='https://github.com/haxball/haxball-issues/wiki/Connection-Issues' target='_blank'>troubleshooting guide</a>.</p>";
@@ -5878,6 +5939,7 @@ function Haxball(options){
               u.xb();
             };
             x.La(a.g);
+            */
             haxball.emit("joinRoomFailed", "Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues");
           },
           r = function () {
@@ -5895,7 +5957,7 @@ function Haxball(options){
               t.Ad = null;
               t.ia();
               b.ia();
-              u.xb();
+              //u.xb();
               //haxball.emit("roomLeave");
             };
             t.Ad = function () {
@@ -5953,11 +6015,14 @@ function Haxball(options){
           //h.ba("Trying reverse connection...");
         };
       } catch (ic) {
+        haxball.emit("joinRoomFailed", ic instanceof q ? ic.Ta : ic);
+        /*
         window.console.log(ic instanceof q ? ic.Ta : ic),
           (c = new P("Unexpected Error", "", [])),
           (c.Vd.innerHTML =
             "An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."),
           x.La(c.g);
+        */
       }
     };
     x.b = !0;
@@ -6708,7 +6773,8 @@ function Haxball(options){
             a = 0;
             for (c = b.I; a < c.length; )
               (d = c[a]), ++a, (d.H = null), (d.Jb = 0);
-            null != b.vf && b.vf(null);
+            //null != b.vf && b.vf(null);
+            haxball.room._onGameStop(null);
           }
         }
       },
@@ -8041,7 +8107,7 @@ function Haxball(options){
           }
           this.K.Wo(this);
           /*this.K.Ma.Os = haxball.room?._onGameTick;*/
-          null != this.Ki && this.Ki(a);
+          //null != this.Ki && this.Ki(a);
         }
       },
       Mf: function (a, b, c) {
@@ -8065,7 +8131,7 @@ function Haxball(options){
             }
             b.Jb = d;
           }
-          Cb.i(this.xl, a, b, c);
+          //Cb.i(this.xl, a, b, c);
         }
       },
       na: function (a) {
@@ -8151,7 +8217,7 @@ function Haxball(options){
         this.Zc = 0 > c ? 0 : 255 < c ? 255 : c;
         d = 0 > d ? 0 : 100 < d ? 100 : d;
         this.ce = this.Zc * d;
-        vb.i(this.Hk, a, this.yd, this.Zc, d);
+        //vb.i(this.Hk, a, this.yd, this.Zc, d);
       },
       sc: function () {
         var a = ya.zc,
@@ -8242,7 +8308,7 @@ function Haxball(options){
     ta.prototype = C(m.prototype, {
       apply: function (a) {
         var b = a.na(this.P);
-        null != b && this.Yg != b.Ld && ((b.Ld = this.Yg), y.i(a.sl, b), (
+        null != b && this.Yg != b.Ld && ((b.Ld = this.Yg)/*, y.i(a.sl, b)*/, (
         haxball.room._onPlayerSyncChange(b?.V, this.Yg))); // id, sync
       },
       ua: function (a) {
@@ -8265,9 +8331,9 @@ function Haxball(options){
     rb.ma = m;
     rb.prototype = C(m.prototype, {
       apply: function (a) {
-        0 == this.P && (vb.i(a.Vl, this.Tc, this.color, this.style, this.fn), (
+        0 == this.P && (/*vb.i(a.Vl, this.Tc, this.color, this.style, this.fn),*/
           haxball.room._onAnnouncement(this.Tc, this.color, this.style, this.fn) // msg, color, style, sound
-        ));
+        );
       },
       ua: function (a) {
         a.mc(U.Qc(this.Tc, 1e3));
@@ -8360,8 +8426,8 @@ function Haxball(options){
           null != c &&
             0 != c.V &&
             c.cb != this.Xg &&
-            ((c.cb = this.Xg), null != a.ii && (a.ii(b, c), 
-            haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V))); // id, isAdmin, byId
+            ((c.cb = this.Xg)/*, (null != a.ii && a.ii(b, c))*/, 
+            haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V)); // id, isAdmin, byId
         }
       },
       ua: function (a) {
@@ -8396,6 +8462,7 @@ function Haxball(options){
       },
       f: ra,
     });
+    internalData.avatarChangerObj = ra;
     S.b = !0;
     S.la = function (a, b) {
       var c = new S();
@@ -8436,8 +8503,8 @@ function Haxball(options){
       apply: function (a) {
         if (a.Lb(this.P, 8)) {
           var b = a.na(this.P);
-          null == a.K && ((a.S = this.Pd), null != a.Ii && (a.Ii(b, this.Pd), 
-          haxball.room._onStadiumChange(this.Pd, b?.V))); // map, byId
+          null == a.K && ((a.S = this.Pd), /*(null != a.Ii && a.Ii(b, this.Pd)), */
+          haxball.room._onStadiumChange(this.Pd, b?.V)); // map, byId
         }
       },
       ua: function (a) {
@@ -8513,8 +8580,10 @@ function Haxball(options){
           b.conn = this.conn;
           b.auth = this.auth; // store auth
           a.I.push(b);
+          /*
           a = a.tl;
           null != a && a(b);
+          */
           haxball.room._onPlayerJoin(this.V, this.name, this.cj, this.Xb, this.conn, this.auth); // id, name, flag, avatar, conn, auth
         }
       },
@@ -8561,7 +8630,7 @@ function Haxball(options){
             e = 0 < b.Oa;
           this.Bf ? (b.Oa = 120) : 120 == b.Oa && (b.Oa = 119);
           //console.log(a); // FIX ME: a.hc!=-1 at latest call.
-          d != this.Bf && (Cb.i(a.ml, c, this.Bf, e), 
+          d != this.Bf && (/*Cb.i(a.ml, c, this.Bf, e), */
           a.hc>0 && haxball.room._onGamePauseChange(this.Bf, c?.V)); // paused, byId
         }
       },
@@ -8585,7 +8654,7 @@ function Haxball(options){
       },
       apply: function (a) {
         var b = a.na(this.P);
-        null != b && (ia.i(a.rl, b, this.Tc), 
+        null != b && (/*ia.i(a.rl, b, this.Tc), */
         haxball.room._onPlayerChat(this.P, this.Tc)); // id, message
       },
       ua: function (a) {
@@ -8629,7 +8698,7 @@ function Haxball(options){
     na.prototype = C(m.prototype, {
       apply: function (a) {
         var b = a.na(this.P);
-        null != b && (ia.i(a.wl, b, this.sj), 
+        null != b && (/*ia.i(a.wl, b, this.sj), */
         haxball.room._onPlayerChatIndicatorChange(b?.V, !this.sj)); // id, value
       },
       ua: function (a) {
@@ -8640,6 +8709,7 @@ function Haxball(options){
       },
       f: na,
     });
+    internalData.chatIndicatorObj = na;
     kc.b = !0;
     kc.fj = function () {
       m.Ha(rb);
@@ -8886,7 +8956,7 @@ function Haxball(options){
               e.Jb = 0;
             }
             internalData.roomObj?.ob.al();
-            null != a.vf && a.vf(b);
+            //null != a.vf && a.vf(b);
             haxball.room._onGameStop(b?.V);  //byId
           }
         }
@@ -9416,6 +9486,7 @@ function Haxball(options){
       },
       f: B,
     };
+    /*
     N.b = !0;
     N.lc = function (a) {
       return (
@@ -9424,12 +9495,10 @@ function Haxball(options){
         ",255)"
       );
     };
-    /*
     N.Gi = function (a, b) {
       a.imageSmoothingEnabled = b;
       a.mozImageSmoothingEnabled = b;
     };
-    */
     N.prototype = {
       Po: function (a, b) {
         var c = this.dd.get(a.V);
@@ -9442,7 +9511,6 @@ function Haxball(options){
               c.Xf = !1;
           }
       },
-      /*
       Pr: function () {
         if (null != this.sa.parentElement) {
           var a = window.devicePixelRatio * this.zg,
@@ -9783,7 +9851,6 @@ function Haxball(options){
         this.c.fill();
         this.c.restore();
       },
-      */
       Xq: function () {
         for (var a = this.dd.values(), b = a.next(); !b.done; ) {
           var c = b.value,
@@ -9793,7 +9860,6 @@ function Haxball(options){
       },
       f: N,
     };
-    /*
     R.b = !0;
     R.prototype = {
       zo: function () {
@@ -9997,7 +10063,6 @@ function Haxball(options){
       },
       f: mb,
     };
-    */
     Da.b = !0;
     Da.Yo = function (a) {
       return a.parentElement.querySelector(":hover") == a;
@@ -10150,7 +10215,6 @@ function Haxball(options){
       },
       f: lb,
     };
-    /*
     kb.b = !0;
     kb.prototype = {
       Dc: function () {
@@ -10189,7 +10253,6 @@ function Haxball(options){
     };
     Ka.b = !0;
     Ka.prototype = { f: Ka };
-    */
     hb.b = !0;
     hb.prototype = {
       Gg: function (a) {
@@ -10198,12 +10261,13 @@ function Haxball(options){
       C: function (a) {
         var b = a.K;
         null != b &&
-          (this.xc.tr(60 * a.Da),
-          this.xc.sr(b.Hc | 0),
+          (//this.xc.tr(60 * a.Da),
+          //this.xc.sr(b.Hc | 0),
           this.Kb.set(b.Kb),
           this.Pb.set(b.Pb),
-          internalData.extrapolatedRoomPhysicsObj = a/*,
-          this.Eb.Kc(a, this.Nb)*/);
+          internalData.extrapolatedRoomPhysicsObj = a
+          //,this.Eb.Kc(a, this.Nb)
+          );
       },
       f: hb,
     };
@@ -10252,22 +10316,25 @@ function Haxball(options){
       },
       f: Rb,
     };
+    */
     ja.b = !0;
     ja.prototype = {
       C: function (a) {
-        null == a.T.K && this.me(!0);
+        //null == a.T.K && this.me(!0);
         A.i(this.yl);
         this.bi.disabled = null == a.T.K;
         this.Gd
           ? this.Wa.C(a.T, a.T.na(a.uc))
-          : ((a = a.Sf()), this.Fb.C(a)/*, n.Na.Xj?.Ls(a)*/);
+          : ((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a)/*, this.Fb.C(a), n.Na.Xj?.Ls(a)*/);
       },
+      /*
       me: function (a) {
         this.Gd != a &&
           ((this.Gd = a)
             ? (this.Jh.appendChild(this.Wa.g), this.Fb.g.remove())
             : (this.Jh.appendChild(this.Fb.g), this.Wa.g.remove()));
       },
+      */
       Zo: function () {
         return null != ja.kq;
       },
@@ -10404,7 +10471,6 @@ function Haxball(options){
       },
       f: db,
     };
-    */
     cb.b = !0;
     cb.prototype = {
       C: function (a, b) {
@@ -10438,9 +10504,9 @@ function Haxball(options){
             (g = this.xd.get(f.V)),
             null == g &&
               ((g = new cb(f)),
-              /*(g.ff = function (a) {
-                y.i(e.ff, a);
-              }),*/
+              //(g.ff = function (a) {
+                //y.i(e.ff, a);
+              //}),
               this.xd.set(f.V, g),
               this.ab.appendChild(g.g)),
             g.C(f, d),
@@ -10462,7 +10528,6 @@ function Haxball(options){
     };
     Q.b = !0;
     Q.prototype = { f: Q };
-    /*
     ha.b = !0;
     ha.Wk = function (a) {
       a = (a / 1e3) | 0;
@@ -10483,7 +10548,6 @@ function Haxball(options){
       },
       f: bb,
     };
-    */
     ab.b = !0;
     ab.prototype = { f: ab };
     Aa.b = !0;
@@ -10583,7 +10647,6 @@ function Haxball(options){
       },
       f: $a,
     };
-    /*
     Za.b = !0;
     Za.prototype = {
       Dc: function () {
@@ -10649,6 +10712,7 @@ function Haxball(options){
         this.qf.selectedIndex = a.ib;
         this.rm.textContent = a.S.w;
         this.rm.classList.toggle("custom", !a.S.Pe());
+        /*
         var e = a.Pc;
         this.Hl.C(
           a.I.filter(function (a) {
@@ -10674,6 +10738,7 @@ function Haxball(options){
           d,
           c
         );
+        */
         this.Rl.disabled = d;
         this.Xh != a.Pc && this.Bj(a.Pc);
         d && ((c = 120 == a.K.Oa), this.ll != c && this.Cj(c));
@@ -10694,10 +10759,8 @@ function Haxball(options){
     /*
     aa.b = !0;
     aa.prototype = { f: aa };
-    */
     P.b = !0;
     P.prototype = { f: P };
-    /*
     Xa.b = !0;
     Xa.prototype = {
       qr: function (a) {
@@ -10904,962 +10967,11 @@ function Haxball(options){
     ];
     M.vj = "application/x-www-form-urlencoded";
     Ha.ab = [
-      "Afghanistan",
-      "AF",
-      33.3,
-      65.1,
-      "Albania",
-      "AL",
-      41.1,
-      20.1,
-      "Algeria",
-      "DZ",
-      28,
-      1.6,
-      "American Samoa",
-      "AS",
-      -14.2,
-      -170.1,
-      "Andorra",
-      "AD",
-      42.5,
-      1.6,
-      "Angola",
-      "AO",
-      -11.2,
-      17.8,
-      "Anguilla",
-      "AI",
-      18.2,
-      -63,
-      "Antigua and Barbuda",
-      "AG",
-      17,
-      -61.7,
-      "Argentina",
-      "AR",
-      -34.5,
-      -58.4,
-      "Armenia",
-      "AM",
-      40,
-      45,
-      "Aruba",
-      "AW",
-      12.5,
-      -69.9,
-      "Australia",
-      "AU",
-      -25.2,
-      133.7,
-      "Austria",
-      "AT",
-      47.5,
-      14.5,
-      "Azerbaijan",
-      "AZ",
-      40.1,
-      47.5,
-      "Bahamas",
-      "BS",
-      25,
-      -77.3,
-      "Bahrain",
-      "BH",
-      25.9,
-      50.6,
-      "Bangladesh",
-      "BD",
-      23.6,
-      90.3,
-      "Barbados",
-      "BB",
-      13.1,
-      -59.5,
-      "Belarus",
-      "BY",
-      53.7,
-      27.9,
-      "Belgium",
-      "BE",
-      50.5,
-      4.4,
-      "Belize",
-      "BZ",
-      17.1,
-      -88.4,
-      "Benin",
-      "BJ",
-      9.3,
-      2.3,
-      "Bermuda",
-      "BM",
-      32.3,
-      -64.7,
-      "Bhutan",
-      "BT",
-      27.5,
-      90.4,
-      "Bolivia",
-      "BO",
-      -16.2,
-      -63.5,
-      "Bosnia and Herzegovina",
-      "BA",
-      43.9,
-      17.6,
-      "Botswana",
-      "BW",
-      -22.3,
-      24.6,
-      "Bouvet Island",
-      "BV",
-      -54.4,
-      3.4,
-      "Brazil",
-      "BR",
-      -14.2,
-      -51.9,
-      "British Indian Ocean Territory",
-      "IO",
-      -6.3,
-      71.8,
-      "British Virgin Islands",
-      "VG",
-      18.4,
-      -64.6,
-      "Brunei",
-      "BN",
-      4.5,
-      114.7,
-      "Bulgaria",
-      "BG",
-      42.7,
-      25.4,
-      "Burkina Faso",
-      "BF",
-      12.2,
-      -1.5,
-      "Burundi",
-      "BI",
-      -3.3,
-      29.9,
-      "Cambodia",
-      "KH",
-      12.5,
-      104.9,
-      "Cameroon",
-      "CM",
-      7.3,
-      12.3,
-      "Canada",
-      "CA",
-      56.1,
-      -106.3,
-      "Cape Verde",
-      "CV",
-      16,
-      -24,
-      "Cayman Islands",
-      "KY",
-      19.5,
-      -80.5,
-      "Central African Republic",
-      "CF",
-      6.6,
-      20.9,
-      "Chad",
-      "TD",
-      15.4,
-      18.7,
-      "Chile",
-      "CL",
-      -35.6,
-      -71.5,
-      "China",
-      "CN",
-      35.8,
-      104.1,
-      "Christmas Island",
-      "CX",
-      -10.4,
-      105.6,
-      "Colombia",
-      "CO",
-      4.5,
-      -74.2,
-      "Comoros",
-      "KM",
-      -11.8,
-      43.8,
-      "Congo [DRC]",
-      "CD",
-      -4,
-      21.7,
-      "Congo [Republic]",
-      "CG",
-      -0.2,
-      15.8,
-      "Cook Islands",
-      "CK",
-      -21.2,
-      -159.7,
-      "Costa Rica",
-      "CR",
-      9.7,
-      -83.7,
-      "Croatia",
-      "HR",
-      45.1,
-      15.2,
-      "Cuba",
-      "CU",
-      21.5,
-      -77.7,
-      "Cyprus",
-      "CY",
-      35.1,
-      33.4,
-      "Czech Republic",
-      "CZ",
-      49.8,
-      15.4,
-      "C\u00f4te d'Ivoire",
-      "CI",
-      7.5,
-      -5.5,
-      "Denmark",
-      "DK",
-      56.2,
-      9.5,
-      "Djibouti",
-      "DJ",
-      11.8,
-      42.5,
-      "Dominica",
-      "DM",
-      15.4,
-      -61.3,
-      "Dominican Republic",
-      "DO",
-      18.7,
-      -70.1,
-      "Ecuador",
-      "EC",
-      -1.8,
-      -78.1,
-      "Egypt",
-      "EG",
-      26.8,
-      30.8,
-      "El Salvador",
-      "SV",
-      13.7,
-      -88.8,
-      "England",
-      "ENG",
-      55.3,
-      -3.4,
-      "Equatorial Guinea",
-      "GQ",
-      1.6,
-      10.2,
-      "Eritrea",
-      "ER",
-      15.1,
-      39.7,
-      "Estonia",
-      "EE",
-      58.5,
-      25,
-      "Ethiopia",
-      "ET",
-      9.1,
-      40.4,
-      "Faroe Islands",
-      "FO",
-      61.8,
-      -6.9,
-      "Fiji",
-      "FJ",
-      -16.5,
-      179.4,
-      "Finland",
-      "FI",
-      61.9,
-      25.7,
-      "France",
-      "FR",
-      46.2,
-      2.2,
-      "French Guiana",
-      "GF",
-      3.9,
-      -53.1,
-      "French Polynesia",
-      "PF",
-      -17.6,
-      -149.4,
-      "Gabon",
-      "GA",
-      -0.8,
-      11.6,
-      "Gambia",
-      "GM",
-      13.4,
-      -15.3,
-      "Georgia",
-      "GE",
-      42.3,
-      43.3,
-      "Germany",
-      "DE",
-      51.1,
-      10.4,
-      "Ghana",
-      "GH",
-      7.9,
-      -1,
-      "Gibraltar",
-      "GI",
-      36.1,
-      -5.3,
-      "Greece",
-      "GR",
-      39,
-      21.8,
-      "Greenland",
-      "GL",
-      71.7,
-      -42.6,
-      "Grenada",
-      "GD",
-      12.2,
-      -61.6,
-      "Guadeloupe",
-      "GP",
-      16.9,
-      -62,
-      "Guam",
-      "GU",
-      13.4,
-      144.7,
-      "Guatemala",
-      "GT",
-      15.7,
-      -90.2,
-      "Guinea",
-      "GN",
-      9.9,
-      -9.6,
-      "Guinea-Bissau",
-      "GW",
-      11.8,
-      -15.1,
-      "Guyana",
-      "GY",
-      4.8,
-      -58.9,
-      "Haiti",
-      "HT",
-      18.9,
-      -72.2,
-      "Honduras",
-      "HN",
-      15.1,
-      -86.2,
-      "Hong Kong",
-      "HK",
-      22.3,
-      114.1,
-      "Hungary",
-      "HU",
-      47.1,
-      19.5,
-      "Iceland",
-      "IS",
-      64.9,
-      -19,
-      "India",
-      "IN",
-      20.5,
-      78.9,
-      "Indonesia",
-      "ID",
-      -0.7,
-      113.9,
-      "Iran",
-      "IR",
-      32.4,
-      53.6,
-      "Iraq",
-      "IQ",
-      33.2,
-      43.6,
-      "Ireland",
-      "IE",
-      53.4,
-      -8.2,
-      "Israel",
-      "IL",
-      31,
-      34.8,
-      "Italy",
-      "IT",
-      41.8,
-      12.5,
-      "Jamaica",
-      "JM",
-      18.1,
-      -77.2,
-      "Japan",
-      "JP",
-      36.2,
-      138.2,
-      "Jordan",
-      "JO",
-      30.5,
-      36.2,
-      "Kazakhstan",
-      "KZ",
-      48,
-      66.9,
-      "Kenya",
-      "KE",
-      -0,
-      37.9,
-      "Kiribati",
-      "KI",
-      -3.3,
-      -168.7,
-      "Kosovo",
-      "XK",
-      42.6,
-      20.9,
-      "Kuwait",
-      "KW",
-      29.3,
-      47.4,
-      "Kyrgyzstan",
-      "KG",
-      41.2,
-      74.7,
-      "Laos",
-      "LA",
-      19.8,
-      102.4,
-      "Latvia",
-      "LV",
-      56.8,
-      24.6,
-      "Lebanon",
-      "LB",
-      33.8,
-      35.8,
-      "Lesotho",
-      "LS",
-      -29.6,
-      28.2,
-      "Liberia",
-      "LR",
-      6.4,
-      -9.4,
-      "Libya",
-      "LY",
-      26.3,
-      17.2,
-      "Liechtenstein",
-      "LI",
-      47.1,
-      9.5,
-      "Lithuania",
-      "LT",
-      55.1,
-      23.8,
-      "Luxembourg",
-      "LU",
-      49.8,
-      6.1,
-      "Macau",
-      "MO",
-      22.1,
-      113.5,
-      "Macedonia [FYROM]",
-      "MK",
-      41.6,
-      21.7,
-      "Madagascar",
-      "MG",
-      -18.7,
-      46.8,
-      "Malawi",
-      "MW",
-      -13.2,
-      34.3,
-      "Malaysia",
-      "MY",
-      4.2,
-      101.9,
-      "Maldives",
-      "MV",
-      3.2,
-      73.2,
-      "Mali",
-      "ML",
-      17.5,
-      -3.9,
-      "Malta",
-      "MT",
-      35.9,
-      14.3,
-      "Marshall Islands",
-      "MH",
-      7.1,
-      171.1,
-      "Martinique",
-      "MQ",
-      14.6,
-      -61,
-      "Mauritania",
-      "MR",
-      21,
-      -10.9,
-      "Mauritius",
-      "MU",
-      -20.3,
-      57.5,
-      "Mayotte",
-      "YT",
-      -12.8,
-      45.1,
-      "Mexico",
-      "MX",
-      23.6,
-      -102.5,
-      "Micronesia",
-      "FM",
-      7.4,
-      150.5,
-      "Moldova",
-      "MD",
-      47.4,
-      28.3,
-      "Monaco",
-      "MC",
-      43.7,
-      7.4,
-      "Mongolia",
-      "MN",
-      46.8,
-      103.8,
-      "Montenegro",
-      "ME",
-      42.7,
-      19.3,
-      "Montserrat",
-      "MS",
-      16.7,
-      -62.1,
-      "Morocco",
-      "MA",
-      31.7,
-      -7,
-      "Mozambique",
-      "MZ",
-      -18.6,
-      35.5,
-      "Myanmar [Burma]",
-      "MM",
-      21.9,
-      95.9,
-      "Namibia",
-      "NA",
-      -22.9,
-      18.4,
-      "Nauru",
-      "NR",
-      -0.5,
-      166.9,
-      "Nepal",
-      "NP",
-      28.3,
-      84.1,
-      "Netherlands",
-      "NL",
-      52.1,
-      5.2,
-      "Netherlands Antilles",
-      "AN",
-      12.2,
-      -69,
-      "New Caledonia",
-      "NC",
-      -20.9,
-      165.6,
-      "New Zealand",
-      "NZ",
-      -40.9,
-      174.8,
-      "Nicaragua",
-      "NI",
-      12.8,
-      -85.2,
-      "Niger",
-      "NE",
-      17.6,
-      8,
-      "Nigeria",
-      "NG",
-      9,
-      8.6,
-      "Niue",
-      "NU",
-      -19,
-      -169.8,
-      "Norfolk Island",
-      "NF",
-      -29,
-      167.9,
-      "North Korea",
-      "KP",
-      40.3,
-      127.5,
-      "Northern Mariana Islands",
-      "MP",
-      17.3,
-      145.3,
-      "Norway",
-      "NO",
-      60.4,
-      8.4,
-      "Oman",
-      "OM",
-      21.5,
-      55.9,
-      "Pakistan",
-      "PK",
-      30.3,
-      69.3,
-      "Palau",
-      "PW",
-      7.5,
-      134.5,
-      "Palestinian Territories",
-      "PS",
-      31.9,
-      35.2,
-      "Panama",
-      "PA",
-      8.5,
-      -80.7,
-      "Papua New Guinea",
-      "PG",
-      -6.3,
-      143.9,
-      "Paraguay",
-      "PY",
-      -23.4,
-      -58.4,
-      "Peru",
-      "PE",
-      -9.1,
-      -75,
-      "Philippines",
-      "PH",
-      12.8,
-      121.7,
-      "Pitcairn Islands",
-      "PN",
-      -24.7,
-      -127.4,
-      "Poland",
-      "PL",
-      51.9,
-      19.1,
-      "Portugal",
-      "PT",
-      39.3,
-      -8.2,
-      "Puerto Rico",
-      "PR",
-      18.2,
-      -66.5,
-      "Qatar",
-      "QA",
-      25.3,
-      51.1,
-      "Romania",
-      "RO",
-      45.9,
-      24.9,
-      "Russia",
-      "RU",
-      61.5,
-      105.3,
-      "Rwanda",
-      "RW",
-      -1.9,
-      29.8,
-      "R\u00e9union",
-      "RE",
-      -21.1,
-      55.5,
-      "Saint Helena",
-      "SH",
-      -24.1,
-      -10,
-      "Saint Kitts",
-      "KN",
-      17.3,
-      -62.7,
-      "Saint Lucia",
-      "LC",
-      13.9,
-      -60.9,
-      "Saint Pierre",
-      "PM",
-      46.9,
-      -56.2,
-      "Saint Vincent",
-      "VC",
-      12.9,
-      -61.2,
-      "Samoa",
-      "WS",
-      -13.7,
-      -172.1,
-      "San Marino",
-      "SM",
-      43.9,
-      12.4,
-      "Saudi Arabia",
-      "SA",
-      23.8,
-      45,
-      "Scotland",
-      "SCT",
-      56.5,
-      4.2,
-      "Senegal",
-      "SN",
-      14.4,
-      -14.4,
-      "Serbia",
-      "RS",
-      44,
-      21,
-      "Seychelles",
-      "SC",
-      -4.6,
-      55.4,
-      "Sierra Leone",
-      "SL",
-      8.4,
-      -11.7,
-      "Singapore",
-      "SG",
-      1.3,
-      103.8,
-      "Slovakia",
-      "SK",
-      48.6,
-      19.6,
-      "Slovenia",
-      "SI",
-      46.1,
-      14.9,
-      "Solomon Islands",
-      "SB",
-      -9.6,
-      160.1,
-      "Somalia",
-      "SO",
-      5.1,
-      46.1,
-      "South Africa",
-      "ZA",
-      -30.5,
-      22.9,
-      "South Georgia",
-      "GS",
-      -54.4,
-      -36.5,
-      "South Korea",
-      "KR",
-      35.9,
-      127.7,
-      "Spain",
-      "ES",
-      40.4,
-      -3.7,
-      "Sri Lanka",
-      "LK",
-      7.8,
-      80.7,
-      "Sudan",
-      "SD",
-      12.8,
-      30.2,
-      "Suriname",
-      "SR",
-      3.9,
-      -56,
-      "Svalbard and Jan Mayen",
-      "SJ",
-      77.5,
-      23.6,
-      "Swaziland",
-      "SZ",
-      -26.5,
-      31.4,
-      "Sweden",
-      "SE",
-      60.1,
-      18.6,
-      "Switzerland",
-      "CH",
-      46.8,
-      8.2,
-      "Syria",
-      "SY",
-      34.8,
-      38.9,
-      "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
-      "ST",
-      0.1,
-      6.6,
-      "Taiwan",
-      "TW",
-      23.6,
-      120.9,
-      "Tajikistan",
-      "TJ",
-      38.8,
-      71.2,
-      "Tanzania",
-      "TZ",
-      -6.3,
-      34.8,
-      "Thailand",
-      "TH",
-      15.8,
-      100.9,
-      "Timor-Leste",
-      "TL",
-      -8.8,
-      125.7,
-      "Togo",
-      "TG",
-      8.6,
-      0.8,
-      "Tokelau",
-      "TK",
-      -8.9,
-      -171.8,
-      "Tonga",
-      "TO",
-      -21.1,
-      -175.1,
-      "Trinidad and Tobago",
-      "TT",
-      10.6,
-      -61.2,
-      "Tunisia",
-      "TN",
-      33.8,
-      9.5,
-      "Turkey",
-      "TR",
-      38.9,
-      35.2,
-      "Turkmenistan",
-      "TM",
-      38.9,
-      59.5,
-      "Turks and Caicos Islands",
-      "TC",
-      21.6,
-      -71.7,
-      "Tuvalu",
-      "TV",
-      -7.1,
-      177.6,
-      "U.S. Minor Outlying Islands",
-      "UM",
-      0,
-      0,
-      "U.S. Virgin Islands",
-      "VI",
-      18.3,
-      -64.8,
-      "Uganda",
-      "UG",
-      1.3,
-      32.2,
-      "Ukraine",
-      "UA",
-      48.3,
-      31.1,
-      "United Arab Emirates",
-      "AE",
-      23.4,
-      53.8,
-      "United Kingdom",
-      "GB",
-      55.3,
-      -3.4,
-      "United States",
-      "US",
-      37,
-      -95.7,
-      "Uruguay",
-      "UY",
-      -32.5,
-      -55.7,
-      "Uzbekistan",
-      "UZ",
-      41.3,
-      64.5,
-      "Vanuatu",
-      "VU",
-      -15.3,
-      166.9,
-      "Vatican City",
-      "VA",
-      41.9,
-      12.4,
-      "Venezuela",
-      "VE",
-      6.4,
-      -66.5,
-      "Vietnam",
-      "VN",
-      14,
-      108.2,
-      "Wales",
-      "WLS",
-      55.3,
-      -3.4,
-      "Wallis and Futuna",
-      "WF",
-      -13.7,
-      -177.1,
-      "Western Sahara",
-      "EH",
-      24.2,
-      -12.8,
-      "Yemen",
-      "YE",
-      15.5,
-      48.5,
-      "Zambia",
-      "ZM",
-      -13.1,
-      27.8,
-      "Zimbabwe",
-      "ZW",
-      -19,
-      29.1,
+      "Afghanistan","AF",33.3,65.1,"Albania","AL",41.1,20.1,"Algeria","DZ",28,1.6,"American Samoa","AS",-14.2,-170.1,"Andorra","AD",42.5,1.6,"Angola","AO",-11.2,17.8,"Anguilla","AI",18.2,-63,"Antigua and Barbuda","AG",17,-61.7,"Argentina","AR",-34.5,-58.4,"Armenia","AM",40,45,"Aruba","AW",12.5,-69.9,"Australia","AU",-25.2,133.7,"Austria","AT",47.5,14.5,"Azerbaijan","AZ",40.1,47.5,"Bahamas","BS",25,-77.3,"Bahrain","BH",25.9,50.6,"Bangladesh","BD",23.6,90.3,"Barbados","BB",13.1,-59.5,"Belarus","BY",53.7,27.9,"Belgium","BE",50.5,4.4,"Belize","BZ",17.1,-88.4,"Benin","BJ",9.3,2.3,"Bermuda","BM",32.3,-64.7,"Bhutan","BT",27.5,90.4,"Bolivia","BO",-16.2,-63.5,"Bosnia and Herzegovina","BA",43.9,17.6,"Botswana","BW",-22.3,24.6,"Bouvet Island","BV",-54.4,3.4,"Brazil","BR",-14.2,-51.9,"British Indian Ocean Territory","IO",-6.3,71.8,"British Virgin Islands","VG",18.4,-64.6,"Brunei","BN",4.5,114.7,"Bulgaria","BG",42.7,25.4,"Burkina Faso","BF",12.2,-1.5,"Burundi","BI",-3.3,29.9,"Cambodia","KH",12.5,104.9,"Cameroon","CM",7.3,12.3,"Canada","CA",56.1,-106.3,"Cape Verde","CV",16,-24,"Cayman Islands","KY",19.5,-80.5,"Central African Republic","CF",6.6,20.9,"Chad","TD",15.4,18.7,"Chile","CL",-35.6,-71.5,"China","CN",35.8,104.1,"Christmas Island","CX",-10.4,105.6,"Colombia","CO",4.5,-74.2,"Comoros","KM",-11.8,43.8,"Congo [DRC]","CD",-4,21.7,"Congo [Republic]","CG",-0.2,15.8,"Cook Islands","CK",-21.2,-159.7,"Costa Rica","CR",9.7,-83.7,"Croatia","HR",45.1,15.2,"Cuba","CU",21.5,-77.7,"Cyprus","CY",35.1,33.4,"Czech Republic","CZ",49.8,15.4,"Côte d'Ivoire","CI",7.5,-5.5,"Denmark","DK",56.2,9.5,
+      "Djibouti","DJ",11.8,42.5,"Dominica","DM",15.4,-61.3,"Dominican Republic","DO",18.7,-70.1,"Ecuador","EC",-1.8,-78.1,"Egypt","EG",26.8,30.8,"El Salvador","SV",13.7,-88.8,"England","ENG",55.3,-3.4,"Equatorial Guinea","GQ",1.6,10.2,"Eritrea","ER",15.1,39.7,"Estonia","EE",58.5,25,"Ethiopia","ET",9.1,40.4,"Faroe Islands","FO",61.8,-6.9,"Fiji","FJ",-16.5,179.4,"Finland","FI",61.9,25.7,"France","FR",46.2,2.2,"French Guiana","GF",3.9,-53.1,"French Polynesia","PF",-17.6,-149.4,"Gabon","GA",-0.8,11.6,"Gambia","GM",13.4,-15.3,"Georgia","GE",42.3,43.3,"Germany","DE",51.1,10.4,"Ghana","GH",7.9,-1,"Gibraltar","GI",36.1,-5.3,"Greece","GR",39,21.8,"Greenland","GL",71.7,-42.6,"Grenada","GD",12.2,-61.6,"Guadeloupe","GP",16.9,-62,"Guam","GU",13.4,144.7,"Guatemala","GT",15.7,-90.2,"Guinea","GN",9.9,-9.6,"Guinea-Bissau","GW",11.8,-15.1,"Guyana","GY",4.8,-58.9,"Haiti","HT",18.9,-72.2,"Honduras","HN",15.1,-86.2,"Hong Kong","HK",22.3,114.1,"Hungary","HU",47.1,19.5,"Iceland","IS",64.9,-19,"India","IN",20.5,78.9,"Indonesia","ID",-0.7,113.9,"Iran","IR",32.4,53.6,"Iraq","IQ",33.2,43.6,"Ireland","IE",53.4,-8.2,"Israel","IL",31,34.8,"Italy","IT",41.8,12.5,"Jamaica","JM",18.1,-77.2,"Japan","JP",36.2,138.2,"Jordan","JO",30.5,36.2,"Kazakhstan","KZ",48,66.9,"Kenya","KE",0,37.9,"Kiribati","KI",-3.3,-168.7,"Kosovo","XK",42.6,20.9,"Kuwait","KW",29.3,47.4,"Kyrgyzstan","KG",41.2,74.7,"Laos","LA",19.8,102.4,"Latvia","LV",56.8,24.6,"Lebanon","LB",33.8,35.8,"Lesotho","LS",-29.6,28.2,"Liberia","LR",6.4,-9.4,"Libya","LY",26.3,17.2,"Liechtenstein","LI",47.1,9.5,"Lithuania","LT",55.1,23.8,
+      "Luxembourg","LU",49.8,6.1,"Macau","MO",22.1,113.5,"Macedonia [FYROM]","MK",41.6,21.7,"Madagascar","MG",-18.7,46.8,"Malawi","MW",-13.2,34.3,"Malaysia","MY",4.2,101.9,"Maldives","MV",3.2,73.2,"Mali","ML",17.5,-3.9,"Malta","MT",35.9,14.3,"Marshall Islands","MH",7.1,171.1,"Martinique","MQ",14.6,-61,"Mauritania","MR",21,-10.9,"Mauritius","MU",-20.3,57.5,"Mayotte","YT",-12.8,45.1,"Mexico","MX",23.6,-102.5,"Micronesia","FM",7.4,150.5,"Moldova","MD",47.4,28.3,"Monaco","MC",43.7,7.4,"Mongolia","MN",46.8,103.8,"Montenegro","ME",42.7,19.3,"Montserrat","MS",16.7,-62.1,"Morocco","MA",31.7,-7,"Mozambique","MZ",-18.6,35.5,"Myanmar [Burma]","MM",21.9,95.9,"Namibia","NA",-22.9,18.4,"Nauru","NR",-0.5,166.9,"Nepal","NP",28.3,84.1,"Netherlands","NL",52.1,5.2,"Netherlands Antilles","AN",12.2,-69,"New Caledonia","NC",-20.9,165.6,"New Zealand","NZ",-40.9,174.8,"Nicaragua","NI",12.8,-85.2,"Niger","NE",17.6,8,"Nigeria","NG",9,8.6,"Niue","NU",-19,-169.8,"Norfolk Island","NF",-29,167.9,"North Korea","KP",40.3,127.5,"Northern Mariana Islands","MP",17.3,145.3,"Norway","NO",60.4,8.4,"Oman","OM",21.5,55.9,"Pakistan","PK",30.3,69.3,"Palau","PW",7.5,134.5,"Palestinian Territories","PS",31.9,35.2,"Panama","PA",8.5,-80.7,"Papua New Guinea","PG",-6.3,143.9,"Paraguay","PY",-23.4,-58.4,"Peru","PE",-9.1,-75,"Philippines","PH",12.8,121.7,"Pitcairn Islands","PN",-24.7,-127.4,"Poland","PL",51.9,19.1,"Portugal","PT",39.3,-8.2,"Puerto Rico","PR",18.2,-66.5,"Qatar","QA",25.3,51.1,"Romania","RO",45.9,24.9,"Russia","RU",61.5,105.3,"Rwanda","RW",-1.9,29.8,"Réunion","RE",-21.1,55.5,"Saint Helena","SH",-24.1,-10,
+      "Saint Kitts","KN",17.3,-62.7,"Saint Lucia","LC",13.9,-60.9,"Saint Pierre","PM",46.9,-56.2,"Saint Vincent","VC",12.9,-61.2,"Samoa","WS",-13.7,-172.1,"San Marino","SM",43.9,12.4,"Saudi Arabia","SA",23.8,45,"Scotland","SCT",56.5,4.2,"Senegal","SN",14.4,-14.4,"Serbia","RS",44,21,"Seychelles","SC",-4.6,55.4,"Sierra Leone","SL",8.4,-11.7,"Singapore","SG",1.3,103.8,"Slovakia","SK",48.6,19.6,"Slovenia","SI",46.1,14.9,"Solomon Islands","SB",-9.6,160.1,"Somalia","SO",5.1,46.1,"South Africa","ZA",-30.5,22.9,"South Georgia","GS",-54.4,-36.5,"South Korea","KR",35.9,127.7,"Spain","ES",40.4,-3.7,"Sri Lanka","LK",7.8,80.7,"Sudan","SD",12.8,30.2,"Suriname","SR",3.9,-56,"Svalbard and Jan Mayen","SJ",77.5,23.6,"Swaziland","SZ",-26.5,31.4,"Sweden","SE",60.1,18.6,"Switzerland","CH",46.8,8.2,"Syria","SY",34.8,38.9,"São Tomé and Príncipe","ST",0.1,6.6,"Taiwan","TW",23.6,120.9,"Tajikistan","TJ",38.8,71.2,"Tanzania","TZ",-6.3,34.8,"Thailand","TH",15.8,100.9,"Timor-Leste","TL",-8.8,125.7,"Togo","TG",8.6,0.8,"Tokelau","TK",-8.9,-171.8,"Tonga","TO",-21.1,-175.1,"Trinidad and Tobago","TT",10.6,-61.2,"Tunisia","TN",33.8,9.5,"Turkey","TR",38.9,35.2,"Turkmenistan","TM",38.9,59.5,"Turks and Caicos Islands","TC",21.6,-71.7,"Tuvalu","TV",-7.1,177.6,"U.S. Minor Outlying Islands","UM",0,0,"U.S. Virgin Islands","VI",18.3,-64.8,"Uganda","UG",1.3,32.2,"Ukraine","UA",48.3,31.1,"United Arab Emirates","AE",23.4,53.8,"United Kingdom","GB",55.3,-3.4,"United States","US",37,-95.7,"Uruguay","UY",-32.5,-55.7,"Uzbekistan","UZ",41.3,64.5,"Vanuatu","VU",-15.3,166.9,"Vatican City","VA",41.9,12.4,
+      "Venezuela","VE",6.4,-66.5,"Vietnam","VN",14,108.2,"Wales","WLS",55.3,-3.4,"Wallis and Futuna","WF",-13.7,-177.1,"Western Sahara","EH",24.2,-12.8,"Yemen","YE",15.5,48.5,"Zambia","ZM",-13.1,27.8,"Zimbabwe","ZW",-19,29.1
     ];
     n.Vr = "wss://p2p.haxball.com/";
     n.Ee = "https://www.haxball.com/rs/";
@@ -11907,10 +11019,8 @@ function Haxball(options){
     R.kn = new Ib([0, -1, 3, 0, 0, 0.35, 0, 0, 0, 0, 0.65, 0, 0, 1, 3, 1]);
     mb.N =
       "<div class='dialog change-location-view'><h1>Change Location</h1><div class='splitter'><div class='list' data-hook='list'></div><div class='buttons'><button data-hook='change'>Change</button><button data-hook='cancel'>Cancel</button></div></div></div>";
-    */
     Da.N =
       "<div class='chatbox-view'><div data-hook='log' class='log'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class='autocompletebox' data-hook='autocompletebox'></div><div class='input'><input data-hook='input' type='text' /><button data-hook='send'>Send</button></div></div>";
-    /*
     kb.N =
       "<div class='choose-nickname-view'><div class='dialog'><h1>Choose nickname</h1><div class='label-input'><label>Nick:</label><input data-hook='input' type='text' /></div><button data-hook='ok'>Ok</button></div></div>";
     jb.N =
@@ -11919,9 +11029,9 @@ function Haxball(options){
       "<div class='create-room-view'><div class='dialog'><h1>Create room</h1><div class='label-input'><label>Room name:</label><input data-hook='name' required /></div><div class='label-input'><label>Password:</label><input data-hook='pass' /></div><div class='label-input'><label>Max players:</label><select data-hook='max-pl'></select></div><button data-hook='unlisted'></button><div class='row'><button data-hook='cancel'>Cancel</button><button data-hook='create'>Create</button></div></div></div>";
     Ka.N =
       "<div class='disconnected-view'><div class='dialog basic-dialog'><h1>Disconnected</h1><p data-hook='reason'></p><div class='buttons'><button data-hook='ok'>Ok</button><button data-hook='replay'>Save replay</button></div></div></div>";
-    */
     hb.N =
       "<div class='game-state-view'><div class='bar-container'><div class='bar'><div class='scoreboard'><div class='teamicon red'></div><div class='score' data-hook='red-score'>0</div><div>-</div><div class='score' data-hook='blue-score'>0</div><div class='teamicon blue'></div></div><div data-hook='timer'></div></div></div></div></div>";//<div class='canvas' data-hook='canvas'></div></div>";
+    */
     ja.N =
       "<div class='game-view' tabindex='-1'><div class='top-section' data-hook='gameplay-section'></div><div class='bottom-section'><div data-hook='stats'></div><div data-hook='chatbox'></div><div class='buttons'><button data-hook='menu'><i class='icon-menu'></i>Menu<span class='tooltip'>Toggle room menu [Escape]</span></button><button data-hook='settings'><i class='icon-cog'></i>Settings</button></div></div><div data-hook='popups'></div></div>";
     /*
@@ -11933,22 +11043,18 @@ function Haxball(options){
       "<div class='dialog pick-stadium-view'><h1>Pick a stadium</h1><div class='splitter'><div class='list' data-hook='list'></div><div class='buttons'><button data-hook='pick'>Pick</button><button data-hook='delete'>Delete</button><div class='file-btn'><label for='stadfile'>Load</label><input id='stadfile' type='file' accept='.hbs' data-hook='file'/></div><button data-hook='export'>Export</button><div class='spacer'></div><button data-hook='cancel'>Cancel</button></div></div></div>";
     db.N =
       "<div class='dialog' style='min-width:200px'><h1 data-hook='name'></h1><button data-hook='admin'></button><button data-hook='kick'>Kick</button><button data-hook='close'>Close</button></div>";
-    */
     cb.N =
       "<div class='player-list-item'><div data-hook='flag' class='flagico'></div><div data-hook='name'></div><div data-hook='ping'></div></div>";
     za.N =
       "<div class='player-list-view'><div class='buttons'><button data-hook='join-btn'>Join</button><button data-hook='reset-btn' class='admin-only'></button></div><div class='list' data-hook='list'></div></div>";
-    /*
     ha.N =
       "<div class='replay-controls-view'><button data-hook='reset'><i class='icon-to-start'></i></button><button data-hook='play'><i data-hook='playicon'></i></button><div data-hook='spd'>1x</div><button data-hook='spddn'>-</button><button data-hook='spdup'>+</button><div data-hook='time'>00:00</div><div class='timebar' data-hook='timebar'><div class='barbg'><div class='bar' data-hook='progbar'></div></div><div class='timetooltip' data-hook='timetooltip'></div></div><button data-hook='leave'>Leave</button></div>";
     bb.N =
       "<div class='dialog basic-dialog room-link-view'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook='link' readonly></input><div class='buttons'><button data-hook='close'>Close</button><button data-hook='copy'>Copy to clipboard</button></div></div>";
-    */
     ab.tj =
       "<tr><td><span data-hook='tag'></span><span data-hook='name'></span></td><td data-hook='players'></td><td data-hook='pass'></td><td><div data-hook='flag' class='flagico'></div><span data-hook='distance'></span></td></tr>";
     Aa.tj =
       "<div class='roomlist-view'><div class='notice' data-hook='notice' hidden><div data-hook='notice-contents'>Testing the notice.</div><div data-hook='notice-close'><i class='icon-cancel'></i></div></div><div class='dialog'><h1>Room list</h1><p>Tip: Join rooms near you to reduce lag.</p><div class='splitter'><div class='list'><table class='header'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class='separator'></div><div class='content' data-hook='listscroll'><table><colgroup><col><col><col><col></colgroup><tbody data-hook='list'></tbody></table></div><div class='filters'><span class='bool' data-hook='fil-pass'>Show locked <i></i></span><span class='bool' data-hook='fil-full'>Show full <i></i></span></div></div><div class='buttons'><button data-hook='refresh'><i class='icon-cw'></i><div>Refresh</div></button><button data-hook='join'><i class='icon-login'></i><div>Join Room</div></button><button data-hook='create'><i class='icon-plus'></i><div>Create Room</div></button><div class='spacer'></div><div class='file-btn'><label for='replayfile'><i class='icon-play'></i><div>Replays</div></label><input id='replayfile' type='file' accept='.hbr2' data-hook='replayfile'/></div><button data-hook='settings'><i class='icon-cog'></i><div>Settings</div></button><button data-hook='changenick'><i class='icon-cw'></i><div>Change Nick</div></button></div></div><p data-hook='count'></p></div></div>";
-    /*
     Za.N =
       "<div class='room-password-view'><div class='dialog'><h1>Password required</h1><div class='label-input'><label>Password:</label><input data-hook='input' /></div><div class='buttons'><button data-hook='cancel'>Cancel</button><button data-hook='ok'>Ok</button></div></div></div>";
     */
@@ -11958,10 +11064,8 @@ function Haxball(options){
     aa.N =
       "<div class='dialog settings-view'><h1>Settings</h1><button data-hook='close'>Close</button><div class='tabs'><button data-hook='soundbtn'>Sound</button><button data-hook='videobtn'>Video</button><button data-hook='inputbtn'>Input</button><button data-hook='miscbtn'>Misc</button></div><div data-hook='presskey' tabindex='-1'><div>Press a key</div></div><div class='tabcontents'><div class='section' data-hook='miscsec'><div class='loc' data-hook='loc'></div><div class='loc' data-hook='loc-ovr'></div><button data-hook='loc-ovr-btn'></button></div><div class='section' data-hook='soundsec'><div data-hook=\"tsound-main\">Sounds enabled</div><div data-hook=\"tsound-chat\">Chat sound enabled</div><div data-hook=\"tsound-highlight\">Nick highlight sound enabled</div><div data-hook=\"tsound-crowd\">Crowd sound enabled</div></div><div class='section' data-hook='inputsec'></div><div class='section' data-hook='videosec'><div>Viewport Mode:<select data-hook='viewmode'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook='fps'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook='resscale'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook=\"tvideo-teamcol\">Custom team colors enabled</div><div data-hook=\"tvideo-showindicators\">Show chat indicators</div><div data-hook=\"tvideo-showavatars\">Show player avatars</div></div></div></div>";
     aa.$l = 0;
-    */
     P.N =
       "<div class='simple-dialog-view'><div class='dialog basic-dialog'><h1 data-hook='title'></h1><p data-hook='content'></p><div class='buttons' data-hook='buttons'></div></div></div>";
-    /*
     Xa.N =
       "<div class='stats-view'><p>Ping: <span data-hook='ping'></span></p><p>Max Ping: <span data-hook='max-ping'></span></p><p>Fps: <span data-hook='fps'></span></p><div data-hook='graph'></div></div>";
     Wa.N =
@@ -11987,7 +11091,7 @@ function Room(internalData, plugins){
     this.sdp = internalData.roomObj.ya.pa.Ra.remoteDescription.sdp; // usage: require("sdp-transform").parse(sdp);
 
   this.isHost = internalData.isHost;
-  this.currentPlayerId = internalData.roomObj.j.Fb.Nb;
+  this.currentPlayerId = internalData.roomObj.ya.uc;
   this.currentPlayer = internalData.roomObj.ya.T.I.filter((x)=>(x.V==this.currentPlayerId))[0];
   this.kickTimeout = 20;
   this.plugins = plugins || [];
@@ -12396,6 +11500,56 @@ function Room(internalData, plugins){
     }
   };
 
+  this._onBansClear = function(){
+    var customData = that.onBeforeBansClear && that.onBeforeBansClear();
+    if (customData!==false){
+      that.activePlugins.forEach((p)=>{
+        p.onBansClear && p.onBansClear(customData);
+      });
+      that.onAfterBansClear && that.onAfterBansClear(customData);
+    }
+  };
+
+  this._onExtrapolationChange = function(value){
+    var customData = that.onBeforeExtrapolationChange && that.onBeforeExtrapolationChange(value);
+    if (customData!==false){
+      that.activePlugins.forEach((p)=>{
+        p.onExtrapolationChange && p.onExtrapolationChange(value, customData);
+      });
+      that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
+    }
+  };
+
+  this._onHandicapChange = function(value){
+    var customData = that.onBeforeHandicapChange && that.onBeforeHandicapChange(value);
+    if (customData!==false){
+      that.activePlugins.forEach((p)=>{
+        p.onHandicapChange && p.onHandicapChange(value, customData);
+      });
+      that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
+    }
+  };
+
+  this._onRoomRecaptchaModeChange = function(on){
+    var customData = that.onBeforeRoomRecaptchaModeChange && that.onBeforeRoomRecaptchaModeChange(on);
+    if (customData!==false){
+      that.activePlugins.forEach((p)=>{
+        p.onRoomRecaptchaModeChange && p.onRoomRecaptchaModeChange(on, customData);
+      });
+      that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
+    }
+  };
+
+  this._onRoomPropertiesChange = function(props){
+    var customData = that.onBeforeRoomPropertiesChange && that.onBeforeRoomPropertiesChange(props);
+    if (customData!==false){
+      that.activePlugins.forEach((p)=>{
+        p.onRoomPropertiesChange && p.onRoomPropertiesChange(props, customData);
+      });
+      that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
+    }
+  };
+
   this.setProperties = function(properties) { // { name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount }
     if (!internalData.isHost)
       return;
@@ -12407,7 +11561,9 @@ function Room(internalData, plugins){
   };
 
   this.setKickRateLimit = function(min, rate, burst) {
-    internalData.roomObj?.ya.ra(internalData.kickRateLimitObj.la(min, rate, burst));
+    var msg = internalData.kickRateLimitObj.la(min, rate, burst);
+    internalData.roomObj?.ya.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
   };
   
   this.setHandicap = function(handicap) {
@@ -12422,15 +11578,35 @@ function Room(internalData, plugins){
   this.clearBans = function() {
     if (!internalData.isHost)
       return;
-    internalData.roomObj?.ya.Ud()
+    internalData.roomObj?.ya.Ud();
   };
 
   this.setAvatar = function(avatar) {
-    internalData.roomObj?.ya.fm(avatar);
+    null != avatar && (avatar = U.Qc(avatar, 2));
+    internalData.generalStorageObj.sh.Xa(avatar);
+    var msg = internalData.avatarChangerObj.la(avatar);
+    internalData.roomObj?.ya.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
+  };
+
+  this.setChatIndicatorActive = function(active) {
+    var msg = internalData.chatIndicatorObj.la(active ? 1 : 0);
+    internalData.roomObj?.ya.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
+  };
+
+  this.getCurrentMap = function() {
+    return internalData.roomObj?.ya?.T?.S;
+  };
+
+  this.mapChecksum = function(map) { // returns null for original maps, checksum value for custom maps
+    return map.Pe() ? null : J.Vg(map.Sj(), 8);
   };
 
   this.setTeamColors = function(team, clear, ...colors) { // team: "blue" | "red", clear: boolean, colors: minimum 2 parseable color parameters 
-    internalData.roomObj?.ya.ra(internalData.teamColorsObj.__cq__(team, clear, ...colors));
+    var msg = internalData.teamColorsObj.__cq__(team, clear, ...colors);
+    internalData.roomObj?.ya.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
   };
 
   this.setUnlimitedPlayerCount = function(on){ // boolean
@@ -12446,13 +11622,27 @@ function Room(internalData, plugins){
     null != targetId ? internalData.dummyPromise.then(function() {
       x._mf_(d, targetId);
     }) : x.ra(d);
+    internalData.execOperationReceivedOnHost(d, targetId);
   };
 
   this.sendChat = function(msg, targetId){  // can only use targetId in host mode.
     if (internalData.isHost)
       sendIndividualChat(msg, targetId);
-    else
-      internalData.roomObj?.Gp(msg);
+    else{
+      var x = internalData.roomObj?.ya;
+      if (!x)
+        return;
+      /*internalData.roomObj.Of.gf(msg) || (()=>{*/
+      var c = new internalData.chatObj();
+      c.Tc = msg;
+      x.ra(c);
+      internalData.execOperationReceivedOnHost(c);
+      //})();
+    }
+  };
+
+  this.sendChatIndicator = function(active){
+    internalData.roomObj?.bm(active);
   };
 
   this.sendAnnouncement = function(msg, targetId, color, style, sound) { // host-only function
@@ -12475,6 +11665,7 @@ function Room(internalData, plugins){
     null != targetId ? internalData.dummyPromise.then(function() {
       x._mf_(h, targetId);
     }) : x.ra(h);
+    internalData.execOperationReceivedOnHost(h, targetId);
   };
 
   this.setDiscProperties = function(discId, properties) { // host-only function
@@ -12483,7 +11674,9 @@ function Room(internalData, plugins){
     var x = internalData.roomObj?.ya;
     if (!x)
       return;
-    x.ra(internalData.discPropertiesObj?._Kf_(discId, !1, properties));
+    var msg = internalData.discPropertiesObj?._Kf_(discId, !1, properties);
+    x.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
   };
 
   this.setPlayerDiscProperties = function(playerId, properties) { // host-only function
@@ -12492,7 +11685,9 @@ function Room(internalData, plugins){
     var x = internalData.roomObj?.ya;
     if (!x)
       return;
-    x.ra(internalData.discPropertiesObj?._Kf_(playerId, !0, properties));
+    var msg = internalData.discPropertiesObj?._Kf_(playerId, !0, properties);
+    x.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
   };
 
   this.getKeyState = function(){
@@ -12534,6 +11729,14 @@ function Room(internalData, plugins){
   this.resetTeams = function(){
     internalData.roomObj?.j?.Wa.ee(internalData.teams.blue);
     internalData.roomObj?.j?.Wa.ee(internalData.teams.red);
+  };
+
+  this.startRecording = function(){ // return true(success)/false(failure - already recording)
+    return internalData.roomObj?.j?.Wa._Qp_(true);
+  };
+
+  this.stopRecording = function(){ // return Uint8Array(success)/null(failure - recording not started)
+    return internalData.roomObj?.j?.Wa._Qp_(false);
   };
 
   this.randTeams = function(){
@@ -12580,26 +11783,26 @@ function Room(internalData, plugins){
     }
   };
 
-  this.setTimeLimit = function(value){ // value = jsdom(select) dependency: internalData.roomObj?.wf.selectedIndex
+  this.setTimeLimit = function(value){
     internalData.roomObj?.j?.Wa.aq(value);
   };
 
-  this.setScoreLimit = function(value){ // value = jsdom(select) dependency: internalData.roomObj?.qf.selectedIndex
+  this.setScoreLimit = function(value){
     internalData.roomObj?.j?.Wa.Tp(value);
   };
 
   this.changeTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.Wa.qm?.Kp(internalData.teams.spec); 
+        internalData.roomObj?.j?.Wa.mg(internalData.roomObj.ya.uc, internalData.teams.spec);  // room.currentPlayerId = internalData.roomObj.ya.uc
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.Wa.Hl?.Kp(internalData.teams.red); 
+        internalData.roomObj?.j?.Wa.mg(internalData.roomObj.ya.uc, internalData.teams.red);  // room.currentPlayerId = internalData.roomObj.ya.uc
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.Wa.Lj?.Kp(internalData.teams.blue); 
+        internalData.roomObj?.j?.Wa.mg(internalData.roomObj.ya.uc, internalData.teams.blue);  // room.currentPlayerId = internalData.roomObj.ya.uc
         break; 
       }
     }
@@ -12608,15 +11811,15 @@ function Room(internalData, plugins){
   this.resetTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.Wa.qm?.ee(internalData.teams.spec); 
+        internalData.roomObj?.j?.Wa.ee(internalData.teams.spec); 
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.Wa.Hl?.ee(internalData.teams.red); 
+        internalData.roomObj?.j?.Wa.ee(internalData.teams.red); 
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.Wa.Lj?.ee(internalData.teams.blue); 
+        internalData.roomObj?.j?.Wa.ee(internalData.teams.blue); 
         break; 
       }
     }
@@ -12625,26 +11828,30 @@ function Room(internalData, plugins){
   this.setPlayerTeam = function(playerId, teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.Wa.qm?.mg(playerId, internalData.teams.spec);
+        internalData.roomObj?.j?.Wa.mg(playerId, internalData.teams.spec);
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.Wa.Hl?.mg(playerId, internalData.teams.red);
+        internalData.roomObj?.j?.Wa.mg(playerId, internalData.teams.red);
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.Wa.Lj?.mg(playerId, internalData.teams.blue);
+        internalData.roomObj?.j?.Wa.mg(playerId, internalData.teams.blue);
         break; 
       }
     }
   };
 
   this.setPlayerAdmin = function(playerId, isAdmin){
-    internalData.roomObj?.ya?.ra(internalData.adminChangerObj?.la(playerId, isAdmin));
+    var msg = internalData.adminChangerObj?.la(playerId, isAdmin);
+    internalData.roomObj?.ya?.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
   };
 
   this.kickPlayer = function(playerId, reason, isBanning){
-    internalData.roomObj?.ya?.ra(internalData.kickerObj?.la(playerId, reason, isBanning));
+    var msg = internalData.kickerObj?.la(playerId, reason, isBanning);
+    internalData.roomObj?.ya?.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
   };
 
   this.getPlayerOriginal = function(id){
