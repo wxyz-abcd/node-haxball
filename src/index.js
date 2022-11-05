@@ -361,7 +361,7 @@ function Haxball(options){
       haxball.once("roomLeave", fLeaveRoom);
       haxball.once("joinRoomSucceeded", fJoinRoomSucceeded);
       haxball.on("connectionStateChange", fConnectionStateChange);
-      internalData.roomJoinerObj.Pf(obj.id, (obj.password == "") ? null : obj.password);
+      internalData.roomJoinerObj.Pf(obj.id, (obj.password == "") ? null : obj.password, obj.token);
     });
   };
 

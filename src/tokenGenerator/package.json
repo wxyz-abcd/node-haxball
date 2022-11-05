@@ -1,0 +1,10 @@
+{
+  "name": "haxball_token_generator",
+  "main": "index.html",
+  "nodejs": true,
+  "node-remote": "*://*/*",
+  "window": {
+    "title": "Haxball Token Generator by abc",
+    "icon": "icon.png"
+  }
+}

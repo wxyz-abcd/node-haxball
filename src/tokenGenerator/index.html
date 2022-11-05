@@ -1,0 +1,103 @@
+<html>
+  <body>
+    <input id="toggleMode" type="button" value="toggle mode" onclick="toggleMode()" />
+    <input id="reset" type="button" value="reset" onclick="reset()" />
+    <iframe src="https://www.haxball.com/headlesstoken" nwdisable nwfaketop style="width: 100%; height: calc(98vh - 40px)"></iframe>
+    <script>
+      var elem = document.getElementsByTagName("iframe")[0], timeout = null;
+      var bToggleMode = document.getElementById("toggleMode"), bReset = document.getElementById("reset");
+      var roomIdDiv, roomIdBr, f;
+      elem.tMode = 0;
+
+      function toggleMode(){
+        if (timeout!=null)
+          return;
+        elem.tMode = 1 - elem.tMode;
+        timeout = setTimeout(()=>{
+          apply();
+          timeout = null;
+        }, 500);
+      }
+
+      function reset(){
+        if (timeout!=null)
+          return;
+        roomIdDiv = null;
+        roomIdBr = null;
+        f = null;
+        elem.tMode = 0;
+        elem.src = "";
+        timeout = setTimeout(()=>{
+          elem.src = "https://www.haxball.com/headlesstoken";
+          timeout = null;
+          bToggleMode.removeAttribute("disabled");
+        }, 500);
+      }
+
+      var changes = {
+        mainTitle: ["Headless Token", "Client Token"],
+        title: ["Obtain Headless Token", "Obtain Client Token"],
+        formAction: ["rs/api/getheadlesstoken", "rs/api/client"],
+        captchaName: ["g-recaptcha-response", "rcr"]
+      };
+
+      function apply(){
+        if (elem.tMode==1)
+          f.prepend(roomIdDiv, roomIdBr);
+        else{
+          roomIdDiv.remove();
+          roomIdBr.remove();
+        }
+        f.action = changes.formAction[elem.tMode];
+        elem.contentWindow.document.head.getElementsByTagName("title")[0].innerText = changes.mainTitle[elem.tMode];
+        elem.contentWindow.document.body.getElementsByTagName("h1")[0].innerText = changes.title[elem.tMode];
+        elem.contentWindow.document.body.getElementsByClassName("g-recaptcha-response")[0].setAttribute("name", changes.captchaName[elem.tMode]);
+      }
+
+      elem.onload = function(){
+        roomIdDiv = elem.contentWindow.document.createElement("div");
+        roomIdDiv.innerHTML = "<label for='room'>RoomId:</label><input type='text' name='room' />";
+        roomIdBr = elem.contentWindow.document.createElement("br");
+        f = elem.contentWindow.document.body.getElementsByTagName("form")[0];
+        apply();
+      };
+
+      function observeChanges(){
+        var observerInterval;
+        observerInterval = setInterval(()=>{
+          if (!elem.contentWindow.document.body.getElementsByTagName("form")[0]){
+            clearInterval(observerInterval);
+            try{
+              var x = elem.contentWindow.document.body.children[0], a = x.innerText, t;
+              try{
+                a = JSON.parse(a).data.token;
+                t = "Client"
+              }
+              catch(ex){
+                a = a.substring(a.indexOf('"')+1, a.lastIndexOf('"'));
+                t = "Host"
+              }
+              x.innerHTML = "<div><label>" + t + " Token:</label><input type='text' value='" + a + "' size='"+(a.length+3)+"'/></div>";
+            }
+            catch(ex2){
+              alert("unknown error");
+              reset();
+            }
+          }
+        }, 5);
+      }
+
+      chrome.webRequest.onCompleted.addListener(function(details) {
+        if (details.statusCode!=200){
+          alert("error: "+details.statusCode);
+          reset();
+          return;
+        }
+        bToggleMode.setAttribute("disabled", true);
+        observeChanges();
+      }, {urls: ["https://www.haxball.com/rs/api/*"]});
+
+      chrome.webRequest.handlerBehaviorChanged();
+    </script>
+  </body>
+</html>
