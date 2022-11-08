@@ -124,7 +124,7 @@ client.on("ready", () => {
   - functions:
     - getRoomList(): returns Promise(roomListArray).
     - setStorageValue(key, value): sets storage\[key\]=(value) where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
-    - createRoom({name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
+    - createRoom({name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
     - joinRoom({roomId, password, token, kickTimeout, plugins}): try to join the room(roomId) with given password(or null=no password). Must leave current room first. returns Promise(room) which is rejected if failed.
     - leaveRoom(): Leave current room. Must be in a room.
 
@@ -153,7 +153,7 @@ client.on("ready", () => {
 
   - functions:
     - leave(): leaves the room.
-    - setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount }): sets the room's properties.
+    - setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword }): sets the room's properties.
     - setRecaptcha(on): sets the room's recaptcha mode. on: boolean
     - setKickRateLimit(min, rate, burst): sets the room's kick rate limit.
     - setHandicap(handicap): sets the player's handicap value in msecs.
@@ -163,6 +163,7 @@ client.on("ready", () => {
     - setChatIndicatorActive(active): sets the current player's chat indicator status.
     - setTeamColors(team, clear, ...colors): sets the team colors for (team). team: "blue" | "red", clear: boolean, colors: minimum 2 parseable color parameters 
     - setUnlimitedPlayerCount(on): adds or removes player limit control. host-only. on: boolean
+    - setFakePassword(fakePwd): sets a fake value for room's password status. host-only. fakePwd: boolean or null to disable
     - sendChat(msg, targetId): send chat message(msg) to player(targetId). targetId is null -> send to everyone. targetId is host-only.
     - sendAnnouncement(msg, targetId, color, style, sound): send announcement message(msg) to player(targetId) with properties(color, style, sound). targetId is null -> send to - everyone. host-only.
     - setDiscProperties(discId, properties): set disc(discId) properties. host-only.
@@ -215,6 +216,8 @@ client.on("ready", () => {
     - \[modifiedNick, modifiedAvatar, modifiedFlag\] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData): set player's data just before player has joined the room. return null -> player is not allowed to join. host-only.
     - \[newPing, customData\] = modifyPlayerPingBefore(playerId, ping): prepares a custom data object to send to all plugins while setting player's ping. customData=false means "don't call callbacks". host-only.
     - newPing = modifyPlayerPingAfter(playerId, ping, customData): set player's ping. host-only.
+    - newPing = modifyClientPing(ping): set current player's ping. client-only.
+    - newFrameNo = modifyFrameNo(frameNo): look laggy to your opponents, especially on extrapolated clients. experimental, mostly causes "bad actor". client-only.
     - customData = onBeforeOperationReceived(obj, msg): the host callback that is called only once for each message received from clients, and its return value is passed as customData to onOperationReceived callback. this callback is useful for parsing chat messages and other stuff that you would like to do only once, before the room callback or any plugin callbacks are called. The default callback value is a function that parses a chat message and returns { isCommand: boolean, data: array of string } where isCommand = text.startsWith("!") and data = text.trimEnd().split(" "). 
     - acceptEvent = onAfterOperationReceived(obj, msg, customData): runs for each message received from clients. obj is the operation type object, msg is the original message, customData is the return value of callback onBeforeOperationReceived(obj, msg). onBeforeOperationReceived is called only once for each message, before all onOperationReceived callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. return true -> accept event, return false -> block message from being processed, throw exception -> break message sender player's connection. host-only.
 

@@ -222,7 +222,7 @@ function Haxball(options){
     internalData.generalStorageObj[Object.keys(internalData.generalStorageObj).filter((x)=>internalData.generalStorageObj[x].w==key)[0]]?.Xa(value);
   };
 
-  this.createRoom = function(obj){ // name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, plugins
+  this.createRoom = function(obj){ // name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, plugins
     return new Promise((resolve, reject)=>{
       if (haxball.room != null || !obj){
         reject();
@@ -259,7 +259,8 @@ function Haxball(options){
         t: obj.token,
         geo: obj.geo,
         cpc: obj.playerCount,
-        upc: obj.unlimitedPlayerCount
+        upc: obj.unlimitedPlayerCount,
+        fPwd: obj.fakePassword
       });
     });
   }
@@ -1173,7 +1174,7 @@ function Haxball(options){
     */
     internalData.createRoom = /*this.Jp = */function (b) {
       var a = n.A.fe.L(); // inserted here to get current nick
-      var cpc = b.cpc;
+      var cpc = b.cpc, fPwd = b.fPwd;
       function c() { // update & synchronize room data with haxball main server via websocket.
         if (!b.Ks) {
           var a = new Fb();
@@ -1182,7 +1183,7 @@ function Haxball(options){
           a.I = (cpc!=null) ? cpc : g.I.length;
           a.Xe = l.fg + 1;
           a.ub = f.ub;
-          a.Ib = null != l.Ib;
+          a.Ib = (fPwd==null) ? (null != l.Ib) : fPwd;
           a.Ec = f.Ec;
           a.Gc = f.Gc;
           var c = w.ha(16);
@@ -1299,6 +1300,8 @@ function Haxball(options){
           props.name = g.jc = a.name || "";
         if (a.hasOwnProperty("password"))
           props.password = l.Ib = a.password;
+        if (a.hasOwnProperty("fakePassword"))
+          props.fakePassword = fPwd = a.fakePassword;
         if (a.hasOwnProperty("geo")){
           props.geo = a.geo;
           f = parseGeo(a.geo);
@@ -1316,7 +1319,11 @@ function Haxball(options){
       t.Of.__supc__ = function (a) {
         l.upc = a;
       };
-
+      t.Of.__sfp__ = function (a) {
+        fPwd = a;
+        c();
+      };
+      
       internalData.isHost = true;
       internalData.roomObj = t;
       internalData.roomPhysicsObj = g;
@@ -4375,6 +4382,7 @@ function Haxball(options){
         this.Di.push(a);
         var b = this.sg.$g(0.5) | 0,
           c = w.ha();
+        haxball.room?.modifyClientPing && (b = haxball.room.modifyClientPing(b));
         c.l(2);
         c.s(a);
         c.lb(b);
@@ -4393,6 +4401,7 @@ function Haxball(options){
           a.zf.Aa && (c = this.Y + (this.Xc | 0) + this.bc);
           var d = w.ha();
           d.l(1);
+          haxball.room?.modifyFrameNo && (c = haxball.room.modifyFrameNo(c));
           d.tb(c);
           d.tb(b);
           m.lj(a, d);
@@ -11570,7 +11579,7 @@ function Room(internalData, plugins){
     }
   };
 
-  this.setProperties = function(properties) { // { name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount }
+  this.setProperties = function(properties) { // { name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword }
     if (!internalData.isHost)
       return;
     internalData.roomObj?.Of.__srp__(properties);
@@ -11631,6 +11640,10 @@ function Room(internalData, plugins){
 
   this.setUnlimitedPlayerCount = function(on){ // boolean
     internalData.roomObj?.Of.__supc__(on);
+  };
+
+  this.setFakePassword = function(on){ // boolean
+    internalData.roomObj?.Of.__sfp__(on);
   };
 
   var sendIndividualChat = function(msg, targetId) {
