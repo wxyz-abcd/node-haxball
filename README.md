@@ -116,7 +116,10 @@ client.on("ready", () => {
 
 - Haxball: Main client class.
 
-  - constructor(): creates a new instance of Haxball client.
+  - static methods:
+    - authKey = Haxball.generateAuthKey(): generates a new auth key. must use {"player_auth_key": authKey} parameter in Haxball _constructor_ in order to use the new auth. you might consider saving the auth value in a file or database for recognition.
+
+  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
 
   - functions:
     - getRoomList(): returns Promise(roomListArray).
@@ -169,6 +172,7 @@ client.on("ready", () => {
     - startGame(): start game.
     - stopGame(): stop game.
     - pauseGame(): toggle pause/resume game.
+    - isGamePaused(): returns true if game is paused.
     - autoTeams(): remove last 2 players from spectators and add them to teams.
     - lockTeams(): toggle lock/unlock the ability to change teams.
     - resetTeams(): move everyone to spectators.
@@ -176,7 +180,6 @@ client.on("ready", () => {
     - resetTeam(teamId): move everyone on team(teamId) to spectators.
     - setSync(value): set synchronized status to value. host-only. value: boolean
     - getDefaultStadium(index): get default stadium array\[index\].
-    - getStoredStadiums(callback): get all stored stadiums. callback: (parsedStadiumArray)=>{}
     - parseStadium(textDataFromHbsFile, onError): parse text as a stadium object and return it.
     - setCurrentStadium(stadium, onError): set current map(stadium).
     - setTimeLimit(value): set time limit(value).

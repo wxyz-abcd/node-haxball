@@ -32,7 +32,6 @@
   "dependencies": {
     "@koush/wrtc": "^0.5.3",
     "@peculiar/webcrypto": "^1.4.0",
-    "jsdom": "^20.0.1",
     "json5": "^2.2.1",
     "pako": "^2.0.4",
     "vm": "^0.1.0",

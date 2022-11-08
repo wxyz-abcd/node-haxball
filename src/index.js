@@ -1,8 +1,5 @@
 const { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("@koush/wrtc");
 const { Crypto } = require("@peculiar/webcrypto");
-const jsdom = require("jsdom");
-const { Blob } = require("node:buffer");
-const { JSDOM } = jsdom;
 const { inherits } = require("util");
 const { EventEmitter } = require("events");
 const WebSocket = require("ws");
@@ -38,6 +35,8 @@ const OperationType = {
   KickBanPlayer: 16,
   SetSync: 17
 };
+
+var crypto = new Crypto();
 
 function HaxballEvent(type, fName, nameMapping, extraCondition){
   this.type = type;
@@ -105,66 +104,7 @@ function recognizeEvent(obj){
 function Haxball(options){
   EventEmitter.call(this);
   this.room = null;
-
-  const window = new JSDOM(
-    `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-    <base target="_top"/>
-    </head>
-  <body>
-    <div class="loader-view">
-      <div class="dialog">
-        <h1>Loading</h1>
-        <div class="spinner">
-          <div class="rect1"></div>
-          <div class="rect2"></div>
-          <div class="rect3"></div>
-          <div class="rect4"></div>
-          <div class="rect5"></div>
-        </div>
-      </div>
-    </div>
-  </body>
-  </html>`,
-    {
-      url: "https://www.haxball.com/PFj3geCw/__cache_static__/g/",
-      referrer: "https://haxball.com/",
-      resources: "usable",
-      contentType: "text/html",
-      includeNodeLocations: true,
-      storageQuota: 10000000,
-    }
-  ).window;
   
-  /*
-  setInterval(() => {
-    console.log(window.document.body.innerHTML);
-  }, 2000);
-  */
-  
-  window.update = function () {};
-  window.performance = perfHooks.performance;
-  window.JSON5 = JSON5;
-  window.pako = pako;
-  var w1ndow = {
-    crypto: new Crypto()
-  };
-  window.location = {
-    ancestorOrigins: {},
-    href: "https://www.haxball.com/play",
-    origin: "https://www.haxball.com",
-    protocol: "https:",
-    host: "www.haxball.com",
-    hostname: "www.haxball.com",
-    port: "",
-    pathname: "/play",
-    search: "",
-    hash: "",
-  };
   class ILocalStorage {
     constructor() {
       this.storage = {};
@@ -184,21 +124,27 @@ function Haxball(options){
     };
   }
 
-  var localStorage = new ILocalStorage();
-
-  window.requestAnimationFrame = function(callback){
-    return setTimeout(callback, 0);
+  var window = {
+    crypto: crypto,
+    setTimeout: setTimeout,
+    clearTimeout: clearTimeout,
+    setInterval: setInterval,
+    clearInterval: clearInterval,
+    performance: perfHooks.performance,
+    console: console,
+    location: {
+      origin: "https://www.haxball.com"
+    },
+    requestAnimationFrame: (callback) => setTimeout(callback, 0),
+    cancelAnimationFrame: clearTimeout,
+    localStorage: new ILocalStorage()
   };
-  window.cancelAnimationFrame = function(obj){
-    clearTimeout(obj);
-  };
-
+  
   var haxball = this;
 
   if (options){
-    for (const [key, value] of Object.entries(options)) {
-      localStorage.setItem(key, value)
-    }
+    for (const [key, value] of Object.entries(options))
+      window.localStorage.setItem(key, value);
   }
   
   var internalData = {
@@ -219,13 +165,13 @@ function Haxball(options){
     createRoom: null,
     kickerObj: null,
     mapObj: null,
-    mapStorageObj: null,
     parserObj: null,
     StadiumSyntaxError: null,
     StadiumCustomError: null,
     teams: null,
     generalStorageObj: null,
     ObjectConverter: null,
+    authObj: null,
     dummyPromise: Promise.resolve(),
     keyState: 0,
     onOperationReceived: function(msg) {
@@ -607,14 +553,11 @@ function Haxball(options){
         A.i(k.qb);
       };
     }
-    */
     function Ya(a) {
       this.fk = !1;
-      /*
       this.qm = new za(p.Ia);
       this.Lj = new za(p.xa);
       this.Hl = new za(p.fa);
-      */
       var b = this;
       this.g = v.Ga(Ya.N);
       var c = v.Ea(this.g);
@@ -633,14 +576,12 @@ function Haxball(options){
       this.qf = c.get("score-limit-sel");
       this.rm = c.get("stadium-name");
       this.sm = c.get("stadium-pick");
-      /*
       this.sm.onclick = function () {
         A.i(b.Xp);
       };
       this.Th(c.get("red-list"), this.Hl, p.fa, a);
       this.Th(c.get("blue-list"), this.Lj, p.xa, a);
       this.Th(c.get("spec-list"), this.qm, p.Ia, a);
-      */
       this.Uk(this.wf, this.Tk(15));
       this.Uk(this.qf, this.Tk(15));
       this.wf.onchange = function () {
@@ -667,7 +608,6 @@ function Haxball(options){
       this.Rl.onclick = function () {
         null != b.ee && (b.ee(p.xa), b.ee(p.fa));
       };
-      /*
       this.Fl.onclick = function () {
         A.i(b.Qp);
       };
@@ -677,14 +617,12 @@ function Haxball(options){
       e.onclick = function () {
         A.i(b.de);
       };
-      */
       f.onclick = function () {
         A.i(b.Pp);
       };
       this.Bj(!1);
       this.Cj(!1);
     }
-    /*
     function Za() {
       var a = this;
       this.g = v.Ga(Za.N);
@@ -1092,22 +1030,22 @@ function Haxball(options){
     }
     */
     function ja(a) {
-      //this.Fb = new hb();
+      /*
+      this.Fb = new hb();
       this.Gd = !1;
-      //this.pe = new Xa();
-      //this.Qa = new Da();
-      //var b = this;
+      this.pe = new Xa();
+      this.Qa = new Da();
+      var b = this;
       this.Wa = new Ya(a);
-      //this.Fb.Nb = a;
+      this.Fb.Nb = a;
       this.g = v.Ga(ja.N);
       a = v.Ea(this.g);
       this.Jh = a.get("gameplay-section");
       this.hf = a.get("popups");
       this.hf.style.display = "none";
-      //v.xe(a.get("chatbox"), this.Qa.g);
-      //v.xe(a.get("stats"), this.pe.g);
+      v.xe(a.get("chatbox"), this.Qa.g);
+      v.xe(a.get("stats"), this.pe.g);
       this.bi = a.get("menu");
-      /*
       this.bi.onclick = function () {
         b.me(!b.Gd);
         b.bi.blur();
@@ -1326,7 +1264,7 @@ function Haxball(options){
       l.kg = function (a) {
         e = a;
         t.Bg = u.$h(a, null != l.Ib);
-        h || ((h = !0), x.La(t.j.g));
+        //h || ((h = !0), x.La(t.j.g));
         haxball.room._onRoomLink(t.Bg);
       };
       t.Ih.Np = function (a, b, c, d) {
@@ -2001,7 +1939,7 @@ function Haxball(options){
     }
     function Ra() {
       this.$d = this.Yf = 0;
-      window.document.addEventListener("focusout", G(this, this.al));
+      //window.document.addEventListener("focusout", G(this, this.al));
     }
     function Gb(a, b) {
       this.Rh = null;
@@ -2030,13 +1968,14 @@ function Haxball(options){
       this.j = new ja(a.uc);
       this.Ih = new Gb(this.j, a.T.na(a.uc).w);
       this.Ih.ri(a.T);
-      //this.j.Qa.fl = G(this, this.Gp);
-      //this.j.Qa.ig = G(this, this.Fp);
-      //window.document.addEventListener("keydown", G(this, this.Bd));
-      //window.document.addEventListener("keyup", G(this, this.Cd));
-      //window.onbeforeunload = function () {
-        //return "Are you sure you want to leave the room?";
-      //};
+      /*
+      this.j.Qa.fl = G(this, this.Gp);
+      this.j.Qa.ig = G(this, this.Fp);
+      window.document.addEventListener("keydown", G(this, this.Bd));
+      window.document.addEventListener("keyup", G(this, this.Cd));
+      window.onbeforeunload = function () {
+        return "Are you sure you want to leave the room?";
+      };
       this.ob.ng = function (b) {
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
@@ -2088,7 +2027,6 @@ function Haxball(options){
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
       };
-      /*
       this.j.Wa.ff = function (c) {
         var d = a.T.na(c);
         if (null != d) {
@@ -2126,8 +2064,74 @@ function Haxball(options){
         }
         b.j.Wa.rr(null != b.Ed);
       };
-      */
       this.j.Wa._Qp_ = function (start) {
+        if (start){
+          if (null != b.Ed)
+            return false;
+          b.zr();
+          return true;
+        }
+        else {
+          if (null == b.Ed)
+            return null;
+          var a = b.Ed.stop();
+          b.Ed = null;
+          return a;
+        }
+      };
+      */
+      this.ob.ng = function (b) {
+        a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
+      };
+      this.j.aq = function (b) {
+        b = da.la(1, b);
+        a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
+      };
+      this.j.Tp = function (b) {
+        b = da.la(0, b);
+        a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
+      };
+      this.j.og = function (b) {
+        b = qa.la(b);
+        a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
+      };
+      this.j.Yp = function () {
+        var msg = new Ma();
+        a.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
+      };
+      this.j.Zp = function () {
+        var msg = new La();
+        a.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
+      };
+      this.j.Mp = function () {
+        b.Bm();
+      };
+      this.j.mg = function (b, c) {
+        var d = S.la(b, c);
+        a.ra(d);
+        internalData.execOperationReceivedOnHost(d);
+      };
+      this.j.ee = this.Wq.bind(this); // G(this, this.Wq);
+      this.j.Dp = function () {
+        var msg = new Qa();
+        a.ra(msg);
+        internalData.execOperationReceivedOnHost(msg);
+      };
+      this.j.Pp = function () {
+        ba.Bq(a);
+      };
+      this.j.$p = function (b) {
+        b = pa.la(b);
+        a.ra(b);
+        internalData.execOperationReceivedOnHost(b);
+      };
+      this.j._Qp_ = function (start) {
         if (start){
           if (null != b.Ed)
             return false;
@@ -2166,7 +2170,7 @@ function Haxball(options){
       this.ya = a;
       this.ba = b;
     }
-    function Hb() {}
+    //function Hb() {}
     function tb(a, b) {
       this.Nj = a;
       this.Si = b;
@@ -2383,15 +2387,17 @@ function Haxball(options){
     function lc() {}
     function zb() {}
     function v() {}
+    /*
     function Db(a, b) {
       this.Ja = a;
       this.value = b;
       a.textContent = "" + b;
     }
-    //function Ca() {}
+    function Ca() {}
+    */
     function mc() {}
     function Ba() {}
-    function Ja() {}
+    //function Ja() {}
     function I() {}
     function w(a, b) {
       null == b && (b = !1);
@@ -2530,9 +2536,11 @@ function Haxball(options){
     function K() {}
     function ec() {}
     function D() {}
+    /*
     function fc(a, b) {
       this.r = new RegExp(a, b.split("u").join(""));
     }
+    */
     function ga() {
       return r.Be(this, "");
     }
@@ -2553,6 +2561,7 @@ function Haxball(options){
     }
     var Ab = Ab || {},
       X;
+    /*
     fc.b = !0;
     fc.prototype = {
       match: function (a) {
@@ -2584,6 +2593,7 @@ function Haxball(options){
       },
       f: fc,
     };
+    */
     D.b = !0;
     D.bj = function (a, b) {
       var c = a.charCodeAt(b);
@@ -3618,11 +3628,11 @@ function Haxball(options){
     I.b = !0;
     I.yo = function () {
       try {
-        return w1ndow.crypto.subtle
+        return window.crypto.subtle
           .generateKey(I.qh, !0, ["sign", "verify"])
           .then(function (a) {
             var b = a.privateKey;
-            return w1ndow.crypto.subtle.exportKey("jwk", b).then(function (a) {
+            return window.crypto.subtle.exportKey("jwk", b).then(function (a) {
               var c = a.y,
                 e = a.d,
                 f = new I();
@@ -3670,7 +3680,7 @@ function Haxball(options){
         }
         return I.Wr(g, k)
           .then(function (a) {
-            return w1ndow.crypto.subtle.verify(I.mm, a, e, d);
+            return window.crypto.subtle.verify(I.mm, a, e, d);
           })
           .then(function (a) {
             if (!a) throw new q(null);
@@ -3682,7 +3692,7 @@ function Haxball(options){
     };
     I.Xr = function (a, b, c) {
       try {
-        return w1ndow.crypto.subtle.importKey(
+        return window.crypto.subtle.importKey(
           "jwk",
           {
             crv: "P-256",
@@ -3703,7 +3713,7 @@ function Haxball(options){
     };
     I.Wr = function (a, b) {
       try {
-        return w1ndow.crypto.subtle.importKey(
+        return window.crypto.subtle.importKey(
           "jwk",
           { crv: "P-256", ext: !0, key_ops: ["verify"], kty: "EC", x: a, y: b },
           I.qh,
@@ -3731,7 +3741,7 @@ function Haxball(options){
           var e = b.a - d;
           b.o.setUint16(c, e, b.Sa);
           var f = new Uint8Array(b.o.buffer, b.o.byteOffset + d, e);
-          return w1ndow.crypto.subtle.sign(I.mm, this.Al, f).then(function (a) {
+          return window.crypto.subtle.sign(I.mm, this.Al, f).then(function (a) {
             b.Mg(a);
             return b.Sb();
           });
@@ -3741,6 +3751,8 @@ function Haxball(options){
       },
       f: I,
     };
+    internalData.authObj = I;
+    /*
     Ja.b = !0;
     Ja.gp = function () {
       if (null != Ja.li) return Ja.li;
@@ -3761,12 +3773,14 @@ function Haxball(options){
       });
       return Ja.li;
     };
+    */
     Ba.b = !0;
     Ba.cg = function (a) {
       return a;
     };
     mc.b = !0;
     mc.ts = function () {
+      /*
       var a = window;
       a.RTCPeerConnection =
         a.webkitRTCPeerConnection ||
@@ -3778,9 +3792,11 @@ function Haxball(options){
         a.webkitRTCSessionDescription ||
         a.mozRTCSessionDescription ||
         a.RTCSessionDescription;
+      */
       var b = new RTCPeerConnection({ iceServers: [] });
-      try {
-        b.createAnswer()["catch"](function () {});
+      //try {
+      b.createAnswer()["catch"](function () {});
+      /*
       } catch (e) {
         var a = a.RTCPeerConnection.prototype,
           c = a.createOffer,
@@ -3798,6 +3814,7 @@ function Haxball(options){
           });
         };
       }
+      */
     };
     /*
     Ca.b = !0;
@@ -3818,7 +3835,6 @@ function Haxball(options){
       URL.revokeObjectURL(d);
       c.remove();
     };
-    */
     Db.b = !0;
     Db.prototype = {
       set: function (a) {
@@ -3850,6 +3866,7 @@ function Haxball(options){
       for (var b = a.firstChild; null != b; )
         a.removeChild(b), (b = a.firstChild);
     };
+    */
     zb.b = !0;
     zb.eh = function (a) {
       return new Promise(function (b, c) {
@@ -4838,6 +4855,7 @@ function Haxball(options){
       },
       f: tb,
     };
+    /*
     Hb.b = !0;
     Hb.gf = function (a) {
       var b = new fc("([^&=]+)=?([^&]*)", "g");
@@ -4855,7 +4873,6 @@ function Haxball(options){
     Hb.L = function () {
       return Hb.gf(window.location.search);
     };
-    /*
     ub.b = !0;
     ub.cq = function (a) {
       if (3 > a.length) throw new q("Not enough arguments");
@@ -5112,8 +5129,8 @@ function Haxball(options){
         //window.document.removeEventListener("keydown", G(this, this.Bd));
         //window.document.removeEventListener("keyup", G(this, this.Cd));
         //window.onbeforeunload = null;
-        //window.cancelAnimationFrame(this.De);
-        this.ob.ia();
+        window.cancelAnimationFrame(this.De);
+        //this.ob.ia();
         //window.clearInterval(this.Gh);
         window.clearInterval(this.Qr);
         window.clearTimeout(this.Nf);
@@ -5406,9 +5423,9 @@ function Haxball(options){
       }
     };
     Ra.prototype = {
-      ia: function () {
+      /*ia: function () {
         window.document.removeEventListener("focusout", G(this, this.al));
-      },
+      },*/
       C: function () {
         var a = internalData.keyState;//this.$d
         if (null != this.ng && a != this.Yf) {
@@ -5428,7 +5445,7 @@ function Haxball(options){
         if (null != this.ng && 0 != this.Yf) {
           this.Yf = this.$d = 0;
           var a = new Ga();
-          a.input = internalData.keyState;//0
+          a.input = 0;//internalData.keyState;
           this.ng(a);
         }
       },
@@ -5470,7 +5487,7 @@ function Haxball(options){
     Xb.b = !0;
     Xb.Pm = function () {
       try {
-        var a = localStorage;
+        var a = window.localStorage;
         a.getItem("");
         if (0 == a.length) {
           var b = "_hx_" + Math.random();
@@ -5562,16 +5579,16 @@ function Haxball(options){
     u.b = !0;
     u.qp = function () {
       mc.ts();
-      x.fj(function () {
-        //u.jk(u.xq);
+      Promise.all([x.fj(/*function () {
+        u.jk(u.xq);
+      }*/), u.hp()]).then(()=>{
         haxball.emit("ready");
       });
-      u.hp();
     };
     u.hp = function () {
       var a = n.A.Gj.L();
       if (null == a)
-        I.yo()
+        return I.yo()
           .then(function (a) {
             u.Je = a;
             n.A.Gj.Xa(a.Ir());
@@ -5580,7 +5597,7 @@ function Haxball(options){
             return {};
           });
       else
-        I.xo(a)
+        return I.xo(a)
           .then(function (a) {
             return (u.Je = a);
           })
@@ -5657,14 +5674,14 @@ function Haxball(options){
       };
       e(a, "");
     };
+    /*
     u.xq = function () {
       var a = Hb.L(),
         b = a.get("c"),
         c = a.get("p");
       a.get("v");
-      null != b && (/*null != c ? u.Dh(b) : */u.Pf(b))/* : u.xb()*/;
+      null != b && (null != c ? u.Dh(b) : u.Pf(b)) : u.xb();
     };
-    /*
     u.xb = function () {
       var a = new Aa(n.A.Lh());
       x.La(a.Ja);
@@ -5952,7 +5969,7 @@ function Haxball(options){
             };
             */
             b.Bg = u.$h(a, !1);
-            x.La(b.j.g);
+            //x.La(b.j.g);
             b.j.de = function () {
               t.Ad = null;
               t.ia();
@@ -6060,14 +6077,14 @@ function Haxball(options){
       kc.fj();
       var b;
       null == n.A.Me.L()
-        ? T.Fo().then(
+        ? (b = T.Fo().then(
             function (a) {
               n.A.Me.Xa(a);
             },
             function () {
               return {};
             }
-          )
+          ))
         : (b = Promise.resolve(null));
       return Promise.all([
         /*
@@ -6106,9 +6123,9 @@ function Haxball(options){
           .catch((error) => console.log(error)),
         */
         b,
-      ]).then(function () {
+      ])/*.then(function () {
         x.us(a);
-      });
+      })*/;
       //});
     };
     /*
@@ -6133,7 +6150,6 @@ function Haxball(options){
           x.La(a.g))
         : a();
     };
-    */
     x.us = function (a) {
       window.document.body.innerHTML = "";
       x.Pg = window.document.createElement("div");
@@ -6150,7 +6166,6 @@ function Haxball(options){
       null != x.Vm && x.Vm.remove();
       null != a && (x.Pg.appendChild(a), (x.Vm = a));
     };
-    /*
     Vb.b = !0;
     Vb.prototype = {
       ia: function () {
@@ -6282,6 +6297,7 @@ function Haxball(options){
         return va.parse(new F(new DataView(a), !1));
       });
     };
+    /*
     Z.b = !0;
     Z["delete"] = function (a) {
       return null == window.indexedDB
@@ -6431,8 +6447,6 @@ function Haxball(options){
             };
           });
     };
-    internalData.mapStorageObj = Z;
-    /*
     Ub.b = !0;
     Ub.prototype = {
       Tl: function () {
@@ -10320,12 +10334,13 @@ function Haxball(options){
     ja.b = !0;
     ja.prototype = {
       C: function (a) {
-        //null == a.T.K && this.me(!0);
+        /*
+        null == a.T.K && this.me(!0);
         A.i(this.yl);
         this.bi.disabled = null == a.T.K;
         this.Gd
           ? this.Wa.C(a.T, a.T.na(a.uc))
-          : ((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a)/*, this.Fb.C(a), n.Na.Xj?.Ls(a)*/);
+          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a)/*, this.Fb.C(a), n.Na.Xj?.Ls(a)*/);
       },
       /*
       me: function (a) {
@@ -10334,7 +10349,6 @@ function Haxball(options){
             ? (this.Jh.appendChild(this.Wa.g), this.Fb.g.remove())
             : (this.Jh.appendChild(this.Fb.g), this.Wa.g.remove()));
       },
-      */
       Zo: function () {
         return null != ja.kq;
       },
@@ -10347,6 +10361,7 @@ function Haxball(options){
             (this.yl = b))
           : ((this.hf.style.display = "none"), (this.yl = null));
       },
+      */
       f: ja,
     };
     /*
@@ -10658,7 +10673,6 @@ function Haxball(options){
       },
       f: Za,
     };
-    */
     Ya.b = !0;
     Ya.prototype = {
       Th: function (a, b, c, d) {
@@ -10673,9 +10687,9 @@ function Haxball(options){
         b.Kp = function (a) {
           ia.i(e.mg, d, a);
         };
-        /*b.ff = function (a) {
+        b.ff = function (a) {
           y.i(e.ff, a);
-        };*/
+        };
       },
       Tk: function (a) {
         for (var b = [], c = 0; c < a; ) {
@@ -10712,7 +10726,6 @@ function Haxball(options){
         this.qf.selectedIndex = a.ib;
         this.rm.textContent = a.S.w;
         this.rm.classList.toggle("custom", !a.S.Pe());
-        /*
         var e = a.Pc;
         this.Hl.C(
           a.I.filter(function (a) {
@@ -10738,7 +10751,6 @@ function Haxball(options){
           d,
           c
         );
-        */
         this.Rl.disabled = d;
         this.Xh != a.Pc && this.Bj(a.Pc);
         d && ((c = 120 == a.K.Oa), this.ll != c && this.Cj(c));
@@ -10756,7 +10768,6 @@ function Haxball(options){
       },
       f: Ya,
     };
-    /*
     aa.b = !0;
     aa.prototype = { f: aa };
     P.b = !0;
@@ -11031,10 +11042,8 @@ function Haxball(options){
       "<div class='disconnected-view'><div class='dialog basic-dialog'><h1>Disconnected</h1><p data-hook='reason'></p><div class='buttons'><button data-hook='ok'>Ok</button><button data-hook='replay'>Save replay</button></div></div></div>";
     hb.N =
       "<div class='game-state-view'><div class='bar-container'><div class='bar'><div class='scoreboard'><div class='teamicon red'></div><div class='score' data-hook='red-score'>0</div><div>-</div><div class='score' data-hook='blue-score'>0</div><div class='teamicon blue'></div></div><div data-hook='timer'></div></div></div></div></div>";//<div class='canvas' data-hook='canvas'></div></div>";
-    */
     ja.N =
       "<div class='game-view' tabindex='-1'><div class='top-section' data-hook='gameplay-section'></div><div class='bottom-section'><div data-hook='stats'></div><div data-hook='chatbox'></div><div class='buttons'><button data-hook='menu'><i class='icon-menu'></i>Menu<span class='tooltip'>Toggle room menu [Escape]</span></button><button data-hook='settings'><i class='icon-cog'></i>Settings</button></div></div><div data-hook='popups'></div></div>";
-    /*
     gb.N =
       "<div class='dialog kick-player-view'><h1 data-hook='title'></h1><div class=label-input><label>Reason: </label><input type='text' data-hook='reason' /></div><button data-hook='ban-btn'><i class='icon-block'></i>Ban from rejoining: <span data-hook='ban-text'></span></button><div class=\"row\"><button data-hook='close'>Cancel</button><button data-hook='kick'>Kick</button></div></div>";
     fb.N =
@@ -11057,10 +11066,8 @@ function Haxball(options){
       "<div class='roomlist-view'><div class='notice' data-hook='notice' hidden><div data-hook='notice-contents'>Testing the notice.</div><div data-hook='notice-close'><i class='icon-cancel'></i></div></div><div class='dialog'><h1>Room list</h1><p>Tip: Join rooms near you to reduce lag.</p><div class='splitter'><div class='list'><table class='header'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class='separator'></div><div class='content' data-hook='listscroll'><table><colgroup><col><col><col><col></colgroup><tbody data-hook='list'></tbody></table></div><div class='filters'><span class='bool' data-hook='fil-pass'>Show locked <i></i></span><span class='bool' data-hook='fil-full'>Show full <i></i></span></div></div><div class='buttons'><button data-hook='refresh'><i class='icon-cw'></i><div>Refresh</div></button><button data-hook='join'><i class='icon-login'></i><div>Join Room</div></button><button data-hook='create'><i class='icon-plus'></i><div>Create Room</div></button><div class='spacer'></div><div class='file-btn'><label for='replayfile'><i class='icon-play'></i><div>Replays</div></label><input id='replayfile' type='file' accept='.hbr2' data-hook='replayfile'/></div><button data-hook='settings'><i class='icon-cog'></i><div>Settings</div></button><button data-hook='changenick'><i class='icon-cw'></i><div>Change Nick</div></button></div></div><p data-hook='count'></p></div></div>";
     Za.N =
       "<div class='room-password-view'><div class='dialog'><h1>Password required</h1><div class='label-input'><label>Password:</label><input data-hook='input' /></div><div class='buttons'><button data-hook='cancel'>Cancel</button><button data-hook='ok'>Ok</button></div></div></div>";
-    */
     Ya.N =
       "<div class='room-view'><div class='container'><h1 data-hook='room-name'></h1><div class='header-btns'><button data-hook='rec-btn'><i class='icon-circle'></i>Rec</button><button data-hook='link-btn'><i class='icon-link'></i>Link</button><button data-hook='leave-btn'><i class='icon-logout'></i>Leave</button></div><div class='teams'><div class='tools admin-only'><button data-hook='auto-btn'>Auto</button><button data-hook='rand-btn'>Rand</button><button data-hook='lock-btn'>Lock</button><button data-hook='reset-all-btn'>Reset</button></div><div data-hook='red-list'></div><div data-hook='spec-list'></div><div data-hook='blue-list'></div><div class='spacer admin-only'></div></div><div class='settings'><div><label class='lbl'>Time limit</label><select data-hook='time-limit-sel'></select></div><div><label class='lbl'>Score limit</label><select data-hook='score-limit-sel'></select></div><div><label class='lbl'>Stadium</label><label class='val' data-hook='stadium-name'>testing the stadium name</label><button class='admin-only' data-hook='stadium-pick'>Pick</button></div></div><div class='controls admin-only'><button data-hook='start-btn'><i class='icon-play'></i>Start game</button><button data-hook='stop-btn'><i class='icon-stop'></i>Stop game</button><button data-hook='pause-btn'><i class='icon-pause'></i>Pause</button></div></div></div>";
-    /*
     aa.N =
       "<div class='dialog settings-view'><h1>Settings</h1><button data-hook='close'>Close</button><div class='tabs'><button data-hook='soundbtn'>Sound</button><button data-hook='videobtn'>Video</button><button data-hook='inputbtn'>Input</button><button data-hook='miscbtn'>Misc</button></div><div data-hook='presskey' tabindex='-1'><div>Press a key</div></div><div class='tabcontents'><div class='section' data-hook='miscsec'><div class='loc' data-hook='loc'></div><div class='loc' data-hook='loc-ovr'></div><button data-hook='loc-ovr-btn'></button></div><div class='section' data-hook='soundsec'><div data-hook=\"tsound-main\">Sounds enabled</div><div data-hook=\"tsound-chat\">Chat sound enabled</div><div data-hook=\"tsound-highlight\">Nick highlight sound enabled</div><div data-hook=\"tsound-crowd\">Crowd sound enabled</div></div><div class='section' data-hook='inputsec'></div><div class='section' data-hook='videosec'><div>Viewport Mode:<select data-hook='viewmode'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook='fps'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook='resscale'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook=\"tvideo-teamcol\">Custom team colors enabled</div><div data-hook=\"tvideo-showindicators\">Show chat indicators</div><div data-hook=\"tvideo-showavatars\">Show player avatars</div></div></div></div>";
     aa.$l = 0;
@@ -11073,7 +11080,7 @@ function Haxball(options){
     */
     r.sn = {}.toString;
     u.qp();
-  })(
+  })(window/*
     "undefined" != typeof window
       ? window
       : "undefined" != typeof global
@@ -11081,10 +11088,23 @@ function Haxball(options){
       : "undefined" != typeof self
       ? self
       : this
-  );
+  */);
 }
 
 inherits(Haxball, EventEmitter);
+
+Haxball.generateAuthKey = function(){
+  try {
+    return crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]).then(function (a) {
+        var b = a.privateKey;
+        return crypto.subtle.exportKey("jwk", b).then(function (a) {
+          return "idkey." + a.x + "." + a.y + "." + a.d;
+        });
+      });
+  } catch (a) {
+    return Promise.reject(a);
+  }
+};
 
 function Room(internalData, plugins){
   if (!internalData.isHost)
@@ -11707,40 +11727,44 @@ function Room(internalData, plugins){
   };
 
   this.startGame = function(){
-    internalData.roomObj?.j?.Wa.Yp();
+    internalData.roomObj?.j?.Yp();
   };
 
   this.stopGame = function(){
-    internalData.roomObj?.j?.Wa.Zp();
+    internalData.roomObj?.j?.Zp();
   };
 
   this.pauseGame = function(){
-    internalData.roomObj?.j?.Wa.Mp();
+    internalData.roomObj?.j?.Mp();
   };
 
   this.autoTeams = function(){
-    internalData.roomObj?.j?.Wa.Dp();
+    internalData.roomObj?.j?.Dp();
   };
 
   this.lockTeams = function(){
-    internalData.roomObj?.j?.Wa.$p(!(internalData.roomObj?.j?.Wa.Xh));
+    internalData.roomObj?.j?.$p(!(internalData.roomPhysicsObj?.Pc));
+  };
+
+  this.isGamePaused = function(){
+    return (120 == internalData.roomPhysicsObj?.K?.Oa);
   };
 
   this.resetTeams = function(){
-    internalData.roomObj?.j?.Wa.ee(internalData.teams.blue);
-    internalData.roomObj?.j?.Wa.ee(internalData.teams.red);
+    internalData.roomObj?.j?.ee(internalData.teams.blue);
+    internalData.roomObj?.j?.ee(internalData.teams.red);
   };
 
   this.startRecording = function(){ // return true(success)/false(failure - already recording)
-    return internalData.roomObj?.j?.Wa._Qp_(true);
+    return internalData.roomObj?.j?._Qp_(true);
   };
 
   this.stopRecording = function(){ // return Uint8Array(success)/null(failure - recording not started)
-    return internalData.roomObj?.j?.Wa._Qp_(false);
+    return internalData.roomObj?.j?._Qp_(false);
   };
 
   this.randTeams = function(){
-    internalData.roomObj?.j?.Wa.Pp();
+    internalData.roomObj?.j?.Pp();
   };
 
   this.setSync = function(value){ // host-only
@@ -11753,10 +11777,6 @@ function Room(internalData, plugins){
 
   this.getDefaultStadium = function(index){
     return internalData.mapObj.wb[index];
-  };
-
-  this.getStoredStadiums = function(callback){
-    internalData.mapStorageObj.getAll().then(callback);
   };
 
   this.parseStadium = function(textDataFromHbsFile, onError){
@@ -11784,25 +11804,25 @@ function Room(internalData, plugins){
   };
 
   this.setTimeLimit = function(value){
-    internalData.roomObj?.j?.Wa.aq(value);
+    internalData.roomObj?.j?.aq(value);
   };
 
   this.setScoreLimit = function(value){
-    internalData.roomObj?.j?.Wa.Tp(value);
+    internalData.roomObj?.j?.Tp(value);
   };
 
   this.changeTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.Wa.mg(internalData.roomObj.ya.uc, internalData.teams.spec);  // room.currentPlayerId = internalData.roomObj.ya.uc
+        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.spec);  // room.currentPlayerId = internalData.roomObj.ya.uc
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.Wa.mg(internalData.roomObj.ya.uc, internalData.teams.red);  // room.currentPlayerId = internalData.roomObj.ya.uc
+        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.red);  // room.currentPlayerId = internalData.roomObj.ya.uc
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.Wa.mg(internalData.roomObj.ya.uc, internalData.teams.blue);  // room.currentPlayerId = internalData.roomObj.ya.uc
+        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.blue);  // room.currentPlayerId = internalData.roomObj.ya.uc
         break; 
       }
     }
@@ -11811,15 +11831,15 @@ function Room(internalData, plugins){
   this.resetTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.Wa.ee(internalData.teams.spec); 
+        internalData.roomObj?.j?.ee(internalData.teams.spec); 
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.Wa.ee(internalData.teams.red); 
+        internalData.roomObj?.j?.ee(internalData.teams.red); 
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.Wa.ee(internalData.teams.blue); 
+        internalData.roomObj?.j?.ee(internalData.teams.blue); 
         break; 
       }
     }
@@ -11828,15 +11848,15 @@ function Room(internalData, plugins){
   this.setPlayerTeam = function(playerId, teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.Wa.mg(playerId, internalData.teams.spec);
+        internalData.roomObj?.j?.mg(playerId, internalData.teams.spec);
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.Wa.mg(playerId, internalData.teams.red);
+        internalData.roomObj?.j?.mg(playerId, internalData.teams.red);
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.Wa.mg(playerId, internalData.teams.blue);
+        internalData.roomObj?.j?.mg(playerId, internalData.teams.blue);
         break; 
       }
     }
