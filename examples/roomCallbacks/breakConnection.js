@@ -28,7 +28,7 @@ function roomCallback(room){ // examples start from here.
         if (m.startsWith("!")){  // custom chat logic for extra commands
         */
         if (customData.isCommand){ // same as above 2 lines.
-          var arr = isCommand.data; // same as var arr = m.trimEnd().split(" ");
+          var arr = customData.data; // same as var arr = m.trimEnd().split(" ");
           switch (arr[0]){
             case "!breakKick":
               breakConnection(playerId, parseInt(arr[1]));
