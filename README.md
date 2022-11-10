@@ -6,7 +6,7 @@
 
 <h1 id="title" align="center">node-haxball</h1>
 
-<h4 align="center">node-haxball is a powerful Node.js module that allows you to easily interact with the Haxball Client.</h4>
+<h4 align="center">node-haxball is the most powerful and lightweight bot API written by abc as a node.js module that will include every possible hack and functionality that you can imagine as a Haxball(www.haxball.com) host/client. </h4>
 
 ### 🔖 Table Of Contents
 
@@ -83,11 +83,13 @@ client.on("ready", () => {
 
 <h2 id="technologies">🚀 Technologies</h2>
 
-- wrtc - WebRTC implementation for NodeJS
-- ws - Websocket Connection Module for NodeJS
-- JSON5 - JSON Helper Module for NodeJS
-- @peculiar/webcrypto - Webcrypto implementation for NodeJS
-- pako - ZLIB Port for NodeJS
+- wrtc - WebRTC implementation for node.js
+- ws - Websocket connection module for node.js
+- JSON5 - JSON helper module for node.js
+- @peculiar/webcrypto - Webcrypto implementation for node.js
+- pako - ZLIB port for node.js
+- xhr2 - XMLHttpRequest port for node.js
+- perf_hooks - Web Performance API for node.js
 
 [Back To The Top](#title)
 
@@ -96,7 +98,8 @@ client.on("ready", () => {
 <h2 id="minimal-requirements">🌱 Minimal Requirements</h2>
 
 - NPM
-- NodeJs
+- Node.js
+- NW.js (for token generation sub-project)
 
 [Back To The Top](#title)
 
@@ -381,8 +384,9 @@ client.on("ready", () => {
 
 <p>
 
-<a href="https://github.com/wxyz-abcd"><img width="60" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a>
-<a href="https://github.com/mertushka"><img width="60" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a>
+node.js initial environment by mertushka <a href="https://github.com/mertushka"><img width="60" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a>
+%98 of the features by abc <a href="https://github.com/wxyz-abcd"><img width="60" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a>
+rest of the features by 0x00  <a href="https://github.com/0x00214131812049"><img width="60" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a>
 
 </p>
 
@@ -392,6 +396,10 @@ client.on("ready", () => {
 
 <h2 id="license">🔏 License</h2>
 
-Copyright © 2022 [wxyz-abcd](https://github.com/wxyz-abcd)
+MIT License, Copyright © 2022 [abc](https://github.com/wxyz-abcd)
+
+Absolutely no rights reserved. Do whatever you want with the codes. 
+
+We do not take any responsibility on potential harm caused by this code. Use at your own risk, and be creative. :)
 
 [Back To The Top](#title)

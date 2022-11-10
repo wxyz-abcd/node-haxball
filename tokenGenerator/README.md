@@ -6,7 +6,7 @@ This project uses NW.js. (https://nwjs.io/)
 
 1. Go to https://nwjs.io/ and download NORMAL or SDK version of NW.js for your platform.
 2. Extract NW.js files into a folder. (folderA)
-3. Copy tokenGenerator files into a folder. (folderB)
+3. Copy the files inside tokenGenerator/src into a folder. (folderB)
 4. Open a command prompt.
 5. Run executable "folderA/nw" with folderB's full path as its only command-line parameter. 
 (You might create a shortcut or a batch file for this.)
