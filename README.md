@@ -384,9 +384,11 @@ client.on("ready", () => {
 
 <p>
 
-node.js initial environment by mertushka <a href="https://github.com/mertushka"><img width="60" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a>
-%98 of the features by abc <a href="https://github.com/wxyz-abcd"><img width="60" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a>
-rest of the features by 0x00  <a href="https://github.com/0x00214131812049"><img width="60" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a>
+<div> - %70 of Node.js initial environment by mertushka <a href="https://github.com/mertushka"><img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
+<div> - Rest of Node.js initial environment and %98 of the bot API features by abc <a href="https://github.com/wxyz-abcd"><img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - Rest of the features by 0x00 <a href="https://github.com/0x00214131812049"><img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
+
+<div>We will continue to add all contributors to this list.</div>
 
 </p>
 
