@@ -232,6 +232,9 @@ function Haxball(options){
         console.log("internal event: LeaveRoom");
         //haxball.off("roomLeave", fLeaveRoom);
         //haxball.off("createRoomSucceeded", fCreateRoomSucceeded);
+        obj.plugins && (obj.plugins.forEach((p)=>{
+          p.finalize && p.finalize();
+        }));
         internalData.isHost = false;
         internalData.roomObj = null;
         internalData.roomPhysicsObj = null;
