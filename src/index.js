@@ -101,6 +101,804 @@ function recognizeEvent(obj){
   return allEvents[obj.__proto__.f.name]?.filter((x)=>(!x.extraCondition || obj[x.extraCondition[0]]==x.extraCondition[1]))[0];
 }
 
+
+
+
+
+// -- start of global Haxball classes --
+
+
+
+
+function Bb(a) {
+  this.xp = a;
+}
+
+function q(a) {
+  this.Ta = a;
+  Error.captureStackTrace && Error.captureStackTrace(this, q);
+}
+q.prototype = Error.prototype;
+Object.defineProperty(q.prototype, "message", {
+  get: function () {
+    return String(this.Ta);
+  },
+});
+function r() {}
+function D() {}
+function J() {}
+function M() {}
+function U() {}
+function Fb() {}
+function Wb() {}
+function va() {}
+function n() {}
+function F(a, b) {
+  null == b && (b = !1);
+  this.o = a;
+  this.Sa = b;
+  this.a = 0;
+}
+function wa(a, b, c, d) {
+  this.w = a;
+  this.Ur = d;
+  this.Yh = b;
+  d = null;
+  null != b && (d = b.getItem(a));
+  this.Hm = c(d);
+}
+function T() {
+  this.ub = "";
+  this.Ec = this.Gc = 0;
+}
+function K() {}
+function Xb() {}
+function W() {
+  this.Yc = new Map();
+}
+function Yb(storage) {
+  function a(a) {
+    return new wa(
+      a,
+      e,
+      function (a) {
+        if (null == a) return null;
+        try {
+          return T.Hh(a);
+        } catch (k) {
+          return null;
+        }
+      },
+      function (a) {
+        if (null == a) return null;
+        try {
+          return a.se();
+        } catch (k) {
+          return null;
+        }
+      }
+    );
+  }
+  function b(a) {
+    return new wa(
+      a,
+      e,
+      function (a) {
+        return null != a ? "0" != a : !0;
+      },
+      function (a) {
+        return a ? "1" : "0";
+      }
+    );
+  }
+  function c(a, b) {
+    return new wa(
+      a,
+      e,
+      function (a) {
+        var c = b;
+        try {
+          null != a && (c = K.parseInt(a));
+        } catch (t) {}
+        return c;
+      },
+      function (a) {
+        return "" + a;
+      }
+    );
+  }
+  function d(a, b, c) {
+    return new wa(
+      a,
+      e,
+      function (a) {
+        return null == a ? b : U.Qc(a, c);
+      },
+      function (a) {
+        return a;
+      }
+    );
+  }
+  var e = Xb.Pm(storage);
+  this.fe = d("player_name", "", 25);
+  this.Tb = c("view_mode", -1);
+  this.Fh = c("fps_limit", 0);
+  this.sh = d("avatar", null, 2);
+  d("rctoken", null, 1024);
+  this.xm = b("team_colors");
+  this.Ak = b("show_indicators");
+  this.pm = b("sound_main");
+  this.Hi = b("sound_chat");
+  this.om = b("sound_highlight");
+  this.nm = b("sound_crowd");
+  this.Gj = d("player_auth_key", null, 1024);
+  this.rd = c("extrapolation", 0);
+  this.Sl = (function (a, b) {
+    return new wa(
+      a,
+      e,
+      function (a) {
+        var c = b;
+        try {
+          null != a && (c = parseFloat(a));
+        } catch (t) {}
+        return c;
+      },
+      function (a) {
+        return "" + a;
+      }
+    );
+  })("resolution_scale", 1);
+  this.lm = b("show_avatars");
+  this.Me = a("geo");
+  this.Ne = a("geo_override");
+  this.tg = (function () {
+    return new wa(
+      "player_keys",
+      e,
+      function (a) {
+        if (null == a) return W.$j();
+        try {
+          return W.Hh(a);
+        } catch (g) {
+          return W.$j();
+        }
+      },
+      function (a) {
+        try {
+          return a.se();
+        } catch (g) {
+          return null;
+        }
+      }
+    );
+  })();
+}
+
+U.b = !0;
+U.Qc = function (a, b) {
+  return a.length <= b ? a : D.substr(a, 0, b);
+};
+U.Zr = function (a) { // calculating hash for conn
+  for (var b = "", c = 0, d = a.byteLength; c < d; ) b += J.Vg(a[c++], 2);
+  return b;
+};
+
+Yb.b = !0;
+Yb.prototype = {
+  Lh: function () {
+    return null != this.Ne.L()
+      ? this.Ne.L()
+      : null != this.Me.L()
+      ? this.Me.L()
+      : new T();
+  },
+  f: Yb,
+};
+
+r.b = !0;
+r.Nm = function (a) {
+  if (a instanceof Array && null == a.eb) return Array;
+  var b = a.f;
+  if (null != b) return b;
+  a = r.wj(a);
+  return null != a ? r.rn(a) : null;
+};
+r.Be = function (a, b) {
+  if (null == a) return "null";
+  if (5 <= b.length) return "<...>";
+  var c = typeof a;
+  "function" == c && (a.b || a.Gf) && (c = "object");
+  switch (c) {
+    case "function":
+      return "<function>";
+    case "object":
+      if (a.eb) {
+        var d = Ab[a.eb],
+          c = d.nh[a.nb],
+          e = d[c];
+        if (e.Ae) {
+          b += "\t";
+          for (var c = c + "(", d = [], f = 0, e = e.Ae; f < e.length; ) {
+            var g = e[f];
+            ++f;
+            d.push(r.Be(a[g], b));
+          }
+          return c + d.join(",") + ")";
+        }
+        return c;
+      }
+      if (a instanceof Array) {
+        c = a.length;
+        d = "[";
+        b += "\t";
+        for (f = 0; f < c; )
+          (e = f++), (d += (0 < e ? "," : "") + r.Be(a[e], b));
+        return d + "]";
+      }
+      try {
+        d = a.toString;
+      } catch (k) {
+        return "???";
+      }
+      if (
+        null != d &&
+        d != Object.toString &&
+        "function" == typeof d &&
+        ((c = a.toString()), "[object Object]" != c)
+      )
+        return c;
+      c = null;
+      d = "{\n";
+      b += "\t";
+      f = null != a.hasOwnProperty;
+      for (c in a)
+        (f && !a.hasOwnProperty(c)) ||
+          "prototype" == c ||
+          "__class__" == c ||
+          "__super__" == c ||
+          "__interfaces__" == c ||
+          "__properties__" == c ||
+          (2 != d.length && (d += ", \n"),
+          (d += b + c + " : " + r.Be(a[c], b)));
+      b = b.substring(1);
+      return d + ("\n" + b + "}");
+    case "string":
+      return a;
+    default:
+      return String(a);
+  }
+};
+r.ph = function (a, b) {
+  if (null == a) return !1;
+  if (a == b) return !0;
+  var c = a.Rd;
+  if (null != c)
+    for (var d = 0, e = c.length; d < e; ) {
+      var f = c[d++];
+      if (f == b || r.ph(f, b)) return !0;
+    }
+  return r.ph(a.ma, b);
+};
+r.pn = function (a, b) {
+  if (null == b) return !1;
+  switch (b) {
+    case Array:
+      return a instanceof Array ? null == a.eb : !1;
+    case oc:
+      return "boolean" == typeof a;
+    case sc:
+      return !0;
+    case z:
+      return "number" == typeof a;
+    case Pb:
+      return "number" == typeof a ? (a | 0) === a : !1;
+    case String:
+      return "string" == typeof a;
+    default:
+      if (null != a)
+        if ("function" == typeof b) {
+          if (a instanceof b || r.ph(r.Nm(a), b)) return !0;
+        } else {
+          if ("object" == typeof b && r.qn(b) && a instanceof b) return !0;
+        }
+      else return !1;
+      return (b == tc && null != a.b) || (b == uc && null != a.Gf)
+        ? !0
+        : Ab[a.eb] == b;
+  }
+};
+r.G = function (a, b) {
+  if (r.pn(a, b)) return a;
+  throw new new q("Cannot cast " + K.ye(a) + " to " + K.ye(b));
+};
+r.wj = function (a) {
+  a = r.sn.call(a).slice(8, -1);
+  return "Object" == a || "Function" == a || "Math" == a || "JSON" == a
+    ? null
+    : a;
+};
+r.qn = function (a) {
+  return null != r.wj(a);
+};
+r.rn = function (a) {
+  return qc[a];
+};
+r.sn = {}.toString;
+
+wa.b = !0;
+wa.prototype = {
+  L: function () {
+    return this.Hm;
+  },
+  Xa: function (a) {
+    this.Hm = a;
+    if (null != this.Yh)
+      try {
+        var b = this.Ur(a);
+        null == b ? this.Yh.removeItem(this.w) : this.Yh.setItem(this.w, b);
+      } catch (c) {}
+  },
+  f: wa,
+};
+
+T.b = !0;
+T.Hh = function (a) {
+  return T.Rf(JSON.parse(a));
+};
+T.Rf = function (a) {
+  var b = new T();
+  b.Ec = a.lat;
+  b.Gc = a.lon;
+  b.ub = a.code.toLowerCase();
+  return b;
+};
+T.Fo = function () {
+  return M.tk(n.Ee + "api/geo").then(function (a) {
+    return T.Rf(a);
+  });
+};
+T.prototype = {
+  se: function () {
+    return JSON.stringify({ lat: this.Ec, lon: this.Gc, code: this.ub });
+  },
+  f: T,
+};
+
+K.b = !0;
+K.ye = function (a) {
+  return r.Be(a, "");
+};
+K.parseInt = function (a) {
+  a = parseInt(
+    a,
+    !a || "0" != a[0] || ("x" != a[1] && "X" != a[1]) ? 10 : 16
+  );
+  return isNaN(a) ? null : a;
+};
+
+Xb.b = !0;
+Xb.Pm = function (storage) {
+  try {
+    var a = storage;
+    a.getItem("");
+    if (0 == a.length) {
+      var b = "_hx_" + Math.random();
+      a.setItem(b, b);
+      a.removeItem(b);
+    }
+    return a;
+  } catch (c) {
+    return null;
+  }
+};
+
+W.b = !0;
+W.Rf = function (a) {
+  for (var b = new W(), c = ec.Mm(a), d = 0; d < c.length; ) {
+    var e = c[d];
+    ++d;
+    b.Yc.set(e, a[e]);
+  }
+  return b;
+};
+W.Hh = function (a) {
+  return W.Rf(JSON.parse(a));
+};
+W.$j = function () {
+  var a = new W();
+  a.Pa("ArrowUp", "Up");
+  a.Pa("KeyW", "Up");
+  a.Pa("ArrowDown", "Down");
+  a.Pa("KeyS", "Down");
+  a.Pa("ArrowLeft", "Left");
+  a.Pa("KeyA", "Left");
+  a.Pa("ArrowRight", "Right");
+  a.Pa("KeyD", "Right");
+  a.Pa("KeyX", "Kick");
+  a.Pa("Space", "Kick");
+  a.Pa("ControlLeft", "Kick");
+  a.Pa("ControlRight", "Kick");
+  a.Pa("ShiftLeft", "Kick");
+  a.Pa("ShiftRight", "Kick");
+  a.Pa("Numpad0", "Kick");
+  return a;
+};
+W.prototype = {
+  Pa: function (a, b) {
+    this.Yc.set(a, b);
+  },
+  L: function (a) {
+    return this.Yc.get(a);
+  },
+  Jq: function (a) {
+    this.Yc["delete"](a);
+  },
+  Eo: function (a) {
+    for (var b = [], c = this.Yc.keys(), d = c.next(); !d.done; ) {
+      var e = d.value,
+        d = c.next();
+      this.Yc.get(e) == a && b.push(e);
+    }
+    return b;
+  },
+  se: function () {
+    for (var a = {}, b = this.Yc.keys(), c = b.next(); !c.done; ) {
+      var d = c.value,
+        c = b.next();
+      a[d] = this.Yc.get(d);
+    }
+    return JSON.stringify(a);
+  },
+  f: W,
+};
+
+n.b = !0;
+n.Vr = "wss://p2p.haxball.com/";
+n.Ee = "https://www.haxball.com/rs/";
+n.Vf = [{ urls: "stun:stun.l.google.com:19302" }];
+//n.A = new Yb();
+
+F.b = !0;
+F.jo = function (a, b) {
+  var c = a.getUint8(b),
+    d,
+    e,
+    f,
+    g,
+    k,
+    l = b;
+  if (0 == (c & 128)) ++b;
+  else if (192 == (c & 224))
+    (d = a.getUint8(b + 1)), (c = ((c & 31) << 6) | (d & 63)), (b += 2);
+  else if (224 == (c & 240))
+    (d = a.getUint8(b + 1)),
+      (e = a.getUint8(b + 2)),
+      (c = ((c & 15) << 12) | ((d & 63) << 6) | (e & 63)),
+      (b += 3);
+  else if (240 == (c & 248))
+    (d = a.getUint8(b + 1)),
+      (e = a.getUint8(b + 2)),
+      (f = a.getUint8(b + 3)),
+      (c = ((c & 7) << 18) | ((d & 63) << 12) | ((e & 63) << 6) | (f & 63)),
+      (b += 4);
+  else if (248 == (c & 252))
+    (d = a.getUint8(b + 1)),
+      (e = a.getUint8(b + 2)),
+      (f = a.getUint8(b + 3)),
+      (g = a.getUint8(b + 4)),
+      (c =
+        ((c & 3) << 24) |
+        ((d & 63) << 18) |
+        ((e & 63) << 12) |
+        ((f & 63) << 6) |
+        (g & 63)),
+      (b += 5);
+  else if (252 == (c & 254))
+    (d = a.getUint8(b + 1)),
+      (e = a.getUint8(b + 2)),
+      (f = a.getUint8(b + 3)),
+      (g = a.getUint8(b + 4)),
+      (k = a.getUint8(b + 5)),
+      (c =
+        ((c & 1) << 30) |
+        ((d & 63) << 24) |
+        ((e & 63) << 18) |
+        ((f & 63) << 12) |
+        ((g & 63) << 6) |
+        (k & 63)),
+      (b += 6);
+  else
+    throw new q(
+      "Cannot decode UTF8 character at offset " +
+        b +
+        ": charCode (" +
+        c +
+        ") is invalid"
+    );
+  return { char: c, length: b - l };
+};
+F.prototype = {
+  sb: function (a) {
+    null == a && (a = this.o.byteLength - this.a);
+    if (this.a + a > this.o.byteLength) throw new q("Read too much");
+    var b = new Uint8Array(this.o.buffer, this.o.byteOffset + this.a, a);
+    this.a += a;
+    return b;
+  },
+  Cl: function (a) {
+    var b = this.sb(a);
+    a = new ArrayBuffer(a);
+    new Uint8Array(a).set(b);
+    return a;
+  },
+  lf: function () {
+    return this.o.getInt8(this.a++);
+  },
+  B: function () {
+    return this.o.getUint8(this.a++);
+  },
+  ni: function () {
+    var a = this.o.getInt16(this.a, this.Sa);
+    this.a += 2;
+    return a;
+  },
+  Ob: function () {
+    var a = this.o.getUint16(this.a, this.Sa);
+    this.a += 2;
+    return a;
+  },
+  M: function () {
+    var a = this.o.getInt32(this.a, this.Sa);
+    this.a += 4;
+    return a;
+  },
+  hb: function () {
+    var a = this.o.getUint32(this.a, this.Sa);
+    this.a += 4;
+    return a;
+  },
+  mi: function () {
+    var a = this.o.getFloat32(this.a, this.Sa);
+    this.a += 4;
+    return a;
+  },
+  u: function () {
+    var a = this.o.getFloat64(this.a, this.Sa);
+    this.a += 8;
+    return a;
+  },
+  Ab: function () {
+    for (
+      var a = this.a, b = 0, c, d = 0;
+      (c = this.o.getUint8(a + b)),
+        5 > b && (d |= ((c & 127) << (7 * b)) >>> 0),
+        ++b,
+        0 != (c & 128);
+
+    );
+    this.a += b;
+    return d | 0;
+  },
+  ie: function (a) {
+    var b = this.a,
+      c,
+      d = "";
+    for (a = b + a; b < a; )
+      (c = F.jo(this.o, b)),
+        (b += c.length),
+        (d += String.fromCodePoint(c["char"]));
+    if (b != a)
+      throw new q(
+        "Actual string length differs from the specified: " +
+          (b - a) +
+          " bytes"
+      );
+    this.a = b;
+    return d;
+  },
+  zb: function () {
+    var a = this.Ab();
+    return 0 >= a ? null : this.ie(a - 1);
+  },
+  ic: function () {
+    return this.ie(this.Ab());
+  },
+  El: function () {
+    return this.ie(this.B());
+  },
+  wg: function () {
+    var a = this.ic();
+    return JSON.parse(a);
+  },
+  f: F,
+};
+
+D.b = !0;
+D.bj = function (a, b) {
+  var c = a.charCodeAt(b);
+  if (c == c) return c;
+};
+D.substr = function (a, b, c) {
+  if (null == c) c = a.length;
+  else if (0 > c)
+    if (0 == b) c = a.length + c;
+    else return "";
+  return a.substr(b, c);
+};
+D.remove = function (a, b) {
+  var c = a.indexOf(b);
+  if (-1 == c) return !1;
+  a.splice(c, 1);
+  return !0;
+};
+
+J.b = !0;
+J.startsWith = function (a, b) {
+  return a.length >= b.length ? D.substr(a, 0, b.length) == b : !1;
+};
+J.ls = function (a, b) {
+  var c = D.bj(a, b);
+  return 8 < c && 14 > c ? !0 : 32 == c;
+};
+J.Gs = function (a) {
+  for (var b = a.length, c = 0; c < b && J.ls(a, b - c - 1); ) ++c;
+  return 0 < c ? D.substr(a, 0, b - c) : a;
+};
+J.Af = function (a) {
+  var b,
+    c = "";
+  for (b = 2 - a.length; c.length < b; ) c += "0";
+  return c + (null == a ? "null" : "" + a);
+};
+J.replace = function (a, b, c) {
+  return a.split(b).join(c);
+};
+J.Vg = function (a, b) {
+  for (
+    var c = "";
+    (c = "0123456789ABCDEF".charAt(a & 15) + c), (a >>>= 4), 0 < a;
+
+  );
+  if (null != b) for (; c.length < b; ) c = "0" + c;
+  return c;
+};
+
+Fb.b = !0;
+Fb.prototype = {
+  Pj: function () {
+    this.w = U.Qc(this.w, 40);
+    this.ub = U.Qc(this.ub, 3);
+  },
+  ga: function (a) {
+    this.Pj();
+    a.Sa = !0;
+    a.Ub(this.Id);
+    a.Im(this.w);
+    a.Im(this.ub);
+    a.Wi(this.Ec);
+    a.Wi(this.Gc);
+    a.l(this.Ib ? 1 : 0);
+    a.l(this.Xe);
+    a.l(this.I);
+    a.Sa = !1;
+  },
+  ja: function (a) {
+    a.Sa = !0;
+    this.Id = a.Ob();
+    this.w = a.El();
+    this.ub = a.El();
+    this.Ec = a.mi();
+    this.Gc = a.mi();
+    this.Ib = 0 != a.B();
+    this.Xe = a.B();
+    this.I = a.B();
+    a.Sa = !1;
+    if (30 < this.I || 30 < this.Xe) throw new q(null);
+    this.Pj();
+  },
+  f: Fb,
+};
+
+Wb.b = !0;
+Wb.prototype = { f: Wb };
+
+M.b = !0;
+M.vj = "application/x-www-form-urlencoded";
+M.Pl = function (a, b, c, d, e) {
+  return new Promise(function (f, g) {
+    var k = new XMLHttpRequest();
+    k.open(b, a);
+    k.responseType = c;
+    k.onload = function () {
+      200 <= k.status && 300 > k.status
+        ? null != k.response
+          ? f(k.response)
+          : g(null)
+        : g("status: " + k.status);
+    };
+    k.onerror = function (a) {
+      g(a);
+    };
+    null != e && k.setRequestHeader("Content-type", e);
+    k.send(d);
+  });
+};
+M.L = function (a, b) {
+  return M.Pl(a, "GET", b, null);
+};
+M.tk = function (a) {
+  return M.L(a, "json").then(function (a) {
+    var b = a.error;
+    if (null != b) throw new q(b);
+    return a.data;
+  });
+};
+M.mq = function (a, b, c) {
+  return M.Pl(a, "POST", "json", b, c);
+};
+M.zl = function (a, b, c) {
+  return M.mq(a, b, c).then(function (a) {
+    var b = a.error;
+    if (null != b) throw new q(b);
+    return a.data;
+  });
+};
+
+va.b = !0;
+va.parse = function (a) {
+  a.B();
+  for (var b = []; 0 != a.o.byteLength - a.a; ) {
+    var c = a.ie(a.Ob()),
+      d = a.Cl(a.Ob());
+    try {
+      var e = new Fb();
+      e.ja(new F(new DataView(d), !1));
+      var f = new Wb();
+      f.vd = e;
+      f.$ = c;
+      b.push(f);
+    } catch (g) {}
+  }
+  return b;
+};
+va.js = function (a, b, c, d) {
+  return Math.acos(
+    Math.sin(a) * Math.sin(c) + Math.cos(a) * Math.cos(c) * Math.cos(b - d)
+  );
+};
+va.Hs = function (a, b) {
+  for (var c = a.Ec, d = a.Gc, e = 0; e < b.length; ) {
+    var f = b[e];
+    ++e;
+    var g = f.vd;
+    f.Le =
+      6378 *
+      va.js(
+        0.017453292519943295 * g.Ec,
+        0.017453292519943295 * g.Gc,
+        0.017453292519943295 * c,
+        0.017453292519943295 * d
+      );
+    isFinite(f.Le) || (f.Le = 22e3);
+  }
+};
+va.get = function () {
+  return M.L(n.Ee + "api/list", "arraybuffer").then(function (a) {
+    return va.parse(new F(new DataView(a), !1));
+  });
+};
+
+
+
+
+
+// -- end of global Haxball classes --
+
+
+
+
+
 function Haxball(options){
   EventEmitter.call(this);
   this.room = null;
@@ -124,29 +922,31 @@ function Haxball(options){
     };
   }
 
-  var window = {
-    crypto: crypto,
-    setTimeout: setTimeout,
-    clearTimeout: clearTimeout,
-    setInterval: setInterval,
-    clearInterval: clearInterval,
-    performance: perfHooks.performance,
-    console: console,
-    location: {
-      origin: "https://www.haxball.com"
-    },
-    requestAnimationFrame: (callback) => setTimeout(callback, 0),
-    cancelAnimationFrame: clearTimeout,
-    localStorage: new ILocalStorage()
-  };
-  
-  var haxball = this;
+  var localStorage = new ILocalStorage();
 
   if (options){
     for (const [key, value] of Object.entries(options))
-      window.localStorage.setItem(key, value);
+      localStorage.setItem(key, value);
   }
   
+  var n_A = new Yb(localStorage);
+
+  var window = {
+    crypto: crypto,
+    setTimeout: options?.render?.setTimeout || setTimeout,
+    clearTimeout: options?.render?.clearTimeout || clearTimeout,
+    setInterval: options?.render?.setInterval || setInterval,
+    clearInterval: options?.render?.clearInterval || clearInterval,
+    performance: options?.render?.performance || perfHooks.performance,
+    console: options?.render?.console || console,
+    requestAnimationFrame: options?.render?.requestAnimationFrame || ((callback) => setTimeout(callback, 16.666666666666667)),
+    cancelAnimationFrame: options?.render?.cancelAnimationFrame || clearTimeout,
+    document: options?.render?.document,
+    devicePixelRatio: options?.render?.devicePixelRatio
+  };
+  
+  var haxball = this, canvas = options?.render?.canvas, images = options?.render?.images, rafCallback = options?.onRequestAnimationFrame;
+
   var internalData = {
     roomObj: null,
     extrapolatedRoomPhysicsObj: null,
@@ -165,11 +965,7 @@ function Haxball(options){
     createRoom: null,
     kickerObj: null,
     mapObj: null,
-    parserObj: null,
-    StadiumSyntaxError: null,
-    StadiumCustomError: null,
     teams: null,
-    generalStorageObj: null,
     ObjectConverter: null,
     authObj: null,
     dummyPromise: Promise.resolve(),
@@ -214,12 +1010,20 @@ function Haxball(options){
     }
   };
 
-  this.getRoomList = function(){
-    return internalData.roomListGetterObj.get();
+  this.getStorageValue = function(key){ // key must be one of ['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors']
+    return n_A[Object.keys(n_A).filter((x)=>n_A[x].w==key)[0]]?.L();
   };
 
   this.setStorageValue = function(key, value){ // key must be one of ['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors']
-    internalData.generalStorageObj[Object.keys(internalData.generalStorageObj).filter((x)=>internalData.generalStorageObj[x].w==key)[0]]?.Xa(value);
+    n_A[Object.keys(n_A).filter((x)=>n_A[x].w==key)[0]]?.Xa(value);
+  };
+
+  this.setCanvas = function(c){
+    internalData.roomObj?.canvasUpdate(c);
+  };
+
+  this.setOnRequestAnimationFrameCallback = function(callback){
+    rafCallback = callback;
   };
 
   this.createRoom = function(obj){ // name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, plugins
@@ -321,13 +1125,12 @@ function Haxball(options){
   
   (function (qc) {
     function hc() {}
+    /*
     function r() {}
     function q(a) {
       this.Ta = a;
       Error.captureStackTrace && Error.captureStackTrace(this, q);
     }
-    internalData.StadiumSyntaxError = q;
-    /*
     function Wa(a) {
       this.g = v.Ga(Wa.N);
       v.Ea(this.g).get("features").textContent = a.join(", ");
@@ -386,7 +1189,7 @@ function Haxball(options){
           g.onclick = (function (a, b) {
             return function () {
               p.Jq(b[0]);
-              n.A.tg.Xa(p);
+              n_A.tg.Xa(p);
               a[0].remove();
             };
           })(f, e);
@@ -402,7 +1205,7 @@ function Haxball(options){
             q.classList.toggle("show", !1);
             b.stopPropagation();
             b = b.code;
-            null == p.L(b) && (p.Pa(b, a), n.A.tg.Xa(p), r());
+            null == p.L(b) && (p.Pa(b, a), n_A.tg.Xa(p), r());
           };
         };
         return b;
@@ -475,15 +1278,15 @@ function Haxball(options){
       f("misc");
       f("input");
       g(t[aa.$l]);
-      e("tsound-main", n.A.pm, function (a) {
+      e("tsound-main", n_A.pm, function (a) {
         //n.Na.im(a ? 1 : 0);
       });
-      e("tsound-chat", n.A.Hi);
-      e("tsound-highlight", n.A.om);
-      e("tsound-crowd", n.A.nm);
+      e("tsound-chat", n_A.Hi);
+      e("tsound-highlight", n_A.om);
+      e("tsound-crowd", n_A.nm);
       d(
         "viewmode",
-        n.A.Tb,
+        n_A.Tb,
         function (a) {
           return a - 1;
         },
@@ -493,7 +1296,7 @@ function Haxball(options){
       );
       d(
         "fps",
-        n.A.Fh,
+        n_A.Fh,
         function (a) {
           return a;
         },
@@ -504,7 +1307,7 @@ function Haxball(options){
       var h = [1, 0.75, 0.5, 0.25];
       d(
         "resscale",
-        n.A.Sl,
+        n_A.Sl,
         function (a) {
           return h[a];
         },
@@ -513,13 +1316,13 @@ function Haxball(options){
           return b;
         }
       );
-      e("tvideo-teamcol", n.A.xm);
-      e("tvideo-showindicators", n.A.Ak);
-      e("tvideo-showavatars", n.A.lm);
+      e("tvideo-teamcol", n_A.xm);
+      e("tvideo-showindicators", n_A.Ak);
+      e("tvideo-showavatars", n_A.lm);
       var m = null,
         m = function () {
-          var b = n.A.Ne.L();
-          c("loc", "Detected location", n.A.Me.L());
+          var b = n_A.Ne.L();
+          c("loc", "Detected location", n_A.Me.L());
           c("loc-ovr", "Location override", b);
           var d = l.get("loc-ovr-btn");
           d.disabled = !a;
@@ -530,12 +1333,12 @@ function Haxball(options){
               }))
             : ((d.textContent = "Remove override"),
               (d.onclick = function () {
-                n.A.Ne.Xa(null);
+                n_A.Ne.Xa(null);
                 m();
               }));
         };
       m();
-      var p = n.A.tg.L(),
+      var p = n_A.tg.L(),
         q = l.get("presskey"),
         r,
         u = l.get("inputsec");
@@ -1034,14 +1837,16 @@ function Haxball(options){
     }
     */
     function ja(a) {
-      /*
       this.Fb = new hb();
+      /*
       this.Gd = !1;
       this.pe = new Xa();
       this.Qa = new Da();
       var b = this;
       this.Wa = new Ya(a);
+      */
       this.Fb.Nb = a;
+      /*
       this.g = v.Ga(ja.N);
       a = v.Ea(this.g);
       this.Jh = a.get("gameplay-section");
@@ -1104,17 +1909,19 @@ function Haxball(options){
       this.g.appendChild((this.dr = this.Wd("0", "digit")));
       this.g.appendChild((this.cr = this.Wd("0", "digit")));
     }
+    */
     function hb() {
-      this.Nb = -1;
-      //this.Eb = new N();
+      //this.Nb = -1;
+      this.Eb = canvas && (new N());
       //this.xc = new Rb();
-      this.g = v.Ga(hb.N);
-      var a = v.Ea(this.g);
-      this.Pb = new Db(a.get("red-score"), 0);
-      this.Kb = new Db(a.get("blue-score"), 0);
+      //this.g = v.Ga(hb.N);
+      //var a = v.Ea(this.g);
+      //this.Pb = new Db(a.get("red-score"), 0);
+      //this.Kb = new Db(a.get("blue-score"), 0);
       //v.xe(a.get("timer"), this.xc.g);
       //v.xe(a.get("canvas"), this.Eb.sa);
     }
+    /*
     function Ka(a, b) {
       var c = this;
       this.g = v.Ga(Ka.N);
@@ -1176,7 +1983,7 @@ function Haxball(options){
     }
     */
     internalData.createRoom = /*this.Jp = */function (b) {
-      var a = n.A.fe.L(); // inserted here to get current nick
+      var a = n_A.fe.L();  // inserted here to get current nick
       var cpc = b.cpc, fPwd = b.fPwd;
       function c() { // update & synchronize room data with haxball main server via websocket.
         if (!b.Ks) {
@@ -1197,10 +2004,10 @@ function Haxball(options){
       }
       //x.La(new P("Creating room", "Connecting...", []).g);
       var e = null,
-        f = null, // n.A.Lh(),
+        f = null, // n_A.Lh(),
         g = new fa();
       function parseGeo(geo){
-        var geoData = n.A.Lh();
+        var geoData = n_A.Lh();
         return T.Rf({
           lat: (geo && geo.lat) || geoData.Ec,
           lon: (geo && geo.lon) || geoData.Gc,
@@ -1213,7 +2020,7 @@ function Haxball(options){
       k.w = a;
       k.cb = !0;
       k.Kd = f.ub;
-      k.Xb = n.A.sh.L();
+      k.Xb = n_A.sh.L();
       g.I.push(k);
       var l = new Lb({
         iceServers: n.Vf,
@@ -1436,33 +2243,36 @@ function Haxball(options){
         c.update();
       }, 0);
     }
+    */
     function Ea() {
       this.Xf = !1;
       this.w = "";
       this.uh = 0;
       this.Jf = "";
       this.kb = new ka();
-      //var a = window.document.createElement("canvas");
-      //a.width = 64;
-      //a.height = 64;
-      //this.rb = a.getContext("2d", null);
-      //this.Ij = this.rb.createPattern(this.rb.canvas, "no-repeat");
-      //this.fo();
+      var a = window.document.createElement("canvas");
+      a.width = 64;
+      a.height = 64;
+      this.rb = a.getContext("2d", null);
+      this.Ij = this.rb.createPattern(this.rb.canvas, "no-repeat");
+      this.fo();
     }
     function Sb() {
       this.xc = 0;
       this.ab = [];
-      this.Ar = new R(["Time is", "Up!"], 16777215);
+      /*this.Ar = new R(["Time is", "Up!"], 16777215);
       this.Gq = new R(["Red is", "Victorious!"], 15035990);
       this.Fq = new R(["Red", "Scores!"], 15035990);
       this.Cn = new R(["Blue is", "Victorious!"], 625603);
       this.Bn = new R(["Blue", "Scores!"], 625603);
-      this.eq = new R(["Game", "Paused"], 16777215);
+      this.eq = new R(["Game", "Paused"], 16777215);*/
     }
+    /*
     function R(a, b) {
       for (var c = [], d = 0; d < a.length; ) c.push(this.sp(a[d++], b));
       this.We = c;
     }
+    */
     function N() {
       this.$c = window.performance.now();
       this.Jg = new Map();
@@ -1474,14 +2284,13 @@ function Haxball(options){
       this.Ya = new H(0, 0);
       this.Dk = !1;
       this.td = new Sb();
-      this.sa = window.document.createElement("canvas");
+      this.sa = canvas;//window.document.createElement("canvas");
       this.sa.mozOpaque = !0;
       this.c = this.sa.getContext("2d", { alpha: !1 });
-      this.Lo = this.c.createPattern(n.Ko, null);
-      this.Wn = this.c.createPattern(n.Vn, null);
-      this.Un = this.c.createPattern(n.Tn, null);
+      this.Lo = this.c.createPattern(/*n.Ko*/images?.grass, null);
+      this.Wn = this.c.createPattern(/*n.Vn*/images?.concrete, null);
+      this.Un = this.c.createPattern(/*n.Tn*/images?.concrete2, null);
     }
-    */
     function B() {
       this.ud = 0;
       this.v = 32;
@@ -1671,10 +2480,11 @@ function Haxball(options){
       this.pf = !1;
     }
     internalData.ObjectConverter = h;
+    /*
     function Bb(a) {
       this.xp = a;
     }
-    internalData.StadiumCustomError = Bb;
+    */
     function Eb() {
       this.Se = 0;
       this.Z = 15;
@@ -1740,7 +2550,7 @@ function Haxball(options){
       var c = this;
       this.c = new AudioContext();
       this.ag = this.c.createGain();
-      this.im(n.A.pm.L() ? 1 : 0);
+      this.im(n_A.pm.L() ? 1 : 0);
       this.ag.connect(this.c.destination);
       this.ro = Promise.all([
         b("sounds/chat.ogg").then(function (a) {
@@ -1768,12 +2578,10 @@ function Haxball(options){
         }),
       ]).catch(console.log);
     }
-    */
     function Z() {}
     function va() {}
     internalData.roomListGetterObj = va;
     function Fb() {}
-    /*
     function Vb(a) {
       this.$c = window.performance.now();
       //this.sd = 0;
@@ -1792,7 +2600,7 @@ function Haxball(options){
         b.sd = 0;
       }, 1e3);
 
-      this.uf(n.A.Tb.L());
+      this.uf(n_A.Tb.L());
       this.j.g.classList.add("replayer");
       this.je = new ha(a);
       this.je.Vp = function () {
@@ -1811,6 +2619,7 @@ function Haxball(options){
     function x() {}
     function u() {}
     internalData.roomJoinerObj = u;
+    /*
     function Wb() {}
     function n() {}
     function W() {
@@ -1888,7 +2697,7 @@ function Haxball(options){
           }
         );
       }
-      var e = Xb.Pm();
+      var e = Xb.Pm(localStorage);
       this.fe = d("player_name", "", 25);
       this.Tb = c("view_mode", -1);
       this.Fh = c("fps_limit", 0);
@@ -1947,6 +2756,7 @@ function Haxball(options){
       this.ub = "";
       this.Ec = this.Gc = 0;
     }
+    */
     function Ra() {
       this.$d = this.Yf = 0;
       //window.document.addEventListener("focusout", G(this, this.al));
@@ -1967,6 +2777,9 @@ function Haxball(options){
       this.Bg = "Waiting for link";
       this.xi = this.am = !1;
       //this.sd = 0;
+      
+      this.j = new ja(a.uc);
+
       var b = this;
       this.Of = new ub(a, function (a) {
         //b.j.Qa.Gb(a);
@@ -1975,7 +2788,11 @@ function Haxball(options){
       a.T.ko = function (c) {
         b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c), internalData.execOperationReceivedOnHost(c));
       };
-      this.j = new ja(a.uc);
+      this.canvasUpdate = function(c){
+        canvas = c;
+        b.j.Fb.Eb = c && (new N());
+      };
+      this.canvasUpdate(canvas);
       this.Ih = new Gb(this.j, a.T.na(a.uc).w);
       this.Ih.ri(a.T);
       /*
@@ -2167,10 +2984,10 @@ function Haxball(options){
         a.C();
       }, 50);
       //this.uf();
-      var c = n.A.rd.L(),
+      var c = n_A.rd.L(),
         c = -200 > c ? -200 : 200 < c ? 200 : c;
       if (0 != c) {
-        var d = n.A.rd.L();
+        var d = n_A.rd.L();
         a.gm(d);
         //this.j.Qa.Gb("Extrapolation set to " + c + " msec");
       }
@@ -2192,15 +3009,15 @@ function Haxball(options){
     function ia() {}
     function y() {}
     function A() {}
-    function M() {}
+    //function M() {}
     function H(a, b) {
       this.x = a;
       this.y = b;
     }
+    /*
     function Ib(a) {
       this.Yb = a.slice();
     }
-    /*
     function Jb(a, b, c) {
       this.Vk = [];
       this.pl = 5;
@@ -2415,12 +3232,14 @@ function Haxball(options){
       this.Sa = b;
       this.a = 0;
     }
+    /*
     function F(a, b) {
       null == b && (b = !1);
       this.o = a;
       this.Sa = b;
       this.a = 0;
     }
+    */
     function Nb(a) {
       this.gd = null;
       this.Eq = 1e4;
@@ -2541,12 +3360,14 @@ function Haxball(options){
     function dc() {
       this.hash = 0;
     }
+    /*
     function U() {}
     function J() {}
     function K() {}
+    */
     function ec() {}
-    function D() {}
     /*
+    function D() {}
     function fc(a, b) {
       this.r = new RegExp(a, b.split("u").join(""));
     }
@@ -2603,7 +3424,6 @@ function Haxball(options){
       },
       f: fc,
     };
-    */
     D.b = !0;
     D.bj = function (a, b) {
       var c = a.charCodeAt(b);
@@ -2623,6 +3443,7 @@ function Haxball(options){
       return !0;
     };
     Math.b = !0;
+    */
     ec.b = !0;
     ec.Mm = function (a) {
       var b = [];
@@ -2634,6 +3455,7 @@ function Haxball(options){
       }
       return b;
     };
+    /*
     K.b = !0;
     K.ye = function (a) {
       return r.Be(a, "");
@@ -2683,6 +3505,7 @@ function Haxball(options){
       for (var b = "", c = 0, d = a.byteLength; c < d; ) b += J.Vg(a[c++], 2);
       return b;
     };
+    */
     dc.b = !0;
     dc.prototype = {
       Yr: function (a) {
@@ -3268,6 +4091,7 @@ function Haxball(options){
         }
       },
     };
+    /*
     F.b = !0;
     F.jo = function (a, b) {
       var c = a.getUint8(b),
@@ -3422,6 +4246,7 @@ function Haxball(options){
       },
       f: F,
     };
+    */
     w.b = !0;
     w.ha = function (a, b) {
       null == b && (b = !1);
@@ -4753,7 +5578,6 @@ function Haxball(options){
       },
       f: Jb,
     });
-    */
     Ib.b = !0;
     Ib.prototype = {
       eval: function (a) {
@@ -4779,8 +5603,10 @@ function Haxball(options){
       },
       f: Ib,
     };
+    */
     H.b = !0;
     H.prototype = { f: H };
+    /*
     M.b = !0;
     M.Pl = function (a, b, c, d, e) {
       return new Promise(function (f, g) {
@@ -4821,6 +5647,7 @@ function Haxball(options){
         return a.data;
       });
     };
+    */
     A.b = !0;
     A.i = function (a) {
       null != a && a();
@@ -4989,7 +5816,7 @@ function Haxball(options){
             2 == a.length
               ? ((a = K.parseInt(a[1])),
                 null != a // && -200 <= a && 200 >= a
-                  ? (n.A.rd.Xa(a),
+                  ? (n_A.rd.Xa(a),
                     this.ya.gm(a),
                     this.ba("Extrapolation set to " + a + " msec"))
                   : this.ba(
@@ -5072,7 +5899,7 @@ function Haxball(options){
       },
       fm: function (a) {
         null != a && (a = U.Qc(a, 2));
-        n.A.sh.Xa(a);
+        n_A.sh.Xa(a);
         var msg = ra.la(a);
         this.ya.ra(msg);
         internalData.execOperationReceivedOnHost(msg);
@@ -5167,7 +5994,7 @@ function Haxball(options){
       },
       Kc: function () {
         var a = window.performance.now();
-        (1 == n.A.Fh.L() && 28.333333333333336 > a - this.$c) ||
+        (1 == n_A.Fh.L() && 28.333333333333336 > a - this.$c) ||
           ((this.$c = a),
           //this.sd++,
           //this.uf(),
@@ -5230,16 +6057,16 @@ function Haxball(options){
             a.preventDefault();
             break;
           case 49:
-            n.A.Tb.Xa(1);
+            n_A.Tb.Xa(1);
             break;
           case 50:
-            n.A.Tb.Xa(2);
+            n_A.Tb.Xa(2);
             break;
           case 51:
-            n.A.Tb.Xa(3);
+            n_A.Tb.Xa(3);
             break;
           case 52:
-            n.A.Tb.Xa(0);
+            n_A.Tb.Xa(0);
             break;
           case 80:
             this.Bm();
@@ -5249,10 +6076,10 @@ function Haxball(options){
         }
       },
       uf: function () {
-        var a = n.A.Tb.L(),
+        var a = n_A.Tb.L(),
           b = this.j.Fb,
           c = b.Eb;
-        c.zg = n.A.Sl.L();
+        c.zg = n_A.Sl.L();
         0 == a
           ? (b.Gg(!0), (c.kf = 1), (c.jf = 0), (c.xf = 0))
           : (b.Gg(!1),
@@ -5316,11 +6143,11 @@ function Haxball(options){
         a.rl = function (a, b) {
           var d = null != c.Rh && -1 != b.indexOf(c.Rh);
           c.j.Qa.ba("" + a.w + ": " + b, d ? "highlight" : null);
-          n.A.om.L() && d ? n.Na.cd(n.Na.zk) : n.A.Hi.L() && n.Na.cd(n.Na.Rj);
+          n_A.om.L() && d ? n.Na.cd(n.Na.zk) : n_A.Hi.L() && n.Na.cd(n.Na.Rj);
         };
         a.Vl = function (a, b, f, g) {
           c.j.Qa.pp(a, b, f);
-          if (n.A.Hi.L())
+          if (n_A.Hi.L())
             switch (g) {
               case 1:
                 n.Na.cd(n.Na.Rj);
@@ -5419,7 +6246,7 @@ function Haxball(options){
     };
     Ra.b = !0;
     Ra.Fk = function (a) {
-      switch (n.A.tg.L().L(a)) {
+      switch (n_A.tg.L().L(a)) {
         case "Down":
           return 2;
         case "Kick":
@@ -5463,6 +6290,7 @@ function Haxball(options){
       },
       f: Ra,
     };
+    /*
     T.b = !0;
     T.Hh = function (a) {
       return T.Rf(JSON.parse(a));
@@ -5499,7 +6327,7 @@ function Haxball(options){
     Xb.b = !0;
     Xb.Pm = function () {
       try {
-        var a = window.localStorage;
+        var a = localStorage; // window.localStorage;
         a.getItem("");
         if (0 == a.length) {
           var b = "_hx_" + Math.random();
@@ -5588,6 +6416,7 @@ function Haxball(options){
     n.b = !0;
     Wb.b = !0;
     Wb.prototype = { f: Wb };
+    */
     u.b = !0;
     u.qp = function () {
       mc.ts();
@@ -5598,12 +6427,12 @@ function Haxball(options){
       });
     };
     u.hp = function () {
-      var a = n.A.Gj.L();
+      var a = n_A.Gj.L();
       if (null == a)
         return I.yo()
           .then(function (a) {
             u.Je = a;
-            n.A.Gj.Xa(a.Ir());
+            n_A.Gj.Xa(a.Ir());
           })
           ["catch"](function () {
             return {};
@@ -5618,14 +6447,14 @@ function Haxball(options){
           });
     };
     u.Bo = function () {
-      var a = Xb.Pm();
+      var a = Xb.Pm(localStorage);
       return null != a ? null != a.getItem("crappy_router") : !1;
     };
     /*
     u.jk = function (a) {
-      var b = new kb(n.A.fe.L());
+      var b = new kb(n_A.fe.L());
       b.cl = function (b) {
-        n.A.fe.Xa(b);
+        n_A.fe.Xa(b);
         //n.Na.Tl();
         a();
       };
@@ -5695,7 +6524,7 @@ function Haxball(options){
       null != b && (null != c ? u.Dh(b) : u.Pf(b)) : u.xb();
     };
     u.xb = function () {
-      var a = new Aa(n.A.Lh());
+      var a = new Aa(n_A.Lh());
       x.La(a.Ja);
       a.Ym = function (b) {
         if (9 != b.vd.Id) {
@@ -5750,11 +6579,11 @@ function Haxball(options){
     };
     */
     u.$h = function (a, b) {
-      return "" + window.location.origin + "/play?c=" + a + (b ? "&p=1" : "");
+      return "https://www.haxball.com/play?c=" + a + (b ? "&p=1" : "");
     };
     /*
     u.oo = function () {
-      var a = n.A.fe.L(),
+      var a = n_A.fe.L(),
         b = new ib("" + a + "'s room");
       x.La(b.g);
       b.ci = function () {
@@ -5782,14 +6611,14 @@ function Haxball(options){
         }
         x.La(new P("Creating room", "Connecting...", []).g);
         var e = null,
-          f = n.A.Lh(),
+          f = n_A.Lh(),
           g = new fa();
         g.jc = b.name;
         var k = new ea();
         k.w = a;
         k.cb = !0;
         k.Kd = f.ub;
-        k.Xb = n.A.sh.L();
+        k.Xb = n_A.sh.L();
         g.I.push(k);
         var l = new Lb({
           iceServers: n.Vf,
@@ -5919,9 +6748,9 @@ function Haxball(options){
         var d = u.Bo(),
           e = new fa(),
           f = w.ha();
-        f.mc(n.A.fe.L());
-        f.mc(n.A.Lh().ub);
-        f.Db(n.A.sh.L());
+        f.mc(n_A.fe.L());
+        f.mc(n_A.Lh().ub);
+        f.Db(n_A.sh.L());
         var g = n.Vf,
           k = n.Vr,
           l = f.Kg(),
@@ -6088,10 +6917,10 @@ function Haxball(options){
       //x.es(function () {
       kc.fj();
       var b;
-      null == n.A.Me.L()
+      null == n_A.Me.L()
         ? (b = T.Fo().then(
             function (a) {
-              n.A.Me.Xa(a);
+              n_A.Me.Xa(a);
             },
             function () {
               return {};
@@ -6106,7 +6935,6 @@ function Haxball(options){
         )
           .then(function (a) {
             a = new JSZip(a);
-            //console.log("asdas");
             //n.Na = new Ub(a);
             return Promise.all([
               //n.Na.ro,
@@ -6195,10 +7023,10 @@ function Haxball(options){
       Kc: function () {
         this.je.C();
         var a = window.performance.now();
-        (1 == n.A.Fh.L() && 28.333333333333336 > a - this.$c) ||
+        (1 == n_A.Fh.L() && 28.333333333333336 > a - this.$c) ||
           ((this.$c = a),
           //this.sd++,
-          this.uf(n.A.Tb.L()),
+          this.uf(n_A.Tb.L()),
           0 < this.ya.Fd || this.j.C(this.ya));
       },
       Bd: function (a) {
@@ -6209,16 +7037,16 @@ function Haxball(options){
             a.preventDefault();
             break;
           case 49:
-            n.A.Tb.Xa(1);
+            n_A.Tb.Xa(1);
             break;
           case 50:
-            n.A.Tb.Xa(2);
+            n_A.Tb.Xa(2);
             break;
           case 51:
-            n.A.Tb.Xa(3);
+            n_A.Tb.Xa(3);
             break;
           case 52:
-            n.A.Tb.Xa(0);
+            n_A.Tb.Xa(0);
         }
       },
       uf: function (a) {
@@ -6230,7 +7058,6 @@ function Haxball(options){
       Cd: function () {},
       f: Vb,
     };
-    */
     Fb.b = !0;
     Fb.prototype = {
       Pj: function () {
@@ -6309,7 +7136,6 @@ function Haxball(options){
         return va.parse(new F(new DataView(a), !1));
       });
     };
-    /*
     Z.b = !0;
     Z["delete"] = function (a) {
       return null == window.indexedDB
@@ -6488,7 +7314,7 @@ function Haxball(options){
         0 >= this.dh &&
           0.05 > this.ve &&
           (window.clearInterval(this.gh), (this.gh = null), (this.ve = 0));
-        this.Tg.gain.value = n.A.nm.L() ? this.ve : 0;
+        this.Tg.gain.value = n_A.nm.L() ? this.ve : 0;
       },
       qj: function (a) {
         var b = this;
@@ -6942,8 +7768,10 @@ function Haxball(options){
       },
       f: Eb,
     };
+    /*
     Bb.b = !0;
     Bb.prototype = { f: Bb };
+    */
     h.b = !0;
     h.ja = function (a) {
       var b = a.B();
@@ -9512,7 +10340,6 @@ function Haxball(options){
       },
       f: B,
     };
-    /*
     N.b = !0;
     N.lc = function (a) {
       return (
@@ -9672,8 +10499,8 @@ function Haxball(options){
           (120 != a.Oa &&
             ((a = (a.Oa / 120) * 200),
             (this.c.fillStyle = "white"),
-            this.c.fillRect(0.5 * -a, 100, a, 20)),
-          this.td.eq.Tq(this.c));
+            this.c.fillRect(0.5 * -a, 100, a, 20))/*,
+          this.td.eq.Tq(this.c)*/);
       },
       lr: function (a) {
         this.Dk != a &&
@@ -9760,14 +10587,14 @@ function Haxball(options){
         N.Gi(this.c, !0);
       },
       Nq: function (a, b) {
-        for (var c = n.A.Ak.L(), d = 0, e = a.I; d < e.length; ) {
+        for (var c = n_A.Ak.L(), d = 0, e = a.I; d < e.length; ) {
           var f = e[d];
           ++d;
           var g = f.H;
           if (null != g) {
             var g = g.a,
               h = this.dd.get(f.V);
-            c && h.Xf && this.c.drawImage(n.Dm, g.x - 0.5 * n.Dm.width, g.y - 35);
+            c && h.Xf && images?.typing && this.c.drawImage(/*n.Dm*/images.typing, g.x - 0.5 * /*n.Dm*/images.typing.width, g.y - 35);
             f != b && h.so(this.c, g.x, g.y + 50);
           }
         }
@@ -9886,6 +10713,7 @@ function Haxball(options){
       },
       f: N,
     };
+    /*
     R.b = !0;
     R.prototype = {
       zo: function () {
@@ -9934,7 +10762,7 @@ function Haxball(options){
         );
       },
       sp: function (a, b) {
-        var c = window.document.createElement("canvas"),
+        var c = options.render.window.document.createElement("canvas"),
           d = c.getContext("2d", null);
         d.font = "900 70px Arial Black,Arial Bold,Gadget,sans-serif";
         c.width = Math.ceil(d.measureText(a).width) + 7;
@@ -9950,6 +10778,7 @@ function Haxball(options){
       },
       f: R,
     };
+    */
     Sb.b = !0;
     Sb.prototype = {
       Pa: function (a) {
@@ -10009,9 +10838,9 @@ function Haxball(options){
       },
       C: function (a, b) {
         if (null != a.H) {
-          var c = n.A.xm.L() ? b.kb[a.ea.$] : a.ea.wm,
+          var c = n_A.xm.L() ? b.kb[a.ea.$] : a.ea.wm,
             d = null != a.Jd ? a.Jd : a.Xb,
-            e = n.A.lm.L() && null != d;
+            e = n_A.lm.L() && null != d;
           if (
             !Ea.Ln(this.kb, c) ||
             (!e && a.Jb != this.uh) ||
@@ -10047,11 +10876,12 @@ function Haxball(options){
           this.rb.textBaseline = "alphabetic";
           this.rb.font = "900 34px 'Arial Black','Arial Bold',Gadget,sans-serif";
           this.rb.fillText(a, 32, 44);
-          //this.Ij = this.rb.createPattern(this.rb.canvas, "no-repeat");
+          this.Ij = this.rb.createPattern(this.rb.canvas, "no-repeat");
         }
       },
       f: Ea,
     };
+    /*
     mb.b = !0;
     mb.prototype = {
       ki: function (a) {
@@ -10084,7 +10914,7 @@ function Haxball(options){
         b.ub = Ha.ab[(a << 2) + 1].toLowerCase();
         b.Ec = Ha.ab[(a << 2) + 2];
         b.Gc = Ha.ab[(a << 2) + 3];
-        n.A.Ne.Xa(b);
+        n_A.Ne.Xa(b);
         A.i(this.qb);
       },
       f: mb,
@@ -10279,24 +11109,29 @@ function Haxball(options){
     };
     Ka.b = !0;
     Ka.prototype = { f: Ka };
+    */
     hb.b = !0;
     hb.prototype = {
+      /*
       Gg: function (a) {
         this.g.classList.toggle("restricted", a);
       },
-      C: function (a) {
+      */
+      C: function (a, c) {
         var b = a.K;
+        rafCallback && rafCallback(c, b);
         null != b &&
-          (//this.xc.tr(60 * a.Da),
-          //this.xc.sr(b.Hc | 0),
+          (/*this.xc.tr(60 * a.Da),
+          this.xc.sr(b.Hc | 0),
           this.Kb.set(b.Kb),
           this.Pb.set(b.Pb),
-          internalData.extrapolatedRoomPhysicsObj = a
-          //,this.Eb.Kc(a, this.Nb)
+          internalData.extrapolatedRoomPhysicsObj = a,*/
+          this.Eb.Kc(a, this.Nb)
           );
       },
       f: hb,
     };
+    /*
     Rb.b = !0;
     Rb.prototype = {
       Wd: function (a, b) {
@@ -10346,13 +11181,14 @@ function Haxball(options){
     ja.b = !0;
     ja.prototype = {
       C: function (a) {
+        var b = a;
         /*
         null == a.T.K && this.me(!0);
         A.i(this.yl);
         this.bi.disabled = null == a.T.K;
         this.Gd
           ? this.Wa.C(a.T, a.T.na(a.uc))
-          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a)/*, this.Fb.C(a), n.Na.Xj?.Ls(a)*/);
+          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a), (canvas && this.Fb.C(a, b))/*, n.Na.Xj?.Ls(a)*/);
       },
       /*
       me: function (a) {
@@ -10799,7 +11635,6 @@ function Haxball(options){
     };
     Wa.b = !0;
     Wa.prototype = { f: Wa };
-    */
     q.b = !0;
     q.ma = Error;
     q.prototype = C(Error.prototype, { f: q });
@@ -10931,7 +11766,7 @@ function Haxball(options){
     r.rn = function (a) {
       return qc[a];
     };
-    internalData.parserObj = r;
+    */
     hc.b = !0;
     hc.Is = function (a, b) {
       var c = new Uint8Array(this, a, null == b ? null : b - a),
@@ -10969,11 +11804,13 @@ function Haxball(options){
       red: p.fa,
       blue: p.xa
     };
+    /*
     Object.defineProperty(q.prototype, "message", {
       get: function () {
         return String(this.Ta);
       },
     });
+    */
     null == ArrayBuffer.prototype.slice && (ArrayBuffer.prototype.slice = hc.Is);
     Va.Yn = { mandatory: { OfferToReceiveAudio: !1, OfferToReceiveVideo: !1 } };
     I.qh = { name: "ECDSA", namedCurve: "P-256" };
@@ -10988,7 +11825,7 @@ function Haxball(options){
       { name: "ru", reliable: !0, kj: !1 },
       { name: "uu", reliable: !1, kj: !1 },
     ];
-    M.vj = "application/x-www-form-urlencoded";
+    //M.vj = "application/x-www-form-urlencoded";
     Ha.ab = [
       "Afghanistan","AF",33.3,65.1,"Albania","AL",41.1,20.1,"Algeria","DZ",28,1.6,"American Samoa","AS",-14.2,-170.1,"Andorra","AD",42.5,1.6,"Angola","AO",-11.2,17.8,"Anguilla","AI",18.2,-63,"Antigua and Barbuda","AG",17,-61.7,"Argentina","AR",-34.5,-58.4,"Armenia","AM",40,45,"Aruba","AW",12.5,-69.9,"Australia","AU",-25.2,133.7,"Austria","AT",47.5,14.5,"Azerbaijan","AZ",40.1,47.5,"Bahamas","BS",25,-77.3,"Bahrain","BH",25.9,50.6,"Bangladesh","BD",23.6,90.3,"Barbados","BB",13.1,-59.5,"Belarus","BY",53.7,27.9,"Belgium","BE",50.5,4.4,"Belize","BZ",17.1,-88.4,"Benin","BJ",9.3,2.3,"Bermuda","BM",32.3,-64.7,"Bhutan","BT",27.5,90.4,"Bolivia","BO",-16.2,-63.5,"Bosnia and Herzegovina","BA",43.9,17.6,"Botswana","BW",-22.3,24.6,"Bouvet Island","BV",-54.4,3.4,"Brazil","BR",-14.2,-51.9,"British Indian Ocean Territory","IO",-6.3,71.8,"British Virgin Islands","VG",18.4,-64.6,"Brunei","BN",4.5,114.7,"Bulgaria","BG",42.7,25.4,"Burkina Faso","BF",12.2,-1.5,"Burundi","BI",-3.3,29.9,"Cambodia","KH",12.5,104.9,"Cameroon","CM",7.3,12.3,"Canada","CA",56.1,-106.3,"Cape Verde","CV",16,-24,"Cayman Islands","KY",19.5,-80.5,"Central African Republic","CF",6.6,20.9,"Chad","TD",15.4,18.7,"Chile","CL",-35.6,-71.5,"China","CN",35.8,104.1,"Christmas Island","CX",-10.4,105.6,"Colombia","CO",4.5,-74.2,"Comoros","KM",-11.8,43.8,"Congo [DRC]","CD",-4,21.7,"Congo [Republic]","CG",-0.2,15.8,"Cook Islands","CK",-21.2,-159.7,"Costa Rica","CR",9.7,-83.7,"Croatia","HR",45.1,15.2,"Cuba","CU",21.5,-77.7,"Cyprus","CY",35.1,33.4,"Czech Republic","CZ",49.8,15.4,"Côte d'Ivoire","CI",7.5,-5.5,"Denmark","DK",56.2,9.5,
       "Djibouti","DJ",11.8,42.5,"Dominica","DM",15.4,-61.3,"Dominican Republic","DO",18.7,-70.1,"Ecuador","EC",-1.8,-78.1,"Egypt","EG",26.8,30.8,"El Salvador","SV",13.7,-88.8,"England","ENG",55.3,-3.4,"Equatorial Guinea","GQ",1.6,10.2,"Eritrea","ER",15.1,39.7,"Estonia","EE",58.5,25,"Ethiopia","ET",9.1,40.4,"Faroe Islands","FO",61.8,-6.9,"Fiji","FJ",-16.5,179.4,"Finland","FI",61.9,25.7,"France","FR",46.2,2.2,"French Guiana","GF",3.9,-53.1,"French Polynesia","PF",-17.6,-149.4,"Gabon","GA",-0.8,11.6,"Gambia","GM",13.4,-15.3,"Georgia","GE",42.3,43.3,"Germany","DE",51.1,10.4,"Ghana","GH",7.9,-1,"Gibraltar","GI",36.1,-5.3,"Greece","GR",39,21.8,"Greenland","GL",71.7,-42.6,"Grenada","GD",12.2,-61.6,"Guadeloupe","GP",16.9,-62,"Guam","GU",13.4,144.7,"Guatemala","GT",15.7,-90.2,"Guinea","GN",9.9,-9.6,"Guinea-Bissau","GW",11.8,-15.1,"Guyana","GY",4.8,-58.9,"Haiti","HT",18.9,-72.2,"Honduras","HN",15.1,-86.2,"Hong Kong","HK",22.3,114.1,"Hungary","HU",47.1,19.5,"Iceland","IS",64.9,-19,"India","IN",20.5,78.9,"Indonesia","ID",-0.7,113.9,"Iran","IR",32.4,53.6,"Iraq","IQ",33.2,43.6,"Ireland","IE",53.4,-8.2,"Israel","IL",31,34.8,"Italy","IT",41.8,12.5,"Jamaica","JM",18.1,-77.2,"Japan","JP",36.2,138.2,"Jordan","JO",30.5,36.2,"Kazakhstan","KZ",48,66.9,"Kenya","KE",0,37.9,"Kiribati","KI",-3.3,-168.7,"Kosovo","XK",42.6,20.9,"Kuwait","KW",29.3,47.4,"Kyrgyzstan","KG",41.2,74.7,"Laos","LA",19.8,102.4,"Latvia","LV",56.8,24.6,"Lebanon","LB",33.8,35.8,"Lesotho","LS",-29.6,28.2,"Liberia","LR",6.4,-9.4,"Libya","LY",26.3,17.2,"Liechtenstein","LI",47.1,9.5,"Lithuania","LT",55.1,23.8,
@@ -10996,11 +11833,12 @@ function Haxball(options){
       "Saint Kitts","KN",17.3,-62.7,"Saint Lucia","LC",13.9,-60.9,"Saint Pierre","PM",46.9,-56.2,"Saint Vincent","VC",12.9,-61.2,"Samoa","WS",-13.7,-172.1,"San Marino","SM",43.9,12.4,"Saudi Arabia","SA",23.8,45,"Scotland","SCT",56.5,4.2,"Senegal","SN",14.4,-14.4,"Serbia","RS",44,21,"Seychelles","SC",-4.6,55.4,"Sierra Leone","SL",8.4,-11.7,"Singapore","SG",1.3,103.8,"Slovakia","SK",48.6,19.6,"Slovenia","SI",46.1,14.9,"Solomon Islands","SB",-9.6,160.1,"Somalia","SO",5.1,46.1,"South Africa","ZA",-30.5,22.9,"South Georgia","GS",-54.4,-36.5,"South Korea","KR",35.9,127.7,"Spain","ES",40.4,-3.7,"Sri Lanka","LK",7.8,80.7,"Sudan","SD",12.8,30.2,"Suriname","SR",3.9,-56,"Svalbard and Jan Mayen","SJ",77.5,23.6,"Swaziland","SZ",-26.5,31.4,"Sweden","SE",60.1,18.6,"Switzerland","CH",46.8,8.2,"Syria","SY",34.8,38.9,"São Tomé and Príncipe","ST",0.1,6.6,"Taiwan","TW",23.6,120.9,"Tajikistan","TJ",38.8,71.2,"Tanzania","TZ",-6.3,34.8,"Thailand","TH",15.8,100.9,"Timor-Leste","TL",-8.8,125.7,"Togo","TG",8.6,0.8,"Tokelau","TK",-8.9,-171.8,"Tonga","TO",-21.1,-175.1,"Trinidad and Tobago","TT",10.6,-61.2,"Tunisia","TN",33.8,9.5,"Turkey","TR",38.9,35.2,"Turkmenistan","TM",38.9,59.5,"Turks and Caicos Islands","TC",21.6,-71.7,"Tuvalu","TV",-7.1,177.6,"U.S. Minor Outlying Islands","UM",0,0,"U.S. Virgin Islands","VI",18.3,-64.8,"Uganda","UG",1.3,32.2,"Ukraine","UA",48.3,31.1,"United Arab Emirates","AE",23.4,53.8,"United Kingdom","GB",55.3,-3.4,"United States","US",37,-95.7,"Uruguay","UY",-32.5,-55.7,"Uzbekistan","UZ",41.3,64.5,"Vanuatu","VU",-15.3,166.9,"Vatican City","VA",41.9,12.4,
       "Venezuela","VE",6.4,-66.5,"Vietnam","VN",14,108.2,"Wales","WLS",55.3,-3.4,"Wallis and Futuna","WF",-13.7,-177.1,"Western Sahara","EH",24.2,-12.8,"Yemen","YE",15.5,48.5,"Zambia","ZM",-13.1,27.8,"Zimbabwe","ZW",-19,29.1
     ];
+    /*
     n.Vr = "wss://p2p.haxball.com/";
     n.Ee = "https://www.haxball.com/rs/";
     n.Vf = [{ urls: "stun:stun.l.google.com:19302" }];
     n.A = new Yb();
-    internalData.generalStorageObj = n.A;
+    */
     O.Yk = (function () {
       for (var a = [], b = 0; 256 > b; ) ++b, a.push(new H(0, 0));
       return a;
@@ -11053,7 +11891,7 @@ function Haxball(options){
     Ka.N =
       "<div class='disconnected-view'><div class='dialog basic-dialog'><h1>Disconnected</h1><p data-hook='reason'></p><div class='buttons'><button data-hook='ok'>Ok</button><button data-hook='replay'>Save replay</button></div></div></div>";
     hb.N =
-      "<div class='game-state-view'><div class='bar-container'><div class='bar'><div class='scoreboard'><div class='teamicon red'></div><div class='score' data-hook='red-score'>0</div><div>-</div><div class='score' data-hook='blue-score'>0</div><div class='teamicon blue'></div></div><div data-hook='timer'></div></div></div></div></div>";//<div class='canvas' data-hook='canvas'></div></div>";
+      "<div class='game-state-view'><div class='bar-container'><div class='bar'><div class='scoreboard'><div class='teamicon red'></div><div class='score' data-hook='red-score'>0</div><div>-</div><div class='score' data-hook='blue-score'>0</div><div class='teamicon blue'></div></div><div data-hook='timer'></div></div></div><div class='canvas' data-hook='canvas'></div></div>";
     ja.N =
       "<div class='game-view' tabindex='-1'><div class='top-section' data-hook='gameplay-section'></div><div class='bottom-section'><div data-hook='stats'></div><div data-hook='chatbox'></div><div class='buttons'><button data-hook='menu'><i class='icon-menu'></i>Menu<span class='tooltip'>Toggle room menu [Escape]</span></button><button data-hook='settings'><i class='icon-cog'></i>Settings</button></div></div><div data-hook='popups'></div></div>";
     gb.N =
@@ -11089,8 +11927,8 @@ function Haxball(options){
       "<div class='stats-view'><p>Ping: <span data-hook='ping'></span></p><p>Max Ping: <span data-hook='max-ping'></span></p><p>Fps: <span data-hook='fps'></span></p><div data-hook='graph'></div></div>";
     Wa.N =
       '<div class=\'unsupported-browser-view\'><div class=\'dialog\'><h1>Unsupported Browser</h1><p>Sorry! Your browser doesn\'t yet implement some features which are required for HaxBall to work.</p><p>The missing features are: <span data-hook=\'features\'></span></p><h2>Recommended browsers:</h2><div><a href="https://www.mozilla.org/firefox/new/"><img src="images/firefox-icon.png"/>Firefox</a></div><div><a href="https://www.google.com/chrome/"><img src="images/chrome-icon.png"/>Chrome</a></div><div><a href="http://www.opera.com/"><img src="images/opera-icon.png"/>Opera</a></div></div></div>';
-    */
     r.sn = {}.toString;
+    */
     u.qp();
   })(window/*
     "undefined" != typeof window
@@ -11105,7 +11943,7 @@ function Haxball(options){
 
 inherits(Haxball, EventEmitter);
 
-Haxball.generateAuthKey = function(){
+function generateAuthKey(){
   try {
     return crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]).then(function (a) {
         var b = a.privateKey;
@@ -11116,6 +11954,14 @@ Haxball.generateAuthKey = function(){
   } catch (a) {
     return Promise.reject(a);
   }
+};
+
+function keyState(dirX, dirY, kick){ // dirX = oneof[-1:left, 0:still, 1:right], dirY = oneof[-1:up, 0:still, 1:down], kick = true/false
+  return (kick?16:0) | (dirX>0?8:(dirX<0?4:0)) | (dirY>0?2:(dirY<0?1:0));
+};
+
+function getRoomList() {
+  return va.get();
 };
 
 function Room(internalData, plugins){
@@ -11603,7 +12449,7 @@ function Room(internalData, plugins){
   };
 
   this.setExtrapolation = function(extrapolation) {
-    internalData.generalStorageObj.rd.Xa(extrapolation);
+    n_A.rd.Xa(extrapolation);
     internalData.roomObj?.ya.gm(extrapolation);
   };
   
@@ -11614,8 +12460,8 @@ function Room(internalData, plugins){
   };
 
   this.setAvatar = function(avatar) {
-    null != avatar && (avatar = U.Qc(avatar, 2));
-    internalData.generalStorageObj.sh.Xa(avatar);
+    null != avatar && (avatar = avatar.substr(0, 2));
+    n_A.sh.Xa(avatar);
     var msg = internalData.avatarChangerObj.la(avatar);
     internalData.roomObj?.ya.ra(msg);
     internalData.execOperationReceivedOnHost(msg);
@@ -11678,7 +12524,7 @@ function Room(internalData, plugins){
   };
 
   this.sendChatIndicator = function(active){
-    internalData.roomObj?.bm(active);
+    internalData.roomObj?.bm(!active);
   };
 
   this.sendAnnouncement = function(msg, targetId, color, style, sound) { // host-only function
@@ -11801,9 +12647,9 @@ function Room(internalData, plugins){
       stadium.Lk(textDataFromHbsFile);
       return stadium;
     } catch (k) {
-      b = k instanceof internalData.StadiumSyntaxError ? k.Ta : k,
-      b instanceof SyntaxError ? onError("SyntaxError in line: " + internalData.parserObj.Be(b.lineNumber, "")) : 
-      b instanceof internalData.StadiumCustomError ? onError(b.xp) : 
+      b = k instanceof q ? k.Ta : k,
+      b instanceof SyntaxError ? onError("SyntaxError in line: " + r.Be(b.lineNumber, "")) : 
+      b instanceof Bb ? onError(b.xp) : 
       onError("Error loading stadium file.")
     }
   };
@@ -11812,9 +12658,9 @@ function Room(internalData, plugins){
     try {
       internalData.roomObj?.j?.og(stadium);
     } catch (k) {
-      b = k instanceof internalData.StadiumSyntaxError ? k.Ta : k,
-      b instanceof SyntaxError ? onError("SyntaxError in line: " + internalData.parserObj.Be(b.lineNumber, "")) : 
-      b instanceof internalData.StadiumCustomError ? onError(b.xp) : 
+      b = k instanceof q ? k.Ta : k,
+      b instanceof SyntaxError ? onError("SyntaxError in line: " + r.Be(b.lineNumber, "")) : 
+      b instanceof Bb ? onError(b.xp) : 
       onError("Error loading stadium file.")
     }
   };
@@ -11830,15 +12676,15 @@ function Room(internalData, plugins){
   this.changeTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.spec);  // room.currentPlayerId = internalData.roomObj.ya.uc
+        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.spec);
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.red);  // room.currentPlayerId = internalData.roomObj.ya.uc
+        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.red);
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.blue);  // room.currentPlayerId = internalData.roomObj.ya.uc
+        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.blue);
         break; 
       }
     }
@@ -12085,10 +12931,6 @@ function Room(internalData, plugins){
   });
 }
 
-function keyState(dirX, dirY, kick){ // dirX = oneof[-1:left, 0:still, 1:right], dirY = oneof[-1:up, 0:still, 1:down], kick = true/false
-  return (kick?16:0) | (dirX>0?8:(dirX<0?4:0)) | (dirY>0?2:(dirY<0?1:0));
-}
-
 function Plugin(name, active=false){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
   this.name = name;
   this.active = active;
@@ -12097,7 +12939,11 @@ function Plugin(name, active=false){ // name is important, we activate/deactivat
 module.exports = {
   OperationType,
   ConnectionState,
-  keyState,
+  Utils: {
+    generateAuthKey, 
+    getRoomList, 
+    keyState
+  },
   Plugin,
   Haxball
 };

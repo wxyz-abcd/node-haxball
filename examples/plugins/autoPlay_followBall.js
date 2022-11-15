@@ -1,4 +1,4 @@
-var { RoomKeyboardHelper, keyState, Plugin } = require("../../src/index");
+var { Utils, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
@@ -57,6 +57,6 @@ module.exports = function(){
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
 
     // apply current keys
-    _room.setKeyState(keyState(dirX, dirY, kick));
+    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

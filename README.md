@@ -117,19 +117,24 @@ client.on("ready", () => {
 
 <h2 id="docs">📰 Mini-Documentation</h2>
 
+- Utils: Some static utility functions.
+
+  - generateAuthKey(): generates a new player_auth_key. you should store it and use it later if you want to be recognized in Haxball rooms. (use it in Haxball _constructor_) (returns Promise(CryptoKeyPair))
+  - getRoomList(): returns the current room list. (returns Promise(roomListArray))
+  - keyState(dirX, dirY, kick): returns an integer keyState value to be used in Room.setKeyState. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
+
 - Haxball: Main client class.
 
-  - static methods:
-    - authKey = Haxball.generateAuthKey(): generates a new auth key. must use {"player_auth_key": authKey} parameter in Haxball _constructor_ in order to use the new auth. you might consider saving the auth value in a file or database for recognition.
-
-  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
+  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. _onRequestAnimationFrame_ callback can also be set here. _render_ is a special key that is used only for rendering purposes. it may have values for these browser environment(window) function/variables: 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance', 'console', 'requestAnimationFrame', 'cancelAnimationFrame', 'devicePixelRatio', 'document', 'images'. images should be an object with keys 'grass', 'concrete', 'concrete2', each assigned to an object of type 'Image'. the functions(_setTimeout_, _clearTimeout_, _setInterval_, _clearInterval_, _requestAnimationFrame_, _cancelAnimationFrame_) should be binded to browser's _window_ object.
 
   - functions:
-    - getRoomList(): returns Promise(roomListArray).
+    - value = getStorageValue(key): returns the current value of storage\[key\] where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
     - setStorageValue(key, value): sets storage\[key\]=(value) where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
     - createRoom({name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
     - joinRoom({roomId, password, token, kickTimeout, plugins}): try to join the room(roomId) with given password(or null=no password). Must leave current room first. returns Promise(room) which is rejected if failed.
     - leaveRoom(): Leave current room. Must be in a room.
+    - setOnRequestAnimationFrameCallback(callback): sets up a custom callback for custom events/updates that will be called each time canvas is rendering a frame.
+    - setCanvas(canvas): sets the canvas to render the game.
 
   - internally used events: 
     - connectionStateChange(state): triggered several times while joining a room. use ConnectionState\[state\] for explanation on returned value.
@@ -352,8 +357,6 @@ client.on("ready", () => {
       - onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
       - onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
       - onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).
-
-- keyState(dirX, dirY, kick): returns a keyState value to be used in Room.setKeyState. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
 
 [Back To The Top](#title)
 

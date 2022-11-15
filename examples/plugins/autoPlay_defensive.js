@@ -1,4 +1,4 @@
-var { keyState, Plugin } = require("../../src/index");
+var { Utils, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
@@ -87,6 +87,6 @@ module.exports = function(){
     */
     
     // apply current keys
-    _room.setKeyState(keyState(dirX, dirY, kick));
+    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

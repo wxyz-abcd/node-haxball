@@ -1,4 +1,4 @@
-var { keyState } = require("../../src/index");
+var { Utils } = require("../../src/index");
 
 const minCoordAlignDelta = 0.5, minKickDistance = 2;
 
@@ -42,6 +42,6 @@ function roomCallback(room){ // examples start from here.
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + minKickDistance) * (playerDisc.Z + ball.Z + minKickDistance));
 
     // apply current keys
-    _room.setKeyState(keyState(dirX, dirY, kick));
+    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };
