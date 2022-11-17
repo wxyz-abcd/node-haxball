@@ -151,6 +151,7 @@ client.on("ready", () => {
 
   - properties:
     - isHost: true for hosts, false for clients
+    - client: a reference to the Haxball client object that created this Room object
     - currentPlayerId: current player's id
     - currentPlayer: the original current player object
     - sdp: current room's sdp value (only for client rooms)

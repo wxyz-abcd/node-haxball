@@ -1050,6 +1050,7 @@ function Haxball(options){
         //haxball.off("roomLeave", fLeaveRoom);
         //haxball.off("createRoomSucceeded", fCreateRoomSucceeded);
         haxball.room = new Room(internalData, obj.plugins);
+        haxball.room.client = haxball;
         haxball.room.kickTimeout = obj.kickTimeout || 20;
         haxball.room.hostPing = 0;
         haxball.emit("roomJoin", haxball.room);
@@ -1098,6 +1099,7 @@ function Haxball(options){
         haxball.off("connectionStateChange", fConnectionStateChange);
         //haxball.off("joinRoomSucceeded", fJoinRoomSucceeded);
         haxball.room = new Room(internalData, obj.plugins);
+        haxball.room.client = haxball;
         haxball.room.kickTimeout = obj.kickTimeout || 20;
         haxball.emit("roomJoin", haxball.room);
         resolve(haxball.room);
@@ -9331,7 +9333,7 @@ function Haxball(options){
         if (null != b) {
           var c = a.na(this.P),
             d = a.Lb(this.P, 1);
-          (d = d || (b == c && !a.Pc && null == a.K)) && (a.Mf(c, b, this.jj),
+          (d = d || b == c && !a.Pc && null == a.K) && (b.ea != this.jj) && (a.Mf(c, b, this.jj),
           haxball.room._onPlayerTeamChange(this.Md, this.jj.$, this.P)); // id, teamId, byId
         }
       },
@@ -9783,7 +9785,7 @@ function Haxball(options){
       },
       f: ma,
     });
-    internalData.kickRateLimitObj = ob;
+    internalData.kickRateLimitObj = ma;
     Ma.b = !0;
     Ma.ma = m;
     Ma.prototype = C(m.prototype, {
@@ -11188,7 +11190,18 @@ function Haxball(options){
         this.bi.disabled = null == a.T.K;
         this.Gd
           ? this.Wa.C(a.T, a.T.na(a.uc))
-          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a), (canvas && this.Fb.C(a, b))/*, n.Na.Xj?.Ls(a)*/);
+          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a), (canvas && (this.uf(), this.Fb.C(a, b)))/*, n.Na.Xj?.Ls(a)*/);
+      },
+      uf: function () {
+        var a = n_A.Tb.L(),
+          b = this.Fb,
+          c = b.Eb;
+        c.zg = n_A.Sl.L();
+        0 == a
+          ? (/*b.Gg(!0),*/ (c.kf = 1), (c.jf = 0), (c.xf = 0))
+          : (/*b.Gg(!1),*/
+            (c.xf = 35),
+            -1 == a ? (c.jf = 450) : ((c.jf = 0), (c.kf = 1 + 0.25 * (a - 1))));
       },
       /*
       me: function (a) {
@@ -12449,7 +12462,8 @@ function Room(internalData, plugins){
   };
 
   this.setExtrapolation = function(extrapolation) {
-    n_A.rd.Xa(extrapolation);
+    //n_A.rd.Xa(extrapolation);
+    that.client.setStorageValue("extrapolation", extrapolation);
     internalData.roomObj?.ya.gm(extrapolation);
   };
   
@@ -12461,7 +12475,8 @@ function Room(internalData, plugins){
 
   this.setAvatar = function(avatar) {
     null != avatar && (avatar = avatar.substr(0, 2));
-    n_A.sh.Xa(avatar);
+    //n_A.sh.Xa(avatar);
+    that.client.setStorageValue("avatar", avatar);
     var msg = internalData.avatarChangerObj.la(avatar);
     internalData.roomObj?.ya.ra(msg);
     internalData.execOperationReceivedOnHost(msg);
