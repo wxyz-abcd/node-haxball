@@ -265,8 +265,8 @@ client.on("ready", () => {
       - onAfterStadiumChange(stadium, byId, customData): room's current stadium was set to (stadium) by player(byId).
       - customData = onBeforeTeamsLockChange(value, byId): room's team lock status was set to (value) by player(byId).
       - onAfterTeamsLockChange(value, byId, customData): room's team lock status was set to (value) by player(byId).
-      - customData = onBeforePlayerJoin(id, name, flag, avatar, conn, auth): a player with properties(id, name, avatar, conn, auth) joined the room.
-      - onAfterPlayerJoin(id, name, flag, avatar, conn, auth, customData): a player with properties(id, name, avatar, conn, auth) joined the room.
+      - customData = onBeforePlayerJoin(playerObj): a player(playerObj) joined the room.
+      - onAfterPlayerJoin(playerObj, customData): a player(playerObj) joined the room.
       - customData = onBeforeGamePauseChange(isPaused, byId): room's game paused status was set to (isPaused) by player(byId).
       - onAfterGamePauseChange(isPaused, byId, customData): room's game paused status was set to (isPaused) by player(byId).
       - customData = onBeforePlayerChat(id, message): a chat message with content(message) was received from player(id).
@@ -275,8 +275,8 @@ client.on("ready", () => {
       - onAfterPlayerInputChange(id, value, customData): player(id)'s input has changed to (value).
       - customData = onBeforePlayerChatIndicatorChange(id, value): player(id)'s chat indicator status has changed to (value).
       - onAfterPlayerChatIndicatorChange(id, value, customData): player(id)'s chat indicator status has changed to (value).
-      - customData = onBeforePlayerLeave(id, reason, isBanned, byId): player(id) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
-      - onAfterPlayerLeave(id, reason, isBanned, byId, customData): player(id) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
+      - customData = onBeforePlayerLeave(playerObj, reason, isBanned, byId): player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
+      - onAfterPlayerLeave(playerObj, reason, isBanned, byId, customData): player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
       - customData = onBeforeSetDiscProperties(id, type, data1, data2): \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
       - onAfterSetDiscProperties(id, type, data1, data2, customData): \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
       - customData = onBeforeKickRateLimitChange(min, rate, burst, byId): room's kick rate limit was set to (min, rate, burst) by player(byId).
@@ -339,12 +339,12 @@ client.on("ready", () => {
       - onPlayerTeamChange(id, teamId, byId, customData): player(id) was moved to team(teamId) by player(byId).
       - onStadiumChange(stadium, byId, customData): room's current stadium was set to (stadium) by player(byId).
       - onTeamsLockChange(value, byId, customData): room's team lock status was set to (value) by player(byId).
-      - onPlayerJoin(id, name, flag, avatar, conn, auth, customData): a player with properties(id, name, avatar, conn, auth) joined the room.
+      - onPlayerJoin(playerObj, customData): a player(playerObj) joined the room.
       - onGamePauseChange(isPaused, byId, customData): room's game paused status was set to (isPaused) by player(byId).
       - onPlayerChat(id, message, customData): a chat message with content(message) was received from player(id).
       - onPlayerInputChange(id, value, customData): player(id)'s input has changed to (value).
       - onPlayerChatIndicatorChange(id, value, customData): player(id)'s chat indicator status has changed to (value).
-      - onPlayerLeave(id, reason, isBanned, byId, customData): player(id) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
+      - onPlayerLeave(playerObj, reason, isBanned, byId, customData): player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
       - onSetDiscProperties(id, type, data1, data2, customData): \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
       - onKickRateLimitChange(min, rate, burst, byId, customData): room's kick rate limit was set to (min, rate, burst) by player(byId).
       - onGameStart(byId, customData): game was started by player(byId).

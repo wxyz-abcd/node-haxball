@@ -69,7 +69,10 @@ module.exports = function(){
     return true;
   };
 
-  this.onPlayerLeave = function(id, reason, isBanned, byId, customData){
+  this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
+    // get player's id
+    var id = playerObj.V;
+
     // free extra memory allocated
     delete controlSwitch[id];
     delete controlSwitchBlocked[id];

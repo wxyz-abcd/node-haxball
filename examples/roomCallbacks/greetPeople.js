@@ -1,16 +1,18 @@
 function roomCallback(room){ // examples start from here.
 
-  var players = {};
-
-  room.onAfterPlayerJoin = (id, name, flag, avatar, conn, auth, customData) => {
-    players[id] = { id, name, flag, conn, auth };
+  room.onAfterPlayerJoin = (playerObj, customData) => {
+    // get player's id and name
+    var id = playerObj.V, name = playerObj.w;
+    
     room.sendChat("Welcome, " + name); // greet everybody
     room.setPlayerAdmin(id, true); // make everybody admin
   };
 
-  room.onAfterPlayerLeave = (id, reason, isBanned, byId, customData) => {
-    room.sendChat("Goodbye, " + players[id].name);
-    delete players[id];
+  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+    // get player's name
+    var name = playerObj.w;
+    
+    room.sendChat("Goodbye, " + name); // say farewell to everybody
   };
 
 }

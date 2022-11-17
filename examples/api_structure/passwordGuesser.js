@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Haxball, keyState } = require("../src/index");
+const { OperationType, ConnectionState, Haxball, Utils } = require("../src/index");
 
 function PasswordGuesser(){
   const guessDictionary = ["password", "111", "222", "333", "123", "12345"]; // write as many guesses as you wish here.

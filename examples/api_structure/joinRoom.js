@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Haxball, keyState } = require("../src/index");
+const { OperationType, ConnectionState, Haxball, Utils } = require("../src/index");
 
 var haxBall = new Haxball({
   player_name: "wxyz-abcd",

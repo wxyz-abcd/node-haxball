@@ -9440,7 +9440,7 @@ function Haxball(options){
           a = a.tl;
           null != a && a(b);
           */
-          haxball.room._onPlayerJoin(this.V, this.name, this.cj, this.Xb, this.conn, this.auth); // id, name, flag, avatar, conn, auth
+          haxball.room._onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
         }
       },
       ua: function (a) {
@@ -9611,7 +9611,7 @@ function Haxball(options){
             D.remove(a.I, b);
             null != a.K && D.remove(a.K.ta.F, b.H);
             vb.i(a.ul, b, this.fd, this.Qg, c);
-            haxball.room._onPlayerLeave(b.V, this.fd, this.Qg, c?.V); // id, reason, isBanned, byId
+            haxball.room._onPlayerLeave(b, this.fd, this.Qg, c?.V); // playerObj, reason, isBanned, byId
           }
         }
       },
@@ -12251,13 +12251,13 @@ function Room(internalData, plugins){
     }
   };
 
-  this._onPlayerJoin = function(id, name, flag, avatar, conn, auth){
-    var customData = that.onBeforePlayerJoin && that.onBeforePlayerJoin(id, name, flag, avatar, conn, auth);
+  this._onPlayerJoin = function(pObj){
+    var customData = that.onBeforePlayerJoin && that.onBeforePlayerJoin(pObj);
     if (customData!==false){
       that.activePlugins.forEach((p)=>{
-        p.onPlayerJoin && p.onPlayerJoin(id, name, flag, avatar, conn, auth, customData);
+        p.onPlayerJoin && p.onPlayerJoin(pObj, customData);
       });
-      that.onAfterPlayerJoin && that.onAfterPlayerJoin(id, name, flag, avatar, conn, auth, customData);
+      that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
     }
   };
 
@@ -12301,13 +12301,13 @@ function Room(internalData, plugins){
     }
   };
 
-  this._onPlayerLeave = function(id, reason, isBanned, byId){
-    var customData = that.onBeforePlayerLeave && that.onBeforePlayerLeave(id, reason, isBanned, byId);
+  this._onPlayerLeave = function(pObj, reason, isBanned, byId){
+    var customData = that.onBeforePlayerLeave && that.onBeforePlayerLeave(pObj, reason, isBanned, byId);
     if (customData!==false){
       that.activePlugins.forEach((p)=>{
-        p.onPlayerLeave && p.onPlayerLeave(id, reason, isBanned, byId, customData);
+        p.onPlayerLeave && p.onPlayerLeave(pObj, reason, isBanned, byId, customData);
       });
-      that.onAfterPlayerLeave && that.onAfterPlayerLeave(id, reason, isBanned, byId, customData);
+      that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
     }
   };
 

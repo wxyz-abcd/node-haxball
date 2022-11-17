@@ -42,7 +42,11 @@ function roomCallback(room){ // examples start from here.
     return true;
   };
 
-  room.onAfterPlayerLeave = (id, reason, isBanned, byId, customData) => {
+  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+    // get player's id
+    var id = playerObj.V;
+    
+    // free extra memory allocated
     delete connectionShouldBreak[id];
   };
 

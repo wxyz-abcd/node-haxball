@@ -35,7 +35,10 @@ function roomCallback(room){ // examples start from here.
     }
   };
 
-  room.onAfterPlayerJoin = (id, name, flag, avatar, conn, auth, customData) => {
+  room.onAfterPlayerJoin = (playerObj, customData) => {
+    // get player's id
+    var id = playerObj.V;
+    
     // add the new player to spectators
     teams[0].push(id);
 
@@ -46,7 +49,10 @@ function roomCallback(room){ // examples start from here.
     balanceTeams();
   };
 
-  room.onAfterPlayerLeave = (id, reason, isBanned, byId, customData) => {
+  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+    // get player's id
+    var id = playerObj.V;
+    
     // remove player from his/her team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));
     if (idx>=0)
