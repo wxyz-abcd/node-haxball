@@ -1,4 +1,4 @@
-[![NPM Version](https://img.shields.io/npm/v/haxball.svg?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/haxball.svg?style=flat-square)](https://npmjs.org/package/node-haxball)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball) [![NPM Version](https://img.shields.io/npm/v/node-haxball?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/node-haxball?style=flat-square)](https://npmjs.org/package/node-haxball)
 
 [![License](https://img.shields.io/github/license/wxyz-abcd/node-haxball?style=flat-square)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/wxyz-abcd/node-haxball?style=flat-square) [![Implementations](https://img.shields.io/badge/%F0%9F%92%A1-implementations-8C8E93.svg?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/issues) ![Repository Size](https://img.shields.io/github/repo-size/wxyz-abcd/node-haxball?style=flat-square)
 
@@ -146,6 +146,10 @@ client.on("ready", () => {
     - joinRoomFailed(error): join room failed with error(error).
     - ready(): haxball api has just become ready to work.
     - roomJoin(room): joined/created room.
+    - joinRoomReverse(): trying reverse connection while joining a room.
+
+  - events to be triggered by user:
+    - cancelJoinRoom(): trigger to cancel joining a room.
 
 - Room: The class that hosts all room operations. Should only be initialized from inside the Haxball client class and retrieved from a resolved Promise resulting from either Haxball.createRoom or Haxball.joinRoom.
 
@@ -189,7 +193,7 @@ client.on("ready", () => {
     - randTeams(): remove random 2 players from spectators and add them to teams.
     - resetTeam(teamId): move everyone on team(teamId) to spectators.
     - setSync(value): set synchronized status to value. host-only. value: boolean
-    - getDefaultStadium(index): get default stadium array\[index\].
+    - getDefaultStadiums(): get default stadium array.
     - parseStadium(textDataFromHbsFile, onError): parse text as a stadium object and return it.
     - setCurrentStadium(stadium, onError): set current map(stadium).
     - setTimeLimit(value): set time limit(value).
@@ -219,6 +223,7 @@ client.on("ready", () => {
     - setPluginActive(name, active): activate/deactivate the plugin(name).
     - startRecording(): start recording replay data. returns true if succeeded, false otherwise. recording should not be started before calling this.
     - stopRecording(): stop recording replay data. returns UIntArray8 data if succeeded, null otherwise. recordin should be started before calling this.
+    - isRecording(): returns true if recording has started; false otherwise.
     
   - modifier callbacks:
     - \[dataArray, customData\] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth): set player's data just before player has joined the room. dataArray format should be \[modifiedNick, modifiedAvatar, modifiedFlag\]. if dataArray is null, player is not allowed to join. also prepares a custom data object to send to all plugins. customData=false means "don't call callbacks". host-only.

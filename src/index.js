@@ -110,10 +110,10 @@ function recognizeEvent(obj){
 
 
 
+var oc = Boolean, z = Number, sc = {}, Pb = {}, tc = {}, uc = {};
 function Bb(a) {
   this.xp = a;
 }
-
 function q(a) {
   this.Ta = a;
   Error.captureStackTrace && Error.captureStackTrace(this, q);
@@ -3742,12 +3742,14 @@ function Haxball(options){
         window.clearTimeout(this.ke);
         this.ke = null;
         window.clearInterval(this.ol);
-        this.X.onmessage = null;
-        this.X.onerror = null;
-        this.X.onclose = null;
-        this.X.onopen = null;
-        this.X.close();
-        this.X = null;
+        if (null != this.X) {
+          this.X.onmessage = null;
+          this.X.onerror = null;
+          this.X.onclose = null;
+          this.X.onopen = null;
+          this.X.close();
+          this.X = null;
+        }
         this.qk();
       },
       Fi: function (a) {
@@ -6769,6 +6771,12 @@ function Haxball(options){
           })/*,
           h = new jb()*/;
         console.log("Connecting to master...");
+        function cancelJoinRoom(){
+          t.Ad = null;
+          t.df = null;
+          t.ia();
+        }
+        haxball.once("cancelJoinRoom", cancelJoinRoom);
         /*
         h.ba("Connecting to master...");
         h.vh.onclick = function () {
@@ -6780,6 +6788,7 @@ function Haxball(options){
         x.La(h.g);
         */
         var m = function (a, b) {
+          haxball.off("cancelJoinRoom", cancelJoinRoom);
           haxball.emit("joinRoomFailed", a);
             /*
             u.xb();
@@ -6791,6 +6800,7 @@ function Haxball(options){
             */
           },
           p = function () {
+            haxball.off("cancelJoinRoom", cancelJoinRoom);
             /*
             var a = new P("Connection Failed", "", ["Ok"]);
             a.Vd.innerHTML =
@@ -6803,6 +6813,7 @@ function Haxball(options){
             haxball.emit("joinRoomFailed", "Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues");
           },
           r = function () {
+            haxball.off("cancelJoinRoom", cancelJoinRoom);
             var b = new ba(t);
             /*
             t.dl = function (a) {
@@ -6873,8 +6884,10 @@ function Haxball(options){
         t.Sp = function () {
           console.log("Trying reverse connection...");
           //h.ba("Trying reverse connection...");
+          haxball.emit("joinRoomReverse");
         };
       } catch (ic) {
+        haxball.off("cancelJoinRoom", cancelJoinRoom);
         haxball.emit("joinRoomFailed", ic instanceof q ? ic.Ta : ic);
         /*
         window.console.log(ic instanceof q ? ic.Ta : ic),
@@ -8270,7 +8283,7 @@ function Haxball(options){
         return JSON.stringify(this.Hr());
       },
       Hr: function () {
-        if (!this.Lf) throw new q(0);
+        //if (!this.Lf) throw new q(0); // disabled storeable map check
         for (var a = {}, b = 0, c = [], d = 0, e = this.J; d < e.length; ) {
           var f = e[d];
           ++d;
@@ -11800,12 +11813,14 @@ function Haxball(options){
     Array.b = !0;
     Date.prototype.f = Date;
     Date.b = "Date";
+    /*
     var Pb = {},
       sc = {},
       z = Number,
       oc = Boolean,
       tc = {},
       uc = {};
+    */
     p.Ia = new p(0, 16777215, 0, -1, "Spectators", "t-spec", 0, 0);
     p.fa = new p(1, 15035990, -1, 8, "Red", "t-red", 0, 2);
     p.xa = new p(2, 5671397, 1, 16, "Blue", "t-blue", 0, 4);
@@ -12640,6 +12655,10 @@ function Room(internalData, plugins){
     return internalData.roomObj?.j?._Qp_(false);
   };
 
+  this.isRecording = function(){
+    return (internalData.roomObj?.Ed != null);
+  };
+
   this.randTeams = function(){
     internalData.roomObj?.j?.Pp();
   };
@@ -12652,8 +12671,8 @@ function Room(internalData, plugins){
     internalData.roomObj?.j?.de();
   };
 
-  this.getDefaultStadium = function(index){
-    return internalData.mapObj.wb[index];
+  this.getDefaultStadiums = function(){
+    return internalData.mapObj.Kh();
   };
 
   this.parseStadium = function(textDataFromHbsFile, onError){
