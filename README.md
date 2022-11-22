@@ -127,6 +127,9 @@ client.on("ready", () => {
 
   - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. _onRequestAnimationFrame_ callback can also be set here. _render_ is a special key that is used only for rendering purposes. it may have values for these browser environment(window) function/variables: 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance', 'console', 'requestAnimationFrame', 'cancelAnimationFrame', 'devicePixelRatio', 'document', 'images'. images should be an object with keys 'grass', 'concrete', 'concrete2', each assigned to an object of type 'Image'. the functions(_setTimeout_, _clearTimeout_, _setInterval_, _clearInterval_, _requestAnimationFrame_, _cancelAnimationFrame_) should be binded to browser's _window_ object.
 
+  - properties:
+    - version: current version number. other clients cannot join the room created by this Haxball client if this version number is different than theirs.
+
   - functions:
     - value = getStorageValue(key): returns the current value of storage\[key\] where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
     - setStorageValue(key, value): sets storage\[key\]=(value) where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
@@ -135,6 +138,8 @@ client.on("ready", () => {
     - leaveRoom(): Leave current room. Must be in a room.
     - setOnRequestAnimationFrameCallback(callback): sets up a custom callback for custom events/updates that will be called each time canvas is rendering a frame.
     - setCanvas(canvas): sets the canvas to render the game.
+    - isCustomVersion(): returns whether the version number is the same as the original client. 
+    - setCustomVersion(custom): if custom=true, sets the version number to a specific value(always using the same for recognition); otherwise sets it to the same as the original client. Set it to true if you want your room to be inaccessible to people using the original client.
 
   - internally used events: 
     - connectionStateChange(state): triggered several times while joining a room. use ConnectionState\[state\] for explanation on returned value.
@@ -147,9 +152,11 @@ client.on("ready", () => {
     - ready(): haxball api has just become ready to work.
     - roomJoin(room): joined/created room.
     - joinRoomReverse(): trying reverse connection while joining a room.
+    - RequestRecaptcha(): recaptcha is required while joining or creating a room.
 
   - events to be triggered by user:
     - cancelJoinRoom(): trigger to cancel joining a room.
+    - RecaptchaToken(token): trigger to send the recaptcha token after RequestRecaptcha event occurred. currently only working for creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources/handlers and use Haxball.joinRoom with the new token.
 
 - Room: The class that hosts all room operations. Should only be initialized from inside the Haxball client class and retrieved from a resolved Promise resulting from either Haxball.createRoom or Haxball.joinRoom.
 
@@ -181,6 +188,7 @@ client.on("ready", () => {
     - sendAnnouncement(msg, targetId, color, style, sound): send announcement message(msg) to player(targetId) with properties(color, style, sound). targetId is null -> send to - everyone. host-only.
     - setDiscProperties(discId, properties): set disc(discId) properties. host-only.
     - setPlayerDiscProperties(playerId, properties): set player(playerId)'s disc properties. host-only.
+    - sendCustomEvent(type, data): sends a CustomEvent(type, data) that can only be received by the users of this modified client.
     - getKeyState(): get current key state.
     - setKeyState(state): set current key state.
     - startGame(): start game.
@@ -308,6 +316,8 @@ client.on("ready", () => {
       - onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
       - customData = onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId): a collision happened between disc(discId1, playerId1) and plane(planeId).
       - onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).
+      - customData = onBeforeCustomEvent(type, data, byId): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
+      - onAfterCustomEvent(type, data, byId, customData): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
     - onPluginActiveChange(plugin): a plugin was activated/deactivated.
 
 - Plugin: A class that defines a plugin. Any plugin should be based on this class.
@@ -363,6 +373,7 @@ client.on("ready", () => {
       - onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
       - onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
       - onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).
+      - onCustomEvent(type, data, byId, customData): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
 
 [Back To The Top](#title)
 

@@ -47,4 +47,5 @@ module.exports = function(){
   this.onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2, customData){};
   this.onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId, customData){};
   this.onCollisionDiscVsPlane = function(discId, discPlayerId, planeId, customData){};
+  this.onCustomEvent = function(type, data, byId, customData){};
 };

@@ -8,6 +8,8 @@ const perfHooks = require("perf_hooks");
 const JSON5 = require("json5");
 const pako = require("pako");
 
+const defaultVersion = 9, customVersion = 117;
+
 const ConnectionState = {
   0: "Connecting to master",
   1: "Connecting to peer",
@@ -33,7 +35,8 @@ const OperationType = {
   SetTeamColors: 14,
   SetPlayerAdmin: 15,
   KickBanPlayer: 16,
-  SetSync: 17
+  SetSync: 17,
+  CustomEvent: 18
 };
 
 var crypto = new Crypto();
@@ -88,6 +91,7 @@ var allEvents = [
   new HaxballEvent(OperationType.Ping, "la", {values: "we", ...allEventsCommon}),
   new HaxballEvent(OperationType.SetDiscProperties, "ob", {id: "ze", type: "Sm", data1: "Ka", data2: "Rc", ...allEventsCommon}), // type(0: disc -> id: discId, 1: player -> id: playerId), data1: [x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping], data2: [color, cMask, cGroup]
   //new HaxballEvent(OperationType.JoinRoom, "oa", {id: "V", name: "name", flag: "cj", avatar: "Xb", conn: "conn", auth: "auth", ...allEventsCommon}),
+  new HaxballEvent(OperationType.CustomEvent, "CustomEvent", {type: "type", data: "data", ...allEventsCommon}),
 
 ].reduce((acc, x)=>{
   if (acc[x.fName])
@@ -902,7 +906,8 @@ va.get = function () {
 function Haxball(options){
   EventEmitter.call(this);
   this.room = null;
-  
+  this.version = defaultVersion;
+
   class ILocalStorage {
     constructor() {
       this.storage = {};
@@ -970,6 +975,7 @@ function Haxball(options){
     authObj: null,
     dummyPromise: Promise.resolve(),
     keyState: 0,
+    customClientIds: new Set(), // store for all client ids that are using our modified client.
     onOperationReceived: function(msg) {
       /*
       var op = {
@@ -1010,6 +1016,17 @@ function Haxball(options){
     }
   };
 
+  this.isCustomVersion = function(){
+    return (this.version == customVersion);
+  };
+
+  this.setCustomVersion = function(custom){ // if set, only modified clients will be able to join the room.
+    if (custom)
+      this.version = customVersion;
+    else
+      this.version = defaultVersion;
+  };
+
   this.getStorageValue = function(key){ // key must be one of ['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors']
     return n_A[Object.keys(n_A).filter((x)=>n_A[x].w==key)[0]]?.L();
   };
@@ -1043,9 +1060,11 @@ function Haxball(options){
         internalData.roomObj = null;
         internalData.roomPhysicsObj = null;
         internalData.extrapolatedRoomPhysicsObj = null;
+        internalData.customClientIds.clear();
         haxball.room = null;
       };
       var fCreateRoomSucceeded = function(){
+        internalData.customClientIds.clear();
         console.log("internal event: CreateRoomSucceeded");
         //haxball.off("roomLeave", fLeaveRoom);
         //haxball.off("createRoomSucceeded", fCreateRoomSucceeded);
@@ -1079,8 +1098,8 @@ function Haxball(options){
         reject();
         return;
       }
-      var fLeaveRoom = function(){
-        console.log("internal event: LeaveRoom");
+      var fLeaveRoom = function(x){
+        console.log("internal event: LeaveRoom", x);
         //haxball.off("roomLeave", fLeaveRoom);
         haxball.off("connectionStateChange", fConnectionStateChange);
         //haxball.off("joinRoomSucceeded", fJoinRoomSucceeded);
@@ -1091,9 +1110,11 @@ function Haxball(options){
         internalData.roomObj = null;
         internalData.roomPhysicsObj = null;
         internalData.extrapolatedRoomPhysicsObj = null;
+        internalData.customClientIds.clear();
         haxball.room = null;
       };
       var fJoinRoomSucceeded = function(){
+        internalData.customClientIds.clear();
         console.log("internal event: JoinRoomSucceeded");
         //haxball.off("roomLeave", fLeaveRoom);
         haxball.off("connectionStateChange", fConnectionStateChange);
@@ -1990,7 +2011,7 @@ function Haxball(options){
       function c() { // update & synchronize room data with haxball main server via websocket.
         if (!b.Ks) {
           var a = new Fb();
-          a.Id = 9;
+          a.Id = haxball.version;
           a.w = g.jc;
           a.I = (cpc!=null) ? cpc : g.I.length;
           a.Xe = l.fg + 1;
@@ -2023,12 +2044,13 @@ function Haxball(options){
       k.cb = !0;
       k.Kd = f.ub;
       k.Xb = n_A.sh.L();
+      k.customClient = true; // host is of course using the modified client :)
       g.I.push(k);
       var l = new Lb({
         iceServers: n.Vf,
         ij: n.Ee + "api/host",
         state: g,
-        version: 9,
+        version: haxball.version,
         gn: b.t // token
       });
       l.upc = b.upc;
@@ -2037,16 +2059,15 @@ function Haxball(options){
       c();
       var t = new ba(l),
         h = !1;
+      /*
       l.ef = function (a, b) {
-        throw new q("Recaptcha not implemented yet.");
-        /*
         u.kk(a, function (a) {
           b(a);
           x.La(t.j.g);
           return (h = !0);
         });
-        */
       };
+      */
       var m = window.setInterval(function () {
         var a = la.la(l);
         l.ra(a);
@@ -2070,6 +2091,9 @@ function Haxball(options){
         l.ra(d);
         internalData.execOperationReceivedOnHost(d);
         c();
+        internalData.dummyPromise.then(()=>{ // send this initial message only to this client once to see whether this player is using our modified client.
+          internalData.roomObj?.ya._mf_(internalData.chatIndicatorObj.la(0, a, 0), a, true);
+        });
       };
       l.Ip = function (a) {
         null != g.na(a) && ((a = Y.la(a, null, !1)), l.ra(a), internalData.execOperationReceivedOnHost(a));
@@ -2433,6 +2457,7 @@ function Haxball(options){
       this.Jb = 0;
       this.cb = !1;
       this.conn = null; // player conn
+      this.customClient = false; // is player using our client?
     }
     function fa() {
       this.hc = -1;
@@ -2770,7 +2795,7 @@ function Haxball(options){
     }
     function ba(a) {
       this.Nf = null;
-      this.Ik = this.zh = !1;
+      this.Ik = /*this.zh =*/ !1;
       this.$c = window.performance.now();
       this.Ed = null;
       this.De = 0;
@@ -3079,9 +3104,11 @@ function Haxball(options){
       this.Ic.kg = function (a) {
         y.i(b.kg, a);
       };
+      /*
       this.Ic.ef = function (a, d) {
         null != b.ef && b.ef(a, d);
       };
+      */
     }
     function xa(a, b) {
       this.Di = [];
@@ -3799,15 +3826,25 @@ function Haxball(options){
         null == this.Ql && (b(), (this.Ql = window.setTimeout(b, 1e3)));
       },
       Ji: function (a) {
+        var fR;
         function b(a) {
           a = a.sitekey;
           if (null == a) throw new q(null);
+          fR = (a)=>{
+            haxball.off("RecaptchaToken", fR);
+            d.Ji(a);
+          };
+          haxball.once("RecaptchaToken", fR);
+          haxball.emit("RequestRecaptcha", a);
+          /*
           null != d.ef &&
             d.ef(a, function (a) {
               d.Ji(a);
             });
+          */
         }
         function c(a) {
+          fR && haxball.off("RecaptchaToken", fR);
           var b = a.url;
           if (null == b) throw new q(null);
           a = a.token;
@@ -3829,9 +3866,9 @@ function Haxball(options){
           };
           d.X.onmessage = G(d, d.Ph);
         }
-        null == a && (a = "");
+        //null == a && (a = "");
         var d = this;
-        M.zl(this.xr, "token=" + this.Dg + "&rcr=" + a, M.vj)
+        M.zl(this.xr, "token=" + (a || this.Dg) + "&rcr="/* + a*/, M.vj)
           .then(function (a) {
             switch (a.action) {
               case "connect":
@@ -3842,6 +3879,7 @@ function Haxball(options){
             }
           })
           ["catch"](function () {
+            fR && haxball.off("RecaptchaToken", fR);
             d.Mh(!0);
           });
       },
@@ -3995,7 +4033,7 @@ function Haxball(options){
       },
       cm: function () {
         var a = w.ha(2, !1);
-        a.l(9);
+        a.l(haxball.version);
         a.l(this.nf ? 1 : 0);
         this.X.send(a.Hd());
         this.dm = this.nf;
@@ -5293,10 +5331,27 @@ function Haxball(options){
         this.Ci();
         0 < this.ac.length && this.Eg(this.Zh(a), 1);
       },
-      _mf_: function(a, b) { // private messaging.
+      ra_custom: function (a, senderId, onlyCustom) { // custom events will only be sent to custom clients.
+        a.P = senderId;
+        var b;
+        0 < this.ac.length && ( 
+          onlyCustom ? (
+            a.apply(this.T),
+            this.Eg_custom(a, 1)
+          ) : (
+            b = this.Y + this.wi + this.bc,
+            a.zf.Aa || (b = this.Y),
+            a.mb = b,
+            this.Cg(a),
+            this.Ci(),
+            this.Eg(this.Zh(a), 1)
+          )
+        );
+      },
+      _mf_: function(a, b, x) { // private messaging.
         var c = this.Ie.get(b);
         if (null != c) {
-          a.P = 0;
+          (!x) && (a.P = 0); // clients might be able to send the message too.
           var d = w.ha();
           d.l(6);
           m.lj(a, d);
@@ -5385,6 +5440,17 @@ function Haxball(options){
           var e = d[c];
           ++c;
           e.yg && e.Rb(a, b);
+        }
+      },
+      Eg_custom: function (a, b) {
+        null == b && (b = 0);
+        var f = w.ha();
+        f.l(6);
+        m.lj(a, f);
+        for (var c = 0, d = this.ac; c < d.length; ) {
+          var e = d[c];
+          ++c;
+          e.yg && internalData.customClientIds.has(e.$) && e.Rb(f, 0);
         }
       },
       hr: function (a) {
@@ -5496,6 +5562,10 @@ function Haxball(options){
         e.P = b.$;
         if (!internalData.onOperationReceived(e))
   				return;
+        if (e.__proto__.f.name=="CustomEvent"){
+          internalData.roomObj?.ya.ra_custom(e, e.P, true);
+          return;
+        }
         f = this.Y;
         g = this.Y + 120;
         e.ue = d;
@@ -6210,9 +6280,11 @@ function Haxball(options){
               : "" + d + "'s admin rights were taken away") + b(a)
           );
         };
+        */
         a.wl = function (a, b) {
           c.j.Fb.Eb.Po(a, b);
         };
+        /*
         a.Hk = function (a, e, f, g) {
           c.j.Qa.Gb(
             "Kick Rate Limit set to (min: " +
@@ -6243,7 +6315,7 @@ function Haxball(options){
         //a.sl = null;
         //a.xl = null;
         //a.ii = null;
-        //a.wl = null;
+        a.wl = null;
         //a.Hk = null;
       },
       f: Gb,
@@ -6474,8 +6546,10 @@ function Haxball(options){
     };
     */
     u.no = function (a, b) {
-      function c() {
-        //haxball.emit("joinRoomFailed", "Recaptcha Failed");
+      var e, fR;
+      function c(msg) {
+        fR && haxball.off("RecaptchaToken", fR);
+        haxball.emit("joinRoomFailed", msg);
         /*
         u.xb();
         var a = new Ka("Failed", null);
@@ -6485,18 +6559,22 @@ function Haxball(options){
         x.La(a.g);
         */
       }
+      //x.La(new P("Connecting", "Connecting...", []).g);
       function d(b) {
         b = b.sitekey;
         if (null == b) throw new q(null);
-        throw new q("Recaptcha not implemented yet.");
+        fR = (b)=>{
+          haxball.off("RecaptchaToken", fR);
+          e(a, b);
+        };
+        haxball.once("RecaptchaToken", fR);
+        haxball.emit("RequestRecaptcha", b);
         /*
         u.kk(b, function (b) {
           e(a, b);
         });
         */
       }
-      //x.La(new P("Connecting", "Connecting...", []).g);
-      var e;
       e = function (a, e) {
         M.zl(n.Ee + "api/client", "room=" + a + "&rcr=" + e, M.vj)
           .then(function (a) {
@@ -6504,6 +6582,7 @@ function Haxball(options){
               case "connect":
                 a = a.token;
                 if (null == a) throw new q(null);
+                fR && haxball.off("RecaptchaToken", fR);
                 b(a);
                 break;
               case "recaptcha":
@@ -6513,8 +6592,8 @@ function Haxball(options){
                 throw new q(null);
             }
           })
-          ["catch"](function () {
-            c();
+          ["catch"](function (ex) {
+            c(ex instanceof q ? (ex.Ta ? ex.Ta : "Failed") : ex);
           });
       };
       e(a, "");
@@ -6762,7 +6841,7 @@ function Haxball(options){
             iceServers: g,
             ij: k,
             state: e,
-            version: 9,
+            version: haxball.version,
             Ms: l,
             password: b,
             cn: d,
@@ -6851,13 +6930,25 @@ function Haxball(options){
               break;
             case 2:
               switch (c.reason) {
-                case 4004:
+                case 4004:{ // recaptcha required
+                  /* // Quitting the room causes RecaptchaToken signal to become obsolate.
+                  var fR = (c)=>{
+                    haxball.off("RecaptchaToken", fR);
+                    u.Pf(a, b, c); // Also, u.Pf now returns Promise, so what to do with the return value?
+                  };
+                  haxball.once("RecaptchaToken", fR);
+                  */
+                  haxball.emit("RequestRecaptcha");
+                  m(xa.xh(c), null); // <----- added for now to quit and rejoin room (to avoid some memory leaks & other problems.)
+                  /*
                   u.no(a, function (c) {
                     u.Pf(a, b, c);
                   });
+                  */
                   break;
-                case 4101:
-                  /*null == b ? u.Dh(a) : */m(xa.xh(c), null);
+                }
+                case 4101: // password required
+                  /*null == b ? u.Dh(a) : */m(xa.xh(c), null); // send "connection closed" for now. (maybe a PasswordRequired signal?)
                   break;
                 default:
                   m(xa.xh(c), null);
@@ -9558,27 +9649,90 @@ function Haxball(options){
       f: Ga,
     });
     na.b = !0;
-    na.la = function (a) {
+    na.la = function (a, id, mode) {
       var b = new na();
       b.sj = a;
+      b.id = id;
+      b.mode = mode;
       return b;
     };
     na.ma = m;
     na.prototype = C(m.prototype, {
       apply: function (a) {
         var b = a.na(this.P);
-        null != b && (/*ia.i(a.wl, b, this.sj), */
-        haxball.room._onPlayerChatIndicatorChange(b?.V, !this.sj)); // id, value
+        if (null != b){
+          if (this.id != null){
+            if (internalData.isHost){
+              if (this.mode==1){
+                b.customClient = true;
+                internalData.customClientIds.add(b.V);
+              }
+            }
+            else{
+              if (this.mode==0){
+                b.customClient = true;
+                internalData.customClientIds.add(b.V);
+                b = a.na(this.id);
+                if (b)
+                  b.customClient = true;
+                internalData.customClientIds.add(this.id);
+                internalData.roomObj?.ya.ra(na.la(1, this.id, 1), 0, true);
+              }
+            }
+            return;
+          }
+          ia.i(a.wl, b, this.sj);
+          haxball.room._onPlayerChatIndicatorChange(this.P, !this.sj); // id, value
+        }
       },
       ua: function (a) {
         a.l(this.sj);
+        if (this.id!=null && this.mode!=null){
+          a.l(this.id);
+          a.l(this.mode);
+        }
       },
       va: function (a) {
         this.sj = a.B();
+        try{
+          this.id = a.B();
+          this.mode = a.B();
+        }catch(ex){}
       },
       f: na,
     });
     internalData.chatIndicatorObj = na;
+    
+    function CustomEvent() {
+      this.da = 0;
+    }
+    CustomEvent.la = function(type, data){
+      var msg = new CustomEvent();
+      msg.type = type;
+      msg.data = data;
+      return msg;
+    }
+    CustomEvent.b = true;
+    CustomEvent.ma = m;
+    CustomEvent.prototype = C(m.prototype, {
+      apply: function (a) {
+        var b = a.na(this.P);
+        null != b && (
+          haxball.room._onCustomEvent(this.type, this.data, this.P)
+        );
+      },
+      ua: function (a) {
+        a.l(this.type);
+        a.mc(JSON.stringify(this.data));
+      },
+      va: function (a) {
+        this.type = a.B();
+        this.data = JSON.parse(a.ic());
+      },
+      f: CustomEvent,
+    });
+    internalData.customEventObj = CustomEvent;
+
     kc.b = !0;
     kc.fj = function () {
       m.Ha(rb);
@@ -9605,6 +9759,7 @@ function Haxball(options){
       m.Ha(ma);
       m.Ha(qb);
       m.Ha(ob);
+      m.Ha(CustomEvent);
     };
     Y.b = !0;
     Y.la = function (a, b, c) {
@@ -11853,7 +12008,8 @@ function Haxball(options){
       { name: "ru", reliable: !0, kj: !1 },
       { name: "uu", reliable: !1, kj: !1 },
     ];
-    //M.vj = "application/x-www-form-urlencoded";
+    /*
+    M.vj = "application/x-www-form-urlencoded";
     Ha.ab = [
       "Afghanistan","AF",33.3,65.1,"Albania","AL",41.1,20.1,"Algeria","DZ",28,1.6,"American Samoa","AS",-14.2,-170.1,"Andorra","AD",42.5,1.6,"Angola","AO",-11.2,17.8,"Anguilla","AI",18.2,-63,"Antigua and Barbuda","AG",17,-61.7,"Argentina","AR",-34.5,-58.4,"Armenia","AM",40,45,"Aruba","AW",12.5,-69.9,"Australia","AU",-25.2,133.7,"Austria","AT",47.5,14.5,"Azerbaijan","AZ",40.1,47.5,"Bahamas","BS",25,-77.3,"Bahrain","BH",25.9,50.6,"Bangladesh","BD",23.6,90.3,"Barbados","BB",13.1,-59.5,"Belarus","BY",53.7,27.9,"Belgium","BE",50.5,4.4,"Belize","BZ",17.1,-88.4,"Benin","BJ",9.3,2.3,"Bermuda","BM",32.3,-64.7,"Bhutan","BT",27.5,90.4,"Bolivia","BO",-16.2,-63.5,"Bosnia and Herzegovina","BA",43.9,17.6,"Botswana","BW",-22.3,24.6,"Bouvet Island","BV",-54.4,3.4,"Brazil","BR",-14.2,-51.9,"British Indian Ocean Territory","IO",-6.3,71.8,"British Virgin Islands","VG",18.4,-64.6,"Brunei","BN",4.5,114.7,"Bulgaria","BG",42.7,25.4,"Burkina Faso","BF",12.2,-1.5,"Burundi","BI",-3.3,29.9,"Cambodia","KH",12.5,104.9,"Cameroon","CM",7.3,12.3,"Canada","CA",56.1,-106.3,"Cape Verde","CV",16,-24,"Cayman Islands","KY",19.5,-80.5,"Central African Republic","CF",6.6,20.9,"Chad","TD",15.4,18.7,"Chile","CL",-35.6,-71.5,"China","CN",35.8,104.1,"Christmas Island","CX",-10.4,105.6,"Colombia","CO",4.5,-74.2,"Comoros","KM",-11.8,43.8,"Congo [DRC]","CD",-4,21.7,"Congo [Republic]","CG",-0.2,15.8,"Cook Islands","CK",-21.2,-159.7,"Costa Rica","CR",9.7,-83.7,"Croatia","HR",45.1,15.2,"Cuba","CU",21.5,-77.7,"Cyprus","CY",35.1,33.4,"Czech Republic","CZ",49.8,15.4,"Côte d'Ivoire","CI",7.5,-5.5,"Denmark","DK",56.2,9.5,
       "Djibouti","DJ",11.8,42.5,"Dominica","DM",15.4,-61.3,"Dominican Republic","DO",18.7,-70.1,"Ecuador","EC",-1.8,-78.1,"Egypt","EG",26.8,30.8,"El Salvador","SV",13.7,-88.8,"England","ENG",55.3,-3.4,"Equatorial Guinea","GQ",1.6,10.2,"Eritrea","ER",15.1,39.7,"Estonia","EE",58.5,25,"Ethiopia","ET",9.1,40.4,"Faroe Islands","FO",61.8,-6.9,"Fiji","FJ",-16.5,179.4,"Finland","FI",61.9,25.7,"France","FR",46.2,2.2,"French Guiana","GF",3.9,-53.1,"French Polynesia","PF",-17.6,-149.4,"Gabon","GA",-0.8,11.6,"Gambia","GM",13.4,-15.3,"Georgia","GE",42.3,43.3,"Germany","DE",51.1,10.4,"Ghana","GH",7.9,-1,"Gibraltar","GI",36.1,-5.3,"Greece","GR",39,21.8,"Greenland","GL",71.7,-42.6,"Grenada","GD",12.2,-61.6,"Guadeloupe","GP",16.9,-62,"Guam","GU",13.4,144.7,"Guatemala","GT",15.7,-90.2,"Guinea","GN",9.9,-9.6,"Guinea-Bissau","GW",11.8,-15.1,"Guyana","GY",4.8,-58.9,"Haiti","HT",18.9,-72.2,"Honduras","HN",15.1,-86.2,"Hong Kong","HK",22.3,114.1,"Hungary","HU",47.1,19.5,"Iceland","IS",64.9,-19,"India","IN",20.5,78.9,"Indonesia","ID",-0.7,113.9,"Iran","IR",32.4,53.6,"Iraq","IQ",33.2,43.6,"Ireland","IE",53.4,-8.2,"Israel","IL",31,34.8,"Italy","IT",41.8,12.5,"Jamaica","JM",18.1,-77.2,"Japan","JP",36.2,138.2,"Jordan","JO",30.5,36.2,"Kazakhstan","KZ",48,66.9,"Kenya","KE",0,37.9,"Kiribati","KI",-3.3,-168.7,"Kosovo","XK",42.6,20.9,"Kuwait","KW",29.3,47.4,"Kyrgyzstan","KG",41.2,74.7,"Laos","LA",19.8,102.4,"Latvia","LV",56.8,24.6,"Lebanon","LB",33.8,35.8,"Lesotho","LS",-29.6,28.2,"Liberia","LR",6.4,-9.4,"Libya","LY",26.3,17.2,"Liechtenstein","LI",47.1,9.5,"Lithuania","LT",55.1,23.8,
@@ -11861,7 +12017,6 @@ function Haxball(options){
       "Saint Kitts","KN",17.3,-62.7,"Saint Lucia","LC",13.9,-60.9,"Saint Pierre","PM",46.9,-56.2,"Saint Vincent","VC",12.9,-61.2,"Samoa","WS",-13.7,-172.1,"San Marino","SM",43.9,12.4,"Saudi Arabia","SA",23.8,45,"Scotland","SCT",56.5,4.2,"Senegal","SN",14.4,-14.4,"Serbia","RS",44,21,"Seychelles","SC",-4.6,55.4,"Sierra Leone","SL",8.4,-11.7,"Singapore","SG",1.3,103.8,"Slovakia","SK",48.6,19.6,"Slovenia","SI",46.1,14.9,"Solomon Islands","SB",-9.6,160.1,"Somalia","SO",5.1,46.1,"South Africa","ZA",-30.5,22.9,"South Georgia","GS",-54.4,-36.5,"South Korea","KR",35.9,127.7,"Spain","ES",40.4,-3.7,"Sri Lanka","LK",7.8,80.7,"Sudan","SD",12.8,30.2,"Suriname","SR",3.9,-56,"Svalbard and Jan Mayen","SJ",77.5,23.6,"Swaziland","SZ",-26.5,31.4,"Sweden","SE",60.1,18.6,"Switzerland","CH",46.8,8.2,"Syria","SY",34.8,38.9,"São Tomé and Príncipe","ST",0.1,6.6,"Taiwan","TW",23.6,120.9,"Tajikistan","TJ",38.8,71.2,"Tanzania","TZ",-6.3,34.8,"Thailand","TH",15.8,100.9,"Timor-Leste","TL",-8.8,125.7,"Togo","TG",8.6,0.8,"Tokelau","TK",-8.9,-171.8,"Tonga","TO",-21.1,-175.1,"Trinidad and Tobago","TT",10.6,-61.2,"Tunisia","TN",33.8,9.5,"Turkey","TR",38.9,35.2,"Turkmenistan","TM",38.9,59.5,"Turks and Caicos Islands","TC",21.6,-71.7,"Tuvalu","TV",-7.1,177.6,"U.S. Minor Outlying Islands","UM",0,0,"U.S. Virgin Islands","VI",18.3,-64.8,"Uganda","UG",1.3,32.2,"Ukraine","UA",48.3,31.1,"United Arab Emirates","AE",23.4,53.8,"United Kingdom","GB",55.3,-3.4,"United States","US",37,-95.7,"Uruguay","UY",-32.5,-55.7,"Uzbekistan","UZ",41.3,64.5,"Vanuatu","VU",-15.3,166.9,"Vatican City","VA",41.9,12.4,
       "Venezuela","VE",6.4,-66.5,"Vietnam","VN",14,108.2,"Wales","WLS",55.3,-3.4,"Wallis and Futuna","WF",-13.7,-177.1,"Western Sahara","EH",24.2,-12.8,"Yemen","YE",15.5,48.5,"Zambia","ZM",-13.1,27.8,"Zimbabwe","ZW",-19,29.1
     ];
-    /*
     n.Vr = "wss://p2p.haxball.com/";
     n.Ee = "https://www.haxball.com/rs/";
     n.Vf = [{ urls: "stun:stun.l.google.com:19302" }];
@@ -11901,6 +12056,7 @@ function Haxball(options){
     Ma.za = m.Fa({ Ba: !1, Aa: !1 });
     La.za = m.Fa({ Ba: !1, Aa: !1 });
     la.za = m.Fa({ Ba: !1, Aa: !1 });
+    CustomEvent.za = m.Fa({ Ba: !1, Aa: !1 });
     E.mn = 0.17435839227423353;
     E.ln = 5.934119456780721;
     /*
@@ -12456,6 +12612,16 @@ function Room(internalData, plugins){
     }
   };
 
+  this._onCustomEvent = function(type, data, byId){
+    var customData = that.onBeforeCustomEvent && that.onBeforeCustomEvent(type, data, byId);
+    if (customData!==false){
+      that.activePlugins.forEach((p)=>{
+        p.onCustomEvent && p.onCustomEvent(type, data, byId, customData);
+      });
+      that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
+    }
+  };
+
   this.setProperties = function(properties) { // { name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword }
     if (!internalData.isHost)
       return;
@@ -12472,6 +12638,15 @@ function Room(internalData, plugins){
     internalData.execOperationReceivedOnHost(msg);
   };
   
+  this.sendCustomEvent = function(type, data) {
+    var msg = internalData.customEventObj.la(type, data);
+    if (this.isHost)
+      internalData.roomObj?.ya.ra_custom(msg, internalData.roomObj.ya.uc, true);
+    else if (internalData.roomObj?.ya?.T?.I[0].customClient)
+      internalData.roomObj?.ya.ra(msg);
+    internalData.execOperationReceivedOnHost(msg);
+  };
+
   this.setHandicap = function(handicap) {
     internalData.roomObj?.ya.kr(handicap);
   };
@@ -12554,7 +12729,7 @@ function Room(internalData, plugins){
   };
 
   this.sendChatIndicator = function(active){
-    internalData.roomObj?.bm(!active);
+    internalData.roomObj?.bm(active);
   };
 
   this.sendAnnouncement = function(msg, targetId, color, style, sound) { // host-only function
