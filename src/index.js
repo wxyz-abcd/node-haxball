@@ -3010,7 +3010,7 @@ function Haxball(options){
       this.Qr = window.setInterval(function () {
         a.C();
       }, 50);
-      //this.uf();
+      this.uf();
       var c = n_A.rd.L(),
         c = -200 > c ? -200 : 200 < c ? 200 : c;
       if (0 != c) {
@@ -5816,31 +5816,32 @@ function Haxball(options){
       return b;
     };
     */
-    ub.__cq__ = function (team, clear, ...colors) {
+    ub.__cq__ = function (teamId, angle, ...colors) {
       var b = new Pa(),
         c = new ka();
       b.Sg = c;
-      switch (team) {
-        case "blue":
-          c.fb = [p.xa.R];
-          b.ea = p.xa;
-          break;
-        case "red":
+      switch (teamId) {
+        case 1:
           c.fb = [p.fa.R];
           b.ea = p.fa;
           break;
+        case 2:
+          c.fb = [p.xa.R];
+          b.ea = p.xa;
+          break;
         default:
-          throw new q('First argument must be either "red" or "blue"');
+          throw new q('Invalid team id');
       }
-      if (clear) 
+      var l = colors.length;
+      if (l < 1)
         return b;
-      if (colors.length < 2)
-        return b;
-      c.hd = ((256 * K.parseInt(colors[0])) / 360) | 0;
-      c.ed = K.parseInt("0x" + colors[1]);
-      if (2 < colors.length) {
+      if (l > 4)
+        l = 4;
+      c.hd = ((256 * K.parseInt(angle)) / 360) | 0;
+      c.ed = K.parseInt("0x" + colors[0]);
+      if (1 < l) {
         c.fb = [];
-        for (var d = 2, e = colors.length; d < e; )
+        for (var d = 1, e = l; d < e; )
           c.fb.push(K.parseInt("0x" + colors[d++]));
       }
       return b;
@@ -6071,7 +6072,7 @@ function Haxball(options){
         (1 == n_A.Fh.L() && 28.333333333333336 > a - this.$c) ||
           ((this.$c = a),
           //this.sd++,
-          //this.uf(),
+          this.uf(),
           (a = this.ya.T.na(this.ya.uc)),
           null != a && (this.xi = a.cb),
           this.j.C(this.ya));
@@ -6149,17 +6150,19 @@ function Haxball(options){
             this.ob.Bd(a.code);
         }
       },
+	  */
       uf: function () {
         var a = n_A.Tb.L(),
           b = this.j.Fb,
           c = b.Eb;
         c.zg = n_A.Sl.L();
         0 == a
-          ? (b.Gg(!0), (c.kf = 1), (c.jf = 0), (c.xf = 0))
-          : (b.Gg(!1),
+          ? (/*b.Gg(!0), */(c.kf = 1), (c.jf = 0), (c.xf = 0))
+          : (/*b.Gg(!1), */
             (c.xf = 35),
             -1 == a ? (c.jf = 450) : ((c.jf = 0), (c.kf = 1 + 0.25 * (a - 1))));
       },
+	  /*
       Cd: function (a) {
         this.ob.Cd(a.code);
       },
@@ -10642,17 +10645,24 @@ function Haxball(options){
         e.y = b + (g - b) * n;
         this.Xn(c, d, a.S);
       },
-      Xn: function (a, b, c) {
-        a > 2 * c.$b
-          ? (this.Ya.x = 0)
-          : this.Ya.x + 0.5 * a > c.$b
-          ? (this.Ya.x = c.$b - 0.5 * a)
-          : this.Ya.x - 0.5 * a < -c.$b && (this.Ya.x = -c.$b + 0.5 * a);
-        b > 2 * c.qc
-          ? (this.Ya.y = 0)
-          : this.Ya.y + 0.5 * b > c.qc
-          ? (this.Ya.y = c.qc - 0.5 * b)
-          : this.Ya.y - 0.5 * b < -c.qc && (this.Ya.y = -c.qc + 0.5 * b);
+      Xn: function (a, b, c) { // move camera origin (this.Ya)
+        if (a > 2 * c.$b)
+          this.Ya.x = 0;
+        else if (this.Ya.x + 0.5 * a > c.$b)
+          this.Ya.x = c.$b - 0.5 * a;
+        else if (this.Ya.x - 0.5 * a < -c.$b)
+          this.Ya.x = -c.$b + 0.5 * a;
+        else if (isNaN(this.Ya.x) || !isFinite(this.Ya.x)) // fix all possible camera problems
+          this.Ya.x = 0;
+        
+        if (b > 2 * c.qc)
+          this.Ya.y = 0;
+        else if (this.Ya.y + 0.5 * b > c.qc)
+          this.Ya.y = c.qc - 0.5 * b;
+        else if (this.Ya.y - 0.5 * b < -c.qc)
+          this.Ya.y = -c.qc + 0.5 * b;
+        else if (isNaN(this.Ya.y) || !isFinite(this.Ya.y)) // fix all possible camera problems
+          this.Ya.y = 0;
       },
       Pq: function (a) {
         this.c.beginPath();
@@ -11358,19 +11368,21 @@ function Haxball(options){
         this.bi.disabled = null == a.T.K;
         this.Gd
           ? this.Wa.C(a.T, a.T.na(a.uc))
-          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a), (canvas && (this.uf(), this.Fb.C(a, b)))/*, n.Na.Xj?.Ls(a)*/);
+          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a), (canvas && (/*this.uf(), */this.Fb.C(a, b)))/*, n.Na.Xj?.Ls(a)*/);
       },
+	  /*
       uf: function () {
         var a = n_A.Tb.L(),
           b = this.Fb,
           c = b.Eb;
         c.zg = n_A.Sl.L();
         0 == a
-          ? (/*b.Gg(!0),*/ (c.kf = 1), (c.jf = 0), (c.xf = 0))
-          : (/*b.Gg(!1),*/
+          ? (/*b.Gg(!0),*//* (c.kf = 1), (c.jf = 0), (c.xf = 0))
+          : (/*b.Gg(!1),*//*
             (c.xf = 35),
             -1 == a ? (c.jf = 450) : ((c.jf = 0), (c.kf = 1 + 0.25 * (a - 1))));
       },
+	  */
       /*
       me: function (a) {
         this.Gd != a &&
@@ -12686,8 +12698,8 @@ function Room(internalData, plugins){
     return map.Pe() ? null : J.Vg(map.Sj(), 8);
   };
 
-  this.setTeamColors = function(team, clear, ...colors) { // team: "blue" | "red", clear: boolean, colors: minimum 2 parseable color parameters 
-    var msg = internalData.teamColorsObj.__cq__(team, clear, ...colors);
+  this.setTeamColors = function(teamId, angle, ...colors) { // teamId: one of (1=red, 2=blue), colors: maximum 4 parseable color parameters 
+    var msg = internalData.teamColorsObj.__cq__(teamId, angle, ...colors);
     internalData.roomObj?.ya.ra(msg);
     internalData.execOperationReceivedOnHost(msg);
   };

@@ -181,7 +181,7 @@ client.on("ready", () => {
     - clearBans(): clears all bans. host-only.
     - setAvatar(avatar): sets the current player's avatar.
     - setChatIndicatorActive(active): sets the current player's chat indicator status.
-    - setTeamColors(team, clear, ...colors): sets the team colors for (team). team: "blue" | "red", clear: boolean, colors: minimum 2 parseable color parameters 
+    - setTeamColors(teamId, angle, ...colors): sets the team colors for (team). teamId: 1(red) | 2(blue), angle: integer, colors: maximum 4 parseable(hex-rgb) color parameters.
     - setUnlimitedPlayerCount(on): adds or removes player limit control. host-only. on: boolean
     - setFakePassword(fakePwd): sets a fake value for room's password status. host-only. fakePwd: boolean or null to disable
     - sendChat(msg, targetId): send chat message(msg) to player(targetId). targetId is null -> send to everyone. targetId is host-only.
@@ -230,7 +230,7 @@ client.on("ready", () => {
     - mapChecksum(map): calculate checksum for given map object. returns null for original maps.
     - setPluginActive(name, active): activate/deactivate the plugin(name).
     - startRecording(): start recording replay data. returns true if succeeded, false otherwise. recording should not be started before calling this.
-    - stopRecording(): stop recording replay data. returns UIntArray8 data if succeeded, null otherwise. recordin should be started before calling this.
+    - stopRecording(): stop recording replay data. returns UIntArray8 data if succeeded, null otherwise. recording should be started before calling this.
     - isRecording(): returns true if recording has started; false otherwise.
     
   - modifier callbacks:
