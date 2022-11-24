@@ -3576,13 +3576,15 @@ function Haxball(options){
         this.Oe(Ob.hh);
       },
       Uj: function () {
-        null != this.X &&
-          ((this.X.onclose = null),
-          (this.X.onmessage = null),
-          (this.X.onerror = null),
-          (this.X.onopen = null),
-          this.X.close(),
-          (this.X = null));
+        try{
+          null != this.X &&
+            ((this.X.onclose = null),
+            (this.X.onmessage = null),
+            (this.X.onerror = null),
+            (this.X.onopen = null),
+            this.X.close(),
+            (this.X = null));
+        }catch(ex){}
         null != this.pa && (this.pa.ia(), (this.pa = null));
       },
       Oe: function (a) {
@@ -3770,12 +3772,14 @@ function Haxball(options){
         this.ke = null;
         window.clearInterval(this.ol);
         if (null != this.X) {
-          this.X.onmessage = null;
-          this.X.onerror = null;
-          this.X.onclose = null;
-          this.X.onopen = null;
-          this.X.close();
-          this.X = null;
+          try{
+            this.X.onmessage = null;
+            this.X.onerror = null;
+            this.X.onclose = null;
+            this.X.onopen = null;
+            this.X.close();
+            this.X = null;
+          }catch(ex){}
         }
         this.qk();
       },
@@ -6216,6 +6220,7 @@ function Haxball(options){
           //n.Na.cd(n.Na.ep);
           //c.Ti(a);
         };
+        a.Oi = 1;
         /*
         a.rl = function (a, b) {
           var d = null != c.Rh && -1 != b.indexOf(c.Rh);
@@ -6309,7 +6314,7 @@ function Haxball(options){
         //a.Vl = null;
         //a.ji = null;
         //a.Ni = null;
-        //a.Oi = null;
+        a.Oi = null;
         //a.ml = null;
         //a.Pi = null;
         //a.Ki = null;
@@ -7690,7 +7695,8 @@ function Haxball(options){
               (c = b[a]), ++a, null != c.H && (c.H.h = 39 | this.ae.cp);
             b = this.ta.F[0].D;
             0 < b.x * b.x + b.y * b.y && (this.Bb = 1);
-          } else if (1 == this.Bb) {
+          } 
+          else if (1 == this.Bb) {
             this.Hc += 0.016666666666666666;
             for (a = 0; a < b.length; )
               (d = b[a]), ++a, null != d.H && (d.H.h = 39);
@@ -7700,21 +7706,15 @@ function Haxball(options){
               a = 0;
               a < c &&
               ((d = a++), (d = this.S.Kn(b[O.dk[d]].a, O.Yk[d])), d == p.Ia);
-  
             );
             d != p.Ia
-              ? ((this.Bb = 2),
-                (this.vc = 150),
-                (this.ae = d),
+              ? (this.Bb = 2,
+                this.vc = 150,
+                this.ae = d,
                 d == p.fa ? this.Kb++ : this.Pb++,
-                /*null != this.Ma.Ni && (
-                  this.Ma.Ni(d.pg), */
-                  haxball.room._onTeamGoal(d?.pg?.$) // teamId
-                /*
-                )
-                */
-                ,
-                null != this.Ma.Ol && this.Ma.Ol(d.$))
+                /*null != this.Ma.Ni && this.Ma.Ni(d.pg),*/
+                haxball.room._onTeamGoal(d?.pg?.$) // teamId
+                /*null != this.Ma.Ol && this.Ma.Ol(d.$)*/)
               : 0 < this.Da &&
                 this.Hc >= 60 * this.Da &&
                 this.Pb != this.Kb &&
@@ -7722,10 +7722,10 @@ function Haxball(options){
           } else if (2 == this.Bb)
             this.vc--,
               0 >= this.vc &&
-                ((0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib)) ||
-                (0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb)
+                (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) ||
+                0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb
                   ? this.um()
-                  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
+                  : (this.Gk()/*, null != this.Ma.lq && this.Ma.lq()*/));
           else if (
             3 == this.Bb &&
             (this.vc--, 0 >= this.vc && ((b = this.Ma), null != b.K))
@@ -7742,12 +7742,10 @@ function Haxball(options){
       um: function () {
         this.vc = 300;
         this.Bb = 3;
-        /*null != this.Ma.Oi && (
-          this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa), */
-          haxball.room._onGameEnd(this.Pb > this.Kb ? p.fa.$ : p.xa.$);// winningTeamId
-        /*
+        null != this.Ma.Oi && ( // this ensures that following statement will run only once. (Still trying to figure out how.)
+          //this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa),
+          haxball.room._onGameEnd(this.Pb > this.Kb ? p.fa.$ : p.xa.$)// winningTeamId
         );
-        */
       },
       Gk: function () {
         var a = this.Ma.I;
@@ -9069,7 +9067,6 @@ function Haxball(options){
             d.Jb = 0;
           }
           this.K.Wo(this);
-          /*this.K.Ma.Os = haxball.room?._onGameTick;*/
           //null != this.Ki && this.Ki(a);
         }
       },
