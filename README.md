@@ -382,6 +382,7 @@ client.on("ready", () => {
   - callbacks:
     - initialize(roomObj): only called once while creating or joining a room.
     - finalize(): only called once while leaving a room.
+    - render(extrapolatedRoomPhysicsObj): called inside requestAnimationFrame callback. rendering logic should be here. 
     - onXXXXXXX(..., customData): \[where XXXXXXX is the name of the event.\] called after room.onAfterXXXXXXX(..., customData). customData is the object that might be returned from room.onAfterXXXXXXX(...).
       - onRoomLink(link, customData): room link was received. host-only.
       - onPlayerBallKick(playerId, customData): ball was kicked by player(playerId).
