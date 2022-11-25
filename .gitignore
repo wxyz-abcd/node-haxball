@@ -110,4 +110,3 @@ dist
 test/
 backup/
 package_git.json
-src/defaultRAF.js

@@ -125,7 +125,7 @@ client.on("ready", () => {
 
 - Haxball: Main client class.
 
-  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. _onRequestAnimationFrame_ callback can also be set here. _render_ is a special key that is used only for rendering purposes. it may have values for these browser environment(window) function/variables: 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance', 'console', 'requestAnimationFrame', 'cancelAnimationFrame', 'devicePixelRatio', 'document', 'images'. images should be an object with keys 'grass', 'concrete', 'concrete2', each assigned to an object of type 'Image'. the functions(_setTimeout_, _clearTimeout_, _setInterval_, _clearInterval_, _requestAnimationFrame_, _cancelAnimationFrame_) should be binded to browser's _window_ object.
+  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. _render_ is a special key that is used mostly for rendering purposes. it may have values for these browser environment(window) function/variables: 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance', 'console', 'requestAnimationFrame', 'cancelAnimationFrame', 'crypto', 'renderer'. the functions(_setTimeout_, _clearTimeout_, _setInterval_, _clearInterval_, _requestAnimationFrame_, _cancelAnimationFrame_) should be binded to browser's _window_ object.
 
   - properties:
     - version: current version number. other clients cannot join the room created by this Haxball client if this version number is different than theirs.
@@ -136,8 +136,7 @@ client.on("ready", () => {
     - createRoom({name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
     - joinRoom({roomId, password, token, kickTimeout, plugins}): try to join the room(roomId) with given password(or null=no password). Must leave current room first. returns Promise(room) which is rejected if failed.
     - leaveRoom(): Leave current room. Must be in a room.
-    - setOnRequestAnimationFrameCallback(callback): sets up a custom callback for custom events/updates that will be called each time canvas is rendering a frame.
-    - setCanvas(canvas): sets the canvas to render the game.
+    - setRenderer(renderer): sets the renderer object that will render the game. The object should follow the provided Renderer template.
     - isCustomVersion(): returns whether the version number is the same as the original client. 
     - setCustomVersion(custom): if custom=true, sets the version number to a specific value(always using the same for recognition); otherwise sets it to the same as the original client. Set it to true if you want your room to be inaccessible to people using the original client.
 
@@ -232,6 +231,7 @@ client.on("ready", () => {
     - startRecording(): start recording replay data. returns true if succeeded, false otherwise. recording should not be started before calling this.
     - stopRecording(): stop recording replay data. returns UIntArray8 data if succeeded, null otherwise. recording should be started before calling this.
     - isRecording(): returns true if recording has started; false otherwise.
+    - setRenderer(renderer): sets the renderer object that will render the game. The object should follow the provided Renderer template.
     
   - modifier callbacks:
     - \[dataArray, customData\] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth): set player's data just before player has joined the room. dataArray format should be \[modifiedNick, modifiedAvatar, modifiedFlag\]. if dataArray is null, player is not allowed to join. also prepares a custom data object to send to all plugins. customData=false means "don't call callbacks". host-only.
@@ -312,10 +312,10 @@ client.on("ready", () => {
       - onAfterRoomPropertiesChange(props, customData): room's properties(props) were changed. host-only.
       - customData = onBeforeCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
       - onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
-      - customData = onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId): a collision happened between disc(discId1, playerId1) and segment(segmentId).
-      - onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
-      - customData = onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId): a collision happened between disc(discId1, playerId1) and plane(planeId).
-      - onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).
+      - customData = onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId): a collision happened between disc(discId, discPlayerId) and segment(segmentId).
+      - onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId, discPlayerId) and segment(segmentId).
+      - customData = onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId): a collision happened between disc(discId, discPlayerId) and plane(planeId).
+      - onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId, discPlayerId) and plane(planeId).
       - customData = onBeforeCustomEvent(type, data, byId): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
       - onAfterCustomEvent(type, data, byId, customData): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
     - onPluginActiveChange(plugin): a plugin was activated/deactivated.
@@ -371,9 +371,55 @@ client.on("ready", () => {
       - onRoomRecaptchaModeChange(on, customData): room's recaptcha mode was set to (on). host-only.
       - onRoomPropertiesChange(props, customData): room's properties(props) were changed. host-only.
       - onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
-      - onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId1, playerId1) and segment(segmentId).
-      - onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId1, playerId1) and plane(planeId).
+      - onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId, discPlayerId) and segment(segmentId).
+      - onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId, discPlayerId) and plane(planeId).
       - onCustomEvent(type, data, byId, customData): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
+
+- Renderer: A class that defines a renderer for Haxball client.
+
+  - constructor(anything): creates a new Renderer instance. the renderer instance will be initialized outside this library, so the constructor is not of our business.
+
+  - callbacks:
+    - initialize(roomObj): only called once while creating or joining a room.
+    - finalize(): only called once while leaving a room.
+    - onXXXXXXX(..., customData): \[where XXXXXXX is the name of the event.\] called after room.onAfterXXXXXXX(..., customData). customData is the object that might be returned from room.onAfterXXXXXXX(...).
+      - onRoomLink(link, customData): room link was received. host-only.
+      - onPlayerBallKick(playerId, customData): ball was kicked by player(playerId).
+      - onTeamGoal(teamId, customData): goal was scored by team(teamId).
+      - onGameEnd(winningTeamId, customData): game was won by team(winningTeamId).
+      - onGameTick(customData): runs on each game tick. (lots of times per second)
+      - onPlayerSyncChange(playerId, value, customData): player(playerId)'s synchronized status has changed to (value).
+      - onAnnouncement(msg, color, style, sound, customData): a message(msg) with properties(color, style, sound) was announced by the room host. may only be triggered by host.
+      - onAutoTeams1(playerId, teamId, byId, customData): "auto" button was used by player(byId) and it caused player(playerId) to join team(teamId).
+      - onAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData): "auto" button was used by player(byId), it caused player(playerId1) to join team(teamId1) and player(playerId2) to join team(teamId2).
+      - onScoreLimitChange(value, byId, customData): score limit was changed to (value) by player(byId).
+      - onTimeLimitChange(value, byId, customData): time limit was changed to (value) by player(byId).
+      - onPlayerAdminChange(id, isAdmin, byId, customData): player(id)'s admin status was changed to (isAdmin) by player(byId).
+      - onPlayerAvatarChange(id, value, customData): player(id) changed its avatar to (value).
+      - onPlayerTeamChange(id, teamId, byId, customData): player(id) was moved to team(teamId) by player(byId).
+      - onStadiumChange(stadium, byId, customData): room's current stadium was set to (stadium) by player(byId).
+      - onTeamsLockChange(value, byId, customData): room's team lock status was set to (value) by player(byId).
+      - onPlayerJoin(playerObj, customData): a player(playerObj) joined the room.
+      - onGamePauseChange(isPaused, byId, customData): room's game paused status was set to (isPaused) by player(byId).
+      - onPlayerChat(id, message, customData): a chat message with content(message) was received from player(id).
+      - onPlayerInputChange(id, value, customData): player(id)'s input has changed to (value).
+      - onPlayerChatIndicatorChange(id, value, customData): player(id)'s chat indicator status has changed to (value).
+      - onPlayerLeave(playerObj, reason, isBanned, byId, customData): player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
+      - onSetDiscProperties(id, type, data1, data2, customData): \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
+      - onKickRateLimitChange(min, rate, burst, byId, customData): room's kick rate limit was set to (min, rate, burst) by player(byId).
+      - onGameStart(byId, customData): game was started by player(byId).
+      - onGameStop(byId, customData): game was stopped by player(byId).
+      - onPingData(array, customData): ping values for all players was received. may only be triggered by host.
+      - onExtrapolationChange(value, customData): extrapolation was set to (value).
+      - onHandicapChange(value, customData): handicap was set to (value).
+      - onBansClear(customData): all bans were cleared. host-only.
+      - onRoomRecaptchaModeChange(on, customData): room's recaptcha mode was set to (on). host-only.
+      - onRoomPropertiesChange(props, customData): room's properties(props) were changed. host-only.
+      - onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData): a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2).
+      - onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData): a collision happened between disc(discId, discPlayerId) and segment(segmentId).
+      - onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData): a collision happened between disc(discId, discPlayerId) and plane(planeId).
+      - onCustomEvent(type, data, byId, customData): a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
+    - onPluginActiveChange(plugin): a plugin was activated/deactivated.
 
 [Back To The Top](#title)
 

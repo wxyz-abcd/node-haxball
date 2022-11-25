@@ -945,12 +945,10 @@ function Haxball(options){
     performance: options?.render?.performance || perfHooks.performance,
     console: options?.render?.console || console,
     requestAnimationFrame: options?.render?.requestAnimationFrame || ((callback) => setTimeout(callback, 16.666666666666667)),
-    cancelAnimationFrame: options?.render?.cancelAnimationFrame || clearTimeout,
-    document: options?.render?.document,
-    devicePixelRatio: options?.render?.devicePixelRatio
+    cancelAnimationFrame: options?.render?.cancelAnimationFrame || clearTimeout
   };
   
-  var haxball = this, canvas = options?.render?.canvas, images = options?.render?.images, rafCallback = options?.onRequestAnimationFrame;
+  var haxball = this, renderer = options?.render?.renderer;
 
   var internalData = {
     roomObj: null,
@@ -976,6 +974,7 @@ function Haxball(options){
     dummyPromise: Promise.resolve(),
     keyState: 0,
     customClientIds: new Set(), // store for all client ids that are using our modified client.
+    renderer: renderer,
     onOperationReceived: function(msg) {
       /*
       var op = {
@@ -1017,14 +1016,14 @@ function Haxball(options){
   };
 
   this.isCustomVersion = function(){
-    return (this.version == customVersion);
+    return (haxball.version == customVersion);
   };
 
   this.setCustomVersion = function(custom){ // if set, only modified clients will be able to join the room.
     if (custom)
-      this.version = customVersion;
+      haxball.version = customVersion;
     else
-      this.version = defaultVersion;
+      haxball.version = defaultVersion;
   };
 
   this.getStorageValue = function(key){ // key must be one of ['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors']
@@ -1035,12 +1034,9 @@ function Haxball(options){
     n_A[Object.keys(n_A).filter((x)=>n_A[x].w==key)[0]]?.Xa(value);
   };
 
-  this.setCanvas = function(c){
-    internalData.roomObj?.canvasUpdate(c);
-  };
-
-  this.setOnRequestAnimationFrameCallback = function(callback){
-    rafCallback = callback;
+  this.setRenderer = function(_renderer){
+    renderer = internalData.renderer = _renderer;
+    haxball.room?.setRenderer(_renderer, true);
   };
 
   this.createRoom = function(obj){ // name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, plugins
@@ -1056,6 +1052,8 @@ function Haxball(options){
         obj.plugins && (obj.plugins.forEach((p)=>{
           p.finalize && p.finalize();
         }));
+        if (renderer)
+          renderer.finalize && renderer.finalize();
         internalData.isHost = false;
         internalData.roomObj = null;
         internalData.roomPhysicsObj = null;
@@ -1106,6 +1104,8 @@ function Haxball(options){
         obj.plugins && (obj.plugins.forEach((p)=>{
           p.finalize && p.finalize();
         }));
+        if (renderer)
+          renderer.finalize && renderer.finalize();
         internalData.isHost = false;
         internalData.roomObj = null;
         internalData.roomPhysicsObj = null;
@@ -1858,18 +1858,14 @@ function Haxball(options){
       this.Ze.textContent = "Kick " + a.w;
       this.Aj(!1);
     }
-    */
     function ja(a) {
       this.Fb = new hb();
-      /*
       this.Gd = !1;
       this.pe = new Xa();
       this.Qa = new Da();
       var b = this;
       this.Wa = new Ya(a);
-      */
       this.Fb.Nb = a;
-      /*
       this.g = v.Ga(ja.N);
       a = v.Ea(this.g);
       this.Jh = a.get("gameplay-section");
@@ -1916,9 +1912,7 @@ function Haxball(options){
         };
         b.bb(a.g);
       };
-      */
     }
-    /*
     function Rb() {
       this.Da = 0;
       this.hk = this.ik = !1;
@@ -1932,19 +1926,17 @@ function Haxball(options){
       this.g.appendChild((this.dr = this.Wd("0", "digit")));
       this.g.appendChild((this.cr = this.Wd("0", "digit")));
     }
-    */
     function hb() {
-      //this.Nb = -1;
-      this.Eb = canvas && (new N());
-      //this.xc = new Rb();
-      //this.g = v.Ga(hb.N);
-      //var a = v.Ea(this.g);
-      //this.Pb = new Db(a.get("red-score"), 0);
-      //this.Kb = new Db(a.get("blue-score"), 0);
-      //v.xe(a.get("timer"), this.xc.g);
-      //v.xe(a.get("canvas"), this.Eb.sa);
+      this.Nb = -1;
+      this.Eb = new N();
+      this.xc = new Rb();
+      this.g = v.Ga(hb.N);
+      var a = v.Ea(this.g);
+      this.Pb = new Db(a.get("red-score"), 0);
+      this.Kb = new Db(a.get("blue-score"), 0);
+      v.xe(a.get("timer"), this.xc.g);
+      v.xe(a.get("canvas"), this.Eb.sa);
     }
-    /*
     function Ka(a, b) {
       var c = this;
       this.g = v.Ga(Ka.N);
@@ -2104,13 +2096,13 @@ function Haxball(options){
         //h || ((h = !0), x.La(t.j.g));
         haxball.room._onRoomLink(t.Bg);
       };
-      t.Ih.Np = function (a, b, c, d) {
+      t.Np = function (a, b, c, d) {
         l.to(a, b, c, d);
       };
-      t.Ih.Op = function () {
+      t.Op = function () {
         c();
       };
-      t.j.de = function () {
+      t.de = function () {
         l.ia();
         t.ia();
         //u.xb();
@@ -2269,7 +2261,6 @@ function Haxball(options){
         c.update();
       }, 0);
     }
-    */
     function Ea() {
       this.Xf = !1;
       this.w = "";
@@ -2286,19 +2277,17 @@ function Haxball(options){
     function Sb() {
       this.xc = 0;
       this.ab = [];
-      /*this.Ar = new R(["Time is", "Up!"], 16777215);
+      this.Ar = new R(["Time is", "Up!"], 16777215);
       this.Gq = new R(["Red is", "Victorious!"], 15035990);
       this.Fq = new R(["Red", "Scores!"], 15035990);
       this.Cn = new R(["Blue is", "Victorious!"], 625603);
       this.Bn = new R(["Blue", "Scores!"], 625603);
-      this.eq = new R(["Game", "Paused"], 16777215);*/
+      this.eq = new R(["Game", "Paused"], 16777215);
     }
-    /*
     function R(a, b) {
       for (var c = [], d = 0; d < a.length; ) c.push(this.sp(a[d++], b));
       this.We = c;
     }
-    */
     function N() {
       this.$c = window.performance.now();
       this.Jg = new Map();
@@ -2313,10 +2302,11 @@ function Haxball(options){
       this.sa = canvas;//window.document.createElement("canvas");
       this.sa.mozOpaque = !0;
       this.c = this.sa.getContext("2d", { alpha: !1 });
-      this.Lo = this.c.createPattern(/*n.Ko*/images?.grass, null);
-      this.Wn = this.c.createPattern(/*n.Vn*/images?.concrete, null);
-      this.Un = this.c.createPattern(/*n.Tn*/images?.concrete2, null);
+      this.Lo = this.c.createPattern(n.Ko, null);
+      this.Wn = this.c.createPattern(n.Vn, null);
+      this.Un = this.c.createPattern(n.Tn, null);
     }
+    */
     function B() {
       this.ud = 0;
       this.v = 32;
@@ -2788,11 +2778,13 @@ function Haxball(options){
       this.$d = this.Yf = 0;
       //window.document.addEventListener("focusout", G(this, this.al));
     }
+    /*
     function Gb(a, b) {
       this.Rh = null;
       this.j = a;
       null != b && (this.Rh = "@" + J.replace(b, " ", "_"));
     }
+    */
     function ba(a) {
       this.Nf = null;
       this.Ik = /*this.zh =*/ !1;
@@ -2802,10 +2794,10 @@ function Haxball(options){
       this.Jn = new tb(3, 1e3);
       this.ob = new Ra();
       this.Bg = "Waiting for link";
-      this.xi = this.am = !1;
+      /*this.xi = */this.am = !1;
       //this.sd = 0;
       
-      this.j = new ja(a.uc);
+      //this.j = new ja(a.uc);
 
       var b = this;
       this.Of = new ub(a, function (a) {
@@ -2815,14 +2807,27 @@ function Haxball(options){
       a.T.ko = function (c) {
         b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c), internalData.execOperationReceivedOnHost(c));
       };
+      /*
       this.canvasUpdate = function(c){
         canvas = c;
         b.j.Fb.Eb = c && (new N());
       };
       this.canvasUpdate(canvas);
+
       this.Ih = new Gb(this.j, a.T.na(a.uc).w);
       this.Ih.ri(a.T);
+      */
+      a.T.ul = function (d, e, f, g) {
+        y.i(b.Op, d.V);
+        null != e && (
+          vb.i(b.Np, d.V, e, null != g ? g.w : null, f)
+        );
+      };
+      a.T.Oi = 1;
       /*
+      a.T.wl = function (_a, _b) {
+        b.j.Fb.Eb.Po(_a, _b);
+      };
       this.j.Qa.fl = G(this, this.Gp);
       this.j.Qa.ig = G(this, this.Fp);
       window.document.addEventListener("keydown", G(this, this.Bd));
@@ -2938,54 +2943,54 @@ function Haxball(options){
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
       };
-      this.j.aq = function (b) {
+      this.aq = function (b) {
         b = da.la(1, b);
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
       };
-      this.j.Tp = function (b) {
+      this.Tp = function (b) {
         b = da.la(0, b);
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
       };
-      this.j.og = function (b) {
+      this.og = function (b) {
         b = qa.la(b);
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
       };
-      this.j.Yp = function () {
+      this.Yp = function () {
         var msg = new Ma();
         a.ra(msg);
         internalData.execOperationReceivedOnHost(msg);
       };
-      this.j.Zp = function () {
+      this.Zp = function () {
         var msg = new La();
         a.ra(msg);
         internalData.execOperationReceivedOnHost(msg);
       };
-      this.j.Mp = function () {
+      this.Mp = function () {
         b.Bm();
       };
-      this.j.mg = function (b, c) {
+      this.mg = function (b, c) {
         var d = S.la(b, c);
         a.ra(d);
         internalData.execOperationReceivedOnHost(d);
       };
-      this.j.ee = this.Wq.bind(this); // G(this, this.Wq);
-      this.j.Dp = function () {
+      this.ee = this.Wq.bind(this); // G(this, this.Wq);
+      this.Dp = function () {
         var msg = new Qa();
         a.ra(msg);
         internalData.execOperationReceivedOnHost(msg);
       };
-      this.j.Pp = function () {
+      this.Pp = function () {
         ba.Bq(a);
       };
-      this.j.$p = function (b) {
+      this.$p = function (b) {
         b = pa.la(b);
         a.ra(b);
         internalData.execOperationReceivedOnHost(b);
       };
-      this.j._Qp_ = function (start) {
+      this._Qp_ = function (start) {
         if (start){
           if (null != b.Ed)
             return false;
@@ -3010,7 +3015,7 @@ function Haxball(options){
       this.Qr = window.setInterval(function () {
         a.C();
       }, 50);
-      this.uf();
+      //canvas && this.uf();
       var c = n_A.rd.L(),
         c = -200 > c ? -200 : 200 < c ? 200 : c;
       if (0 != c) {
@@ -6074,12 +6079,15 @@ function Haxball(options){
       Kc: function () {
         var a = window.performance.now();
         (1 == n_A.Fh.L() && 28.333333333333336 > a - this.$c) ||
-          ((this.$c = a),
-          //this.sd++,
-          this.uf(),
-          (a = this.ya.T.na(this.ya.uc)),
-          null != a && (this.xi = a.cb),
-          this.j.C(this.ya));
+          ((this.$c = a),/*
+            this.sd++,
+            (canvas && this.uf()),
+            (a = this.ya.T.na(this.ya.uc)),
+            null != a && (this.xi = a.cb),
+            this.j.C(this.ya)*/
+            internalData.extrapolatedRoomPhysicsObj = this.ya.Sf(), 
+            renderer?.render(internalData.extrapolatedRoomPhysicsObj)
+          );
       },
       /*
       Gp: function (a) {
@@ -6154,28 +6162,26 @@ function Haxball(options){
             this.ob.Bd(a.code);
         }
       },
-	  */
       uf: function () {
         var a = n_A.Tb.L(),
           b = this.j.Fb,
           c = b.Eb;
         c.zg = n_A.Sl.L();
         0 == a
-          ? (/*b.Gg(!0), */(c.kf = 1), (c.jf = 0), (c.xf = 0))
-          : (/*b.Gg(!1), */
+          ? (b.Gg(!0), (c.kf = 1), (c.jf = 0), (c.xf = 0))
+          : (b.Gg(!1), 
             (c.xf = 35),
             -1 == a ? (c.jf = 450) : ((c.jf = 0), (c.kf = 1 + 0.25 * (a - 1))));
       },
-	  /*
       Cd: function (a) {
         this.ob.Cd(a.code);
       },
       */
       f: ba,
     };
+    /*
     Gb.b = !0;
     Gb.prototype = {
-      /*
       Ti: function (a) {
         var b = this.j.Qa.Bc,
           c = [],
@@ -6187,41 +6193,34 @@ function Haxball(options){
         }
         b.Hj = c;
       },
-      */
       ri: function (a) {
-        function xx(){}
-        /*
         function b(a) {
           return null == a ? "" : " by " + a.w;
         }
-        */
         var c = this;
-        //this.Ti(a);
-        /*
+        this.Ti(a);
         a.tl = function (b) {
           //c.j.Qa.Gb("" + b.w + " has joined");
           //n.Na.cd(n.Na.$o);
           //c.Ti(a);
         };
-        */
         a.ul = function (d, e, f, g) {
           y.i(c.Op, d.V);
           null == e
-            ? (xx()/*d = "" + d.w + " has left"*/)
-            : (vb.i(c.Np, d.V, e, null != g ? g.w : null, f)/*,
+            ? (d = "" + d.w + " has left")
+            : (vb.i(c.Np, d.V, e, null != g ? g.w : null, f),
               (d =
                 "" +
                 d.w +
                 " was " +
                 (f ? "banned" : "kicked") +
                 b(g) +
-                ("" != e ? " (" + e + ")" : ""))*/);
-          //c.j.Qa.Gb(d);
-          //n.Na.cd(n.Na.ep);
-          //c.Ti(a);
+                ("" != e ? " (" + e + ")" : "")));
+          c.j.Qa.Gb(d);
+          n.Na.cd(n.Na.ep);
+          c.Ti(a);
         };
         a.Oi = 1;
-        /*
         a.rl = function (a, b) {
           var d = null != c.Rh && -1 != b.indexOf(c.Rh);
           c.j.Qa.ba("" + a.w + ": " + b, d ? "highlight" : null);
@@ -6288,11 +6287,9 @@ function Haxball(options){
               : "" + d + "'s admin rights were taken away") + b(a)
           );
         };
-        */
         a.wl = function (a, b) {
           c.j.Fb.Eb.Po(a, b);
         };
-        /*
         a.Hk = function (a, e, f, g) {
           c.j.Qa.Gb(
             "Kick Rate Limit set to (min: " +
@@ -6305,29 +6302,29 @@ function Haxball(options){
               b(a)
           );
         };
-        */
       },
       Lr: function (a) {
-        //a.tl = null;
+        a.tl = null;
         a.ul = null;
-        //a.rl = null;
-        //a.Vl = null;
-        //a.ji = null;
-        //a.Ni = null;
+        a.rl = null;
+        a.Vl = null;
+        a.ji = null;
+        a.Ni = null;
         a.Oi = null;
-        //a.ml = null;
-        //a.Pi = null;
-        //a.Ki = null;
-        //a.vf = null;
-        //a.Ii = null;
-        //a.sl = null;
-        //a.xl = null;
-        //a.ii = null;
+        a.ml = null;
+        a.Pi = null;
+        a.Ki = null;
+        a.vf = null;
+        a.Ii = null;
+        a.sl = null;
+        a.xl = null;
+        a.ii = null;
         a.wl = null;
-        //a.Hk = null;
+        a.Hk = null;
       },
       f: Gb,
     };
+    */
     Ra.b = !0;
     Ra.Fk = function (a) {
       switch (n_A.tg.L().L(a)) {
@@ -6911,7 +6908,7 @@ function Haxball(options){
             */
             b.Bg = u.$h(a, !1);
             //x.La(b.j.g);
-            b.j.de = function () {
+            b.de = function () {
               t.Ad = null;
               t.ia();
               b.ia();
@@ -9132,7 +9129,7 @@ function Haxball(options){
         this.S = h.ja(a);
         var b = 0 != a.B();
         this.K = null;
-        b && ((this.K = new O()), this.K.ja(a, this)/*, this.K.Ma.Os = haxball.room?._onGameTick*/);// gameTick event...
+        b && ((this.K = new O()), this.K.ja(a, this));
 
         for (
           var b = null == this.K ? null : this.K.ta.F, c = a.B(), d = this.I;
@@ -9681,7 +9678,7 @@ function Haxball(options){
             }
             return;
           }
-          ia.i(a.wl, b, this.sj);
+          //ia.i(a.wl, b, this.sj);
           haxball.room._onPlayerChatIndicatorChange(this.P, !this.sj); // id, value
         }
       },
@@ -10510,6 +10507,7 @@ function Haxball(options){
       },
       f: B,
     };
+    /*
     N.b = !0;
     N.lc = function (a) {
       return (
@@ -10676,8 +10674,8 @@ function Haxball(options){
           (120 != a.Oa &&
             ((a = (a.Oa / 120) * 200),
             (this.c.fillStyle = "white"),
-            this.c.fillRect(0.5 * -a, 100, a, 20))/*,
-          this.td.eq.Tq(this.c)*/);
+            this.c.fillRect(0.5 * -a, 100, a, 20)),
+          this.td.eq.Tq(this.c));
       },
       lr: function (a) {
         this.Dk != a &&
@@ -10771,7 +10769,7 @@ function Haxball(options){
           if (null != g) {
             var g = g.a,
               h = this.dd.get(f.V);
-            c && h.Xf && images?.typing && this.c.drawImage(/*n.Dm*/images.typing, g.x - 0.5 * /*n.Dm*/images.typing.width, g.y - 35);
+            c && h.Xf && images?.typing && this.c.drawImage(n.Dm, g.x - 0.5 * n.Dm.width, g.y - 35);
             f != b && h.so(this.c, g.x, g.y + 50);
           }
         }
@@ -10890,7 +10888,6 @@ function Haxball(options){
       },
       f: N,
     };
-    /*
     R.b = !0;
     R.prototype = {
       zo: function () {
@@ -10955,7 +10952,6 @@ function Haxball(options){
       },
       f: R,
     };
-    */
     Sb.b = !0;
     Sb.prototype = {
       Pa: function (a) {
@@ -11058,7 +11054,6 @@ function Haxball(options){
       },
       f: Ea,
     };
-    /*
     mb.b = !0;
     mb.prototype = {
       ki: function (a) {
@@ -11286,29 +11281,23 @@ function Haxball(options){
     };
     Ka.b = !0;
     Ka.prototype = { f: Ka };
-    */
     hb.b = !0;
     hb.prototype = {
-      /*
       Gg: function (a) {
         this.g.classList.toggle("restricted", a);
       },
-      */
       C: function (a, c) {
         var b = a.K;
-        rafCallback && rafCallback(c, b);
         null != b &&
-          (/*this.xc.tr(60 * a.Da),
+          (this.xc.tr(60 * a.Da),
           this.xc.sr(b.Hc | 0),
           this.Kb.set(b.Kb),
           this.Pb.set(b.Pb),
-          internalData.extrapolatedRoomPhysicsObj = a,*/
           this.Eb.Kc(a, this.Nb)
           );
       },
       f: hb,
     };
-    /*
     Rb.b = !0;
     Rb.prototype = {
       Wd: function (a, b) {
@@ -11354,20 +11343,17 @@ function Haxball(options){
       },
       f: Rb,
     };
-    */
     ja.b = !0;
     ja.prototype = {
       C: function (a) {
         var b = a;
-        /*
         null == a.T.K && this.me(!0);
         A.i(this.yl);
         this.bi.disabled = null == a.T.K;
         this.Gd
           ? this.Wa.C(a.T, a.T.na(a.uc))
-          : */((a = a.Sf()), (internalData.extrapolatedRoomPhysicsObj = a), (canvas && (/*this.uf(), */this.Fb.C(a, b)))/*, n.Na.Xj?.Ls(a)*/);
+          : (a = a.Sf(), internalData.extrapolatedRoomPhysicsObj = a, this.uf(), this.Fb.C(a, b), n.Na.Xj?.Ls(a));
       },
-	  /*
       uf: function () {
         var a = n_A.Tb.L(),
           b = this.Fb,
@@ -11399,10 +11385,8 @@ function Haxball(options){
             (this.yl = b))
           : ((this.hf.style.display = "none"), (this.yl = null));
       },
-      */
       f: ja,
     };
-    /*
     gb.b = !0;
     gb.prototype = {
       Aj: function (a) {
@@ -12158,6 +12142,7 @@ function getRoomList() {
 };
 
 function Room(internalData, plugins){
+  var renderer = internalData.renderer;
   if (!internalData.isHost)
     this.sdp = internalData.roomObj.ya.pa.Ra.remoteDescription.sdp; // usage: require("sdp-transform").parse(sdp);
 
@@ -12193,6 +12178,13 @@ function Room(internalData, plugins){
 
   var that = this;
 
+  this.setRenderer = function(_renderer, auto = false){ // do not call this function with auto = true, it will not work properly.
+    if (auto)
+      renderer = _renderer;
+    else
+      that.client.setRenderer(_renderer);
+  };
+
   this.setPluginActive = function(name, active){
     /*
     var oIdx = that.plugins.findIndex((x)=>x.name==name);
@@ -12219,6 +12211,7 @@ function Room(internalData, plugins){
     p.active = active;
     p.onActiveChanged && p.onActiveChanged();
     that.onPluginActiveChange && that.onPluginActiveChange(p);
+    renderer?.onPluginActiveChange && renderer.onPluginActiveChange(p);
   };
 
   this._modifyPlayerData = function(playerId, name, flag, avatar, conn, auth){
@@ -12278,6 +12271,7 @@ function Room(internalData, plugins){
         p.onRoomLink && p.onRoomLink(link, customData);
       });
       that.onAfterRoomLink && that.onAfterRoomLink(link, customData);
+      renderer?.onRoomLink && renderer.onRoomLink(link, customData);
     }
   };
 
@@ -12288,6 +12282,7 @@ function Room(internalData, plugins){
         p.onPlayerBallKick && p.onPlayerBallKick(playerId, customData);
       });
       that.onAfterPlayerBallKick && that.onAfterPlayerBallKick(playerId, customData);
+      renderer?.onPlayerBallKick && renderer.onPlayerBallKick(playerId, customData);
     }
   };
 
@@ -12298,6 +12293,7 @@ function Room(internalData, plugins){
         p.onTeamGoal && p.onTeamGoal(teamId, customData);
       });
       that.onAfterTeamGoal && that.onAfterTeamGoal(teamId, customData);
+      renderer?.onTeamGoal && renderer.onTeamGoal(teamId, customData);
     }
   };
 
@@ -12308,6 +12304,7 @@ function Room(internalData, plugins){
         p.onGameEnd && p.onGameEnd(winningTeamId, customData);
       });
       that.onAfterGameEnd && that.onAfterGameEnd(winningTeamId, customData);
+      renderer?.onGameEnd && renderer.onGameEnd(winningTeamId, customData);
     }
   };
 
@@ -12318,6 +12315,7 @@ function Room(internalData, plugins){
         p.onGameTick && p.onGameTick(customData);
       });
       that.onAfterGameTick && that.onAfterGameTick(customData);
+      renderer?.onGameTick && renderer.onGameTick(customData);
     }
   };
 
@@ -12328,6 +12326,7 @@ function Room(internalData, plugins){
         p.onPlayerSyncChange && p.onPlayerSyncChange(playerId, value, customData);
       });
       that.onAfterPlayerSyncChange && that.onAfterPlayerSyncChange(playerId, value, customData);
+      renderer?.onPlayerSyncChange && renderer.onPlayerSyncChange(playerId, value, customData);
     }
   };
 
@@ -12338,6 +12337,7 @@ function Room(internalData, plugins){
         p.onAnnouncement && p.onAnnouncement(msg, color, style, sound, customData);
       });
       that.onAfterAnnouncement && that.onAfterAnnouncement(msg, color, style, sound, customData);
+      renderer?.onAnnouncement && renderer.onAnnouncement(msg, color, style, sound, customData);
     }
   };
 
@@ -12348,6 +12348,7 @@ function Room(internalData, plugins){
         p.onAutoTeams1 && p.onAutoTeams1(playerId, teamId, byId, customData);
       });
       that.onAfterAutoTeams1 && that.onAfterAutoTeams1(playerId, teamId, byId, customData);
+      renderer?.onAutoTeams1 && renderer.onAutoTeams1(playerId, teamId, byId, customData);
     }
   };
 
@@ -12358,6 +12359,7 @@ function Room(internalData, plugins){
         p.onAutoTeams2 && p.onAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData);
       });
       that.onAfterAutoTeams2 && that.onAfterAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData);
+      renderer?.onAutoTeams2 && renderer.onAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData);
     }
   };
 
@@ -12368,6 +12370,7 @@ function Room(internalData, plugins){
         p.onScoreLimitChange && p.onScoreLimitChange(value, byId, customData);
       });
       that.onAfterScoreLimitChange && that.onAfterScoreLimitChange(value, byId, customData);
+      renderer?.onScoreLimitChange && renderer.onScoreLimitChange(value, byId, customData);
     }
   };
 
@@ -12378,6 +12381,7 @@ function Room(internalData, plugins){
         p.onTimeLimitChange && p.onTimeLimitChange(value, byId, customData);
       });
       that.onAfterTimeLimitChange && that.onAfterTimeLimitChange(value, byId, customData);
+      renderer?.onTimeLimitChange && renderer.onTimeLimitChange(value, byId, customData);
     }
   };
 
@@ -12388,6 +12392,7 @@ function Room(internalData, plugins){
         p.onPlayerAdminChange && p.onPlayerAdminChange(id, isAdmin, byId, customData);
       });
       that.onAfterPlayerAdminChange && that.onAfterPlayerAdminChange(id, isAdmin, byId, customData);
+      renderer?.onPlayerAdminChange && renderer.onPlayerAdminChange(id, isAdmin, byId, customData);
     }
   };
 
@@ -12398,6 +12403,7 @@ function Room(internalData, plugins){
         p.onPlayerAvatarChange && p.onPlayerAvatarChange(id, value, customData);
       });
       that.onAfterPlayerAvatarChange && that.onAfterPlayerAvatarChange(id, value, customData);
+      renderer?.onPlayerAvatarChange && renderer.onPlayerAvatarChange(id, value, customData);
     }
   };
 
@@ -12408,6 +12414,7 @@ function Room(internalData, plugins){
         p.onPlayerTeamChange && p.onPlayerTeamChange(id, teamId, byId, customData);
       });
       that.onAfterPlayerTeamChange && that.onAfterPlayerTeamChange(id, teamId, byId, customData);
+      renderer?.onPlayerTeamChange && renderer.onPlayerTeamChange(id, teamId, byId, customData);
     }
   };
 
@@ -12418,6 +12425,7 @@ function Room(internalData, plugins){
         p.onStadiumChange && p.onStadiumChange(stadium, byId, customData);
       });
       that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
+      renderer?.onStadiumChange && renderer.onStadiumChange(stadium, byId, customData);
     }
   };
 
@@ -12428,6 +12436,7 @@ function Room(internalData, plugins){
         p.onTeamsLockChange && p.onTeamsLockChange(value, byId, customData);
       });
       that.onAfterTeamsLockChange && that.onAfterTeamsLockChange(value, byId, customData);
+      renderer?.onTeamsLockChange && renderer.onTeamsLockChange(value, byId, customData);
     }
   };
 
@@ -12438,6 +12447,7 @@ function Room(internalData, plugins){
         p.onPlayerJoin && p.onPlayerJoin(pObj, customData);
       });
       that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
+      renderer?.onPlayerJoin && renderer.onPlayerJoin(pObj, customData);
     }
   };
 
@@ -12448,6 +12458,7 @@ function Room(internalData, plugins){
         p.onGamePauseChange && p.onGamePauseChange(isPaused, byId, customData);
       });
       that.onAfterGamePauseChange && that.onAfterGamePauseChange(isPaused, byId, customData);
+      renderer?.onGamePauseChange && renderer.onGamePauseChange(isPaused, byId, customData);
     }
   };
 
@@ -12458,6 +12469,7 @@ function Room(internalData, plugins){
         p.onPlayerChat && p.onPlayerChat(id, message, customData);
       });
       that.onAfterPlayerChat && that.onAfterPlayerChat(id, message, customData);
+      renderer?.onPlayerChat && renderer.onPlayerChat(id, message, customData);
     }
   };
 
@@ -12468,6 +12480,7 @@ function Room(internalData, plugins){
         p.onPlayerInputChange && p.onPlayerInputChange(id, value, customData);
       });
       that.onAfterPlayerInputChange && that.onAfterPlayerInputChange(id, value, customData);
+      renderer?.onPlayerInputChange && renderer.onPlayerInputChange(id, value, customData);
     }
   };
 
@@ -12478,6 +12491,7 @@ function Room(internalData, plugins){
         p.onPlayerChatIndicatorChange && p.onPlayerChatIndicatorChange(id, value, customData);
       });
       that.onAfterPlayerChatIndicatorChange && that.onAfterPlayerChatIndicatorChange(id, value, customData);
+      renderer?.onPlayerChatIndicatorChange && renderer.onPlayerChatIndicatorChange(id, value, customData);
     }
   };
 
@@ -12488,6 +12502,7 @@ function Room(internalData, plugins){
         p.onPlayerLeave && p.onPlayerLeave(pObj, reason, isBanned, byId, customData);
       });
       that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
+      renderer?.onPlayerLeave && renderer.onPlayerLeave(pObj, reason, isBanned, byId, customData);
     }
   };
 
@@ -12498,6 +12513,7 @@ function Room(internalData, plugins){
         p.onSetDiscProperties && p.onSetDiscProperties(id, type, data1, data2, customData);
       });
       that.onAfterSetDiscProperties && that.onAfterSetDiscProperties(id, type, data1, data2, customData);
+      renderer?.onSetDiscProperties && renderer.onSetDiscProperties(id, type, data1, data2, customData);
     }
   };
 
@@ -12508,6 +12524,7 @@ function Room(internalData, plugins){
         p.onKickRateLimitChange && p.onKickRateLimitChange(min, rate, burst, byId, customData);
       });
       that.onAfterKickRateLimitChange && that.onAfterKickRateLimitChange(min, rate, burst, byId, customData);
+      renderer?.onKickRateLimitChange && renderer.onKickRateLimitChange(min, rate, burst, byId, customData);
     }
   };
 
@@ -12518,6 +12535,7 @@ function Room(internalData, plugins){
         p.onGameStart && p.onGameStart(byId, customData);
       });
       that.onAfterGameStart && that.onAfterGameStart(byId, customData);
+      renderer?.onGameStart && renderer.onGameStart(byId, customData);
     }
   };
 
@@ -12528,6 +12546,7 @@ function Room(internalData, plugins){
         p.onGameStop && p.onGameStop(byId, customData);
       });
       that.onAfterGameStop && that.onAfterGameStop(byId, customData);
+      renderer?.onGameStop && renderer.onGameStop(byId, customData);
     }
   };
 
@@ -12538,6 +12557,7 @@ function Room(internalData, plugins){
         p.onPingData && p.onPingData(array, customData);
       });
       that.onAfterPingData && that.onAfterPingData(array, customData);
+      renderer?.onPingData && renderer.onPingData(array, customData);
     }
   };
 
@@ -12548,6 +12568,7 @@ function Room(internalData, plugins){
         p.onCollisionDiscVsDisc && p.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
       });
       that.onAfterCollisionDiscVsDisc && that.onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
+      renderer?.onCollisionDiscVsDisc && renderer.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
     }
   };
 
@@ -12558,6 +12579,7 @@ function Room(internalData, plugins){
         p.onCollisionDiscVsSegment && p.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
       });
       that.onAfterCollisionDiscVsSegment && that.onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
+      renderer?.onCollisionDiscVsSegment && renderer.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
     }
   };
 
@@ -12568,6 +12590,7 @@ function Room(internalData, plugins){
         p.onCollisionDiscVsPlane && p.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
       });
       that.onAfterCollisionDiscVsPlane && that.onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
+      renderer?.onCollisionDiscVsPlane && renderer.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
     }
   };
 
@@ -12578,6 +12601,7 @@ function Room(internalData, plugins){
         p.onBansClear && p.onBansClear(customData);
       });
       that.onAfterBansClear && that.onAfterBansClear(customData);
+      renderer?.onBansClear && renderer.onBansClear(customData);
     }
   };
 
@@ -12588,6 +12612,7 @@ function Room(internalData, plugins){
         p.onExtrapolationChange && p.onExtrapolationChange(value, customData);
       });
       that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
+      renderer?.onExtrapolationChange && renderer.onExtrapolationChange(value, customData);
     }
   };
 
@@ -12598,6 +12623,7 @@ function Room(internalData, plugins){
         p.onHandicapChange && p.onHandicapChange(value, customData);
       });
       that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
+      renderer?.onHandicapChange && renderer.onHandicapChange(value, customData);
     }
   };
 
@@ -12608,6 +12634,7 @@ function Room(internalData, plugins){
         p.onRoomRecaptchaModeChange && p.onRoomRecaptchaModeChange(on, customData);
       });
       that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
+      renderer?.onRoomRecaptchaModeChange && renderer.onRoomRecaptchaModeChange(on, customData);
     }
   };
 
@@ -12618,6 +12645,7 @@ function Room(internalData, plugins){
         p.onRoomPropertiesChange && p.onRoomPropertiesChange(props, customData);
       });
       that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
+      renderer?.onRoomPropertiesChange && renderer.onRoomPropertiesChange(props, customData);
     }
   };
 
@@ -12628,6 +12656,7 @@ function Room(internalData, plugins){
         p.onCustomEvent && p.onCustomEvent(type, data, byId, customData);
       });
       that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
+      renderer?.onCustomEvent && renderer.onCustomEvent(type, data, byId, customData);
     }
   };
 
@@ -12803,23 +12832,23 @@ function Room(internalData, plugins){
   };
 
   this.startGame = function(){
-    internalData.roomObj?.j?.Yp();
+    internalData.roomObj?.Yp();
   };
 
   this.stopGame = function(){
-    internalData.roomObj?.j?.Zp();
+    internalData.roomObj?.Zp();
   };
 
   this.pauseGame = function(){
-    internalData.roomObj?.j?.Mp();
+    internalData.roomObj?.Mp();
   };
 
   this.autoTeams = function(){
-    internalData.roomObj?.j?.Dp();
+    internalData.roomObj?.Dp();
   };
 
   this.lockTeams = function(){
-    internalData.roomObj?.j?.$p(!(internalData.roomPhysicsObj?.Pc));
+    internalData.roomObj?.$p(!(internalData.roomPhysicsObj?.Pc));
   };
 
   this.isGamePaused = function(){
@@ -12827,16 +12856,16 @@ function Room(internalData, plugins){
   };
 
   this.resetTeams = function(){
-    internalData.roomObj?.j?.ee(internalData.teams.blue);
-    internalData.roomObj?.j?.ee(internalData.teams.red);
+    internalData.roomObj?.ee(internalData.teams.blue);
+    internalData.roomObj?.ee(internalData.teams.red);
   };
 
   this.startRecording = function(){ // return true(success)/false(failure - already recording)
-    return internalData.roomObj?.j?._Qp_(true);
+    return internalData.roomObj?._Qp_(true);
   };
 
   this.stopRecording = function(){ // return Uint8Array(success)/null(failure - recording not started)
-    return internalData.roomObj?.j?._Qp_(false);
+    return internalData.roomObj?._Qp_(false);
   };
 
   this.isRecording = function(){
@@ -12844,7 +12873,7 @@ function Room(internalData, plugins){
   };
 
   this.randTeams = function(){
-    internalData.roomObj?.j?.Pp();
+    internalData.roomObj?.Pp();
   };
 
   this.setSync = function(value){ // host-only
@@ -12852,7 +12881,7 @@ function Room(internalData, plugins){
   }
 
   this.leave = function(){
-    internalData.roomObj?.j?.de();
+    internalData.roomObj?.de();
   };
 
   this.getDefaultStadiums = function(){
@@ -12874,7 +12903,7 @@ function Room(internalData, plugins){
 
   this.setCurrentStadium = function(stadium, onError){
     try {
-      internalData.roomObj?.j?.og(stadium);
+      internalData.roomObj?.og(stadium);
     } catch (k) {
       b = k instanceof q ? k.Ta : k,
       b instanceof SyntaxError ? onError("SyntaxError in line: " + r.Be(b.lineNumber, "")) : 
@@ -12884,25 +12913,25 @@ function Room(internalData, plugins){
   };
 
   this.setTimeLimit = function(value){
-    internalData.roomObj?.j?.aq(value);
+    internalData.roomObj?.aq(value);
   };
 
   this.setScoreLimit = function(value){
-    internalData.roomObj?.j?.Tp(value);
+    internalData.roomObj?.Tp(value);
   };
 
   this.changeTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.spec);
+        internalData.roomObj?.mg(internalData.roomObj.ya.uc, internalData.teams.spec);
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.red);
+        internalData.roomObj?.mg(internalData.roomObj.ya.uc, internalData.teams.red);
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.mg(internalData.roomObj.ya.uc, internalData.teams.blue);
+        internalData.roomObj?.mg(internalData.roomObj.ya.uc, internalData.teams.blue);
         break; 
       }
     }
@@ -12911,15 +12940,15 @@ function Room(internalData, plugins){
   this.resetTeam = function(teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.ee(internalData.teams.spec); 
+        internalData.roomObj?.ee(internalData.teams.spec); 
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.ee(internalData.teams.red); 
+        internalData.roomObj?.ee(internalData.teams.red); 
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.ee(internalData.teams.blue); 
+        internalData.roomObj?.ee(internalData.teams.blue); 
         break; 
       }
     }
@@ -12928,15 +12957,15 @@ function Room(internalData, plugins){
   this.setPlayerTeam = function(playerId, teamId){
     switch (teamId){
       case 0: { 
-        internalData.roomObj?.j?.mg(playerId, internalData.teams.spec);
+        internalData.roomObj?.mg(playerId, internalData.teams.spec);
         break; 
       }
       case 1: { 
-        internalData.roomObj?.j?.mg(playerId, internalData.teams.red);
+        internalData.roomObj?.mg(playerId, internalData.teams.red);
         break; 
       }
       case 2: { 
-        internalData.roomObj?.j?.mg(playerId, internalData.teams.blue);
+        internalData.roomObj?.mg(playerId, internalData.teams.blue);
         break; 
       }
     }
@@ -13138,6 +13167,9 @@ function Room(internalData, plugins){
     });
     return ret;
   };
+
+  if (renderer)
+    renderer.initialize && renderer.initialize(internalData.roomObj);
 
   this.plugins.forEach((p)=>{
     p.initialize && p.initialize(that);
