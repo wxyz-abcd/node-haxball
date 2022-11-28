@@ -117,6 +117,18 @@ client.on("ready", () => {
 
 <h2 id="docs">📰 Mini-Documentation</h2>
 
+- Library constructor(object, config): Initializes the library with given parameters. This constructor is only for browsers & custom environments.
+  - object: These are objects/functions that directly affect the core functionalities. You should usually pass "document.window" here, because most of these objects reside there.
+    - setTimeout, clearTimeout, setInterval, clearInterval, requestAnimationFrame, cancelAnimationFrame,  (if you are on a custom environment such as NW.js or Electron, these functions should be binded to browser's window object before being passed on.)
+    - console, performance, crypto,  (browser's window object should have these objects as well.)
+    - RTCPeerConnection, RTCIceCandidate, RTCSessionDescription, WebSocket, XMLHttpRequest,  (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
+    - EventEmitter, inherits,  (use polyfills for these.)
+    - JSON5, pako.  (These are two external libraries required by Haxball.)
+  - config: Custom configuration. Valid object keys are;
+    - WebSocketChangeOriginAllowed: true/false. browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. if WebSocketChangeOriginAllowed is true, we do not need a proxy server. (we can do that in NW.js, for example)
+    - WebSocketProxyUrl: proxy websocket url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "wss://p2p.haxball.com/" for host and "wss://p2p2.haxball.com/" for client.
+    - HttpProxyUrl: proxy http url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "https://www.haxball.com/rs/".
+
 - Utils: Some static utility functions.
 
   - generateAuthKey(): generates a new player_auth_key. you should store it and use it later if you want to be recognized in Haxball rooms. (use it in Haxball _constructor_) (returns Promise(CryptoKeyPair))
@@ -125,7 +137,7 @@ client.on("ready", () => {
 
 - Haxball: Main client class.
 
-  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. _render_ is a special key that is used mostly for rendering purposes. it may have values for these browser environment(window) function/variables: 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance', 'console', 'requestAnimationFrame', 'cancelAnimationFrame', 'crypto', 'renderer'. the functions(_setTimeout_, _clearTimeout_, _setInterval_, _clearInterval_, _requestAnimationFrame_, _cancelAnimationFrame_) should be binded to browser's _window_ object.
+  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. Apart from these keys, it is possible to send a Renderer object with 'renderer' key.
 
   - properties:
     - version: current version number. other clients cannot join the room created by this Haxball client if this version number is different than theirs.
@@ -453,6 +465,7 @@ client.on("ready", () => {
 
 <div> - %70 of Node.js initial environment by mertushka <a href="https://github.com/mertushka"><img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
 <div> - Rest of Node.js initial environment and %98 of the bot API features by abc <a href="https://github.com/wxyz-abcd"><img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - Room.modifyFrameNo by Punisher <a href="https://github.com/guguxh"><img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
 <div> - Rest of the features by 0x00 <a href="https://github.com/0x00214131812049"><img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
 
 <div>We will continue to add all contributors to this list.</div>

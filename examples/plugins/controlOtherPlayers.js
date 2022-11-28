@@ -1,4 +1,4 @@
-var { Plugin } = require("../../src/index");
+var { OperationType, Plugin } = require("../../src/index");
 
 module.exports = function(){
 

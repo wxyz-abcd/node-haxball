@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node test/createRoomTests.js",
     "ctest": "node test/createRoomTests.js",
-    "jtest": "node test/joinRoomTests.js"
+    "jtest": "node test/joinRoomTests.js",
+    "btest": "cd test/browser && npm start"
   },
   "contributors": [
     "wxyz-abcd <mail.api.test.1.1.1@gmail.com>",

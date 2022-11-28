@@ -1,3 +1,5 @@
+var { OperationType } = require("../../src/index");
+
 function roomCallback(room){ // examples start from here.
 
   var connectionShouldBreak = {};
