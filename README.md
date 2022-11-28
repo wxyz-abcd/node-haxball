@@ -79,6 +79,29 @@ client.on("ready", () => {
 });
 ```
 
+#### 💻 Usage on Browser
+
+```html
+<html>
+  <head>
+    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
+    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
+    <script src="./polyfill/eventemitter.js"></script> <!-- polyfill for node.js EventEmitter. TODO: upload this on the web frontend project. -->
+    <script src="./polyfill/inherits.js"></script> <!-- polyfill for node.js utils.inherits. TODO: upload this on the web frontend project. -->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/api.js"></script> <!-- this file comes from this repo -->
+  </head>
+  <body>
+    <script>
+      var { Haxball } = abcHaxballAPI(window, {
+        WebSocketProxyUrl: "ws://abc-node-haxball.eu-4.evennode.com/", // proxy server urls dedicated to redirect & modify requests.
+        HttpProxyUrl: "http://abc-node-haxball.eu-4.evennode.com/rs/"
+      });
+      // now you are ready to use the same functions here.
+    </script>
+  </body>
+</html>
+```
+
 ---
 
 <h2 id="technologies">🚀 Technologies</h2>
