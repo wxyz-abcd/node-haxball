@@ -4852,10 +4852,13 @@ function abcHaxballAPI(window, config){
       Ia.prototype = {
         Rm: function (a) {
           for (
-            var b = 0, c = a.mb, d = a.da, e = 0, f = this.list;
-            e < f.length;
-    
-          ) {
+            var b = 0, c = a.mb, d = a.da, e = 0, f = this.list; e < f.length; ){
+            // variable c here is the frame number of each client
+            // also same time the ID of each client is being shared here with other clients, which now we know 'mb' is the 100% confirmed frameNo
+            // example output if log the incoming value: Ga {da: 0, input: 0, P: 0, mb: 513}
+            // trace this function and where it goes may help on creating things such as frame number manipulation detection or beyond
+            // for now we know the way it works is tb -> ua -> m.lj -> ra -> ob.ng -> C -> bf
+            // not mentioned in above line but data is coming to this function aswell
             var g = f[e];
             ++e;
             var k = g.mb;
