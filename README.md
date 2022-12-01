@@ -93,8 +93,8 @@ client.on("ready", () => {
   <body>
     <script>
       var { Haxball } = abcHaxballAPI(window, {
-        WebSocketProxyUrl: "ws://abc-node-haxball.eu-4.evennode.com/", // proxy server urls dedicated to redirect & modify requests.
-        HttpProxyUrl: "http://abc-node-haxball.eu-4.evennode.com/rs/"
+        WebSocketProxyUrl: "ws://abc-node-haxball.eu-4.evennode.com/", // unfortunately, my application has just been blocked by evennode. i guess it was using too much resources.
+        HttpProxyUrl: "http://abc-node-haxball.eu-4.evennode.com/rs/"  // from now on, these url's will not work for you. i will update urls here as soon as i find a good replacement.
       });
       // now you are ready to use the same functions here.
     </script>
@@ -486,11 +486,11 @@ client.on("ready", () => {
 
 <p>
 
-<div> - %70 of Node.js initial environment by mertushka <a href="https://github.com/mertushka"><img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
-<div> - Rest of Node.js initial environment and %98 of the bot API features by abc <a href="https://github.com/wxyz-abcd"><img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
-<div> - Room.modifyFrameNo by Punisher <a href="https://github.com/guguxh"><img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
-<div> - Rest of the features by 0x00 <a href="https://github.com/0x00214131812049"><img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
-
+<div> - Initial testing environment by <a href="https://github.com/mertushka">mertushka <img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
+<div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - Room.modifyFrameNo by <a href="https://github.com/hxgd1">Punisher <img width="20" src="https://avatars.githubusercontent.com/u/114198188?v=4"/></a></div>
+<div> - Rest of the features by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
+<div/>
 <div>We will continue to add all contributors to this list.</div>
 
 </p>

@@ -9512,7 +9512,7 @@ function abcHaxballAPI(window, config){
       pa.ma = m;
       pa.prototype = C(m.prototype, {
         apply: function (a) {
-          a.Lb(this.P, 2) && (a.Pc = this.newValue) && haxball.room._onTeamsLockChange(this.newValue, this.P);
+          a.Lb(this.P, 2) && (a.Pc = this.newValue, haxball.room._onTeamsLockChange(this.newValue, this.P));
         },
         ua: function (a) {
           a.l(this.newValue ? 1 : 0);
