@@ -93,8 +93,8 @@ client.on("ready", () => {
   <body>
     <script>
       var { Haxball } = abcHaxballAPI(window, {
-        WebSocketProxyUrl: "ws://abc-node-haxball.eu-4.evennode.com/", // unfortunately, my application was blocked by evennode. i guess it was using too much resources.
-        HttpProxyUrl: "http://abc-node-haxball.eu-4.evennode.com/rs/"  // these url's will not work for you. i have just finished the frontend project, and i am looking for these urls' replacements now.
+        WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // let's see how much these urls will last.
+        HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
       });
       // now you are ready to use the same functions here.
     </script>
