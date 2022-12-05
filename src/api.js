@@ -113,6 +113,7 @@ function abcHaxballAPI(window, config){
   }, {});
 
   function recognizeEvent(obj){
+    var eventType = obj.__proto__ ? obj.__proto__.f.on : obj.eventType; // <-- this will be O(1), instead of Array.filter: O(n)
     return allEvents[obj.__proto__.f.name]?.filter((x)=>(!x.extraCondition || obj[x.extraCondition[0]]==x.extraCondition[1]))[0];
   }
 
@@ -2992,6 +2993,7 @@ function abcHaxballAPI(window, config){
             if (null != b.Ed)
               return false;
             b.zr();
+            _onRoomRecordingChange(true);
             return true;
           }
           else {
@@ -2999,6 +3001,7 @@ function abcHaxballAPI(window, config){
               return null;
             var a = b.Ed.stop();
             b.Ed = null;
+            _onRoomRecordingChange(a);
             return a;
           }
         };
@@ -4808,8 +4811,9 @@ function abcHaxballAPI(window, config){
         a.ua(b);
       };
       m.fh = function (a) {
-        var b = a.B(),
-          b = Object.create(m.Qm.get(b).prototype);
+        var eventType = a.B(),
+          b = Object.create(m.Qm.get(eventType).prototype);
+        b.eventType = eventType;
         b.da = 0;
         b.mb = 0;
         b.va(a);
@@ -5863,8 +5867,8 @@ function abcHaxballAPI(window, config){
         }
         return b;
       };
-      /*
       ub.prototype = {
+      /*
         gf: function (a) {
           var b = this;
           if ("/" != a.charAt(0)) return !1;
@@ -5996,9 +6000,9 @@ function abcHaxballAPI(window, config){
           this.ya.ra(msg);
           internalData.execOperationReceivedOnHost(msg);
         },
+        */
         f: ub,
       };
-      */
       internalData.teamColorsObj = ub;
       Ha.b = !0;
       ba.b = !0;
@@ -7699,7 +7703,10 @@ function abcHaxballAPI(window, config){
               for (a = 0; a < b.length; )
                 (c = b[a]), ++a, null != c.H && (c.H.h = 39 | this.ae.cp);
               b = this.ta.F[0].D;
-              0 < b.x * b.x + b.y * b.y && (this.Bb = 1);
+              if (0 < b.x * b.x + b.y * b.y){
+                this.Bb = 1;
+                haxball.room._onKickOff();
+              }
             } 
             else if (1 == this.Bb) {
               this.Hc += 0.016666666666666666;
@@ -9188,7 +9195,7 @@ function abcHaxballAPI(window, config){
           var a = ya.zc,
             b = this.gc;
           this.hc != a &&
-            (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this));
+            (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this), haxball.room._onLocalFrame(a));
           return b;
         },
         f: fa,
@@ -9335,8 +9342,8 @@ function abcHaxballAPI(window, config){
             var t;
             0 != c &&
               (f == e
-                ? 2 > c || (a.Mf(b, d[0], p.fa), a.Mf(b, d[1], p.xa), haxball.room._onAutoTeams2(d[0].V, p.fa.$, d[1].V, p.xa.$, this.P))
-                : (t = f > e ? p.fa : p.xa, a.Mf(b, d[0], t), haxball.room._onAutoTeams1(d[0].V, t.$, this.P)));
+                ? 2 > c || (a.Mf(b, d[0], p.fa), a.Mf(b, d[1], p.xa), haxball.room._onAutoTeams(d[0].V, p.fa.$, d[1].V, p.xa.$, this.P))
+                : (t = f > e ? p.fa : p.xa, a.Mf(b, d[0], t), haxball.room._onAutoTeams(d[0].V, t.$, null, null, this.P)));
           }
         },
         ua: function () {},
@@ -9489,7 +9496,7 @@ function abcHaxballAPI(window, config){
       Pa.ma = m;
       Pa.prototype = C(m.prototype, {
         apply: function (a) {
-          a.Lb(this.P, 2) && this.ea != p.Ia && (a.kb[this.ea.$] = this.Sg);
+          a.Lb(this.P, 2) && this.ea != p.Ia && (a.kb[this.ea.$] = this.Sg, haxball.room._onTeamColorsChange(this.ea.$, this.Sg, this.P));
         },
         ua: function (a) {
           a.l(this.ea.$);
@@ -12350,25 +12357,36 @@ function abcHaxballAPI(window, config){
       }
     };
 
-    this._onAutoTeams1 = function(playerId, teamId, byId){
-      var customData = that.onBeforeAutoTeams1 && that.onBeforeAutoTeams1(playerId, teamId, byId);
+    this._onKickOff = function(){
+      var customData = that.onBeforeKickOff && that.onBeforeKickOff();
       if (customData!==false){
         that.activePlugins.forEach((p)=>{
-          p.onAutoTeams1 && p.onAutoTeams1(playerId, teamId, byId, customData);
+          p.onKickOff && p.onKickOff(customData);
         });
-        that.onAfterAutoTeams1 && that.onAfterAutoTeams1(playerId, teamId, byId, customData);
-        renderer?.onAutoTeams1 && renderer.onAutoTeams1(playerId, teamId, byId, customData);
+        that.onAfterKickOff && that.onAfterKickOff(playerId, teamId, byId, customData);
+        renderer?.onKickOff && renderer.onKickOff(playerId, teamId, byId, customData);
       }
     };
 
-    this._onAutoTeams2 = function(playerId1, teamId1, playerId2, teamId2, byId){
-      var customData = that.onBeforeAutoTeams2 && that.onBeforeAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId);
+    this._onLocalFrame = function(localFrameNo){
+      var customData = that.onBeforeLocalFrame && that.onBeforeLocalFrame(localFrameNo);
       if (customData!==false){
         that.activePlugins.forEach((p)=>{
-          p.onAutoTeams2 && p.onAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData);
+          p.onLocalFrame && p.onLocalFrame(localFrameNo, customData);
         });
-        that.onAfterAutoTeams2 && that.onAfterAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData);
-        renderer?.onAutoTeams2 && renderer.onAutoTeams2(playerId1, teamId1, playerId2, teamId2, byId, customData);
+        that.onAfterLocalFrame && that.onAfterLocalFrame(localFrameNo, customData);
+        renderer?.onLocalFrame && renderer.onLocalFrame(localFrameNo, customData);
+      }
+    };
+
+    this._onAutoTeams = function(playerId1, teamId1, playerId2, teamId2, byId){
+      var customData = that.onBeforeAutoTeams && that.onBeforeAutoTeams(playerId1, teamId1, playerId2, teamId2, byId);
+      if (customData!==false){
+        that.activePlugins.forEach((p)=>{
+          p.onAutoTeams && p.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+        });
+        that.onAfterAutoTeams && that.onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+        renderer?.onAutoTeams && renderer.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
       }
     };
 
@@ -12435,6 +12453,17 @@ function abcHaxballAPI(window, config){
         });
         that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
         renderer?.onStadiumChange && renderer.onStadiumChange(stadium, byId, customData);
+      }
+    };
+
+    this._onTeamColorsChange = function(teamId, value, byId){
+      var customData = that.onBeforeTeamColorsChange && that.onBeforeTeamColorsChange(teamId, value, byId);
+      if (customData!==false){
+        that.activePlugins.forEach((p)=>{
+          p.onTeamColorsChange && p.onTeamColorsChange(teamId, value, byId, customData);
+        });
+        that.onAfterTeamColorsChange && that.onAfterTeamColorsChange(teamId, value, byId, customData);
+        renderer?.onTeamColorsChange && renderer.onTeamColorsChange(teamId, value, byId, customData);
       }
     };
 
@@ -12644,6 +12673,17 @@ function abcHaxballAPI(window, config){
         });
         that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
         renderer?.onRoomRecaptchaModeChange && renderer.onRoomRecaptchaModeChange(on, customData);
+      }
+    };
+
+    this._onRoomRecordingChange = function(value){
+      var customData = that.onBeforeRoomRecordingChange && that.onBeforeRoomRecordingChange(value);
+      if (customData!==false){
+        that.activePlugins.forEach((p)=>{
+          p.onRoomRecordingChange && p.onRoomRecordingChange(value, customData);
+        });
+        that.onAfterRoomRecordingChange && that.onAfterRoomRecordingChange(value, customData);
+        renderer?.onRoomRecordingChange && renderer.onRoomRecordingChange(value, customData);
       }
     };
 
@@ -12919,6 +12959,10 @@ function abcHaxballAPI(window, config){
         b instanceof Bb ? onError(b.xp) : 
         onError("Error loading stadium file.")
       }
+    };
+
+    this.exportStadium = function(stadium){
+      return stadium.se();
     };
 
     this.setTimeLimit = function(value){
