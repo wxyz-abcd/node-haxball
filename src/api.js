@@ -2802,9 +2802,79 @@ function abcHaxballAPI(window, config){
           //b.j.Qa.Gb(a);
         });
         this.ya = a;
-        a.T.ko = function (c) {
+        
+        // a.T.xxx: these functions run only once; 
+        // see in function zj: this.T.C(1); 
+        // all other engine updates run K.C(x), and not T.C(x).
+        
+        a.T.iq = (b)=>{
+          haxball.room._onPlayerInputChange(b.V, b.ob);
+        };
+        a.T.tl = (b)=>{
+          haxball.room._onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+        };
+        a.T.ji = (d)=>{
+          haxball.room._onPlayerBallKick(d?.V);
+        };
+        a.T.Ni = (team)=>{
+          haxball.room._onTeamGoal(team?.$);
+        };
+        a.T.Oi = (team)=>{
+          haxball.room._onGameEnd(team.$); // winningTeamId
+        };
+        a.T.ml = (c, Bf, e, a)=>{
+          //console.log(a); // a.hc!=-1 at latest call, possible fix: basro uses (!e) instead of (a.hc>0), that might be only for pause and not for resume.
+          a.hc>0 && haxball.room._onGamePauseChange(Bf, c?.V) // paused, byId
+        };
+        a.T.Ki = function(a){
+          haxball.room._onGameStart(a?.V); // byId
+        }
+        a.T.Os = ()=>{
+          haxball.room._onGameTick();
+        };
+        a.T._KO_ = ()=>{
+          haxball.room._onKickOff();
+        };
+        a.T._CDD_ = (a, b, c, d)=>{
+          haxball.room._onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+        };
+        a.T._CDP_ = (a, b, c)=>{
+          haxball.room._onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+        };
+        a.T._CDS_ = (a, b, c)=>{
+          haxball.room._onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+        };
+        a.T.Pi = ()=>{ 
+          // time is up!!
+        };
+        a.T.lq = ()=>{
+          // map objects reinitialized (after goal).
+        };
+        a.T.ko = function (c) { // set sync
           b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c), internalData.execOperationReceivedOnHost(c));
         };
+        a.T.rl = function(b, Tc){
+          haxball.room._onPlayerChat(b.V, Tc); // id, message
+        };
+        a.T.Vl = function(msg, color, style, sound){
+          haxball.room._onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+        };
+        a.T.vf = function(b){
+          haxball.room._onGameStop(b?.V);  //byId
+        };
+        a.T.Ii = function(a, e){
+          haxball.room._onStadiumChange(e, a?.V); // map, byId
+        };
+        a.T.sl = function(b){
+          haxball.room._onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+        };
+        a.T.ii = function(b, c){
+          haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+        };
+        a.T.Hk = function(a, b, c, d){
+          haxball.room._onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+        };
+
         /*
         this.canvasUpdate = function(c){
           canvas = c;
@@ -2820,12 +2890,12 @@ function abcHaxballAPI(window, config){
           null != e && (
             vb.i(b.Np, d.V, e, null != g ? g.w : null, f)
           );
+          haxball.room._onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
         };
-        a.T.Oi = 1;
+        a.T.wl = function(a, b){
+          haxball.room._onPlayerChatIndicatorChange(a?.V, !b); // id, value
+        };
         /*
-        a.T.wl = function (_a, _b) {
-          b.j.Fb.Eb.Po(_a, _b);
-        };
         this.j.Qa.fl = G(this, this.Gp);
         this.j.Qa.ig = G(this, this.Fp);
         window.document.addEventListener("keydown", G(this, this.Bd));
@@ -7623,9 +7693,8 @@ function abcHaxballAPI(window, config){
         C: function (a) {
           if (0 < this.Oa) 120 > this.Oa && this.Oa--;
           else {
-            haxball.room._onGameTick();
-            //var b = this.Ma.Os;
-            //null != b && b();
+            var b = this.Ma.Os;
+            null != b && b();
             for (var b = this.Ma.I, c = 0; c < b.length; ) {
               var d = b[c];
               ++c;
@@ -7664,7 +7733,6 @@ function abcHaxballAPI(window, config){
                   }
                   f &&
                     (null != this.Ma.ji && this.Ma.ji(d),
-                    haxball.room._onPlayerBallKick(d?.V),
                     (d.Wb = !1),
                     (d.Sc = this.Ma.yd),
                     (d.yc -= this.Ma.Zc));
@@ -7698,14 +7766,14 @@ function abcHaxballAPI(window, config){
                   (f.x = k.x),
                   (f.y = k.y),
                   ++c);
-            this.ta.C(a);
+            this.ta.C(a, this.Ma);
             if (0 == this.Bb) {
               for (a = 0; a < b.length; )
                 (c = b[a]), ++a, null != c.H && (c.H.h = 39 | this.ae.cp);
               b = this.ta.F[0].D;
               if (0 < b.x * b.x + b.y * b.y){
                 this.Bb = 1;
-                haxball.room._onKickOff();
+                null != this.Ma._KO_ && this.Ma._KO_();
               }
             } 
             else if (1 == this.Bb) {
@@ -7724,20 +7792,19 @@ function abcHaxballAPI(window, config){
                   this.vc = 150,
                   this.ae = d,
                   d == p.fa ? this.Kb++ : this.Pb++,
-                  /*null != this.Ma.Ni && this.Ma.Ni(d.pg),*/
-                  haxball.room._onTeamGoal(d?.pg?.$) // teamId
+                  null != this.Ma.Ni && this.Ma.Ni(d.pg)
                   /*null != this.Ma.Ol && this.Ma.Ol(d.$)*/)
                 : 0 < this.Da &&
                   this.Hc >= 60 * this.Da &&
                   this.Pb != this.Kb &&
-                  (/*null != this.Ma.Pi && this.Ma.Pi(), */this.um());
+                  (null != this.Ma.Pi && this.Ma.Pi(), this.um());
             } else if (2 == this.Bb)
               this.vc--,
                 0 >= this.vc &&
                   (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) ||
                   0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb
                     ? this.um()
-                    : (this.Gk()/*, null != this.Ma.lq && this.Ma.lq()*/));
+                    : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
             else if (
               3 == this.Bb &&
               (this.vc--, 0 >= this.vc && ((b = this.Ma), null != b.K))
@@ -7746,18 +7813,14 @@ function abcHaxballAPI(window, config){
               a = 0;
               for (c = b.I; a < c.length; )
                 (d = c[a]), ++a, (d.H = null), (d.Jb = 0);
-              //null != b.vf && b.vf(null);
-              haxball.room._onGameStop(null);
+              null != b.vf && b.vf(null);
             }
           }
         },
         um: function () {
           this.vc = 300;
           this.Bb = 3;
-          null != this.Ma.Oi && ( // this ensures that following statement will run only once. (Still trying to figure out how.)
-            //this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa),
-            haxball.room._onGameEnd(this.Pb > this.Kb ? p.fa.$ : p.xa.$)// winningTeamId
-          );
+          null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa);
         },
         Gk: function () {
           var a = this.Ma.I;
@@ -9079,7 +9142,7 @@ function abcHaxballAPI(window, config){
               d.Jb = 0;
             }
             this.K.Wo(this);
-            //null != this.Ki && this.Ki(a);
+            null != this.Ki && this.Ki(a);
           }
         },
         Mf: function (a, b, c) {
@@ -9189,7 +9252,7 @@ function abcHaxballAPI(window, config){
           this.Zc = 0 > c ? 0 : 255 < c ? 255 : c;
           d = 0 > d ? 0 : 100 < d ? 100 : d;
           this.ce = this.Zc * d;
-          //vb.i(this.Hk, a, this.yd, this.Zc, d);
+          vb.i(this.Hk, a, this.yd, this.Zc, d);
         },
         sc: function () {
           var a = ya.zc,
@@ -9219,7 +9282,7 @@ function abcHaxballAPI(window, config){
         a.Sc = b.Sc;
         a.H = null == b.H ? null : b.H.sc();
         if (a.H)
-          a.H.playerId = a.V;   // c = discId -> disc[discId].playerId = playerId
+          a.H.playerId = a.V;
         a.ea = b.ea;
       };
       ea.prototype = {
@@ -9280,8 +9343,7 @@ function abcHaxballAPI(window, config){
       ta.prototype = C(m.prototype, {
         apply: function (a) {
           var b = a.na(this.P);
-          null != b && this.Yg != b.Ld && ((b.Ld = this.Yg)/*, y.i(a.sl, b)*/, (
-          haxball.room._onPlayerSyncChange(b?.V, this.Yg))); // id, sync
+          null != b && this.Yg != b.Ld && ((b.Ld = this.Yg), y.i(a.sl, b));
         },
         ua: function (a) {
           a.l(this.Yg ? 1 : 0);
@@ -9303,9 +9365,7 @@ function abcHaxballAPI(window, config){
       rb.ma = m;
       rb.prototype = C(m.prototype, {
         apply: function (a) {
-          0 == this.P && (/*vb.i(a.Vl, this.Tc, this.color, this.style, this.fn),*/
-            haxball.room._onAnnouncement(this.Tc, this.color, this.style, this.fn) // msg, color, style, sound
-          );
+          0 == this.P && vb.i(a.Vl, this.Tc, this.color, this.style, this.fn);
         },
         ua: function (a) {
           a.mc(U.Qc(this.Tc, 1e3));
@@ -9398,8 +9458,7 @@ function abcHaxballAPI(window, config){
             null != c &&
               0 != c.V &&
               c.cb != this.Xg &&
-              ((c.cb = this.Xg)/*, (null != a.ii && a.ii(b, c))*/, 
-              haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V)); // id, isAdmin, byId
+              ((c.cb = this.Xg), (null != a.ii && a.ii(b, c)));
           }
         },
         ua: function (a) {
@@ -9475,8 +9534,7 @@ function abcHaxballAPI(window, config){
         apply: function (a) {
           if (a.Lb(this.P, 8)) {
             var b = a.na(this.P);
-            null == a.K && ((a.S = this.Pd), /*(null != a.Ii && a.Ii(b, this.Pd)), */
-            haxball.room._onStadiumChange(this.Pd, b?.V)); // map, byId
+            null == a.K && ((a.S = this.Pd), (null != a.Ii && a.Ii(b, this.Pd)));
           }
         },
         ua: function (a) {
@@ -9552,11 +9610,8 @@ function abcHaxballAPI(window, config){
             b.conn = this.conn;
             b.auth = this.auth; // store auth
             a.I.push(b);
-            /*
             a = a.tl;
             null != a && a(b);
-            */
-            haxball.room._onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
           }
         },
         ua: function (a) {
@@ -9601,9 +9656,7 @@ function abcHaxballAPI(window, config){
               d = 120 == b.Oa,
               e = 0 < b.Oa;
             this.Bf ? (b.Oa = 120) : 120 == b.Oa && (b.Oa = 119);
-            //console.log(a); // FIX ME: a.hc!=-1 at latest call.
-            d != this.Bf && (/*Cb.i(a.ml, c, this.Bf, e), */
-            a.hc>0 && haxball.room._onGamePauseChange(this.Bf, c?.V)); // paused, byId
+            d != this.Bf && (Cb.i(a.ml, c, this.Bf, e, a));
           }
         },
         ua: function (a) {
@@ -9626,8 +9679,7 @@ function abcHaxballAPI(window, config){
         },
         apply: function (a) {
           var b = a.na(this.P);
-          null != b && (/*ia.i(a.rl, b, this.Tc), */
-          haxball.room._onPlayerChat(this.P, this.Tc)); // id, message
+          null != b && (ia.i(a.rl, b, this.Tc));
         },
         ua: function (a) {
           a.mc(U.Qc(this.Tc, 140));
@@ -9649,7 +9701,6 @@ function abcHaxballAPI(window, config){
             0 == (b.ob & 16) && 0 != (c & 16) && (b.Wb = !0);
             b.ob = c;
             null != a.iq && a.iq(b);
-            haxball.room._onPlayerInputChange(this.P, c);
           }
         },
         ua: function (a) {
@@ -9693,8 +9744,7 @@ function abcHaxballAPI(window, config){
               }
               return;
             }
-            //ia.i(a.wl, b, this.sj);
-            haxball.room._onPlayerChatIndicatorChange(this.P, !this.sj); // id, value
+            ia.i(a.wl, b, this.sj);
           }
         },
         ua: function (a) {
@@ -9791,7 +9841,6 @@ function abcHaxballAPI(window, config){
               D.remove(a.I, b);
               null != a.K && D.remove(a.K.ta.F, b.H);
               vb.i(a.ul, b, this.fd, this.Qg, c);
-              haxball.room._onPlayerLeave(b, this.fd, this.Qg, c?.V); // playerObj, reason, isBanned, byId
             }
           }
         },
@@ -9950,8 +9999,7 @@ function abcHaxballAPI(window, config){
       ma.ma = m;
       ma.prototype = C(m.prototype, {
         apply: function (a) {
-          a.Lb(this.P, 2) && (a.mr(a.na(this.P), this.min, this.nj, this.aj), 
-          haxball.room._onKickRateLimitChange(this.min, this.nj, this.aj, this.P)); // min, rate, burst, byId
+          a.Lb(this.P, 2) && a.mr(a.na(this.P), this.min, this.nj, this.aj);
         },
         ua: function (a) {
           a.O(this.min);
@@ -9970,8 +10018,7 @@ function abcHaxballAPI(window, config){
       Ma.ma = m;
       Ma.prototype = C(m.prototype, {
         apply: function (a) {
-          a.Lb(this.P, 32) && (a.yr(a.na(this.P), 0), 
-          haxball.room._onGameStart(this.P)); // byId
+          a.Lb(this.P, 32) && a.yr(a.na(this.P), 0);
         },
         ua: function () {},
         va: function () {},
@@ -9992,8 +10039,7 @@ function abcHaxballAPI(window, config){
                 e.Jb = 0;
               }
               internalData.roomObj?.ob.al();
-              //null != a.vf && a.vf(b);
-              haxball.room._onGameStop(b?.V);  //byId
+              null != a.vf && a.vf(b);
             }
           }
         },
@@ -10094,7 +10140,7 @@ function abcHaxballAPI(window, config){
           this.h = a.M();
           this.v = a.M();
         },
-        Pn: function (a) {
+        Pn: function (a, pObj) {
           var b = this.a,
             c = a.a,
             d = b.x - c.x,
@@ -10130,10 +10176,10 @@ function abcHaxballAPI(window, config){
               (c = e - c),
               (f.x = a.x + d * c),
               (f.y = a.y + b * c),
-              (haxball.room._onCollisionDiscVsDisc(this.v, this.playerId, oldA.v, oldA.playerId))); // discId1, discPlayerId1, discId2, discPlayerId2
+              (pObj._CDD_ && pObj._CDD_(this.v, this.playerId, oldA.v, oldA.playerId)));
           }
         },
-        Qn: function (a, id1, id2) {
+        Qn: function (a, id1, id2, pObj) {
           var b, c, d;
           if (0 != 0 * a.vb) {
             b = a.W.a;
@@ -10181,7 +10227,7 @@ function abcHaxballAPI(window, config){
               (e = a = this.D),
               (a.x = e.x - b * d),
               (a.y = e.y - c * d),
-              (haxball.room._onCollisionDiscVsSegment(id1, this.playerId, id2-1)))); // discId, discPlayerId, segmentId
+              (pObj._CDS_ && pObj._CDS_(id1, this.playerId, id2-1)))); // discId, discPlayerId, segmentId
         },
         sc: function () {
           var a = ya.zc,
@@ -10307,7 +10353,7 @@ function abcHaxballAPI(window, config){
             this.F.push(d);
           }
         },
-        C: function (a) {
+        C: function (a, pObj) {
           for (var b = 0, c = this.F; b < c.length; ) {
             var d = c[b];
             ++b;
@@ -10329,7 +10375,7 @@ function abcHaxballAPI(window, config){
             c = this.F[d];
             d += 1;
             for (e = this.F.length; d < e; )
-              (f = this.F[d++]), 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Pn(f);
+              (f = this.F[d++]), 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Pn(f, pObj);
             if (0 != c.aa) {
               d = 0;
               for (e = this.qa; d < e.length; )
@@ -10351,12 +10397,12 @@ function abcHaxballAPI(window, config){
                       (f = f.wa),
                       (k.x = l.x - f.x * g),
                       (k.y = l.y - f.y * g),
-                      (haxball.room._onCollisionDiscVsPlane(id, c.playerId, d-1))); // discId, discPlayerId, planeId
+                      (pObj._CDP_ && pObj._CDP_(id, c.playerId, d-1))); // discId, discPlayerId, planeId
                   }
                 }
               d = 0;
               for (e = this.U; d < e.length; )
-                (f = e[d]), ++d, 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Qn(f, id, d); // id, d
+                (f = e[d]), ++d, 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Qn(f, id, d, pObj);
               d = 0;
               for (e = this.J; d < e.length; )
                 if (
