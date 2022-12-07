@@ -86,9 +86,9 @@ client.on("ready", () => {
   <head>
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
-    <script src="https://raw.githubusercontent.com/wxyz-abcd/node-haxball/main/src/browser_polyfill/eventemitter.js"></script> <!-- polyfill for node.js EventEmitter. this file comes from this repo. -->
-    <script src="https://raw.githubusercontent.com/wxyz-abcd/node-haxball/main/src/browser_polyfill/inherits.js"></script> <!-- polyfill for node.js utils.inherits. this file comes from this repo. -->
-    <script src="https://raw.githubusercontent.com/wxyz-abcd/node-haxball/main/src/api.js"></script> <!-- this file comes from this repo -->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/browser_polyfill/eventemitter.js"></script> <!-- polyfill for node.js EventEmitter. this file comes from this repo. -->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/browser_polyfill/inherits.js"></script> <!-- polyfill for node.js utils.inherits. this file comes from this repo. -->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/api.js"></script> <!-- this file comes from this repo -->
   </head>
   <body>
     <script>
