@@ -86,9 +86,9 @@ client.on("ready", () => {
   <head>
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
-    <script src="./browser_polyfill/eventemitter.js"></script> <!-- polyfill for node.js EventEmitter. this file comes from this repo. -->
-    <script src="./browser_polyfill/inherits.js"></script> <!-- polyfill for node.js utils.inherits. this file comes from this repo. -->
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/api.js"></script> <!-- this file comes from this repo -->
+    <script src="https://raw.githubusercontent.com/wxyz-abcd/node-haxball/main/src/browser_polyfill/eventemitter.js"></script> <!-- polyfill for node.js EventEmitter. this file comes from this repo. -->
+    <script src="https://raw.githubusercontent.com/wxyz-abcd/node-haxball/main/src/browser_polyfill/inherits.js"></script> <!-- polyfill for node.js utils.inherits. this file comes from this repo. -->
+    <script src="https://raw.githubusercontent.com/wxyz-abcd/node-haxball/main/src/api.js"></script> <!-- this file comes from this repo -->
   </head>
   <body>
     <script>
@@ -168,7 +168,7 @@ client.on("ready", () => {
   - functions:
     - value = getStorageValue(key): returns the current value of storage\[key\] where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
     - setStorageValue(key, value): sets storage\[key\]=(value) where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
-    - createRoom({name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
+    - createRoom({name, password, maxPlayerCount, showInRoomList, noPlayer, token, geo, playerCount, unlimitPlayerCount, fakePassword, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
     - joinRoom({roomId, password, token, kickTimeout, plugins}): try to join the room(roomId) with given password(or null=no password). Must leave current room first. returns Promise(room) which is rejected if failed.
     - leaveRoom(): Leave current room. Must be in a room.
     - setRenderer(renderer): sets the renderer object that will render the game. The object should follow the provided Renderer template.

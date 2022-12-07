@@ -1037,7 +1037,7 @@ function abcHaxballAPI(window, config){
       haxball.room?.setRenderer(_renderer, true);
     };
 
-    this.createRoom = function(obj){ // name, password, maxPlayerCount, showInRoomList, token, geo, playerCount, unlimitPlayerCount, fakePassword, plugins
+    this.createRoom = function(obj){ // name, password, maxPlayerCount, showInRoomList, noPlayer, token, geo, playerCount, unlimitPlayerCount, fakePassword, plugins
       return new Promise((resolve, reject)=>{
         if (haxball.room != null || !obj){
           reject();
@@ -1077,6 +1077,7 @@ function abcHaxballAPI(window, config){
         internalData.createRoom({
           name: obj.name,
           password: (obj.password == "") ? null : obj.password,
+          noPlayer: !!obj.noPlayer,
           qs: obj.maxPlayerCount.toString(),
           Ks: !obj.showInRoomList,
           t: obj.token,
@@ -2029,13 +2030,15 @@ function abcHaxballAPI(window, config){
         }
         var f = parseGeo(b.geo);
         g.jc = b.name;
-        var k = new ea();
-        k.w = a;
-        k.cb = !0;
-        k.Kd = f.ub;
-        k.Xb = n_A.sh.L();
-        k.customClient = true; // host is of course using the modified client :)
-        g.I.push(k);
+        if (!b.noPlayer){
+          var k = new ea();
+          k.w = a;
+          k.cb = !0;
+          k.Kd = f.ub;
+          k.Xb = n_A.sh.L();
+          k.customClient = true; // host is of course using the modified client :)
+          g.I.push(k);
+        }
         var l = new Lb({
           iceServers: n.Vf,
           ij: n.Ee + "api/host",
