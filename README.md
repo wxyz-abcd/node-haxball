@@ -82,6 +82,8 @@ Room.create({
 
 #### 💻 Usage on Browser
 
+  - NOTE: Usage on Browser currently relies on our proxy server, and the server is currently <a href="https://abc-haxball-proxy.up.railway.app/"><img alt="not active" src="https://abc-haxball-proxy.up.railway.app/tick.png" width="14" /></a>.
+
 ```html
 <html>
   <head>
