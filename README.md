@@ -35,19 +35,22 @@ npm install node-haxball
 Joining a room:
 
 ```js
-const { Haxball } = require("node-haxball");
+const { Room, Utils } = require("node-haxball");
 
-const client = new Haxball({
-  player_name: "wxyz-abcd",
-  avatar: "👽",
-});
-
-client.on("ready", () => {
-  client.joinRoom({
+Utils.generateAuth().then(([authKey, authObj])=>{
+  Room.join({
     id: "Olnit_iGRWs"
-  }).then((room) => {
-    const { name } = room.getRoomData();
-    room.sendChat("Hello " + name);
+  }, {
+    authObj: authObj,
+    storage: {
+      player_name: "wxyz-abcd",
+      avatar: "👽",
+      player_auth_key: authKey
+    }, 
+    onSuccess: (room)=>{
+      const { name } = room.getRoomData();
+      room.sendChat("Hello " + name);
+    }
   });
 });
 ```
@@ -55,26 +58,29 @@ client.on("ready", () => {
 Creating a room:
 
 ```js
-const { Haxball } = require("node-haxball");
+const { Room, Utils } = require("node-haxball");
 
-const client = new Haxball({
-  player_name: "wxyz-abcd",
-  avatar: "👽",
-});
-
-client.on("ready", () => {
-  client.createRoom({
+Utils.generateAuth().then(([authKey, authObj])=>{
+  Room.join({
     name: "room123", 
     password: "password", 
     showInRoomList: true, 
     maxPlayerCount: 8,
     token: "thr1.AAAAAGNMOokNqt3forXs_Q.3qQMuLQOS9o"
-  }).then((room) => {
-    const { name } = room.getRoomData();
-    room.sendChat("Hello " + name);
-    room.onAfterRoomLink = (roomLink)=>{
-      console.log("room link:", roomLink);
-    };
+  }, {
+    authObj: authObj,
+    storage: {
+      player_name: "wxyz-abcd",
+      avatar: "👽",
+      player_auth_key: authKey
+    }, 
+    onSuccess: (room)=>{
+      const { name } = room.getRoomData();
+      room.sendChat("Hello " + name);
+      room.onAfterRoomLink = (roomLink)=>{
+        console.log("room link:", roomLink);
+      };
+    }
   });
 });
 ```
@@ -86,13 +92,11 @@ client.on("ready", () => {
   <head>
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/browser_polyfill/eventemitter.js"></script> <!-- polyfill for node.js EventEmitter. this file comes from this repo. -->
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/browser_polyfill/inherits.js"></script> <!-- polyfill for node.js utils.inherits. this file comes from this repo. -->
     <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/api.js"></script> <!-- this file comes from this repo -->
   </head>
   <body>
     <script>
-      var { Haxball } = abcHaxballAPI(window, {
+      var { Room, Utils } = abcHaxballAPI(window, {
         WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // let's see how much these urls will last.
         HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
       });
@@ -154,49 +158,78 @@ client.on("ready", () => {
 
 - Utils: Some static utility functions.
 
-  - generateAuthKey(): generates a new player_auth_key. you should store it and use it later if you want to be recognized in Haxball rooms. (use it in Haxball _constructor_) (returns Promise(CryptoKeyPair))
+  - generateAuth(): generates a new player_auth_key along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in Room.join. (returns Promise([authKey, authObj]))
+  - authFromKey(authKey): recreates the auth object for given authKey. the object is used in Room.join. (returns Promise(authObj))
   - getRoomList(): returns the current room list. (returns Promise(roomListArray))
   - keyState(dirX, dirY, kick): returns an integer keyState value to be used in Room.setKeyState. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
+  - getGeo(): connects to Haxball's geolocation api to get your location based on IP address. you can use it directly as "geo" key in Haxball constructor. (returns Promise(geoLocationObject))
 
-- Haxball: Main client class.
+- Room: Main static room functions.
+  - create(createParams, commonParams): create a room with given parameters.
+    - createParams: {
+      - name: name of the room.
+      - password: password to protect the room. can be set null/undefined for no password.
+      - token: get a recaptcha token from www.haxball.com/headlesstoken and write it here to bypass the loop of trying to solve recaptcha.
+      - noPlayer: set it to true if you are planning to host the room without actually playing the game, otherwise set it to false.
+      - geo: {lat: latitude(number), lon: longitude(number), flag: 2 letter country flag(string)} geolocation values of the room about to be created.
+      - playerCount: if set to a number, always fixes the player count to this specific number.
+      - maxPlayerCount: the maximum allowed player count in the room.
+      - unlimitedPlayerCount: if set to true, bypasses the player count controller.
+      - fakePassword: if set to true, the room will show that it is password-protected while in fact it is not.
+      - showInRoomList: set to true if you want this room to show up in the room list.
+    }.
+    - commonParams: explained in Room.join.
 
-  - constructor(object): creates a new instance of Haxball client with storage values in parameter _object_ set accordingly. values for only these keys of _object_ will be used: \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\]. Apart from these keys, it is possible to send a Renderer object with 'renderer' key.
+  - join(joinParams, commonParams): try to join the room(roomId) with given password(or null=no password). returns Promise(room) which is rejected if failed.
+    - joinParams: {
+      - id: the id of the room to join. for example, if the room link is https://www.haxball.com/play?c=31IBNI3w4F0, this room's id is "31IBNI3w4F0".
+      - password: a password value to join the room if the room is password-protected.
+      - token: if the room is recaptcha-protected, you have to use a client token. currently there is not a clean way of doing this except using the NW.js token generator project, so you might want to look at it.
+      - authObj: an auth object that has to be initialized by Utils.generateAuth() or Utils.authFromKey() before being used here.
+    }
+    - commonParams: {
 
-  - properties:
-    - version: current version number. other clients cannot join the room created by this Haxball client if this version number is different than theirs.
+      --- properties section ---
 
-  - functions:
-    - value = getStorageValue(key): returns the current value of storage\[key\] where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
-    - setStorageValue(key, value): sets storage\[key\]=(value) where key must be one of \['show_indicators','player_name','fps_limit','player_auth_key','sound_chat','show_avatars','geo','geo_override','sound_crowd','sound_highlight','sound_main','extrapolation','avatar','resolution_scale','view_mode','player_keys','team_colors'\].
-    - createRoom({name, password, maxPlayerCount, showInRoomList, noPlayer, token, geo, playerCount, unlimitPlayerCount, fakePassword, kickTimeout, plugins}): create a room with given parameters. Must leave current room first. returns Promise(room) which is rejected if failed.
-    - joinRoom({roomId, password, token, kickTimeout, plugins}): try to join the room(roomId) with given password(or null=no password). Must leave current room first. returns Promise(room) which is rejected if failed.
-    - leaveRoom(): Leave current room. Must be in a room.
-    - setRenderer(renderer): sets the renderer object that will render the game. The object should follow the provided Renderer template.
-    - isCustomVersion(): returns whether the version number is the same as the original client. 
-    - setCustomVersion(custom): if custom=true, sets the version number to a specific value(always using the same for recognition); otherwise sets it to the same as the original client. Set it to true if you want your room to be inaccessible to people using the original client.
+      - storage: {
+        - crappy_router: if true, sets some timeout value to 10 seconds instead of 4 seconds while joining a room.
+        - extrapolation: use the future(+) or past(-) values of game state while rendering or other kinds of processing. this value should be a number between -200ms and 200ms.
+        - fps_limit: if 1, fps limit is set to 30, otherwise no limit is set.
+        - player_name: name of the player. defaults to "abc".
+        - avatar: avatar of the player. defauls to null.
+        - geo: {
+          - lat: latitude value (number, default is 40).
+          - lon: longitude value (number, default is 40).
+          - flag: 2 letter country code (string, default is "tr").
+        }.
+        - onValueSet(key, value): a callback function that is called just after the value of a key of this object has been changed by this library. defaults to null.
+      }.
+      - renderer: the Renderer object that can render the game. the object should follow the provided Renderer template. default is null.
+      - plugins: array of Plugin's to be used.
+      - version: Haxball's version number. other clients cannot join this room if their version number is different than this number. default is 9.
+      - kickTimeout: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. default is 20(msec).
 
-  - internally used events: 
-    - connectionStateChange(state): triggered several times while joining a room. use ConnectionState\[state\] for explanation on returned value.
-    - joinRoomSucceeded(): triggered only once when join room succeeds and just before Room object is created and Promise is resolved.
-    - createRoomSucceeded(): triggered only once when create room succeeds and just before Room object is created and Promise is resolved.
-    - roomLeave(): triggered only once while leaving the room by any means.
+      --- event callbacks section ---
 
-  - other events:
-    - joinRoomFailed(error): join room failed with error(error).
-    - ready(): haxball api has just become ready to work.
-    - roomJoin(room): joined/created room.
-    - joinRoomReverse(): trying reverse connection while joining a room.
-    - RequestRecaptcha(): recaptcha is required while joining or creating a room.
+      - onSuccess(room): joined/created room.
+      - onFailure(error): join room failed with error(error).
+      - onLeave(msg): triggered while leaving the room with reason(msg).
+      - onConnectionStateChange(state): connection state has just changed to (state).
+      - onReverseConnection(): trying reverse connection while joining a room.
+      - onRequestRecaptcha(): recaptcha is required while joining or creating a room.
+      
+      --- event triggers section ---
 
-  - events to be triggered by user:
-    - cancelJoinRoom(): trigger to cancel joining a room.
-    - RecaptchaToken(token): trigger to send the recaptcha token after RequestRecaptcha event occurred. currently only working for creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources/handlers and use Haxball.joinRoom with the new token.
+      - cancel(): should be used to cancel the process of joining a room.
+      - useRecaptchaToken(token): should be used to send the recaptcha token after onRequestRecaptcha event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use Room.join with the new token.
 
-- Room: The class that hosts all room operations. Should only be initialized from inside the Haxball client class and retrieved from a resolved Promise resulting from either Haxball.createRoom or Haxball.joinRoom.
+    }.
+
+- Room: The class that currently hosts all room operations. Should only be initialized by either Room.join or Room.create.
 
   - properties:
     - isHost: true for hosts, false for clients
-    - client: a reference to the Haxball client object that created this Room object
+    - client: a reference to an inner client object that the event callbacks before room was created are attached to.
     - currentPlayerId: current player's id
     - currentPlayer: the original current player object
     - sdp: current room's sdp value (only for client rooms)
@@ -334,7 +367,11 @@ client.on("ready", () => {
       - onAfterGameStart(byId, customData): game was started by player(byId).
       - customData = onBeforeKickOff(): game kicked off. triggered individually.
       - onAfterKickOff(customData): game kicked off. triggered individually.
-      - customData = onBeforeLocalFrame(localFrameNo): new game frame was received. triggered individually.
+      - customData = onBeforeTimeIsUp(): time is up. triggered individually.
+      - onAfterTimeIsUp(customData): time is up. triggered individually.
+      - customData = onBeforePositionsReset(): positions were reset just after a goal. triggered individually.
+      - onAfterPositionsReset(customData): positions were reset just after a goal. triggered individually.
+      - customData = onBeforeLocalFrame(localFrameNo, customData): new game frame was received. triggered individually.
       - onAfterLocalFrame(localFrameNo, customData): new game frame was received. triggered individually.
       - customData = onBeforeGameStop(byId): game was stopped by player(byId).
       - onAfterGameStop(byId, customData): game was stopped by player(byId).
@@ -406,7 +443,9 @@ client.on("ready", () => {
       - onKickRateLimitChange(min, rate, burst, byId, customData): room's kick rate limit was set to (min, rate, burst) by player(byId).
       - onGameStart(byId, customData): game was started by player(byId).
       - onKickOff(customData): game kicked off. triggered individually.
-      - onLocalFrame(localFrameNo): new game frame was received. triggered individually.
+      - onTimeIsUp(customData): time is up. triggered individually.
+      - onPositionsReset(customData): positions were reset just after a goal. triggered individually.
+      - onLocalFrame(localFrameNo, customData): new game frame was received. triggered individually.
       - onGameStop(byId, customData): game was stopped by player(byId).
       - onPingData(array, customData): ping values for all players was received. may only be triggered by host.
       - onExtrapolationChange(value, customData): extrapolation was set to (value). triggered individually.
@@ -455,7 +494,9 @@ client.on("ready", () => {
       - onTeamColorsChange(teamId, value, byId, customData): team(teamId)'s colors were changed to (value) by player(byId).
       - onGameStart(byId, customData): game was started by player(byId).
       - onKickOff(customData): game kicked off. triggered individually.
-      - onLocalFrame(localFrameNo): new game frame was received. triggered individually.
+      - onTimeIsUp(customData): time is up. triggered individually.
+      - onPositionsReset(customData): positions were reset just after a goal. triggered individually.
+      - onLocalFrame(localFrameNo, customData): new game frame was received. triggered individually.
       - onGameStop(byId, customData): game was stopped by player(byId).
       - onPingData(array, customData): ping values for all players was received. may only be triggered by host.
       - onExtrapolationChange(value, customData): extrapolation was set to (value). triggered individually.

@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Haxball, Utils } = require("../src/index");
+const { OperationType, ConnectionState, Room, Utils, Plugin } = require("../src/index");
 
 function PasswordGuesser(){
   const guessDictionary = ["password", "111", "222", "333", "123", "12345"]; // write as many guesses as you wish here.
@@ -15,23 +15,34 @@ function PasswordGuesser(){
   }
 }
 
-var haxBall = new Haxball({
-  player_name: "wxyz-abcd",
-  avatar: "👽",
-});
-
 var pg = new PasswordGuesser();
 
-function joinRoom(id){
-  haxBall.joinRoom({
-    id: id, 
-    password: pg.nextGuess()
-  }).then(roomCallback, () => {
-    joinRoom(id); // try again if failed.
-  });
-}
+Utils.generateAuth().then(([authKey, authObj])=>{
+  var storage = {
+    player_name: "wxyz-abcd",
+    avatar: "👽",
+    player_auth_key: authKey
+  };
 
-haxBall.on("ready", () => {
+  function joinRoom(id){
+    var guess = pg.nextGuess();
+    if (!guess){
+      console.log("Could not guess password.");
+      return;
+    }
+    Room.join({
+      id: id,
+      password: guess
+    }, {
+      authObj: authObj,
+      storage: storage, 
+      onSuccess: roomCallback,
+      onFailure: () => {
+        joinRoom(id); // try again if failed.
+      }
+    });
+  }
+  
   joinRoom("8Q059ls-QTQ"); // room id here.
 });
 

@@ -109,4 +109,5 @@ dist
 # Custom
 test/
 backup/
+src_2/
 package_git.json

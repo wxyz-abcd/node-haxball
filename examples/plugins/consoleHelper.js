@@ -1,5 +1,5 @@
 var { Plugin } = require("../../src/index");
-const vm = require("vm");
+const vm = require("vm"); // you need to install this package manually in order to use it. (npm install vm)
 
 module.exports = function(){
   
