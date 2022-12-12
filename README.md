@@ -144,7 +144,6 @@ Room.create({
     - setTimeout, clearTimeout, setInterval, clearInterval, requestAnimationFrame, cancelAnimationFrame,  (if you are on a custom environment such as NW.js or Electron, these functions should be binded to browser's window object before being passed on.)
     - console, performance, crypto,  (browser's window object should have these objects as well.)
     - RTCPeerConnection, RTCIceCandidate, RTCSessionDescription, WebSocket, XMLHttpRequest,  (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
-    - EventEmitter, inherits,  (use polyfills for these.)
     - JSON5, pako.  (These are two external libraries required by Haxball.)
   - config: Custom configuration. Valid object keys are;
     - WebSocketChangeOriginAllowed: true/false. browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. if WebSocketChangeOriginAllowed is true, we do not need a proxy server. (we can do that in NW.js, for example)
