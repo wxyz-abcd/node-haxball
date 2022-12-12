@@ -6,7 +6,7 @@
 
 <h1 id="title" align="center">node-haxball</h1>
 
-<h4 align="center">node-haxball is the most powerful and lightweight bot API written by abc as a node.js module that will include every possible hack and functionality that you can imagine as a Haxball(www.haxball.com) host/client. </h4>
+<h4 align="center">node-haxball is the most powerful and lightweight bot API written by abc as a javascript library that supports both node.js and browser environments and will include every possible hack and functionality that you can imagine as a Haxball(www.haxball.com) host AND client. </h4>
 
 ### 🔖 Table Of Contents
 
@@ -39,17 +39,19 @@ const { Room, Utils } = require("node-haxball");
 
 Utils.generateAuth().then(([authKey, authObj])=>{
   Room.join({
-    id: "Olnit_iGRWs"
+    id: "Olnit_iGRWs",
+    authObj: authObj
   }, {
-    authObj: authObj,
     storage: {
       player_name: "wxyz-abcd",
-      avatar: "👽",
-      player_auth_key: authKey
+      avatar: "👽"
     }, 
     onSuccess: (room)=>{
       const { name } = room.getRoomData();
       room.sendChat("Hello " + name);
+      room.onAfterRoomLink = (roomLink)=>{
+        console.log("room link:", roomLink);
+      };
     }
   });
 });
@@ -60,28 +62,21 @@ Creating a room:
 ```js
 const { Room, Utils } = require("node-haxball");
 
-Utils.generateAuth().then(([authKey, authObj])=>{
-  Room.join({
-    name: "room123", 
-    password: "password", 
-    showInRoomList: true, 
-    maxPlayerCount: 8,
-    token: "thr1.AAAAAGNMOokNqt3forXs_Q.3qQMuLQOS9o"
-  }, {
-    authObj: authObj,
-    storage: {
-      player_name: "wxyz-abcd",
-      avatar: "👽",
-      player_auth_key: authKey
-    }, 
-    onSuccess: (room)=>{
-      const { name } = room.getRoomData();
-      room.sendChat("Hello " + name);
-      room.onAfterRoomLink = (roomLink)=>{
-        console.log("room link:", roomLink);
-      };
-    }
-  });
+Room.create({
+  name: "room123", 
+  password: "password", 
+  showInRoomList: true, 
+  maxPlayerCount: 8,
+  token: "thr1.AAAAAGNMOokNqt3forXs_Q.3qQMuLQOS9o"
+}, {
+  storage: {
+    player_name: "wxyz-abcd",
+    avatar: "👽"
+  }, 
+  onSuccess: (room)=>{
+    const { name } = room.getRoomData();
+    room.sendChat("Hello " + name);
+  }
 });
 ```
 
