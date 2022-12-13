@@ -11,9 +11,6 @@
 ### 🔖 Table Of Contents
 
 - 🤔 [How To Use](#how-to-use)
-- 🚀 [Technologies](#technologies)
-- 🌱 [Minimal Requirements](#minimal-requirements)
-- 🎊 [Features](#features)
 - 🎊 [Mini-Documentation](#docs)
 - 💡 [How To Contribute](#how-to-contribute)
 - 🤗 [Contributors](#contributors)
@@ -105,60 +102,26 @@ Room.create({
 
 ---
 
-<h2 id="technologies">🚀 Technologies</h2>
-
-- wrtc - WebRTC implementation for node.js
-- ws - Websocket connection module for node.js
-- JSON5 - JSON helper module for node.js
-- @peculiar/webcrypto - Webcrypto implementation for node.js
-- pako - ZLIB port for node.js
-- xhr2 - XMLHttpRequest port for node.js
-- perf_hooks - Web Performance API for node.js
-
-[Back To The Top](#title)
-
----
-
-<h2 id="minimal-requirements">🌱 Minimal Requirements</h2>
-
-- NPM
-- Node.js
-- NW.js (for token generation sub-project)
-
-[Back To The Top](#title)
-
----
-
-<h2 id="features">🎊 Features</h2>
-
-- [x] Event based
-- [x] Asynchronous
-- [x] Performant
-
-[Back To The Top](#title)
-
----
-
 <h2 id="docs">📰 Mini-Documentation</h2>
 
 - `Library constructor(object, config)`: Initializes the library with given parameters. This constructor is only for browsers & custom environments.
   - `object`: These are objects/functions that directly affect the core functionalities. You should usually pass "window" here, because most of these objects reside there.
-    - setTimeout, clearTimeout, setInterval, clearInterval, requestAnimationFrame, cancelAnimationFrame,  (if you are on a custom environment such as NW.js or Electron, these functions should be binded to browser's window object before being passed on.)
-    - console, performance, crypto,  (browser's window object should have these objects as well.)
-    - RTCPeerConnection, RTCIceCandidate, RTCSessionDescription, WebSocket, XMLHttpRequest,  (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
-    - JSON5, pako.  (These are two external libraries required by Haxball.)
+    - `setTimeout`, `clearTimeout`, `setInterval`, `clearInterval`, `requestAnimationFrame`, `cancelAnimationFrame`, (if you are on a custom environment such as NW.js or Electron, these functions should be binded to browser's window object before being passed on.)
+    - `console`, `performance`, `crypto`, (browser's window object should have these objects as well.)
+    - `RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `WebSocket`, `XMLHttpRequest`, (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
+    - `JSON5`, `pako`. (These are two external libraries required by Haxball.)
   - `config`: Custom configuration. Valid object keys are;
-    - `WebSocketChangeOriginAllowed`: true/false. browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. if WebSocketChangeOriginAllowed is true, we do not need a proxy server. (we can do that in NW.js, for example)
+    - `WebSocketChangeOriginAllowed`: true/false. browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If true, we do not need a proxy server. (we can do that in NW.js, for example)
     - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "wss://p2p.haxball.com/" for host and "wss://p2p2.haxball.com/" for client.
     - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "https://www.haxball.com/rs/".
 
 - `Utils`: Some static utility functions.
 
-  - `generateAuth()`: generates a new player_auth_key along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in Room.join. (returns Promise([authKey, authObj]))
-  - `authFromKey(authKey)`: recreates the auth object for given authKey. the object is used in Room.join. (returns Promise(authObj))
-  - `getRoomList()`: returns the current room list. (returns Promise(roomListArray))
-  - `keyState(dirX, dirY, kick)`: returns an integer keyState value to be used in Room.setKeyState. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
-  - `getGeo()`: connects to Haxball's geolocation api to get your location based on IP address. you can use it directly as "geo" key inside "storage" object. (returns Promise(geoLocationObject))
+  - `generateAuth()`: generates a new `player_auth_key` along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in `Room.join`. returns `Promise([authKey, authObj])`
+  - `authFromKey(authKey)`: recreates the auth object for given `authKey`. the object is used in `Room.join`. returns `Promise(authObj)`
+  - `getRoomList()`: returns the current room list. returns `Promise(roomListArray)`
+  - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
+  - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as "geo" key inside "storage" object. returns `Promise(geoLocationObject)`
 
 - `Room`: Main static room functions.
   - `create(createParams, commonParams)`: create a room with given parameters.
@@ -167,21 +130,21 @@ Room.create({
       - `password`: password to protect the room. can be set null/undefined for no password.
       - `token`: get a recaptcha token from www.haxball.com/headlesstoken and write it here to bypass the loop of trying to solve recaptcha.
       - `noPlayer`: set it to true if you are planning to host the room without actually playing the game, otherwise set it to false.
-      - `geo`: {lat: latitude(number), lon: longitude(number), flag: 2 letter country flag(string)} geolocation values of the room about to be created.
+      - `geo`: `{lat: latitude(number), lon: longitude(number), flag: 2 letter country flag(string)}` geolocation values of the room about to be created.
       - `playerCount`: if set to a number, always fixes the player count to this specific number.
       - `maxPlayerCount`: the maximum allowed player count in the room.
       - `unlimitedPlayerCount`: if set to true, bypasses the player count controller.
       - `fakePassword`: if set to true, the room will show that it is password-protected while in fact it is not.
       - `showInRoomList`: set to true if you want this room to show up in the room list.
     }.
-    - `commonParams`: explained in Room.join.
+    - `commonParams`: explained below in `Room.join`.
 
-  - `join(joinParams, commonParams)`: try to join the room(roomId) with given password(or null=no password). returns Promise(room) which is rejected if failed.
+  - `join(joinParams, commonParams)`: try to join the room(roomId) with given password(or null=no password). returns `Promise(room)` which is rejected if failed.
     - `joinParams`: {
       - `id`: the id of the room to join. for example, if the room link is https://www.haxball.com/play?c=31IBNI3w4F0, this room's id is `31IBNI3w4F0`.
       - `password`: a password value to join the room if the room is password-protected.
       - `token`: if the room is recaptcha-protected, you have to use a client token. currently there is not a clean way of doing this except using the NW.js token generator project, so you might want to look at it.
-      - `authObj`: an auth object that has to be initialized by Utils.generateAuth() or `Utils.authFromKey()` before being used here.
+      - `authObj`: an auth object that has to be initialized by `Utils.generateAuth()` or `Utils.authFromKey()` before being used here.
     }
     - `commonParams`: {
 
@@ -217,11 +180,11 @@ Room.create({
       --- event triggers section ---
 
       - `cancel()`: should be used to cancel the process of joining a room.
-      - `useRecaptchaToken(token)`: should be used to send the recaptcha token after onRequestRecaptcha event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use Room.join with the new token.
+      - `useRecaptchaToken(token)`: should be used to send the recaptcha token after `onRequestRecaptcha` event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use Room.join with the new token.
 
     }.
 
-- `Room`: The class that currently hosts all room operations. Should only be initialized by either Room.join or Room.create.
+- `Room`: The class that currently hosts all room operations. Should only be initialized by either `Room.join` or `Room.create`.
 
   - `properties`:
     - `isHost`: true for hosts, false for clients
@@ -232,7 +195,7 @@ Room.create({
     - `kickTimeout`: time between releasing and re-pressing the kick key (in milliseconds, defaults to 20)
     - `plugins`: array of all available plugins. this is used internally to restore the order of plugins while plugin activation/deactivation.
     - `activePlugins`: array of currently active plugins. this is used internally for callbacks.
-    - `pluginsMap`: all available plugins mapped as pluginsMap\[plugin.name\] = plugin, for optimized use to communicate between plugins.
+    - `pluginsMap`: all available plugins mapped as `pluginsMap[plugin.name] = plugin`, for optimized use to communicate between plugins.
 
   - `functions`:
     - `leave()`: leaves the room.
@@ -246,9 +209,9 @@ Room.create({
     - `setChatIndicatorActive(active)`: sets the current player's chat indicator status.
     - `setTeamColors(teamId, angle, ...colors)`: sets the team colors for (team). teamId: 1(red) | 2(blue), angle: integer, colors: maximum 4 parseable(hex-rgb) color parameters.
     - `setUnlimitedPlayerCount(on)`: adds or removes player limit control. host-only. on: boolean
-    - `setFakePassword(fakePwd)`: sets a fake value for room's password status. host-only. fakePwd: boolean or null to disable
-    - `sendChat(msg, targetId)`: send chat message(msg) to player(targetId). targetId is null -> send to everyone. targetId is host-only.
-    - `sendAnnouncement(msg, targetId, color, style, sound)`: send announcement message(msg) to player(targetId) with properties(color, style, sound). targetId is null -> send to - everyone. host-only.
+    - `setFakePassword(fakePwd)`: sets a fake value for room's password status. host-only. `fakePwd`: boolean or null to disable
+    - `sendChat(msg, targetId)`: send chat message(msg) to player(targetId). `targetId` is null -> send to everyone. `targetId` is host-only.
+    - `sendAnnouncement(msg, targetId, color, style, sound)`: send announcement message(msg) to player(targetId) with properties(color, style, sound). `targetId` is null -> send to - everyone. host-only.
     - `setDiscProperties(discId, properties)`: set disc(discId) properties. host-only.
     - `setPlayerDiscProperties(playerId, properties)`: set player(playerId)'s disc properties. host-only.
     - `sendCustomEvent(type, data)`: sends a `CustomEvent(type, data)` that can only be received by the users of this modified client.
@@ -272,7 +235,7 @@ Room.create({
     - `setScoreLimit(value)`: set score limit(value).
     - `changeTeam(teamId)`: set current player's team(teamId).
     - `setPlayerTeam(playerId, teamId)`: set player(playerId)'s team to team(teamId).
-    - `setPlayerAdmin(playerId, isAdmin)`: set player(playerId)'s admin status to isAdmin.
+    - `setPlayerAdmin(playerId, isAdmin)`: set player(playerId)'s admin status to `isAdmin`.
     - `kickPlayer(playerId, reason, isBanning)`: kick/ban a player(playerId) with reason(reason).
     - `getPlayerOriginal(id)`: get original player data object for player(id).
     - `getPlayer(id)`: get a new and structured player data object for player(id).
@@ -294,23 +257,23 @@ Room.create({
     - `mapChecksum(map)`: calculate checksum for given map object. returns null for original maps.
     - `setPluginActive(name, active)`: activate/deactivate the plugin(name).
     - `startRecording()`: start recording replay data. returns true if succeeded, false otherwise. recording should not be started before calling this.
-    - `stopRecording()`: stop recording replay data. returns UIntArray8 data if succeeded, null otherwise. recording should be started before calling this.
+    - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.
     - `isRecording()`: returns true if recording has started; false otherwise.
-    - `setRenderer(renderer)`: sets the renderer object that will render the game. The object should follow the provided Renderer template.
+    - `setRenderer(renderer)`: sets the renderer object that will render the game. The object should follow the provided `Renderer` template.
     
   - `modifier callbacks`:
-    - `\[dataArray, customData\] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedNick, modifiedAvatar, modifiedFlag`]. if dataArray is null, player is not allowed to join. also prepares a custom data object to send to all plugins. customData=false means "don't call callbacks". host-only.
+    - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedNick, modifiedAvatar, modifiedFlag]`. if `dataArray` is null, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. host-only.
-    - `[newPing, customData] = modifyPlayerPingBefore(playerId, ping)`: prepares a custom data object to send to all plugins while setting player's ping. customData=false means "don't call callbacks". host-only.
+    - `[newPing, customData] = modifyPlayerPingBefore(playerId, ping)`: prepares a custom data object to send to all plugins while setting player's ping. `customData=false` means "don't call callbacks". host-only.
     - `newPing = modifyPlayerPingAfter(playerId, ping, customData)`: set player's ping. host-only.
     - `newPing = modifyClientPing(ping)`: set current player's ping. client-only.
     - `newFrameNo = modifyFrameNo(frameNo)`: look laggy to your opponents, especially on extrapolated clients. experimental, mostly causes "bad actor". client-only.
-    - `customData = onBeforeOperationReceived(obj, msg)`: the host callback that is called only once for each message received from clients, and its return value is passed as customData to onOperationReceived callback. this callback is useful for parsing chat messages and other stuff that you would like to do only once, before the room callback or any plugin callbacks are called. The default callback value is a function that parses a chat message and returns { isCommand: boolean, data: array of string } where `isCommand = text.startsWith("!")` and `data = text.trimEnd().split(" ")`. 
-    - `acceptEvent = onAfterOperationReceived(obj, msg, customData)`: runs for each message received from clients. obj is the operation type object, msg is the original message, customData is the return value of callback onBeforeOperationReceived(obj, msg). onBeforeOperationReceived is called only once for each message, before all onOperationReceived callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. return true -> accept event, return false -> block message from being processed, throw exception -> break message sender player's connection. host-only.
+    - `customData = onBeforeOperationReceived(obj, msg)`: the host callback that is called only once for each message received from clients, and its return value is passed as customData to onOperationReceived callback. this callback is useful for parsing chat messages and other stuff that you would like to do only once, before the room callback or any plugin callbacks are called. The default callback value is a function that parses a chat message and returns `{ isCommand: boolean, data: string array }` where `isCommand = text.startsWith("!")` and `data = text.trimEnd().split(" ")`. 
+    - `acceptEvent = onAfterOperationReceived(obj, msg, customData)`: runs for each message received from clients. `obj` is the operation type object, `msg` is the original message, `customData` is the return value of callback `onBeforeOperationReceived(obj, msg)`. `onBeforeOperationReceived` is called only once for each message, before all `onOperationReceived` callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. return true -> accept event, return false -> block message from being processed, throw exception -> break message sender player's connection. host-only.
 
   - `callbacks`:
-    - `customData = onBeforeXXXXXXX(...)`: \[where XXXXXXX is the name of the event.\] called before plugin callbacks. return a customData object to be used for each plugin.onXXXXXXX(..., customData) and then room.onAfterXXXXXXX(..., customData). return false to stop propagation. 
-    - `onAfterXXXXXXX(..., customData)`: \[where XXXXXXX is the name of the event.\] called after plugin callbacks. the last parameter, customData, is the data object that was returned from room.onBeforeXXXXXXX(...).
+    - `customData = onBeforeXXXXXXX(...)`: (where XXXXXXX is the name of the event) called before plugin callbacks. return a customData object to be used for each `plugin.onXXXXXXX(..., customData)` and then `room.onAfterXXXXXXX(..., customData)`. return false to stop propagation. 
+    - `onAfterXXXXXXX(..., customData)`: (where XXXXXXX is the name of the event) called after plugin callbacks. the last parameter, customData, is the data object that was returned from `room.onBeforeXXXXXXX(...)`.
       - `customData = onBeforeRoomLink(link)`: room link was received. host-only.
       - `onAfterRoomLink(link, customData)`: room link was received. host-only.
       - `customData = onBeforePlayerBallKick(playerId)`: ball was kicked by player(playerId). triggered individually.
@@ -351,10 +314,10 @@ Room.create({
       - `onAfterPlayerInputChange(id, value, customData)`: player(id)'s input has changed to (value).
       - `customData = onBeforePlayerChatIndicatorChange(id, value)`: player(id)'s chat indicator status has changed to (value).
       - `onAfterPlayerChatIndicatorChange(id, value, customData)`: player(id)'s chat indicator status has changed to (value).
-      - `customData = onBeforePlayerLeave(playerObj, reason, isBanned, byId)`: player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
-      - `onAfterPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
-      - `customData = onBeforeSetDiscProperties(id, type, data1, data2)`: \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
-      - `onAfterSetDiscProperties(id, type, data1, data2, customData)`: \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
+      - `customData = onBeforePlayerLeave(playerObj, reason, isBanned, byId)`: player(playerObj) has left the room, (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
+      - `onAfterPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
+      - `customData = onBeforeSetDiscProperties(id, type, data1, data2)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
+      - `onAfterSetDiscProperties(id, type, data1, data2, customData)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
       - `customData = onBeforeTeamColorsChange(teamId, value, byId)`: team(teamId)'s colors were changed to (value) by player(byId).
       - `onAfterTeamColorsChange(teamId, value, byId, customData)`: team(teamId)'s colors were changed to (value) by player(byId).
       - `customData = onBeforeKickRateLimitChange(min, rate, burst, byId)`: room's kick rate limit was set to (min, rate, burst) by player(byId).
@@ -400,19 +363,19 @@ Room.create({
   - `constructor(name, active)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. 
 
   - `properties`:
-    - `name`: name of the plugin. Must be unique, and is used internally in Room.setPluginActive. All Plugins can be accessed with their names via Room.pluginsMap\[name\].
-    - `active`: activation status of the plugin. You should use Room.setPluginActive(name, active) if you want to modify this value manually.
+    - `name`: name of the plugin. Must be unique, and is used internally in `Room.setPluginActive`. All Plugins can be accessed with their names via `Room.pluginsMap[name]`.
+    - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
 
   - `modifier callbacks`:
-    - `\[modifiedNick, modifiedAvatar, modifiedFlag\] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from room.modifyPlayerDataBefore. host-only.
+    - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
     - `newPing = modifyPlayerPing(playerId, ping, customData)`: set player's ping. customData is an optional data object returned from room.modifyPlayerPingBefore. host-only.
-    - `acceptEvent = onOperationReceived(obj, msg, customData)`:  runs for each message received from clients. obj is the operation type object, msg is the original message. you may modify msg's contents here as you wish. customData is an optional data object returned from room.onBeforeOperationReceived. return true -> accept event, return false -> block message from being processed, throw exception -> break message sender player's connection. host-only.
+    - `acceptEvent = onOperationReceived(obj, msg, customData)`:  runs for each message received from clients. obj is the operation type object, msg is the original message. you may modify msg's contents here as you wish. customData is an optional data object returned from `room.onBeforeOperationReceived`. return true -> accept event, return false -> block message from being processed, throw exception -> break message sender player's connection. host-only.
 
   - `callbacks`:
     - `initialize(room)`: only called once while creating or joining a room.
     - `finalize()`: only called once while leaving a room.
     - `onActiveChanged()`: plugin was activated or deactivated with Room.setPluginActive.
-    - `onXXXXXXX(..., customData)`: \[where XXXXXXX is the name of the event.\] called after room.onBeforeXXXXXXX(...) and before room.onAfterXXXXXXX(..., customData). customData is the object that might be returned from room.onBeforeXXXXXXX(...).
+    - `onXXXXXXX(..., customData)`: (where XXXXXXX is the name of the event) called after room.onBeforeXXXXXXX(...) and before room.onAfterXXXXXXX(..., customData). customData is the object that might be returned from room.onBeforeXXXXXXX(...).
       - `onRoomLink(link, customData)`: room link was received. host-only.
       - `onPlayerBallKick(playerId, customData)`: ball was kicked by player(playerId). triggered individually.
       - `onTeamGoal(teamId, customData)`: goal was scored by team(teamId). triggered individually.
@@ -433,8 +396,8 @@ Room.create({
       - `onPlayerChat(id, message, customData)`: a chat message with content(message) was received from player(id).
       - `onPlayerInputChange(id, value, customData)`: player(id)'s input has changed to (value).
       - `onPlayerChatIndicatorChange(id, value, customData)`: player(id)'s chat indicator status has changed to (value).
-      - `onPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
-      - `onSetDiscProperties(id, type, data1, data2, customData)`: \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
+      - `onPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, or was (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
+      - `onSetDiscProperties(id, type, data1, data2, customData)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
       - `onTeamColorsChange(teamId, value, byId, customData)`: team(teamId)'s colors were changed to (value) by player(byId).
       - `onKickRateLimitChange(min, rate, burst, byId, customData)`: room's kick rate limit was set to (min, rate, burst) by player(byId).
       - `onGameStart(byId, customData)`: game was started by player(byId).
@@ -463,7 +426,7 @@ Room.create({
     - `initialize(roomObj)`: only called once while creating or joining a room.
     - `finalize()`: only called once while leaving a room.
     - `render(extrapolatedRoomPhysicsObj)`: called inside requestAnimationFrame callback. rendering logic should be here. 
-    - `onXXXXXXX(..., customData)`: \[where XXXXXXX is the name of the event.\] called after room.onAfterXXXXXXX(..., customData). customData is the object that might be returned from room.onAfterXXXXXXX(...).
+    - `onXXXXXXX(..., customData)`: (where XXXXXXX is the name of the event) called after `room.onAfterXXXXXXX(..., customData)`. `customData` is the object that might be returned from `room.onAfterXXXXXXX(...)`.
       - `onRoomLink(link, customData)`: room link was received. host-only.
       - `onPlayerBallKick(playerId, customData)`: ball was kicked by player(playerId). triggered individually.
       - `onTeamGoal(teamId, customData)`: goal was scored by team(teamId). triggered individually.
@@ -484,14 +447,14 @@ Room.create({
       - `onPlayerChat(id, message, customData)`: a chat message with content(message) was received from player(id).
       - `onPlayerInputChange(id, value, customData)`: player(id)'s input has changed to (value).
       - `onPlayerChatIndicatorChange(id, value, customData)`: player(id)'s chat indicator status has changed to (value).
-      - `onPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, or was \[kicked or banned\](isBanned) by player(byId) with reason(reason).
-      - `onSetDiscProperties(id, type, data1, data2, customData)`: \[type=0: disc, type=1: player\](id)'s properties was set to (data1, data2). may only be triggered by host.
+      - `onPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
+      - `onSetDiscProperties(id, type, data1, data2, customData)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
       - `onKickRateLimitChange(min, rate, burst, byId, customData)`: room's kick rate limit was set to (min, rate, burst) by player(byId).
       - `onTeamColorsChange(teamId, value, byId, customData)`: team(teamId)'s colors were changed to (value) by player(byId).
       - `onGameStart(byId, customData)`: game was started by player(byId).
       - `onKickOff(customData)`: game kicked off. triggered individually.
       - `onTimeIsUp(customData)`: time is up. triggered individually.
-      - `onPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
+      - `onPositionsReset(customData)`: positions were reset after a goal. triggered individually.
       - `onLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
       - `onGameStop(byId, customData)`: game was stopped by player(byId).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
@@ -499,7 +462,7 @@ Room.create({
       - `onHandicapChange(value, customData)`: handicap was set to (value). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (on). host-only.
-      - `onRoomRecordingChange(value, customData)`: recording started(value=true) or stopped(value is arraybuffer). triggered individually.
+      - `onRoomRecordingChange(value, customData)`: recording started(value=true) or stopped(value is ArrayBuffer). triggered individually.
       - `onRoomPropertiesChange(props, customData)`: room's properties(props) were changed. host-only.
       - `onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData)`: a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2). triggered individually.
       - `onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData)`: a collision happened between disc(discId, discPlayerId) and segment(segmentId). triggered individually.
