@@ -142,7 +142,7 @@ Room.create({
 <h2 id="docs">📰 Mini-Documentation</h2>
 
 - Library constructor(object, config): Initializes the library with given parameters. This constructor is only for browsers & custom environments.
-  - object: These are objects/functions that directly affect the core functionalities. You should usually pass "document.window" here, because most of these objects reside there.
+  - object: These are objects/functions that directly affect the core functionalities. You should usually pass "window" here, because most of these objects reside there.
     - setTimeout, clearTimeout, setInterval, clearInterval, requestAnimationFrame, cancelAnimationFrame,  (if you are on a custom environment such as NW.js or Electron, these functions should be binded to browser's window object before being passed on.)
     - console, performance, crypto,  (browser's window object should have these objects as well.)
     - RTCPeerConnection, RTCIceCandidate, RTCSessionDescription, WebSocket, XMLHttpRequest,  (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
@@ -158,7 +158,7 @@ Room.create({
   - authFromKey(authKey): recreates the auth object for given authKey. the object is used in Room.join. (returns Promise(authObj))
   - getRoomList(): returns the current room list. (returns Promise(roomListArray))
   - keyState(dirX, dirY, kick): returns an integer keyState value to be used in Room.setKeyState. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
-  - getGeo(): connects to Haxball's geolocation api to get your location based on IP address. you can use it directly as "geo" key in Haxball constructor. (returns Promise(geoLocationObject))
+  - getGeo(): connects to Haxball's geolocation api to get your location based on IP address. you can use it directly as "geo" key inside "storage" object. (returns Promise(geoLocationObject))
 
 - Room: Main static room functions.
   - create(createParams, commonParams): create a room with given parameters.
