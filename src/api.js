@@ -7627,6 +7627,7 @@ function abcHaxballAPI(window, config){
           //"An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."),
         //x.La(c.g);
     }
+    return haxball;
   };
 
   function createRoom(roomParams, haxballParams){
@@ -7836,6 +7837,7 @@ function abcHaxballAPI(window, config){
     internalData.roomObj = t;
     internalData.roomPhysicsObj = g;
     fCreateRoomSucceeded();
+    return haxball;
   }
 
   function generateAuth(){ // returns Promise([authKey, authObj])
