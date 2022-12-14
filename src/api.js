@@ -7087,7 +7087,7 @@ function abcHaxballAPI(window, config){
         if (null != b.Ed)
           return false;
         b.zr();
-        _onRoomRecordingChange(true);
+        haxball.room._onRoomRecordingChange(true);
         return true;
       }
       else {
@@ -7095,7 +7095,7 @@ function abcHaxballAPI(window, config){
           return null;
         var a = b.Ed.stop();
         b.Ed = null;
-        _onRoomRecordingChange(a);
+        haxball.room._onRoomRecordingChange(a);
         return a;
       }
     };
@@ -7203,16 +7203,20 @@ function abcHaxballAPI(window, config){
     },
     Kc: function () {
       var a = /*window.*/performance.now();
-      (1 == this.haxball.__internalData.storage.fps_limit/*this.haxball.__internalData.n_A.Fh.L()*/ && 28.333333333333336 > a - this.$c) ||
-        ((this.$c = a),/*
-          this.sd++,
-          (canvas && this.uf()),
-          (a = this.ya.T.na(this.ya.uc)),
-          null != a && (this.xi = a.cb),
-          this.j.C(this.ya)*/
-          this.haxball.__internalData.extrapolatedRoomPhysicsObj = this.ya.Sf(), 
-          this.haxball.__internalData.renderer?.render(this.haxball.__internalData.extrapolatedRoomPhysicsObj)
-        );
+      if (/*this.haxball.__internalData.n_A.Fh.L()*/this.haxball.__internalData.storage.fps_limit == 1 && a - this.$c < 28.333333333333336)
+        return;
+      this.$c = a;
+      /*
+      this.sd++;
+      if (canvas)
+        this.uf();
+      a = this.ya.T.na(this.ya.uc);
+      if (null != a)
+        this.xi = a.cb;
+      this.j.C(this.ya);
+      */
+      this.haxball.__internalData.extrapolatedRoomPhysicsObj = this.ya.Sf();
+      this.haxball.__internalData.renderer?.render(this.haxball.__internalData.extrapolatedRoomPhysicsObj);
     },
     /*
     Gp: function (a) {
@@ -7862,6 +7866,27 @@ function abcHaxballAPI(window, config){
 
   function getGeo() {
     return T.Fo();
+  };
+
+  function getDefaultStadiums(){
+    return h.Kh();
+  };
+
+  function parseStadium(textDataFromHbsFile, onError){
+    try {
+      var stadium = new h();
+      stadium.Lk(textDataFromHbsFile);
+      return stadium;
+    } catch (k) {
+      b = k instanceof q ? k.Ta : k,
+      b instanceof SyntaxError ? onError("SyntaxError in line: " + r.Be(b.lineNumber, "")) : 
+      b instanceof Bb ? onError(b.xp) : 
+      onError("Error loading stadium file.")
+    }
+  };
+
+  function exportStadium(stadium){
+    return stadium.se();
   };
 
   function Room(internalData, plugins){
@@ -8664,23 +8689,6 @@ function abcHaxballAPI(window, config){
       internalData.roomObj?.de();
     };
 
-    this.getDefaultStadiums = function(){
-      return h.Kh();
-    };
-
-    this.parseStadium = function(textDataFromHbsFile, onError){
-      try {
-        var stadium = new h();
-        stadium.Lk(textDataFromHbsFile);
-        return stadium;
-      } catch (k) {
-        b = k instanceof q ? k.Ta : k,
-        b instanceof SyntaxError ? onError("SyntaxError in line: " + r.Be(b.lineNumber, "")) : 
-        b instanceof Bb ? onError(b.xp) : 
-        onError("Error loading stadium file.")
-      }
-    };
-
     this.setCurrentStadium = function(stadium, onError){
       try {
         internalData.roomObj?.og(stadium);
@@ -8690,10 +8698,6 @@ function abcHaxballAPI(window, config){
         b instanceof Bb ? onError(b.xp) : 
         onError("Error loading stadium file.")
       }
-    };
-
-    this.exportStadium = function(stadium){
-      return stadium.se();
     };
 
     this.setTimeLimit = function(value){
@@ -8978,7 +8982,10 @@ function abcHaxballAPI(window, config){
       authFromKey,
       getRoomList, 
       keyState,
-      getGeo
+      getGeo,
+      parseStadium,
+      exportStadium,
+      getDefaultStadiums
     },
     Room: {
       join: joinRoom,

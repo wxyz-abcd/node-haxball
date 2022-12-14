@@ -122,6 +122,9 @@ Room.create({
   - `getRoomList()`: returns the current room list. returns `Promise(roomListArray)`
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. dirX = oneof\[-1:left, 0:still, 1:right\], dirY = oneof\[-1:up, 0:still, 1:down\], kick = true/false.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as "geo" key inside "storage" object. returns `Promise(geoLocationObject)`
+  - `getDefaultStadiums()`: get default stadium array.
+  - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
+  - `exportStadium(stadium)`: generate and return text(.hbs) content from a stadium object.
 
 - `Room`: Main static room functions.
   - `create(createParams, commonParams)`: create a room with given parameters.
@@ -227,9 +230,6 @@ Room.create({
     - `randTeams()`: remove random 2 players from spectators and add them to teams.
     - `resetTeam(teamId)`: move everyone on team(teamId) to spectators.
     - `setSync(value)`: set synchronized status to value. host-only. value: boolean
-    - `getDefaultStadiums()`: get default stadium array.
-    - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
-    - `exportStadium(stadium)`: generate and return text(.hbs) content from a stadium object.
     - `setCurrentStadium(stadium, onError)`: set current map(stadium).
     - `setTimeLimit(value)`: set time limit(value).
     - `setScoreLimit(value)`: set score limit(value).
@@ -504,6 +504,7 @@ Room.create({
 <div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
 <div> - Room.modifyFrameNo by <a href="https://github.com/hxgd1">Punisher <img width="20" src="https://avatars.githubusercontent.com/u/114198188?v=4"/></a></div>
 <div> - Rest of the features by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
+<div> - Docs formatted by <a href="https://github.com/uzayyli">uzaylı <img width="20" src="https://avatars.githubusercontent.com/u/87779551?v=4"/></a></div>
 <div/>
 <div>We will continue to add all contributors to this list.</div>
 
