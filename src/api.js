@@ -5907,15 +5907,15 @@ function abcHaxballAPI(window, config){
     },
     Ji: function (a) {
       function b(a) {
-        a = a.sitekey, c = this;
+        a = a.sitekey/*, c = this*/;
         if (null == a) throw new q(null);
-        c.haxball.useRecaptchaToken = (a)=>{
-          c.haxball.useRecaptchaToken = null;
+        d.haxball.useRecaptchaToken = (a)=>{//c.
+          d.haxball.useRecaptchaToken = null;//c.
           d.Ji(a);
         };
-        if (!c.haxball.onRequestRecaptcha)
+        if (!d.haxball.onRequestRecaptcha)//c.
           throw "Recaptcha requested. Either set onRequestRecaptcha or set a working token while creating/joining a room.";
-        c.haxball.onRequestRecaptcha(a);
+        d.haxball.onRequestRecaptcha(a);//c.
         /*
         null != d.ef &&
           d.ef(a, function (a) {
