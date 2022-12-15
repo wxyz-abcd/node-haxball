@@ -5964,7 +5964,8 @@ function abcHaxballAPI(window, config){
               b(a);
           }
         })
-        ["catch"](function () {
+        ["catch"](function (ex) {
+          console.log(ex);
           d.haxball.useRecaptchaToken = null;
           d.Mh(!0);
         });
@@ -7791,6 +7792,7 @@ function abcHaxballAPI(window, config){
       clearInterval(m);
       fLeaveRoom();
     };
+    haxball.cancel = t.de;
     t.Of.Fg = function (a) {
       l.Ib = a;
       c();

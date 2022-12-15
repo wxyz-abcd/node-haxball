@@ -86,7 +86,7 @@ Room.create({
   <head>
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
     <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball/src/api.js"></script> <!-- this file comes from this repo -->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
   </head>
   <body>
     <script>
