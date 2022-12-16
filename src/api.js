@@ -5615,7 +5615,7 @@ function abcHaxballAPI(window, config){
       null != this.pa && ((this.pa.cf = null), this.pa.ia(), (this.pa = null));
       this.ek = null == a ? "Connection closed" : a;
       this.tf(4);
-      this.haxball._onRoomLeave(this.ek);
+      y.i(this.haxball._onRoomLeave, this.ek);
     },
     tf: function (a) {
       this.pd != a && ((this.pd = a), (y.i(this.haxball._onConnectionStateChange, a)), null != this.Ad && this.Ad(a));
