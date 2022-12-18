@@ -21,14 +21,11 @@
 
 <h2 id="how-to-use">🤔 How To Use</h2>
 
-#### 💻 Installing
+#### 💻 Installing & importing as a node.js/CommonJS module:
 
 ```sh
 npm install node-haxball
 ```
-
-#### 💻 Importing as a node.js/CommonJS module:
-
 ```js
 const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-haxball");
 // Use example code here.
@@ -57,7 +54,7 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
 </html>
 ```
 
-#### 💻 Usage on Browser
+#### 💻 Example code using the library:
 
 Joining a room:
 
