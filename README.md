@@ -27,12 +27,41 @@
 npm install node-haxball
 ```
 
-#### 💻 Module Usage Example
+#### 💻 Importing as a node.js/CommonJS module:
+
+```js
+const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-haxball");
+// Use example code here.
+```
+
+#### 💻 Usage on Browser
+
+  - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>.
+
+```html
+<html>
+  <head>
+    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
+    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
+  </head>
+  <body>
+    <script>
+      var { Room, Utils } = abcHaxballAPI(window, {
+        WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
+        HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+      });
+      // Use example code here.
+    </script>
+  </body>
+</html>
+```
+
+#### 💻 Usage on Browser
 
 Joining a room:
 
 ```js
-const { Room, Utils } = require("node-haxball");
 
 Utils.generateAuth().then(([authKey, authObj])=>{
   Room.join({
@@ -57,7 +86,6 @@ Utils.generateAuth().then(([authKey, authObj])=>{
 Creating a room:
 
 ```js
-const { Room, Utils } = require("node-haxball");
 
 Room.create({
   name: "room123", 
@@ -75,29 +103,6 @@ Room.create({
     room.sendChat("Hello " + name);
   }
 });
-```
-
-#### 💻 Usage on Browser
-
-  - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>.
-
-```html
-<html>
-  <head>
-    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
-    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
-  </head>
-  <body>
-    <script>
-      var { Room, Utils } = abcHaxballAPI(window, {
-        WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // let's see how much these urls will last.
-        HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
-      });
-      // now you are ready to use the same functions here.
-    </script>
-  </body>
-</html>
 ```
 
 ---
