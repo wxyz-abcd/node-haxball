@@ -3576,7 +3576,7 @@ function abcHaxballAPI(window, config){
 
   fa.b = !0;
   fa.Rd = [Ta, cc];
-  fa.qd = function (a, b) {
+  fa.qd = function (a, b, haxball) {
     a.jc = b.jc;
     if (null == b.I) a.I = null;
     else {
@@ -3585,6 +3585,7 @@ function abcHaxballAPI(window, config){
       for (var e = 0, f = d.length; e < f; ) {
         var g = e++;
         c[g] = d[g].hs();
+        //haxball.room._onPlayerObjectCreated(c[g]);  // runs in extrapolation loop, too many times per second. disabled for now.
       }
     }
     a.K = null == b.K ? null : b.K.sc();
@@ -3662,7 +3663,7 @@ function abcHaxballAPI(window, config){
       this.kb[1].ga(a);
       this.kb[2].ga(a);
     },
-    ja: function (a) {
+    ja: function (a/*, haxball*/) {
       this.jc = a.zb();
       this.Pc = 0 != a.B();
       this.ib = a.M();
@@ -3720,11 +3721,11 @@ function abcHaxballAPI(window, config){
       this.ce = this.Zc * d;
       vb.i(this.Hk, a, this.yd, this.Zc, d);
     },
-    sc: function () {
+    sc: function (/*haxball*/) {
       var a = ya.zc,
         b = this.gc;
       this.hc != a &&
-        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this), this._LF_(a));
+        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this/*, haxball*/), this._LF_(a));
       return b;
     },
     f: fa,
@@ -4107,7 +4108,7 @@ function abcHaxballAPI(window, config){
   };
   oa.ma = m;
   oa.prototype = C(m.prototype, {
-    apply: function (a) {
+    apply: function (a, haxball) {
       if (0 == this.P) {
         var b = new ea();
         b.V = this.V;
@@ -4119,6 +4120,7 @@ function abcHaxballAPI(window, config){
         a.I.push(b);
         a = a.tl;
         null != a && a(b);
+        haxball.room._onPlayerObjectCreated(b);
       }
     },
     ua: function (a) {
@@ -5038,14 +5040,14 @@ function abcHaxballAPI(window, config){
     },
     Cg: function (a) {
       a.mb == this.Y && a.da <= this.cc
-        ? ((a.da = this.cc++), a.apply(this.T), null != this.fc && this.fc(a))
+        ? ((a.da = this.cc++), a.apply(this.T, this.haxball), null != this.fc && this.fc(a))
         : this.le.Rm(a);
     },
     wk: function (a, b) {
       if (0 >= a) return this.T;
       a > this.Ff && (a = this.Ff);
       ya.zc++;
-      var c = this.T.sc(),
+      var c = this.T.sc(/*this.haxball*/),
         d;
       null != b ? (this.Ri.as(this.le, b), (d = this.Ri)) : (d = this.le);
       d = d.list;
@@ -5689,7 +5691,7 @@ function abcHaxballAPI(window, config){
       this.te = a.hb();
       this.cc = a.Ab();
       this.Xc = 10;
-      for (this.T.ja(a); 0 < a.o.byteLength - a.a; ) this.Cg(this.Gm(a));
+      for (this.T.ja(a/*, this.haxball*/); 0 < a.o.byteLength - a.a; ) this.Cg(this.Gm(a));
       /*window.*/clearTimeout(this.re);
       this.tf(3);
     },
@@ -7464,6 +7466,9 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       //haxball.emit("roomJoin", haxball.room);
       y.i(haxball.onSuccess, haxball.room);
+      internalData.roomObj.ya.T.I.forEach((x)=>{
+        haxball.room._onPlayerObjectCreated(x);
+      });
     };
     haxball._onConnectionStateChange = function(state){
       console.log("internal event: ConnectionStateChange");
@@ -7667,6 +7672,9 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       haxball.room.hostPing = 0;
       y.i(haxball.onSuccess, haxball.room);
+      internalData.roomObj.ya.T.I.forEach((x)=>{
+        haxball.room._onPlayerObjectCreated(x);
+      });
     };
     var b = {
       name: name, 
@@ -8014,6 +8022,17 @@ function abcHaxballAPI(window, config){
       if (b && that.onAfterOperationReceived && !that.onAfterOperationReceived(obj, msg, customData))
         b = false;
       return b;
+    };
+
+    this._onPlayerObjectCreated = function(playerObject){
+      var customData = that.onBeforePlayerObjectCreated && that.onBeforePlayerObjectCreated(playerObject);
+      if (customData!==false){
+        that.activePlugins.forEach((p)=>{
+          p.onPlayerObjectCreated && p.onPlayerObjectCreated(playerObject, customData);
+        });
+        that.onAfterPlayerObjectCreated && that.onAfterPlayerObjectCreated(playerObject, customData);
+        renderer?.onPlayerObjectCreated && renderer.onPlayerObjectCreated(playerObject, customData);
+      }
     };
 
     this._onRoomLink = function(link){

@@ -34,25 +34,47 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
 #### 💻 Usage on Browser
 
   - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>.
+  - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at haxballOriginModifier project.)
 
-```html
-<html>
-  <head>
-    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
-    <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
-  </head>
-  <body>
-    <script>
-      var { Room, Utils } = abcHaxballAPI(window, {
-        WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
-        HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
-      });
-      // Use example code here.
-    </script>
-  </body>
-</html>
-```
+  #### 💻 Usage on Browser (via Proxy Server)
+
+  ```html
+  <html>
+    <head>
+      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
+      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
+      <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
+    </head>
+    <body>
+      <script>
+        var { OperationType, ConnectionState, Room, Utils, Plugin } = abcHaxballAPI(window, {
+          WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
+          HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+        });
+        // Use example code here.
+      </script>
+    </body>
+  </html>
+  ```
+
+  #### 💻 Usage on Browser (via haxballOriginModifier Browser Extension)
+
+  ```html
+  <html>
+    <head>
+      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
+      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
+      <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
+    </head>
+    <body>
+      <script>
+        var { OperationType, ConnectionState, Room, Utils, Plugin } = abcHaxballAPI(window); 
+        // You do not need a proxy server if you use browser's extension mechanism.
+        // Use example code here.
+      </script>
+    </body>
+  </html>
+  ```
 
 #### 💻 Example code using the library:
 
@@ -112,7 +134,7 @@ Room.create({
     - `console`, `performance`, `crypto`, (browser's window object should have these objects as well.)
     - `RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `WebSocket`, `XMLHttpRequest`, (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
     - `JSON5`, `pako`. (These are two external libraries required by Haxball.)
-  - `config`: Custom configuration. Valid object keys are;
+  - `config`: Custom configuration. You may pass "null" here if you want to use other methods of applying origin change such as using our browser extension(haxballOriginModifier). Valid object keys are;
     - `WebSocketChangeOriginAllowed`: true/false. browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If true, we do not need a proxy server. (we can do that in NW.js, for example)
     - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "wss://p2p.haxball.com/" for host and "wss://p2p2.haxball.com/" for client.
     - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "https://www.haxball.com/rs/".
@@ -306,6 +328,8 @@ Room.create({
       - `onAfterStadiumChange(stadium, byId, customData)`: room's current stadium was set to (stadium) by player(byId).
       - `customData = onBeforeTeamsLockChange(value, byId)`: room's team lock status was set to (value) by player(byId).
       - `onAfterTeamsLockChange(value, byId, customData)`: room's team lock status was set to (value) by player(byId).
+      - `customData = onBeforePlayerObjectCreated(playerObj)`: a player object(playerObj) was created.
+      - `onAfterPlayerObjectCreated(playerObj, customData)`: a player object(playerObj) was created.
       - `customData = onBeforePlayerJoin(playerObj)`: a player(playerObj) joined the room.
       - `onAfterPlayerJoin(playerObj, customData)`: a player(playerObj) joined the room.
       - `customData = onBeforeGamePauseChange(isPaused, byId)`: room's game paused status was set to (isPaused) by player(byId).
@@ -393,6 +417,7 @@ Room.create({
       - `onPlayerTeamChange(id, teamId, byId, customData)`: player(id) was moved to team(teamId) by player(byId).
       - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (stadium) by player(byId).
       - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (value) by player(byId).
+      - `onPlayerObjectCreated(playerObj, customData)`: a player object(playerObj) was created.
       - `onPlayerJoin(playerObj, customData)`: a player(playerObj) joined the room.
       - `onGamePauseChange(isPaused, byId, customData)`: room's game paused status was set to (isPaused) by player(byId).
       - `onPlayerChat(id, message, customData)`: a chat message with content(message) was received from player(id).
@@ -444,6 +469,7 @@ Room.create({
       - `onPlayerTeamChange(id, teamId, byId, customData)`: player(id) was moved to team(teamId) by player(byId).
       - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (stadium) by player(byId).
       - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (value) by player(byId).
+      - `onPlayerObjectCreated(playerObj, customData)`: a player object(playerObj) was created.
       - `onPlayerJoin(playerObj, customData)`: a player(playerObj) joined the room.
       - `onGamePauseChange(isPaused, byId, customData)`: room's game paused status was set to (isPaused) by player(byId).
       - `onPlayerChat(id, message, customData)`: a chat message with content(message) was received from player(id).

@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "abc Modified Haxball Client - Request Origin Modifier",
+  "version": "1.0",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://*.haxball.com/*",
+    "wss://*.haxball.com/*",
+    "https://*.railway.app/*", 
+    "wss://*.railway.app/*",
+    "http://*.localhost:8080/*",
+    "ws://*.localhost:8080/*"
+  ],
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback"
+  ]
+}

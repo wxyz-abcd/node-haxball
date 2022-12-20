@@ -93,6 +93,10 @@ module.exports = function(){
     console.log("onTeamsLockChange...", value, byId, customData);
   };
 
+  this.onPlayerObjectCreated = function(playerObj, customData){
+    console.log("onPlayerObjectCreated...", playerObj, customData);
+  };
+
   this.onPlayerJoin = function(playerObj, customData){
     console.log("onPlayerJoin...", playerObj, customData);
   };

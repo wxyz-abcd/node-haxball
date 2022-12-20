@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-haxball");
+const { OperationType, ConnectionState, Room, Utils, Plugin } = require("../../src/index");
 
 Room.create({
   name: "bot test", 

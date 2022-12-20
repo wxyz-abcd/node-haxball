@@ -65,6 +65,10 @@ function roomCallback(room){ // examples start from here.
     console.log("onTeamsLockChange...", value, byId, customData);
   };
 
+  this.onAfterPlayerObjectCreated = function(playerObj, customData){
+    console.log("onPlayerObjectCreated...", playerObj, customData);
+  };
+
   this.onAfterPlayerJoin = function(playerObj, customData){
     console.log("onPlayerJoin...", playerObj, customData);
   };

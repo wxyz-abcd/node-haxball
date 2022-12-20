@@ -31,6 +31,7 @@ function Renderer(canvas){
   this.onPlayerTeamChange = function(id, teamId, byId, customData){};
   this.onStadiumChange = function(stadium, byId, customData){};
   this.onTeamsLockChange = function(value, byId, customData){};
+  this.onPlayerObjectCreated = function(playerObj, customData){};
   this.onPlayerJoin = function(playerObj, customData){};
   this.onGamePauseChange = function(isPaused, byId, customData){};
   this.onPlayerChat = function(id, message, customData){};
