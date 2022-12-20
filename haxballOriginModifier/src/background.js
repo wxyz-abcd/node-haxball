@@ -24,7 +24,7 @@ chrome.declarativeNetRequest.updateDynamicRules(
         },
         condition: {
           urlFilter: '*://*.haxball.com/*',
-          domains: ["haxball.com", "railway.app", "localhost:8080"]
+          domains: ["haxball.com", "railway.app", "localhost"]
         }
       }
     ]

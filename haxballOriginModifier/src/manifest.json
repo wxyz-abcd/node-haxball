@@ -10,8 +10,8 @@
     "wss://*.haxball.com/*",
     "https://*.railway.app/*", 
     "wss://*.railway.app/*",
-    "http://*.localhost:8080/*",
-    "ws://*.localhost:8080/*"
+    "http://*.localhost:*/*",
+    "ws://*.localhost:*/*"
   ],
   "permissions": [
     "declarativeNetRequest",
