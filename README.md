@@ -387,11 +387,12 @@ Room.create({
 
 - `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 
-  - `constructor(name, active)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. 
+  - `constructor(name, active, allowFlags)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true.
 
   - `properties`:
     - `name`: name of the plugin. Must be unique, and is used internally in `Room.setPluginActive`. All Plugins can be accessed with their names via `Room.pluginsMap[name]`.
     - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
+    - `allowFlags`: determines whether the plugin is allowed to run in created or joined rooms. its default value is `Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom`.
 
   - `modifier callbacks`:
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.

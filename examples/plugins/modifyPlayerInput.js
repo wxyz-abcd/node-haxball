@@ -2,7 +2,7 @@ var { OperationType, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
-  Plugin.call(this, "modifyPlayerInput", true); // "modifyPlayerInput" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "modifyPlayerInput", true, Plugin.AllowFlags.CreateRoom); // "modifyPlayerInput" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. Every plugin should have a unique name. We allow this plugin to be activated on only CreateRoom.
 
   var staticInputs = {}, _room = null;
 

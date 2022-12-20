@@ -1,7 +1,7 @@
 const { Plugin } = require(".");
 
 module.exports = function(){
-  Plugin.call(this, "template", true); // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "template", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
 
   this.initialize = function(room){};
   this.finalize = function(){};

@@ -2,7 +2,7 @@ var { Utils, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
-  Plugin.call(this, "autoPlay_followBall", true); // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "autoPlay_followBall", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
 
   // parameters are exported so that they can be edited outside this class.
   this.minCoordAlignDelta = 0.5;

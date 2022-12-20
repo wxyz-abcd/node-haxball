@@ -9002,10 +9002,16 @@ function abcHaxballAPI(window, config){
     }
   }
 
-  function Plugin(name, active=false){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
+  function Plugin(name, active=false, allowFlags=3){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
     this.name = name;
     this.active = active;
+    this.allowFlags = allowFlags;
   }
+
+  Plugin.AllowFlags = {
+    JoinRoom: 1,
+    CreateRoom: 2
+  };
 
   return {
     OperationType,

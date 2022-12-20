@@ -2,7 +2,7 @@ var { OperationType, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
-  Plugin.call(this, "controlOtherPlayers", true); // "controlOtherPlayers" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "controlOtherPlayers", true, Plugin.AllowFlags.CreateRoom); // "controlOtherPlayers" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. Every plugin should have a unique name. We allow this plugin to be activated on only CreateRoom.
 
   var _room = room, controlSwitch = {}, controlSwitchBlocked = {};
 

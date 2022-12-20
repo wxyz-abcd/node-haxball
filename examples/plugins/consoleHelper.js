@@ -3,7 +3,7 @@ const vm = require("vm"); // you need to install this package manually in order 
 
 module.exports = function(){
   
-  Plugin.call(this, "consoleHelper", true); // "consoleHelper" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "consoleHelper", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "consoleHelper" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
 
   var _room, stdin, listener = function(d) {
     vm.runInContext(d.toString().trim(), _room); // process the string as a command in the room context.

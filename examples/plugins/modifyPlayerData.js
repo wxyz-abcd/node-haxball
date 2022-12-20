@@ -2,7 +2,7 @@ var { Plugin } = require("../../src/index");
 
 module.exports = function(){
 
-  Plugin.call(this, "modifyPlayerData", true); // "modifyPlayerData" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "modifyPlayerData", true, Plugin.AllowFlags.CreateRoom); // "modifyPlayerData" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. Every plugin should have a unique name. We allow this plugin to be activated on only CreateRoom.
 
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){
     if (nick=="abc")

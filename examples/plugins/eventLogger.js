@@ -1,7 +1,7 @@
 var { Plugin } = require("../../src/index");
 
 module.exports = function(){
-  Plugin.call(this, "eventLogger", true);
+  Plugin.call(this, "eventLogger", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // We allow this plugin to be activated on both CreateRoom and JoinRoom.
 
   this.initialize = function(room){
     console.log("initialize...", room);
