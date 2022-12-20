@@ -190,6 +190,7 @@ Room.create({
         }.
         - `onValueSet(key, value)`: a callback function that is called just after the value of a key of this object has been changed by this library. defaults to null.
       }.
+      - `noPluginMechanism`: if true, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define Room._onXXXXXX callbacks by yourself.
       - `renderer`: the `Renderer` object that can render the game. the object should follow the provided Renderer template. default is null.
       - `plugins`: array of `Plugin`'s to be used.
       - `version`: Haxball's version number. other clients cannot join this room if their version number is different than this number. default is 9.

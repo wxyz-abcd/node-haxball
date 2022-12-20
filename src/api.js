@@ -3880,8 +3880,8 @@ function abcHaxballAPI(window, config){
         var t;
         0 != c &&
           (f == e
-            ? 2 > c || (a.Mf(b, d[0], p.fa), a.Mf(b, d[1], p.xa), a._AT_(d[0].V, p.fa.$, d[1].V, p.xa.$, this.P)) // _onAutoTeams
-            : (t = f > e ? p.fa : p.xa, a.Mf(b, d[0], t), a._AT_(d[0].V, t.$, null, null, this.P))); // _onAutoTeams
+            ? 2 > c || (a.Mf(b, d[0], p.fa), a.Mf(b, d[1], p.xa), a._AT_(d[0].V, p.fa.$, d[1].V, p.xa.$, this.P))
+            : (t = f > e ? p.fa : p.xa, a.Mf(b, d[0], t), a._AT_(d[0].V, t.$, null, null, this.P)));
       }
     },
     ua: function () {},
@@ -3907,10 +3907,10 @@ function abcHaxballAPI(window, config){
           case 0:
             var b = this.newValue;
             a.ib = 0 > b ? 0 : 99 < b ? 99 : b;
-            a._SLC_(this.newValue, this.P); // _onScoreLimitChange
+            a._SLC_(this.newValue, this.P);
             break;
           case 1:
-            (b = this.newValue), (a.Da = 0 > b ? 0 : 99 < b ? 99 : b), a._TLC_(this.newValue, this.P); // _onTimeLimitChange
+            (b = this.newValue), (a.Da = 0 > b ? 0 : 99 < b ? 99 : b), a._TLC_(this.newValue, this.P);
         }
       }
     },
@@ -4054,7 +4054,7 @@ function abcHaxballAPI(window, config){
   Pa.ma = m;
   Pa.prototype = C(m.prototype, {
     apply: function (a) {
-      a.Lb(this.P, 2) && this.ea != p.Ia && (a.kb[this.ea.$] = this.Sg, a._TCC_(this.ea.$, this.Sg, this.P)); // _onTeamColorsChange
+      a.Lb(this.P, 2) && this.ea != p.Ia && (a.kb[this.ea.$] = this.Sg, a._TCC_(this.ea.$, this.Sg, this.P));
     },
     ua: function (a) {
       a.l(this.ea.$);
@@ -4081,7 +4081,7 @@ function abcHaxballAPI(window, config){
   pa.ma = m;
   pa.prototype = C(m.prototype, {
     apply: function (a) {
-      a.Lb(this.P, 2) && (a.Pc = this.newValue, a._TLC2_(this.newValue, this.P)); // _onTeamsLockChange
+      a.Lb(this.P, 2) && (a.Pc = this.newValue, a._TLC2_(this.newValue, this.P));
     },
     ua: function (a) {
       a.l(this.newValue ? 1 : 0);
@@ -4120,7 +4120,7 @@ function abcHaxballAPI(window, config){
         a.I.push(b);
         a = a.tl;
         null != a && a(b);
-        haxball.room._onPlayerObjectCreated(b);
+        haxball.room._onPlayerObjectCreated && haxball.room._onPlayerObjectCreated(b);
       }
     },
     ua: function (a) {
@@ -6126,7 +6126,7 @@ function abcHaxballAPI(window, config){
       a.l(this.nf ? 1 : 0);
       this.X.send(a.Hd());
       this.dm = this.nf;
-      this.haxball.room._onRoomRecaptchaModeChange(this.nf);
+      this.haxball.room._onRoomRecaptchaModeChange && this.haxball.room._onRoomRecaptchaModeChange(this.nf);
     },
     Bi: function (a, b, c, d) {
       var e = w.ha(32, !1);
@@ -6386,7 +6386,7 @@ function abcHaxballAPI(window, config){
     Ud: function () {
       this.Ic.Ud();
       this.Kj.clear();
-      this.haxball.room._onBansClear();
+      this.haxball.room._onBansClear && this.haxball.room._onBansClear();
     },
     Fi: function (a) {
       this.Ic.Fi(a);
@@ -6615,7 +6615,8 @@ function abcHaxballAPI(window, config){
     },
     sq: function (a, b) {
       var c = a.u();
-      b.yb = this.haxball.room._modifyPlayerPing(b.$, a.Ab());
+      if (this.haxball.room._modifyPlayerPing)
+        b.yb = this.haxball.room._modifyPlayerPing(b.$, a.Ab());
       var d = w.ha();
       d.l(4);
       d.s((/*window.*/performance.now() - this.Li) * this.Ac + this.wi);
@@ -6774,64 +6775,64 @@ function abcHaxballAPI(window, config){
     // all other engine updates run K.C(x), and not T.C(x).
     
     a.T.iq = (b)=>{
-      haxball.room._onPlayerInputChange(b.V, b.ob);
+      haxball.room._onPlayerInputChange && haxball.room._onPlayerInputChange(b.V, b.ob);
     };
     a.T.tl = (b)=>{
-      haxball.room._onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+      haxball.room._onPlayerJoin && haxball.room._onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
     };
     a.T.ji = (d)=>{
-      haxball.room._onPlayerBallKick(d?.V);
+      haxball.room._onPlayerBallKick && haxball.room._onPlayerBallKick(d?.V);
     };
     a.T.Ni = (team)=>{
-      haxball.room._onTeamGoal(team?.$);
+      haxball.room._onTeamGoal && haxball.room._onTeamGoal(team?.$);
     };
     a.T.Oi = (team)=>{
-      haxball.room._onGameEnd(team.$); // winningTeamId
+      haxball.room._onGameEnd && haxball.room._onGameEnd(team.$); // winningTeamId
     };
     a.T.ml = (c, Bf, e)=>{
-      (!e) && haxball.room._onGamePauseChange(Bf, c?.V) // paused, byId
+      (!e) && haxball.room._onGamePauseChange && haxball.room._onGamePauseChange(Bf, c?.V) // paused, byId
     };
     a.T.Ki = function(a){
-      haxball.room._onGameStart(a?.V); // byId
+      haxball.room._onGameStart && haxball.room._onGameStart(a?.V); // byId
     }
     a.T.Os = ()=>{
-      haxball.room._onGameTick();
+      haxball.room._onGameTick && haxball.room._onGameTick();
     };
     a.T._KO_ = ()=>{
-      haxball.room._onKickOff();
+      haxball.room._onKickOff && haxball.room._onKickOff();
     };
     a.T._LF_ = (a)=>{
-      haxball.room._onLocalFrame(a);
+      haxball.room._onLocalFrame && haxball.room._onLocalFrame(a);
     }
     a.T._CDD_ = (a, b, c, d)=>{
-      haxball.room._onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+      haxball.room._onCollisionDiscVsDisc && haxball.room._onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
     };
     a.T._CDP_ = (a, b, c)=>{
-      haxball.room._onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+      haxball.room._onCollisionDiscVsPlane && haxball.room._onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
     };
     a.T._CDS_ = (a, b, c)=>{
-      haxball.room._onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+      haxball.room._onCollisionDiscVsSegment && haxball.room._onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
     };
     a.T._AT_ = (a, b, c, d, e) => {
-      haxball.room._onAutoTeams(a, b, c, d, e);
+      haxball.room._onAutoTeams && haxball.room._onAutoTeams(a, b, c, d, e);
     };
     a.T._TLC_ = (a, b) => {
-      haxball.room._onTimeLimitChange(a, b);
+      haxball.room._onTimeLimitChange && haxball.room._onTimeLimitChange(a, b);
     };
     a.T._SLC_ = (a, b) => {
-      haxball.room._onScoreLimitChange(a, b);
+      haxball.room._onScoreLimitChange && haxball.room._onScoreLimitChange(a, b);
     };
     a.T._PAC_ = (a, b) => {
-      haxball.room._onPlayerAvatarChange(a, b);
+      haxball.room._onPlayerAvatarChange && haxball.room._onPlayerAvatarChange(a, b);
     };
     a.T._PTC_ = (a, b, c) => {
-      haxball.room._onPlayerTeamChange(a, b, c);
+      haxball.room._onPlayerTeamChange && haxball.room._onPlayerTeamChange(a, b, c);
     };
     a.T._TCC_ = (a, b, c) => {
-      haxball.room._onTeamColorsChange(a, b, c);
+      haxball.room._onTeamColorsChange && haxball.room._onTeamColorsChange(a, b, c);
     };
     a.T._TLC2_ = (a, b) => {
-      haxball.room._onTeamsLockChange(a, b);
+      haxball.room._onTeamsLockChange && haxball.room._onTeamsLockChange(a, b);
     };
     a.T._CCI_ = (x, y, z) => {
       if (haxball.__internalData.isHost){
@@ -6851,13 +6852,13 @@ function abcHaxballAPI(window, config){
       }
     };
     a.T._CE_ = (a, b, c)=>{
-      haxball.room._onCustomEvent(a, b, c); // type, data, byUser
+      haxball.room._onCustomEvent && haxball.room._onCustomEvent(a, b, c); // type, data, byUser
     };
     a.T._SDP_ = (a, b, c, d)=>{
-      haxball.room._onSetDiscProperties(a, b, c, d); // id, type, data1, data2
+      haxball.room._onSetDiscProperties && haxball.room._onSetDiscProperties(a, b, c, d); // id, type, data1, data2
     };
     a.T._PD_ = (a)=>{
-      haxball.room._onPingData(a); // ping array
+      haxball.room._onPingData && haxball.room._onPingData(a); // ping array
     };
     a.T._HP_ = ()=>{
       return haxball?.room?.hostPing || 0
@@ -6866,40 +6867,40 @@ function abcHaxballAPI(window, config){
       b.ob.al();
     };
     a.T._HC_ = (a)=>{
-      haxball.room._onHandicapChange(a);
+      haxball.room._onHandicapChange && haxball.room._onHandicapChange(a);
     };
     a.T._EC_ = (a)=>{
-      haxball.room._onExtrapolationChange(a);
+      haxball.room._onExtrapolationChange && haxball.room._onExtrapolationChange(a);
     };
     a.T.Pi = ()=>{ 
-      haxball.room._onTimeIsUp();
+      haxball.room._onTimeIsUp && haxball.room._onTimeIsUp();
     };
     a.T.lq = ()=>{
-      haxball.room._onPositionsReset();
+      haxball.room._onPositionsReset && haxball.room._onPositionsReset();
     };
     a.T.ko = function (c) { // set sync
       b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c), haxball.__internalData.execOperationReceivedOnHost(c));
     };
     a.T.rl = function(b, Tc){
-      haxball.room._onPlayerChat(b.V, Tc); // id, message
+      haxball.room._onPlayerChat && haxball.room._onPlayerChat(b.V, Tc); // id, message
     };
     a.T.Vl = function(msg, color, style, sound){
-      haxball.room._onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+      haxball.room._onAnnouncement && haxball.room._onAnnouncement(msg, color, style, sound); // msg, color, style, sound
     };
     a.T.vf = function(b){
-      haxball.room._onGameStop(b?.V);  //byId
+      haxball.room._onGameStop && haxball.room._onGameStop(b?.V);  //byId
     };
     a.T.Ii = function(a, e){
-      haxball.room._onStadiumChange(e, a?.V); // map, byId
+      haxball.room._onStadiumChange && haxball.room._onStadiumChange(e, a?.V); // map, byId
     };
     a.T.sl = function(b){
-      haxball.room._onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+      haxball.room._onPlayerSyncChange && haxball.room._onPlayerSyncChange(b?.V, b?.Ld);// id, sync
     };
     a.T.ii = function(b, c){
-      haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+      haxball.room._onPlayerAdminChange && haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
     };
     a.T.Hk = function(a, b, c, d){
-      haxball.room._onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+      haxball.room._onKickRateLimitChange && haxball.room._onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
     };
   
     /*
@@ -6917,10 +6918,10 @@ function abcHaxballAPI(window, config){
       null != e && (
         vb.i(b.Np, d.V, e, null != g ? g.w : null, f)
       );
-      haxball.room._onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
+      haxball.room._onPlayerLeave && haxball.room._onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
     };
     a.T.wl = function(a, b){
-      haxball.room._onPlayerChatIndicatorChange(a?.V, !b); // id, value
+      haxball.room._onPlayerChatIndicatorChange && haxball.room._onPlayerChatIndicatorChange(a?.V, !b); // id, value
     };
     /*
     this.j.Qa.fl = G(this, this.Gp);
@@ -7090,7 +7091,7 @@ function abcHaxballAPI(window, config){
         if (null != b.Ed)
           return false;
         b.zr();
-        haxball.room._onRoomRecordingChange(true);
+        haxball.room._onRoomRecordingChange && haxball.room._onRoomRecordingChange(true);
         return true;
       }
       else {
@@ -7098,7 +7099,7 @@ function abcHaxballAPI(window, config){
           return null;
         var a = b.Ed.stop();
         b.Ed = null;
-        haxball.room._onRoomRecordingChange(a);
+        haxball.room._onRoomRecordingChange && haxball.room._onRoomRecordingChange(a);
         return a;
       }
     };
@@ -7382,6 +7383,7 @@ function abcHaxballAPI(window, config){
       keyState: 0,
       renderer: haxball.renderer,
       storage: haxball.storage,
+      pluginMechanismActive: !haxball.noPluginMechanism,
       //n_A: n_A,
       onOperationReceived: function(msg) {
         //var op = {
@@ -7408,6 +7410,8 @@ function abcHaxballAPI(window, config){
           //}, {})
         //});
 
+        if (!haxball.room._onOperationReceived)
+          return true;
         return haxball.room._onOperationReceived(c, msg); // c = oo[0]
       },
       execOperationReceivedOnHost: function(msg, targetId) {
@@ -7466,7 +7470,7 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       //haxball.emit("roomJoin", haxball.room);
       y.i(haxball.onSuccess, haxball.room);
-      internalData.roomObj.ya.T.I.forEach((x)=>{
+      haxball.room._onPlayerObjectCreated && internalData.roomObj.ya.T.I.forEach((x)=>{
         haxball.room._onPlayerObjectCreated(x);
       });
     };
@@ -7672,7 +7676,7 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       haxball.room.hostPing = 0;
       y.i(haxball.onSuccess, haxball.room);
-      internalData.roomObj.ya.T.I.forEach((x)=>{
+      haxball.room._onPlayerObjectCreated && internalData.roomObj.ya.T.I.forEach((x)=>{
         haxball.room._onPlayerObjectCreated(x);
       });
     };
@@ -7766,10 +7770,12 @@ function abcHaxballAPI(window, config){
       if (3 < e.length) throw new q("country too long");
       var f = b.zb();
       if (null != f && 2 < f.length) throw new q("avatar too long");
-      var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
-      if (!newPlayerData)
-        throw "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth;
-      [d, e, f] = newPlayerData;
+      if (haxball.room._modifyPlayerData){
+        var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
+        if (!newPlayerData)
+          throw "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth;
+        [d, e, f] = newPlayerData;
+      }
       d = oa.la(a, d, e, f, conn, auth);
       l.ra(d);
       internalData.execOperationReceivedOnHost(d);
@@ -7785,7 +7791,7 @@ function abcHaxballAPI(window, config){
       e = a;
       t.Bg = roomLink(a, null != l.Ib);
       //h || ((h = !0), x.La(t.j.g));
-      haxball.room._onRoomLink(t.Bg);
+      haxball.room._onRoomLink && haxball.room._onRoomLink(t.Bg);
     };
     t.Np = function (a, b, c, d) {
       l.to(a, b, c, d);
@@ -7805,7 +7811,7 @@ function abcHaxballAPI(window, config){
       l.Ib = a;
       c();
       null != e && (t.Bg = roomLink(e, null != l.Ib));
-      haxball.room._onRoomPropertiesChange({password: a});
+      haxball.room._onRoomPropertiesChange && haxball.room._onRoomPropertiesChange({password: a});
     };
     t.Of.jm = function (a) {
       l.Ei(a);
@@ -7833,7 +7839,7 @@ function abcHaxballAPI(window, config){
       c();
       if (a.hasOwnProperty("password"))
         null != e && (t.Bg = roomLink(e, null != l.Ib));
-      haxball.room._onRoomPropertiesChange(props);
+        haxball.room._onRoomPropertiesChange && haxball.room._onRoomPropertiesChange(props);
     };
     t.Of.__supc__ = function (a) {
       l.upc = a;
@@ -7910,581 +7916,583 @@ function abcHaxballAPI(window, config){
     this.currentPlayerId = internalData.roomObj.ya.uc;
     this.currentPlayer = internalData.roomObj.ya.T.I.filter((x)=>(x.V==this.currentPlayerId))[0];
     this.kickTimeout = 20;
-    this.plugins = plugins || [];
-    this.pluginsMap = this.plugins.reduce((acc, x)=>{
-      acc[x.name] = x;
-      return acc;
-    }, {});
-    this.activePlugins = this.plugins.filter((p)=>p.active);
+    if (internalData.pluginMechanismActive){
+      this.plugins = plugins || [];
+      this.pluginsMap = this.plugins.reduce((acc, x)=>{
+        acc[x.name] = x;
+        return acc;
+      }, {});
+      this.activePlugins = this.plugins.filter((p)=>p.active);
 
-    function addInOrder(a, b, x){ // a is an array, b is the same array with some elements removed, x is one of the removed elements. objective is to always add the same element back in the same index.
-      var i=0, j=0;
-      while(i<a.length && j<b.length){
-        while (i<a.length && j<b.length && a[i]==b[j] && a[i]!=x){
-          i++;
-          j++;
+      function addInOrder(a, b, x){ // a is an array, b is the same array with some elements removed, x is one of the removed elements. objective is to always add the same element back in the same index.
+        var i=0, j=0;
+        while(i<a.length && j<b.length){
+          while (i<a.length && j<b.length && a[i]==b[j] && a[i]!=x){
+            i++;
+            j++;
+          }
+          if (a[i]==x)
+            break;
+          while (i<a.length && j<b.length && a[i]!=b[j] && a[i]!=x){
+            i++;
+          }
+          if (a[i]==x)
+            break;
         }
-        if (a[i]==x)
-          break;
-        while (i<a.length && j<b.length && a[i]!=b[j] && a[i]!=x){
-          i++;
+        if (b[j]!=x)
+          b.splice(j, 0, x);
+      }
+
+      var that = this;
+
+      this.setRenderer = function(_renderer, auto = false){ // do not call this function with auto = true, it will not work properly.
+        if (auto)
+          renderer = _renderer;
+        else
+          that.client.setRenderer(_renderer);
+      };
+
+      this.setPluginActive = function(name, active){
+        /*
+        var oIdx = that.plugins.findIndex((x)=>x.name==name);
+        if (oIdx<0)
+          return;
+        var p = that.plugins[oIdx];
+        */
+        var p = that.plugins.filter((x)=>x.name==name)[0];
+        if (!p)
+          return;
+        if (p.active && !active){
+          var idx = that.activePlugins.findIndex((x)=>x.name==name);
+          if (idx<0)
+            return;
+          that.activePlugins.splice(idx, 1);
         }
-        if (a[i]==x)
-          break;
-      }
-      if (b[j]!=x)
-        b.splice(j, 0, x);
-    }
+        else if (!p.active && active){
+          var idx = that.activePlugins.findIndex((x)=>x.name==name);
+          if (idx>=0)
+            return;
+          //that.activePlugins.splice(oIdx, 0, p); // might change the order of plugins, therefore we have to implement addInOrder.
+          addInOrder(that.plugins, that.activePlugins, p); // insert plugin to its old index. 
+        }
+        p.active = active;
+        p.onActiveChanged && p.onActiveChanged();
+        that.onPluginActiveChange && that.onPluginActiveChange(p);
+        renderer?.onPluginActiveChange && renderer.onPluginActiveChange(p);
+      };
 
-    var that = this;
+      this._modifyPlayerData = function(playerId, name, flag, avatar, conn, auth){
+        var a = [name, flag, avatar], customData;
+        that.modifyPlayerDataBefore && ([a, customData] = that.modifyPlayerDataBefore(playerId, a[0], a[1], a[2], conn, auth));
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.modifyPlayerData && a && (a = p.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
+          });
+          that.modifyPlayerDataAfter && a && (a = that.modifyPlayerDataAfter(playerId, a[0], a[1], a[2], conn, auth, customData));
+        }
+        return a;
+      };
 
-    this.setRenderer = function(_renderer, auto = false){ // do not call this function with auto = true, it will not work properly.
-      if (auto)
-        renderer = _renderer;
-      else
-        that.client.setRenderer(_renderer);
-    };
+      this._modifyPlayerPing = function(playerId, ping){
+        var customData;
+        that.modifyPlayerPingBefore && ([ping, customData] = that.modifyPlayerPingBefore(playerId, ping));
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.modifyPlayerPing && (ping = p.modifyPlayerPing(playerId, ping, customData));
+          });
+          that.modifyPlayerPingAfter && (ping = that.modifyPlayerPingAfter(playerId, ping, customData));
+        }
+        return ping;
+      };
 
-    this.setPluginActive = function(name, active){
-      /*
-      var oIdx = that.plugins.findIndex((x)=>x.name==name);
-      if (oIdx<0)
-        return;
-      var p = that.plugins[oIdx];
-      */
-      var p = that.plugins.filter((x)=>x.name==name)[0];
-      if (!p)
-        return;
-      if (p.active && !active){
-        var idx = that.activePlugins.findIndex((x)=>x.name==name);
-        if (idx<0)
+      this.onBeforeOperationReceived = function(obj, msg){
+        if (obj.type != OperationType.SendChat)
           return;
-        that.activePlugins.splice(idx, 1);
-      }
-      else if (!p.active && active){
-        var idx = that.activePlugins.findIndex((x)=>x.name==name);
-        if (idx>=0)
-          return;
-        //that.activePlugins.splice(oIdx, 0, p); // might change the order of plugins, therefore we have to implement addInOrder.
-        addInOrder(that.plugins, that.activePlugins, p); // insert plugin to its old index. 
-      }
-      p.active = active;
-      p.onActiveChanged && p.onActiveChanged();
-      that.onPluginActiveChange && that.onPluginActiveChange(p);
-      renderer?.onPluginActiveChange && renderer.onPluginActiveChange(p);
-    };
-
-    this._modifyPlayerData = function(playerId, name, flag, avatar, conn, auth){
-      var a = [name, flag, avatar], customData;
-      that.modifyPlayerDataBefore && ([a, customData] = that.modifyPlayerDataBefore(playerId, a[0], a[1], a[2], conn, auth));
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.modifyPlayerData && a && (a = p.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
-        });
-        that.modifyPlayerDataAfter && a && (a = that.modifyPlayerDataAfter(playerId, a[0], a[1], a[2], conn, auth, customData));
-      }
-      return a;
-    };
-
-    this._modifyPlayerPing = function(playerId, ping){
-      var customData;
-      that.modifyPlayerPingBefore && ([ping, customData] = that.modifyPlayerPingBefore(playerId, ping));
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.modifyPlayerPing && (ping = p.modifyPlayerPing(playerId, ping, customData));
-        });
-        that.modifyPlayerPingAfter && (ping = that.modifyPlayerPingAfter(playerId, ping, customData));
-      }
-      return ping;
-    };
-
-    this.onBeforeOperationReceived = function(obj, msg){
-      if (obj.type != OperationType.SendChat)
-        return;
-      var m = obj.getValue(msg, "text");
-      if (m.startsWith("!")){  // custom chat logic for extra commands
+        var m = obj.getValue(msg, "text");
+        if (m.startsWith("!")){  // custom chat logic for extra commands
+          return {
+            isCommand: true, 
+            data: m.trimEnd().split(" ")
+          };
+        };
         return {
-          isCommand: true, 
-          data: m.trimEnd().split(" ")
+          isCommand: false
         };
       };
-      return {
-        isCommand: false
-      };
-    };
 
-    this._onOperationReceived = function(obj, msg){
-      var customData = that.onBeforeOperationReceived && that.onBeforeOperationReceived(obj, msg), b = (customData!==false);
-      that.activePlugins.forEach((p)=>{
-        if (b && p.onOperationReceived && !p.onOperationReceived(obj, msg, customData))
+      this._onOperationReceived = function(obj, msg){
+        var customData = that.onBeforeOperationReceived && that.onBeforeOperationReceived(obj, msg), b = (customData!==false);
+        that.activePlugins.forEach((p)=>{
+          if (b && p.onOperationReceived && !p.onOperationReceived(obj, msg, customData))
+            b = false;
+        });
+        if (b && that.onAfterOperationReceived && !that.onAfterOperationReceived(obj, msg, customData))
           b = false;
-      });
-      if (b && that.onAfterOperationReceived && !that.onAfterOperationReceived(obj, msg, customData))
-        b = false;
-      return b;
-    };
+        return b;
+      };
 
-    this._onPlayerObjectCreated = function(playerObject){
-      var customData = that.onBeforePlayerObjectCreated && that.onBeforePlayerObjectCreated(playerObject);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerObjectCreated && p.onPlayerObjectCreated(playerObject, customData);
-        });
-        that.onAfterPlayerObjectCreated && that.onAfterPlayerObjectCreated(playerObject, customData);
-        renderer?.onPlayerObjectCreated && renderer.onPlayerObjectCreated(playerObject, customData);
-      }
-    };
+      this._onPlayerObjectCreated = function(playerObject){
+        var customData = that.onBeforePlayerObjectCreated && that.onBeforePlayerObjectCreated(playerObject);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerObjectCreated && p.onPlayerObjectCreated(playerObject, customData);
+          });
+          that.onAfterPlayerObjectCreated && that.onAfterPlayerObjectCreated(playerObject, customData);
+          renderer?.onPlayerObjectCreated && renderer.onPlayerObjectCreated(playerObject, customData);
+        }
+      };
 
-    this._onRoomLink = function(link){
-      var customData = that.onBeforeRoomLink && that.onBeforeRoomLink(link);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onRoomLink && p.onRoomLink(link, customData);
-        });
-        that.onAfterRoomLink && that.onAfterRoomLink(link, customData);
-        renderer?.onRoomLink && renderer.onRoomLink(link, customData);
-      }
-    };
+      this._onRoomLink = function(link){
+        var customData = that.onBeforeRoomLink && that.onBeforeRoomLink(link);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onRoomLink && p.onRoomLink(link, customData);
+          });
+          that.onAfterRoomLink && that.onAfterRoomLink(link, customData);
+          renderer?.onRoomLink && renderer.onRoomLink(link, customData);
+        }
+      };
 
-    this._onPlayerBallKick = function(playerId){
-      var customData = that.onBeforePlayerBallKick && that.onBeforePlayerBallKick(playerId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerBallKick && p.onPlayerBallKick(playerId, customData);
-        });
-        that.onAfterPlayerBallKick && that.onAfterPlayerBallKick(playerId, customData);
-        renderer?.onPlayerBallKick && renderer.onPlayerBallKick(playerId, customData);
-      }
-    };
+      this._onPlayerBallKick = function(playerId){
+        var customData = that.onBeforePlayerBallKick && that.onBeforePlayerBallKick(playerId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerBallKick && p.onPlayerBallKick(playerId, customData);
+          });
+          that.onAfterPlayerBallKick && that.onAfterPlayerBallKick(playerId, customData);
+          renderer?.onPlayerBallKick && renderer.onPlayerBallKick(playerId, customData);
+        }
+      };
 
-    this._onTeamGoal = function(teamId){
-      var customData = that.onBeforeTeamGoal && that.onBeforeTeamGoal(teamId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onTeamGoal && p.onTeamGoal(teamId, customData);
-        });
-        that.onAfterTeamGoal && that.onAfterTeamGoal(teamId, customData);
-        renderer?.onTeamGoal && renderer.onTeamGoal(teamId, customData);
-      }
-    };
+      this._onTeamGoal = function(teamId){
+        var customData = that.onBeforeTeamGoal && that.onBeforeTeamGoal(teamId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onTeamGoal && p.onTeamGoal(teamId, customData);
+          });
+          that.onAfterTeamGoal && that.onAfterTeamGoal(teamId, customData);
+          renderer?.onTeamGoal && renderer.onTeamGoal(teamId, customData);
+        }
+      };
 
-    this._onGameEnd = function(winningTeamId){
-      var customData = that.onBeforeGameEnd && that.onBeforeGameEnd(winningTeamId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onGameEnd && p.onGameEnd(winningTeamId, customData);
-        });
-        that.onAfterGameEnd && that.onAfterGameEnd(winningTeamId, customData);
-        renderer?.onGameEnd && renderer.onGameEnd(winningTeamId, customData);
-      }
-    };
+      this._onGameEnd = function(winningTeamId){
+        var customData = that.onBeforeGameEnd && that.onBeforeGameEnd(winningTeamId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onGameEnd && p.onGameEnd(winningTeamId, customData);
+          });
+          that.onAfterGameEnd && that.onAfterGameEnd(winningTeamId, customData);
+          renderer?.onGameEnd && renderer.onGameEnd(winningTeamId, customData);
+        }
+      };
 
-    this._onGameTick = function(){
-      var customData = that.onBeforeGameTick && that.onBeforeGameTick();
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onGameTick && p.onGameTick(customData);
-        });
-        that.onAfterGameTick && that.onAfterGameTick(customData);
-        renderer?.onGameTick && renderer.onGameTick(customData);
-      }
-    };
+      this._onGameTick = function(){
+        var customData = that.onBeforeGameTick && that.onBeforeGameTick();
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onGameTick && p.onGameTick(customData);
+          });
+          that.onAfterGameTick && that.onAfterGameTick(customData);
+          renderer?.onGameTick && renderer.onGameTick(customData);
+        }
+      };
 
-    this._onPlayerSyncChange = function(playerId, value){
-      var customData = that.onBeforePlayerSyncChange && that.onBeforePlayerSyncChange(playerId, value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerSyncChange && p.onPlayerSyncChange(playerId, value, customData);
-        });
-        that.onAfterPlayerSyncChange && that.onAfterPlayerSyncChange(playerId, value, customData);
-        renderer?.onPlayerSyncChange && renderer.onPlayerSyncChange(playerId, value, customData);
-      }
-    };
+      this._onPlayerSyncChange = function(playerId, value){
+        var customData = that.onBeforePlayerSyncChange && that.onBeforePlayerSyncChange(playerId, value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerSyncChange && p.onPlayerSyncChange(playerId, value, customData);
+          });
+          that.onAfterPlayerSyncChange && that.onAfterPlayerSyncChange(playerId, value, customData);
+          renderer?.onPlayerSyncChange && renderer.onPlayerSyncChange(playerId, value, customData);
+        }
+      };
 
-    this._onAnnouncement = function(msg, color, style, sound){
-      var customData = that.onBeforeAnnouncement && that.onBeforeAnnouncement(msg, color, style, sound);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onAnnouncement && p.onAnnouncement(msg, color, style, sound, customData);
-        });
-        that.onAfterAnnouncement && that.onAfterAnnouncement(msg, color, style, sound, customData);
-        renderer?.onAnnouncement && renderer.onAnnouncement(msg, color, style, sound, customData);
-      }
-    };
+      this._onAnnouncement = function(msg, color, style, sound){
+        var customData = that.onBeforeAnnouncement && that.onBeforeAnnouncement(msg, color, style, sound);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onAnnouncement && p.onAnnouncement(msg, color, style, sound, customData);
+          });
+          that.onAfterAnnouncement && that.onAfterAnnouncement(msg, color, style, sound, customData);
+          renderer?.onAnnouncement && renderer.onAnnouncement(msg, color, style, sound, customData);
+        }
+      };
 
-    this._onKickOff = function(){
-      var customData = that.onBeforeKickOff && that.onBeforeKickOff();
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onKickOff && p.onKickOff(customData);
-        });
-        that.onAfterKickOff && that.onAfterKickOff(playerId, teamId, byId, customData);
-        renderer?.onKickOff && renderer.onKickOff(playerId, teamId, byId, customData);
-      }
-    };
+      this._onKickOff = function(){
+        var customData = that.onBeforeKickOff && that.onBeforeKickOff();
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onKickOff && p.onKickOff(customData);
+          });
+          that.onAfterKickOff && that.onAfterKickOff(playerId, teamId, byId, customData);
+          renderer?.onKickOff && renderer.onKickOff(playerId, teamId, byId, customData);
+        }
+      };
 
-    this._onLocalFrame = function(localFrameNo){
-      var customData = that.onBeforeLocalFrame && that.onBeforeLocalFrame(localFrameNo);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onLocalFrame && p.onLocalFrame(localFrameNo, customData);
-        });
-        that.onAfterLocalFrame && that.onAfterLocalFrame(localFrameNo, customData);
-        renderer?.onLocalFrame && renderer.onLocalFrame(localFrameNo, customData);
-      }
-    };
+      this._onLocalFrame = function(localFrameNo){
+        var customData = that.onBeforeLocalFrame && that.onBeforeLocalFrame(localFrameNo);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onLocalFrame && p.onLocalFrame(localFrameNo, customData);
+          });
+          that.onAfterLocalFrame && that.onAfterLocalFrame(localFrameNo, customData);
+          renderer?.onLocalFrame && renderer.onLocalFrame(localFrameNo, customData);
+        }
+      };
 
-    this._onAutoTeams = function(playerId1, teamId1, playerId2, teamId2, byId){
-      var customData = that.onBeforeAutoTeams && that.onBeforeAutoTeams(playerId1, teamId1, playerId2, teamId2, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onAutoTeams && p.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-        });
-        that.onAfterAutoTeams && that.onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-        renderer?.onAutoTeams && renderer.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-      }
-    };
+      this._onAutoTeams = function(playerId1, teamId1, playerId2, teamId2, byId){
+        var customData = that.onBeforeAutoTeams && that.onBeforeAutoTeams(playerId1, teamId1, playerId2, teamId2, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onAutoTeams && p.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+          });
+          that.onAfterAutoTeams && that.onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+          renderer?.onAutoTeams && renderer.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+        }
+      };
 
-    this._onScoreLimitChange = function(value, byId){
-      var customData = that.onBeforeScoreLimitChange && that.onBeforeScoreLimitChange(value, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onScoreLimitChange && p.onScoreLimitChange(value, byId, customData);
-        });
-        that.onAfterScoreLimitChange && that.onAfterScoreLimitChange(value, byId, customData);
-        renderer?.onScoreLimitChange && renderer.onScoreLimitChange(value, byId, customData);
-      }
-    };
+      this._onScoreLimitChange = function(value, byId){
+        var customData = that.onBeforeScoreLimitChange && that.onBeforeScoreLimitChange(value, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onScoreLimitChange && p.onScoreLimitChange(value, byId, customData);
+          });
+          that.onAfterScoreLimitChange && that.onAfterScoreLimitChange(value, byId, customData);
+          renderer?.onScoreLimitChange && renderer.onScoreLimitChange(value, byId, customData);
+        }
+      };
 
-    this._onTimeLimitChange = function(value, byId){
-      var customData = that.onBeforeTimeLimitChange && that.onBeforeTimeLimitChange(value, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onTimeLimitChange && p.onTimeLimitChange(value, byId, customData);
-        });
-        that.onAfterTimeLimitChange && that.onAfterTimeLimitChange(value, byId, customData);
-        renderer?.onTimeLimitChange && renderer.onTimeLimitChange(value, byId, customData);
-      }
-    };
+      this._onTimeLimitChange = function(value, byId){
+        var customData = that.onBeforeTimeLimitChange && that.onBeforeTimeLimitChange(value, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onTimeLimitChange && p.onTimeLimitChange(value, byId, customData);
+          });
+          that.onAfterTimeLimitChange && that.onAfterTimeLimitChange(value, byId, customData);
+          renderer?.onTimeLimitChange && renderer.onTimeLimitChange(value, byId, customData);
+        }
+      };
 
-    this._onPlayerAdminChange = function(id, isAdmin, byId){
-      var customData = that.onBeforePlayerAdminChange && that.onBeforePlayerAdminChange(id, isAdmin, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerAdminChange && p.onPlayerAdminChange(id, isAdmin, byId, customData);
-        });
-        that.onAfterPlayerAdminChange && that.onAfterPlayerAdminChange(id, isAdmin, byId, customData);
-        renderer?.onPlayerAdminChange && renderer.onPlayerAdminChange(id, isAdmin, byId, customData);
-      }
-    };
+      this._onPlayerAdminChange = function(id, isAdmin, byId){
+        var customData = that.onBeforePlayerAdminChange && that.onBeforePlayerAdminChange(id, isAdmin, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerAdminChange && p.onPlayerAdminChange(id, isAdmin, byId, customData);
+          });
+          that.onAfterPlayerAdminChange && that.onAfterPlayerAdminChange(id, isAdmin, byId, customData);
+          renderer?.onPlayerAdminChange && renderer.onPlayerAdminChange(id, isAdmin, byId, customData);
+        }
+      };
 
-    this._onPlayerAvatarChange = function(id, value){
-      var customData = that.onBeforePlayerAvatarChange && that.onBeforePlayerAvatarChange(id, value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerAvatarChange && p.onPlayerAvatarChange(id, value, customData);
-        });
-        that.onAfterPlayerAvatarChange && that.onAfterPlayerAvatarChange(id, value, customData);
-        renderer?.onPlayerAvatarChange && renderer.onPlayerAvatarChange(id, value, customData);
-      }
-    };
+      this._onPlayerAvatarChange = function(id, value){
+        var customData = that.onBeforePlayerAvatarChange && that.onBeforePlayerAvatarChange(id, value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerAvatarChange && p.onPlayerAvatarChange(id, value, customData);
+          });
+          that.onAfterPlayerAvatarChange && that.onAfterPlayerAvatarChange(id, value, customData);
+          renderer?.onPlayerAvatarChange && renderer.onPlayerAvatarChange(id, value, customData);
+        }
+      };
 
-    this._onPlayerTeamChange = function(id, teamId, byId){
-      var customData = that.onBeforePlayerTeamChange && that.onBeforePlayerTeamChange(id, teamId, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerTeamChange && p.onPlayerTeamChange(id, teamId, byId, customData);
-        });
-        that.onAfterPlayerTeamChange && that.onAfterPlayerTeamChange(id, teamId, byId, customData);
-        renderer?.onPlayerTeamChange && renderer.onPlayerTeamChange(id, teamId, byId, customData);
-      }
-    };
+      this._onPlayerTeamChange = function(id, teamId, byId){
+        var customData = that.onBeforePlayerTeamChange && that.onBeforePlayerTeamChange(id, teamId, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerTeamChange && p.onPlayerTeamChange(id, teamId, byId, customData);
+          });
+          that.onAfterPlayerTeamChange && that.onAfterPlayerTeamChange(id, teamId, byId, customData);
+          renderer?.onPlayerTeamChange && renderer.onPlayerTeamChange(id, teamId, byId, customData);
+        }
+      };
 
-    this._onStadiumChange = function(stadium, byId){
-      var customData = that.onBeforeStadiumChange && that.onBeforeStadiumChange(stadium, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onStadiumChange && p.onStadiumChange(stadium, byId, customData);
-        });
-        that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
-        renderer?.onStadiumChange && renderer.onStadiumChange(stadium, byId, customData);
-      }
-    };
+      this._onStadiumChange = function(stadium, byId){
+        var customData = that.onBeforeStadiumChange && that.onBeforeStadiumChange(stadium, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onStadiumChange && p.onStadiumChange(stadium, byId, customData);
+          });
+          that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
+          renderer?.onStadiumChange && renderer.onStadiumChange(stadium, byId, customData);
+        }
+      };
 
-    this._onTeamColorsChange = function(teamId, value, byId){
-      var customData = that.onBeforeTeamColorsChange && that.onBeforeTeamColorsChange(teamId, value, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onTeamColorsChange && p.onTeamColorsChange(teamId, value, byId, customData);
-        });
-        that.onAfterTeamColorsChange && that.onAfterTeamColorsChange(teamId, value, byId, customData);
-        renderer?.onTeamColorsChange && renderer.onTeamColorsChange(teamId, value, byId, customData);
-      }
-    };
+      this._onTeamColorsChange = function(teamId, value, byId){
+        var customData = that.onBeforeTeamColorsChange && that.onBeforeTeamColorsChange(teamId, value, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onTeamColorsChange && p.onTeamColorsChange(teamId, value, byId, customData);
+          });
+          that.onAfterTeamColorsChange && that.onAfterTeamColorsChange(teamId, value, byId, customData);
+          renderer?.onTeamColorsChange && renderer.onTeamColorsChange(teamId, value, byId, customData);
+        }
+      };
 
-    this._onTeamsLockChange = function(value, byId){
-      var customData = that.onBeforeTeamsLockChange && that.onBeforeTeamsLockChange(value, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onTeamsLockChange && p.onTeamsLockChange(value, byId, customData);
-        });
-        that.onAfterTeamsLockChange && that.onAfterTeamsLockChange(value, byId, customData);
-        renderer?.onTeamsLockChange && renderer.onTeamsLockChange(value, byId, customData);
-      }
-    };
+      this._onTeamsLockChange = function(value, byId){
+        var customData = that.onBeforeTeamsLockChange && that.onBeforeTeamsLockChange(value, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onTeamsLockChange && p.onTeamsLockChange(value, byId, customData);
+          });
+          that.onAfterTeamsLockChange && that.onAfterTeamsLockChange(value, byId, customData);
+          renderer?.onTeamsLockChange && renderer.onTeamsLockChange(value, byId, customData);
+        }
+      };
 
-    this._onPlayerJoin = function(pObj){
-      var customData = that.onBeforePlayerJoin && that.onBeforePlayerJoin(pObj);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerJoin && p.onPlayerJoin(pObj, customData);
-        });
-        that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
-        renderer?.onPlayerJoin && renderer.onPlayerJoin(pObj, customData);
-      }
-    };
+      this._onPlayerJoin = function(pObj){
+        var customData = that.onBeforePlayerJoin && that.onBeforePlayerJoin(pObj);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerJoin && p.onPlayerJoin(pObj, customData);
+          });
+          that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
+          renderer?.onPlayerJoin && renderer.onPlayerJoin(pObj, customData);
+        }
+      };
 
-    this._onGamePauseChange = function(isPaused, byId){
-      var customData = that.onBeforeGamePauseChange && that.onBeforeGamePauseChange(isPaused, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onGamePauseChange && p.onGamePauseChange(isPaused, byId, customData);
-        });
-        that.onAfterGamePauseChange && that.onAfterGamePauseChange(isPaused, byId, customData);
-        renderer?.onGamePauseChange && renderer.onGamePauseChange(isPaused, byId, customData);
-      }
-    };
+      this._onGamePauseChange = function(isPaused, byId){
+        var customData = that.onBeforeGamePauseChange && that.onBeforeGamePauseChange(isPaused, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onGamePauseChange && p.onGamePauseChange(isPaused, byId, customData);
+          });
+          that.onAfterGamePauseChange && that.onAfterGamePauseChange(isPaused, byId, customData);
+          renderer?.onGamePauseChange && renderer.onGamePauseChange(isPaused, byId, customData);
+        }
+      };
 
-    this._onPlayerChat = function(id, message){
-      var customData = that.onBeforePlayerChat && that.onBeforePlayerChat(id, message);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerChat && p.onPlayerChat(id, message, customData);
-        });
-        that.onAfterPlayerChat && that.onAfterPlayerChat(id, message, customData);
-        renderer?.onPlayerChat && renderer.onPlayerChat(id, message, customData);
-      }
-    };
+      this._onPlayerChat = function(id, message){
+        var customData = that.onBeforePlayerChat && that.onBeforePlayerChat(id, message);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerChat && p.onPlayerChat(id, message, customData);
+          });
+          that.onAfterPlayerChat && that.onAfterPlayerChat(id, message, customData);
+          renderer?.onPlayerChat && renderer.onPlayerChat(id, message, customData);
+        }
+      };
 
-    this._onPlayerInputChange = function(id, value){
-      var customData = that.onBeforePlayerInputChange && that.onBeforePlayerInputChange(id, value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerInputChange && p.onPlayerInputChange(id, value, customData);
-        });
-        that.onAfterPlayerInputChange && that.onAfterPlayerInputChange(id, value, customData);
-        renderer?.onPlayerInputChange && renderer.onPlayerInputChange(id, value, customData);
-      }
-    };
+      this._onPlayerInputChange = function(id, value){
+        var customData = that.onBeforePlayerInputChange && that.onBeforePlayerInputChange(id, value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerInputChange && p.onPlayerInputChange(id, value, customData);
+          });
+          that.onAfterPlayerInputChange && that.onAfterPlayerInputChange(id, value, customData);
+          renderer?.onPlayerInputChange && renderer.onPlayerInputChange(id, value, customData);
+        }
+      };
 
-    this._onPlayerChatIndicatorChange = function(id, value){
-      var customData = that.onBeforePlayerChatIndicatorChange && that.onBeforePlayerChatIndicatorChange(id, value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerChatIndicatorChange && p.onPlayerChatIndicatorChange(id, value, customData);
-        });
-        that.onAfterPlayerChatIndicatorChange && that.onAfterPlayerChatIndicatorChange(id, value, customData);
-        renderer?.onPlayerChatIndicatorChange && renderer.onPlayerChatIndicatorChange(id, value, customData);
-      }
-    };
+      this._onPlayerChatIndicatorChange = function(id, value){
+        var customData = that.onBeforePlayerChatIndicatorChange && that.onBeforePlayerChatIndicatorChange(id, value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerChatIndicatorChange && p.onPlayerChatIndicatorChange(id, value, customData);
+          });
+          that.onAfterPlayerChatIndicatorChange && that.onAfterPlayerChatIndicatorChange(id, value, customData);
+          renderer?.onPlayerChatIndicatorChange && renderer.onPlayerChatIndicatorChange(id, value, customData);
+        }
+      };
 
-    this._onPlayerLeave = function(pObj, reason, isBanned, byId){
-      var customData = that.onBeforePlayerLeave && that.onBeforePlayerLeave(pObj, reason, isBanned, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPlayerLeave && p.onPlayerLeave(pObj, reason, isBanned, byId, customData);
-        });
-        that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
-        renderer?.onPlayerLeave && renderer.onPlayerLeave(pObj, reason, isBanned, byId, customData);
-      }
-    };
+      this._onPlayerLeave = function(pObj, reason, isBanned, byId){
+        var customData = that.onBeforePlayerLeave && that.onBeforePlayerLeave(pObj, reason, isBanned, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPlayerLeave && p.onPlayerLeave(pObj, reason, isBanned, byId, customData);
+          });
+          that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
+          renderer?.onPlayerLeave && renderer.onPlayerLeave(pObj, reason, isBanned, byId, customData);
+        }
+      };
 
-    this._onSetDiscProperties = function(id, type, data1, data2){
-      var customData = that.onBeforeSetDiscProperties && that.onBeforeSetDiscProperties(id, type, data1, data2);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onSetDiscProperties && p.onSetDiscProperties(id, type, data1, data2, customData);
-        });
-        that.onAfterSetDiscProperties && that.onAfterSetDiscProperties(id, type, data1, data2, customData);
-        renderer?.onSetDiscProperties && renderer.onSetDiscProperties(id, type, data1, data2, customData);
-      }
-    };
+      this._onSetDiscProperties = function(id, type, data1, data2){
+        var customData = that.onBeforeSetDiscProperties && that.onBeforeSetDiscProperties(id, type, data1, data2);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onSetDiscProperties && p.onSetDiscProperties(id, type, data1, data2, customData);
+          });
+          that.onAfterSetDiscProperties && that.onAfterSetDiscProperties(id, type, data1, data2, customData);
+          renderer?.onSetDiscProperties && renderer.onSetDiscProperties(id, type, data1, data2, customData);
+        }
+      };
 
-    this._onKickRateLimitChange = function(min, rate, burst, byId){
-      var customData = that.onBeforeKickRateLimitChange && that.onBeforeKickRateLimitChange(min, rate, burst, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onKickRateLimitChange && p.onKickRateLimitChange(min, rate, burst, byId, customData);
-        });
-        that.onAfterKickRateLimitChange && that.onAfterKickRateLimitChange(min, rate, burst, byId, customData);
-        renderer?.onKickRateLimitChange && renderer.onKickRateLimitChange(min, rate, burst, byId, customData);
-      }
-    };
+      this._onKickRateLimitChange = function(min, rate, burst, byId){
+        var customData = that.onBeforeKickRateLimitChange && that.onBeforeKickRateLimitChange(min, rate, burst, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onKickRateLimitChange && p.onKickRateLimitChange(min, rate, burst, byId, customData);
+          });
+          that.onAfterKickRateLimitChange && that.onAfterKickRateLimitChange(min, rate, burst, byId, customData);
+          renderer?.onKickRateLimitChange && renderer.onKickRateLimitChange(min, rate, burst, byId, customData);
+        }
+      };
 
-    this._onGameStart = function(byId){
-      var customData = that.onBeforeGameStart && that.onBeforeGameStart(byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onGameStart && p.onGameStart(byId, customData);
-        });
-        that.onAfterGameStart && that.onAfterGameStart(byId, customData);
-        renderer?.onGameStart && renderer.onGameStart(byId, customData);
-      }
-    };
+      this._onGameStart = function(byId){
+        var customData = that.onBeforeGameStart && that.onBeforeGameStart(byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onGameStart && p.onGameStart(byId, customData);
+          });
+          that.onAfterGameStart && that.onAfterGameStart(byId, customData);
+          renderer?.onGameStart && renderer.onGameStart(byId, customData);
+        }
+      };
 
-    this._onGameStop = function(byId){
-      var customData = that.onBeforeGameStop && that.onBeforeGameStop(byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onGameStop && p.onGameStop(byId, customData);
-        });
-        that.onAfterGameStop && that.onAfterGameStop(byId, customData);
-        renderer?.onGameStop && renderer.onGameStop(byId, customData);
-      }
-    };
+      this._onGameStop = function(byId){
+        var customData = that.onBeforeGameStop && that.onBeforeGameStop(byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onGameStop && p.onGameStop(byId, customData);
+          });
+          that.onAfterGameStop && that.onAfterGameStop(byId, customData);
+          renderer?.onGameStop && renderer.onGameStop(byId, customData);
+        }
+      };
 
-    this._onPingData = function(array){
-      var customData = that.onBeforePingData && that.onBeforePingData(array);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPingData && p.onPingData(array, customData);
-        });
-        that.onAfterPingData && that.onAfterPingData(array, customData);
-        renderer?.onPingData && renderer.onPingData(array, customData);
-      }
-    };
+      this._onPingData = function(array){
+        var customData = that.onBeforePingData && that.onBeforePingData(array);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPingData && p.onPingData(array, customData);
+          });
+          that.onAfterPingData && that.onAfterPingData(array, customData);
+          renderer?.onPingData && renderer.onPingData(array, customData);
+        }
+      };
 
-    this._onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2){
-      var customData = that.onBeforeCollisionDiscVsDisc && that.onBeforeCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onCollisionDiscVsDisc && p.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-        });
-        that.onAfterCollisionDiscVsDisc && that.onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-        renderer?.onCollisionDiscVsDisc && renderer.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-      }
-    };
+      this._onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2){
+        var customData = that.onBeforeCollisionDiscVsDisc && that.onBeforeCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onCollisionDiscVsDisc && p.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
+          });
+          that.onAfterCollisionDiscVsDisc && that.onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
+          renderer?.onCollisionDiscVsDisc && renderer.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
+        }
+      };
 
-    this._onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId){
-      var customData = that.onBeforeCollisionDiscVsSegment && that.onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onCollisionDiscVsSegment && p.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-        });
-        that.onAfterCollisionDiscVsSegment && that.onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-        renderer?.onCollisionDiscVsSegment && renderer.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-      }
-    };
+      this._onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId){
+        var customData = that.onBeforeCollisionDiscVsSegment && that.onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onCollisionDiscVsSegment && p.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
+          });
+          that.onAfterCollisionDiscVsSegment && that.onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
+          renderer?.onCollisionDiscVsSegment && renderer.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
+        }
+      };
 
-    this._onCollisionDiscVsPlane = function(discId, discPlayerId, planeId){
-      var customData = that.onBeforeCollisionDiscVsPlane && that.onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onCollisionDiscVsPlane && p.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-        });
-        that.onAfterCollisionDiscVsPlane && that.onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-        renderer?.onCollisionDiscVsPlane && renderer.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-      }
-    };
+      this._onCollisionDiscVsPlane = function(discId, discPlayerId, planeId){
+        var customData = that.onBeforeCollisionDiscVsPlane && that.onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onCollisionDiscVsPlane && p.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
+          });
+          that.onAfterCollisionDiscVsPlane && that.onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
+          renderer?.onCollisionDiscVsPlane && renderer.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
+        }
+      };
 
-    this._onTimeIsUp = function(){
-      var customData = that.onBeforeTimeIsUp && that.onBeforeTimeIsUp();
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onTimeIsUp && p.onTimeIsUp(customData);
-        });
-        that.onAfterTimeIsUp && that.onAfterTimeIsUp(customData);
-        renderer?.onTimeIsUp && renderer.onTimeIsUp(customData);
-      }
-    };
+      this._onTimeIsUp = function(){
+        var customData = that.onBeforeTimeIsUp && that.onBeforeTimeIsUp();
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onTimeIsUp && p.onTimeIsUp(customData);
+          });
+          that.onAfterTimeIsUp && that.onAfterTimeIsUp(customData);
+          renderer?.onTimeIsUp && renderer.onTimeIsUp(customData);
+        }
+      };
 
-    this._onPositionsReset = function(){
-      var customData = that.onBeforePositionsReset && that.onBeforePositionsReset();
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onPositionsReset && p.onPositionsReset(customData);
-        });
-        that.onAfterPositionsReset && that.onAfterPositionsReset(customData);
-        renderer?.onPositionsReset && renderer.onPositionsReset(customData);
-      }
-    };
+      this._onPositionsReset = function(){
+        var customData = that.onBeforePositionsReset && that.onBeforePositionsReset();
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onPositionsReset && p.onPositionsReset(customData);
+          });
+          that.onAfterPositionsReset && that.onAfterPositionsReset(customData);
+          renderer?.onPositionsReset && renderer.onPositionsReset(customData);
+        }
+      };
 
-    this._onBansClear = function(){
-      var customData = that.onBeforeBansClear && that.onBeforeBansClear();
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onBansClear && p.onBansClear(customData);
-        });
-        that.onAfterBansClear && that.onAfterBansClear(customData);
-        renderer?.onBansClear && renderer.onBansClear(customData);
-      }
-    };
+      this._onBansClear = function(){
+        var customData = that.onBeforeBansClear && that.onBeforeBansClear();
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onBansClear && p.onBansClear(customData);
+          });
+          that.onAfterBansClear && that.onAfterBansClear(customData);
+          renderer?.onBansClear && renderer.onBansClear(customData);
+        }
+      };
 
-    this._onExtrapolationChange = function(value){
-      var customData = that.onBeforeExtrapolationChange && that.onBeforeExtrapolationChange(value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onExtrapolationChange && p.onExtrapolationChange(value, customData);
-        });
-        that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
-        renderer?.onExtrapolationChange && renderer.onExtrapolationChange(value, customData);
-      }
-    };
+      this._onExtrapolationChange = function(value){
+        var customData = that.onBeforeExtrapolationChange && that.onBeforeExtrapolationChange(value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onExtrapolationChange && p.onExtrapolationChange(value, customData);
+          });
+          that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
+          renderer?.onExtrapolationChange && renderer.onExtrapolationChange(value, customData);
+        }
+      };
 
-    this._onHandicapChange = function(value){
-      var customData = that.onBeforeHandicapChange && that.onBeforeHandicapChange(value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onHandicapChange && p.onHandicapChange(value, customData);
-        });
-        that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
-        renderer?.onHandicapChange && renderer.onHandicapChange(value, customData);
-      }
-    };
+      this._onHandicapChange = function(value){
+        var customData = that.onBeforeHandicapChange && that.onBeforeHandicapChange(value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onHandicapChange && p.onHandicapChange(value, customData);
+          });
+          that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
+          renderer?.onHandicapChange && renderer.onHandicapChange(value, customData);
+        }
+      };
 
-    this._onRoomRecaptchaModeChange = function(on){
-      var customData = that.onBeforeRoomRecaptchaModeChange && that.onBeforeRoomRecaptchaModeChange(on);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onRoomRecaptchaModeChange && p.onRoomRecaptchaModeChange(on, customData);
-        });
-        that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
-        renderer?.onRoomRecaptchaModeChange && renderer.onRoomRecaptchaModeChange(on, customData);
-      }
-    };
+      this._onRoomRecaptchaModeChange = function(on){
+        var customData = that.onBeforeRoomRecaptchaModeChange && that.onBeforeRoomRecaptchaModeChange(on);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onRoomRecaptchaModeChange && p.onRoomRecaptchaModeChange(on, customData);
+          });
+          that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
+          renderer?.onRoomRecaptchaModeChange && renderer.onRoomRecaptchaModeChange(on, customData);
+        }
+      };
 
-    this._onRoomRecordingChange = function(value){
-      var customData = that.onBeforeRoomRecordingChange && that.onBeforeRoomRecordingChange(value);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onRoomRecordingChange && p.onRoomRecordingChange(value, customData);
-        });
-        that.onAfterRoomRecordingChange && that.onAfterRoomRecordingChange(value, customData);
-        renderer?.onRoomRecordingChange && renderer.onRoomRecordingChange(value, customData);
-      }
-    };
+      this._onRoomRecordingChange = function(value){
+        var customData = that.onBeforeRoomRecordingChange && that.onBeforeRoomRecordingChange(value);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onRoomRecordingChange && p.onRoomRecordingChange(value, customData);
+          });
+          that.onAfterRoomRecordingChange && that.onAfterRoomRecordingChange(value, customData);
+          renderer?.onRoomRecordingChange && renderer.onRoomRecordingChange(value, customData);
+        }
+      };
 
-    this._onRoomPropertiesChange = function(props){
-      var customData = that.onBeforeRoomPropertiesChange && that.onBeforeRoomPropertiesChange(props);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onRoomPropertiesChange && p.onRoomPropertiesChange(props, customData);
-        });
-        that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
-        renderer?.onRoomPropertiesChange && renderer.onRoomPropertiesChange(props, customData);
-      }
-    };
+      this._onRoomPropertiesChange = function(props){
+        var customData = that.onBeforeRoomPropertiesChange && that.onBeforeRoomPropertiesChange(props);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onRoomPropertiesChange && p.onRoomPropertiesChange(props, customData);
+          });
+          that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
+          renderer?.onRoomPropertiesChange && renderer.onRoomPropertiesChange(props, customData);
+        }
+      };
 
-    this._onCustomEvent = function(type, data, byId){
-      var customData = that.onBeforeCustomEvent && that.onBeforeCustomEvent(type, data, byId);
-      if (customData!==false){
-        that.activePlugins.forEach((p)=>{
-          p.onCustomEvent && p.onCustomEvent(type, data, byId, customData);
-        });
-        that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
-        renderer?.onCustomEvent && renderer.onCustomEvent(type, data, byId, customData);
-      }
-    };
+      this._onCustomEvent = function(type, data, byId){
+        var customData = that.onBeforeCustomEvent && that.onBeforeCustomEvent(type, data, byId);
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.onCustomEvent && p.onCustomEvent(type, data, byId, customData);
+          });
+          that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
+          renderer?.onCustomEvent && renderer.onCustomEvent(type, data, byId, customData);
+        }
+      };
+    }
 
     this.setProperties = function(properties) { // { name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword }
       if (!internalData.isHost)
@@ -8979,17 +8987,19 @@ function abcHaxballAPI(window, config){
       return ret;
     };
 
-    if (renderer)
-      renderer.initialize && renderer.initialize(internalData.roomObj);
+    if (internalData.pluginMechanismActive){
+      if (renderer)
+        renderer.initialize && renderer.initialize(internalData.roomObj);
 
-    this.plugins.forEach((p)=>{
-      p.initialize && p.initialize(that);
-    });
+      this.plugins.forEach((p)=>{
+        p.initialize && p.initialize(that);
+      });
 
-    this.activePlugins.forEach((p)=>{
-      p.onActiveChanged && p.onActiveChanged();
-      that.onPluginActiveChange && that.onPluginActiveChange(p);
-    });
+      this.activePlugins.forEach((p)=>{
+        p.onActiveChanged && p.onActiveChanged();
+        that.onPluginActiveChange && that.onPluginActiveChange(p);
+      });
+    }
   }
 
   function Plugin(name, active=false){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
