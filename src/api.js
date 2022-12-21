@@ -4765,7 +4765,7 @@ function abcHaxballAPI(window, config){
           break;
         case "colors":
           try {
-            (d = ub.cq(a)), this.ya.ra(d), internalData.execOperationReceivedOnHost(d);
+            (d = ub.cq(a)), (internalData.execOperationReceivedOnHost(d)!=false && this.ya.ra(d));
           } catch (g) {
             (a = g instanceof q ? g.Ta : g), "string" == typeof a && this.ba(a);
           }
@@ -4802,7 +4802,7 @@ function abcHaxballAPI(window, config){
             a = K.parseInt(a[3]);
             null == d || null == e || null == a
               ? this.ba("Invalid arguments")
-              : (msg = ma.la(d, e, a), this.ya.ra(msg), internalData.execOperationReceivedOnHost(msg));
+              : (msg = ma.la(d, e, a), (internalData.execOperationReceivedOnHost(msg)!=false && this.ya.ra(msg)));
           }
           break;
         case "recaptcha":
@@ -4859,8 +4859,7 @@ function abcHaxballAPI(window, config){
       null != a && (a = U.Qc(a, 2));
       n_A.sh.Xa(a);
       var msg = ra.la(a);
-      this.ya.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && this.ya.ra(msg);
     },
     */
     f: ub,
@@ -6395,7 +6394,7 @@ function abcHaxballAPI(window, config){
       this.Ic.Ei(a);
     },
     ra: function (a) {
-      a.P = 0;
+      //a.P = 0; // removing this line may have caused some bugs. thorough testing required.
       var b = this.Y + this.wi + this.bc;
       a.zf.Aa || (b = this.Y);
       a.mb = b;
@@ -6879,7 +6878,7 @@ function abcHaxballAPI(window, config){
       haxball.room._onPositionsReset && haxball.room._onPositionsReset();
     };
     a.T.ko = function (c) { // set sync
-      b.am != c && ((b.am = c), (c = ta.la(c)), a.ra(c), haxball.__internalData.execOperationReceivedOnHost(c));
+      b.am != c && ((b.am = c), (c = ta.la(c)), (haxball.__internalData.execOperationReceivedOnHost(c)!=false && a.ra(c)));
     };
     a.T.rl = function(b, Tc){
       haxball.room._onPlayerChat && haxball.room._onPlayerChat(b.V, Tc); // id, message
@@ -6932,55 +6931,46 @@ function abcHaxballAPI(window, config){
       return "Are you sure you want to leave the room?";
     };
     this.ob.ng = function (b) {
-      a.ra(b);
-      internalData.execOperationReceivedOnHost(b);
+      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.j.Wa.aq = function (b) {
       b = da.la(1, b);
-      a.ra(b);
-      internalData.execOperationReceivedOnHost(b);
+      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.j.Wa.Tp = function (b) {
       b = da.la(0, b);
-      a.ra(b);
-      internalData.execOperationReceivedOnHost(b);
+      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.j.og = function (b) {
       b = qa.la(b);
-      a.ra(b);
-      internalData.execOperationReceivedOnHost(b);
+      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.j.Wa.Yp = function () {
       var msg = new Ma();
-      a.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
     };
     this.j.Wa.Zp = function () {
       var msg = new La();
-      a.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
     };
     this.j.Wa.Mp = function () {
       b.Bm();
     };
     this.j.Wa.mg = function (b, c) {
       var d = S.la(b, c);
-      a.ra(d);
-      internalData.execOperationReceivedOnHost(d);
+      internalData.execOperationReceivedOnHost(d)!=false && a.ra(d);
     };
     this.j.Wa.ee = this.Wq.bind(this); // G(this, this.Wq);
     this.j.Wa.Dp = function () {
       var msg = new Qa();
-      a.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
     };
     this.j.Wa.Pp = function () {
       ba.Bq(a);
     };
     this.j.Wa.$p = function (b) {
       b = pa.la(b);
-      a.ra(b);
-      internalData.execOperationReceivedOnHost(b);
+      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.j.Wa.ff = function (c) {
       var d = a.T.na(c);
@@ -7036,55 +7026,46 @@ function abcHaxballAPI(window, config){
     };
     */
     this.ob.ng = function (b) {
-      a.ra(b);
-      haxball.__internalData.execOperationReceivedOnHost(b);
+      haxball.__internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.aq = function (b) {
       b = da.la(1, b);
-      a.ra(b);
-      haxball.__internalData.execOperationReceivedOnHost(b);
+      haxball.__internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.Tp = function (b) {
       b = da.la(0, b);
-      a.ra(b);
-      haxball.__internalData.execOperationReceivedOnHost(b);
+      haxball.__internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.og = function (b) {
       b = qa.la(b);
-      a.ra(b);
-      haxball.__internalData.execOperationReceivedOnHost(b);
+      haxball.__internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this.Yp = function () {
       var msg = new Ma();
-      a.ra(msg);
-      haxball.__internalData.execOperationReceivedOnHost(msg);
+      haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
     };
     this.Zp = function () {
       var msg = new La();
-      a.ra(msg);
-      haxball.__internalData.execOperationReceivedOnHost(msg);
+      haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
     };
     this.Mp = function () {
       b.Bm();
     };
     this.mg = function (b, c) {
       var d = S.la(b, c);
-      a.ra(d);
-      haxball.__internalData.execOperationReceivedOnHost(d);
+      haxball.__internalData.execOperationReceivedOnHost(d)!=false && a.ra(d);
     };
     this.ee = this.Wq.bind(this); // G(this, this.Wq);
     this.Dp = function () {
       var msg = new Qa();
-      a.ra(msg);
-      haxball.__internalData.execOperationReceivedOnHost(msg);
+      haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
     };
     this.Pp = function () {
       ba.Bq(haxball, a);
     };
     this.$p = function (b) {
       b = pa.la(b);
-      a.ra(b);
-      haxball.__internalData.execOperationReceivedOnHost(b);
+      haxball.__internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
     this._Qp_ = function (start) {
       if (start){
@@ -7156,8 +7137,8 @@ function abcHaxballAPI(window, config){
         return c.splice((Math.random() * c.length) | 0, 1)[0];
       }),
       e == d
-        ? 2 > f || (msg = S.la(b(), p.fa), a.ra(msg), haxball.__internalData.execOperationReceivedOnHost(msg), msg = S.la(b(), p.xa), a.ra(msg), haxball.__internalData.execOperationReceivedOnHost(msg))
-        : ((d = e > d ? p.fa : p.xa), msg = S.la(b(), d), a.ra(msg), haxball.__internalData.execOperationReceivedOnHost(msg)));
+        ? 2 > f || (msg = S.la(b(), p.fa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)), msg = S.la(b(), p.xa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)))
+        : ((d = e > d ? p.fa : p.xa), msg = S.la(b(), d), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg))));
   };
   ba.prototype = {
     zr: function () {
@@ -7195,8 +7176,7 @@ function abcHaxballAPI(window, config){
       }
       for (a = 0; a < b.length; ) {
         var msg = b[a++];
-        this.ya.ra(msg);
-        this.haxball.__internalData.execOperationReceivedOnHost(msg);
+        this.haxball.__internalData.execOperationReceivedOnHost(msg)!=false && this.ya.ra(msg);
       }
     },
     bf: function () {
@@ -7247,17 +7227,17 @@ function abcHaxballAPI(window, config){
       var msg;
       a != this.Ik && (
         msg = na.la(a ? 0 : 1),
-        this.ya.ra(msg), 
-        (this.Ik = a),
-        this.haxball.__internalData.execOperationReceivedOnHost(msg)
+        (this.haxball.__internalData.execOperationReceivedOnHost(msg)!=false && (
+          this.ya.ra(msg), 
+          (this.Ik = a)
+        ))
       );
     },
     Bm: function () {
       if (null != this.ya.T.K) {
         var a = new Oa();
         a.Bf = 120 != this.ya.T.K.Oa;
-        this.ya.ra(a);
-        this.haxball.__internalData.execOperationReceivedOnHost(a);
+        this.haxball.__internalData.execOperationReceivedOnHost(a)!=false && this.ya.ra(a);
       }
     },
     /*
@@ -7419,7 +7399,7 @@ function abcHaxballAPI(window, config){
           return;
         msg.P = 0;
         msg._TP = targetId; // this can not be modified
-        internalData.onOperationReceived(msg);
+        return internalData.onOperationReceived(msg);
       }
     };
     haxball.__internalData = internalData;
@@ -7757,11 +7737,10 @@ function abcHaxballAPI(window, config){
     //};
     var m = setInterval(function () {
       var a = la.la(l);
-      l.ra(a);
-      internalData.execOperationReceivedOnHost(a);
+      internalData.execOperationReceivedOnHost(a)!=false && l.ra(a);
     }, 3e3);
     l.$k = function (a) {
-      null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), l.ra(a), internalData.execOperationReceivedOnHost(a));
+      null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), (internalData.execOperationReceivedOnHost(a)!=false && l.ra(a)));
     };
     l.Hp = function (a, b, conn, auth) { // receive conn & auth data
       var d = b.ic();
@@ -7777,15 +7756,16 @@ function abcHaxballAPI(window, config){
         [d, e, f] = newPlayerData;
       }
       d = oa.la(a, d, e, f, conn, auth);
+      if (internalData.execOperationReceivedOnHost(d)==false)
+        throw "Player join event blocked by OperationReceived: " + d;
       l.ra(d);
-      internalData.execOperationReceivedOnHost(d);
       c();
       internalData.dummyPromise.then(()=>{ // send this initial message only to this client once to see whether this player is using our modified client.
         internalData.roomObj?.ya._mf_(na.la(0, a, 0), a, true);
       });
     };
     l.Ip = function (a) {
-      null != g.na(a) && ((a = Y.la(a, null, !1)), l.ra(a), internalData.execOperationReceivedOnHost(a));
+      null != g.na(a) && ((a = Y.la(a, null, !1)), (internalData.execOperationReceivedOnHost(a)!=false && l.ra(a))); // should we allow Player leave event to be blocked by OperationReceived ???
     };
     l.kg = function (a) {
       e = a;
@@ -8506,17 +8486,18 @@ function abcHaxballAPI(window, config){
 
     this.setKickRateLimit = function(min, rate, burst) {
       var msg = ma.la(min, rate, burst);
-      internalData.roomObj?.ya.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
     };
     
     this.sendCustomEvent = function(type, data) {
       var msg = CustomEvent.la(type, data);
-      if (this.isHost)
-        internalData.roomObj?.ya.ra_custom(msg, internalData.roomObj.ya.uc, true);
-      else if (internalData.roomObj?.ya?.T?.I[0].customClient)
-        internalData.roomObj?.ya.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && (
+        (this.isHost ? 
+          internalData.roomObj?.ya.ra_custom(msg, internalData.roomObj.ya.uc, true) 
+        :
+          (internalData.roomObj?.ya?.T?.I[0].customClient && internalData.roomObj?.ya.ra(msg))
+        )
+      );
     };
 
     this.setHandicap = function(handicap) {
@@ -8542,14 +8523,12 @@ function abcHaxballAPI(window, config){
       //that.client.setStorageValue("avatar", avatar);
       that.client.__internalData.storage.setValue("avatar", avatar);
       var msg = ra.la(avatar);
-      internalData.roomObj?.ya.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
     };
 
     this.setChatIndicatorActive = function(active) {
       var msg = na.la(active ? 1 : 0);
-      internalData.roomObj?.ya.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
     };
 
     this.getCurrentMap = function() {
@@ -8562,8 +8541,7 @@ function abcHaxballAPI(window, config){
 
     this.setTeamColors = function(teamId, angle, ...colors) { // teamId: one of (1=red, 2=blue), colors: maximum 4 parseable color parameters 
       var msg = ub.__cq__(teamId, angle, ...colors);
-      internalData.roomObj?.ya.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
     };
 
     this.setUnlimitedPlayerCount = function(on){ // boolean
@@ -8580,10 +8558,11 @@ function abcHaxballAPI(window, config){
         return;
       var d = new Na();
       d.Tc = msg;
-      null != targetId ? internalData.dummyPromise.then(function() {
-        x._mf_(d, targetId);
-      }) : x.ra(d);
-      internalData.execOperationReceivedOnHost(d, targetId);
+      (internalData.execOperationReceivedOnHost(d, targetId)!=false) && (
+        null != targetId ? internalData.dummyPromise.then(function() {
+          x._mf_(d, targetId);
+        }) : x.ra(d)
+      );
     };
 
     this.sendChat = function(msg, targetId){  // can only use targetId in host mode.
@@ -8596,8 +8575,7 @@ function abcHaxballAPI(window, config){
         /*internalData.roomObj.Of.gf(msg) || (()=>{*/
         var c = new Na();
         c.Tc = msg;
-        x.ra(c);
-        internalData.execOperationReceivedOnHost(c);
+        internalData.execOperationReceivedOnHost(c)!=false && x.ra(c);
         //})();
       }
     };
@@ -8623,10 +8601,11 @@ function abcHaxballAPI(window, config){
       null == color && (color = -1);
       null == sound && (sound = 1);
       var h = rb.la(msg, color, style, sound);
-      null != targetId ? internalData.dummyPromise.then(function() {
-        x._mf_(h, targetId);
-      }) : x.ra(h);
-      internalData.execOperationReceivedOnHost(h, targetId);
+      (internalData.execOperationReceivedOnHost(h, targetId)!=false) && (
+        null != targetId ? internalData.dummyPromise.then(function() {
+          x._mf_(h, targetId);
+        }) : x.ra(h)
+      )
     };
 
     this.setDiscProperties = function(discId, properties) { // host-only function
@@ -8636,8 +8615,7 @@ function abcHaxballAPI(window, config){
       if (!x)
         return;
       var msg = ob._Kf_(discId, !1, properties);
-      x.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && x.ra(msg);
     };
 
     this.setPlayerDiscProperties = function(playerId, properties) { // host-only function
@@ -8647,8 +8625,7 @@ function abcHaxballAPI(window, config){
       if (!x)
         return;
       var msg = ob._Kf_(playerId, !0, properties);
-      x.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && x.ra(msg);
     };
 
     this.getKeyState = function(){
@@ -8792,14 +8769,12 @@ function abcHaxballAPI(window, config){
 
     this.setPlayerAdmin = function(playerId, isAdmin){
       var msg = sa.la(playerId, isAdmin);
-      internalData.roomObj?.ya?.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya?.ra(msg);
     };
 
     this.kickPlayer = function(playerId, reason, isBanning){
       var msg = Y.la(playerId, reason, isBanning);
-      internalData.roomObj?.ya?.ra(msg);
-      internalData.execOperationReceivedOnHost(msg);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya?.ra(msg);
     };
 
     this.getPlayerOriginal = function(id){
