@@ -151,19 +151,23 @@ Room.create({
         - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (null = use library's default `cancelAnimationFrame`.)
         - `fps_limit`: Any positive number that will be used as the fps limit. (null = no limit)
 
-    - Returning replay reader object(`replayReaderObj`) contents:
-      - `roomData`: An object containing all information about the current room state.
-      - `length()`: Returns the length of replay content in milliseconds.
-      - `getTime()`: Returns the current time in milliseconds.
-      - `setTime(destinationTime)`: Plays the replay until the `destinationTime`(in milliseconds) or end of replay is reached. Note that it may take some time to reach the destination 
-      time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
-      `replayReaderObj.onDestinationTimeReached` or `replayReaderObj.onEnd` 
-      - `setSpeed(coefficient)`: Changes the speed of playing the replay. `coefficient` must be a real number >=0. 
-        - `coefficient` = 0 : stop replay.
-        - 0 < `coefficient` < 1 : slow-motion replay.
-        - `coefficient` = 1 : normal speed replay.
-        - `coefficient` > 1 : fast-motion replay.
-      - `destroy()`: Frees the resources that are used by this object.
+    - Returning replay reader object(`replayReaderObj`):
+      - properties:
+        - `roomData`: An object containing all information about the current room state.
+      - functions:
+        - `length()`: Returns the length of replay content in milliseconds.
+        - `getTime()`: Returns the current time in milliseconds.
+        - `setTime(destinationTime)`: Plays the replay until the `destinationTime`(in milliseconds) or end of replay is reached. Note that it may take some time to reach the destination 
+        time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
+        - `setSpeed(coefficient)`: Changes the speed of playing the replay. `coefficient` must be a real number >=0. 
+          - `coefficient` = 0 : stop replay.
+          - 0 < `coefficient` < 1 : slow-motion replay.
+          - `coefficient` = 1 : normal speed replay.
+          - `coefficient` > 1 : fast-motion replay.
+        - `destroy()`: Frees the resources that are used by this object.
+      - callbacks:
+        - `onDestinationTimeReached`: Destination time has been reached. Runs after a call to `setTime(destinationTime)`.
+        - `onEnd`: The end of replay data has been reached.
 
 - `Utils`: Some static utility functions.
 
