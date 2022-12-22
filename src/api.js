@@ -181,6 +181,13 @@ function abcHaxballAPI(window, config){
   }
   Bb.b = !0;
   Bb.prototype = { f: Bb };
+  function Kb(a) {
+    this.Id = a
+  }
+  Kb.b = !0;
+  Kb.prototype = {
+    f: Kb
+  };
   function q(a) {
     this.Ta = a;
     Error.captureStackTrace && Error.captureStackTrace(this, q);
@@ -3725,7 +3732,7 @@ function abcHaxballAPI(window, config){
       var a = ya.zc,
         b = this.gc;
       this.hc != a &&
-        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this/*, haxball*/), this._LF_(a));
+        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this/*, haxball*/), (this._LF_ && this._LF_(a)));
       return b;
     },
     f: fa,
@@ -3757,13 +3764,13 @@ function abcHaxballAPI(window, config){
     b.l(c);
     a.ua(b);
   };
-  m.fh = function (a) {
+  m.fh = function (a, replayMode) {
     var eventType = a.B(),
       b = Object.create(m.Qm.get(eventType).prototype);
     b.eventType = eventType;
     b.da = 0;
     b.mb = 0;
-    b.va(a);
+    b.va(a, replayMode);
     return b;
   };
   m.prototype = {
@@ -3880,8 +3887,8 @@ function abcHaxballAPI(window, config){
         var t;
         0 != c &&
           (f == e
-            ? 2 > c || (a.Mf(b, d[0], p.fa), a.Mf(b, d[1], p.xa), a._AT_(d[0].V, p.fa.$, d[1].V, p.xa.$, this.P))
-            : (t = f > e ? p.fa : p.xa, a.Mf(b, d[0], t), a._AT_(d[0].V, t.$, null, null, this.P)));
+            ? 2 > c || (a.Mf(b, d[0], p.fa), a.Mf(b, d[1], p.xa), (a._AT_ && a._AT_(d[0].V, p.fa.$, d[1].V, p.xa.$, this.P)))
+            : (t = f > e ? p.fa : p.xa, a.Mf(b, d[0], t), (a._AT_ && a._AT_(d[0].V, t.$, null, null, this.P))));
       }
     },
     ua: function () {},
@@ -3907,10 +3914,10 @@ function abcHaxballAPI(window, config){
           case 0:
             var b = this.newValue;
             a.ib = 0 > b ? 0 : 99 < b ? 99 : b;
-            a._SLC_(this.newValue, this.P);
+            (a._SLC_ && a._SLC_(this.newValue, this.P));
             break;
           case 1:
-            (b = this.newValue), (a.Da = 0 > b ? 0 : 99 < b ? 99 : b), a._TLC_(this.newValue, this.P);
+            (b = this.newValue), (a.Da = 0 > b ? 0 : 99 < b ? 99 : b), (a._TLC_ && a._TLC_(this.newValue, this.P));
         }
       }
     },
@@ -3971,7 +3978,7 @@ function abcHaxballAPI(window, config){
   ra.prototype = C(m.prototype, {
     apply: function (a) {
       var b = a.na(this.P);
-      null != b && (b.Xb = this.Zb, a._PAC_(this.P, this.Zb));
+      null != b && (b.Xb = this.Zb, (a._PAC_ && a._PAC_(this.P, this.Zb)));
     },
     ua: function (a) {
       a.Db(this.Zb);
@@ -4001,7 +4008,7 @@ function abcHaxballAPI(window, config){
         var c = a.na(this.P),
           d = a.Lb(this.P, 1);
         (d = d || b == c && !a.Pc && null == a.K) && (b.ea != this.jj) && (a.Mf(c, b, this.jj),
-        a._PTC_(this.Md, this.jj.$, this.P)); // id, teamId, byId
+        a._PTC_ && a._PTC_(this.Md, this.jj.$, this.P)); // id, teamId, byId
       }
     },
     ua: function (a) {
@@ -4054,7 +4061,7 @@ function abcHaxballAPI(window, config){
   Pa.ma = m;
   Pa.prototype = C(m.prototype, {
     apply: function (a) {
-      a.Lb(this.P, 2) && this.ea != p.Ia && (a.kb[this.ea.$] = this.Sg, a._TCC_(this.ea.$, this.Sg, this.P));
+      a.Lb(this.P, 2) && this.ea != p.Ia && (a.kb[this.ea.$] = this.Sg, (a._TCC_ && a._TCC_(this.ea.$, this.Sg, this.P)));
     },
     ua: function (a) {
       a.l(this.ea.$);
@@ -4081,7 +4088,7 @@ function abcHaxballAPI(window, config){
   pa.ma = m;
   pa.prototype = C(m.prototype, {
     apply: function (a) {
-      a.Lb(this.P, 2) && (a.Pc = this.newValue, a._TLC2_(this.newValue, this.P));
+      a.Lb(this.P, 2) && (a.Pc = this.newValue, (a._TLC2_ && a._TLC2_(this.newValue, this.P)));
     },
     ua: function (a) {
       a.l(this.newValue ? 1 : 0);
@@ -4120,7 +4127,7 @@ function abcHaxballAPI(window, config){
         a.I.push(b);
         a = a.tl;
         null != a && a(b);
-        haxball.room._onPlayerObjectCreated && haxball.room._onPlayerObjectCreated(b);
+        haxball?.room?._onPlayerObjectCreated && haxball.room._onPlayerObjectCreated(b);
       }
     },
     ua: function (a) {
@@ -4253,7 +4260,7 @@ function abcHaxballAPI(window, config){
       var b = a.na(this.P);
       if (null != b){
         if (this.id != null){
-          a._CCI_(b, this.id, this.mode);
+          a._CCI_ && a._CCI_(b, this.id, this.mode);
           /*
           if (internalData.isHost){
             if (this.mode==1){
@@ -4285,12 +4292,14 @@ function abcHaxballAPI(window, config){
         a.l(this.mode);
       }
     },
-    va: function (a) {
+    va: function (a, replayMode) {
       this.sj = a.B();
-      try{
-        this.id = a.B();
-        this.mode = a.B();
-      }catch(ex){}
+      if (!replayMode){
+        try{
+          this.id = a.B();
+          this.mode = a.B();
+        }catch(ex){}
+      }
     },
     f: na,
   });
@@ -4309,7 +4318,7 @@ function abcHaxballAPI(window, config){
   CustomEvent.prototype = C(m.prototype, {
     apply: function (a) {
       var b = a.na(this.P);
-      null != b && a._CE_(this.type, this.data, this.P);
+      null != b && a._CE_ && a._CE_(this.type, this.data, this.P);
     },
     ua: function (a) {
       a.l(this.type);
@@ -4454,7 +4463,7 @@ function abcHaxballAPI(window, config){
             null != this.Rc[0] && (a.R = this.Rc[0]),
             null != this.Rc[1] && (a.h = this.Rc[1]),
             null != this.Rc[2] && (a.v = this.Rc[2]),
-            c._SDP_(this.ze, this.Sm, this.Ka, this.Rc)); // id, type, data1, data2
+            (c._SDP_ && c._SDP_(this.ze, this.Sm, this.Ka, this.Rc))); // id, type, data1, data2
         }
       }
     },
@@ -4548,7 +4557,7 @@ function abcHaxballAPI(window, config){
   la.la = function (a) {
     for (var b = new la(), c = a.T.I, d = [], e = 0; e < c.length; ) {
       var f = a.Ie.get(c[e++].V);
-      d.push(null == f ? a.T._HP_() : f.yb);
+      d.push(null == f ? (a.T._HP_ && a.T._HP_()) : f.yb);
     }
     b.we = d;
     return b;
@@ -4564,7 +4573,7 @@ function abcHaxballAPI(window, config){
           if (d >= this.we.length) break;
           a[d].yb = this.we[d];
         }
-        e._PD_(this.we); // ping array
+        e._PD_ && e._PD_(this.we); // ping array
       }
     },
     ua: function (a) {
@@ -4595,7 +4604,7 @@ function abcHaxballAPI(window, config){
             e.H = null;
             e.Jb = 0;
           }
-          a._RI_();
+          a._RI_ && a._RI_();
           null != a.vf && a.vf(b);
         }
       }
@@ -5071,11 +5080,11 @@ function abcHaxballAPI(window, config){
       //300 < a && (a = 300);
       //0 > a && (a = 0);
       this.bc = (this.Ac * a) | 0;
-      this.T._HC_(a);
+      this.T._HC_ && this.T._HC_(a);
     },
     gm: function (a) {
       this.rd = this.Ac * a;
-      this.T._EC_(a);
+      this.T._EC_ && this.T._EC_(a);
     },
     f: V,
   });
@@ -6702,52 +6711,6 @@ function abcHaxballAPI(window, config){
     f: Ra,
   };
   
-  function ac(a, b) {
-    this.Xm = 0;
-    this.version = 1;
-    this.ah = 0;
-    this.Nd = w.ha(1e3);
-    this.Df = w.ha(16384);
-    var c = this;
-    this.version = b;
-    var d = (this.ah = a.Y);
-    this.hj = a;
-    a.T.ga(this.Df);
-    a.fc = function (b) {
-      var e = a.Y;
-      c.Df.lb(e - d);
-      d = e;
-      c.Df.Ub(b.P);
-      m.lj(b, c.Df);
-    };
-    this.Nd.Ub(0);
-    var e = this.ah;
-    a.T.km(function (b) {
-      var d = a.Y;
-      c.Nd.lb(d - e);
-      c.Nd.l(b);
-      c.Xm++;
-      e = d;
-    });
-  }
-  ac.b = !0;
-  ac.prototype = {
-    stop: function () {
-      this.hj.fc = null;
-      this.hj.T.km(null);
-      this.Nd.o.setUint16(0, this.Xm, this.Nd.Sa);
-      this.Nd.Vb(this.Df.Sb());
-      var a = pako.deflateRaw(this.Nd.Sb()),
-        b = w.ha(a.byteLength + 32);
-      b.Og("HBR2");
-      b.tb(this.version);
-      b.tb(this.hj.Y - this.ah);
-      b.Vb(a);
-      return b.Sb();
-    },
-    f: ac,
-  };
-  
   function ba(haxball, a) { // to fix: haxball, __internalData, n_A
     this.haxball = haxball;
     this.Nf = null;
@@ -7296,7 +7259,462 @@ function abcHaxballAPI(window, config){
   function roomLink(a, b) { // u.$h
     return "https://www.haxball.com/play?c=" + a + (b ? "&p=1" : "");
   };
+
+  // replay section :
+
+  function ac(a, b) {
+    this.Xm = 0;
+    this.version = 1;
+    this.ah = 0;
+    this.Nd = w.ha(1e3);
+    this.Df = w.ha(16384);
+    var c = this;
+    this.version = b;
+    var d = (this.ah = a.Y);
+    this.hj = a;
+    a.T.ga(this.Df);
+    a.fc = function (b) {
+      var e = a.Y;
+      c.Df.lb(e - d);
+      d = e;
+      c.Df.Ub(b.P);
+      m.lj(b, c.Df);
+    };
+    this.Nd.Ub(0);
+    var e = this.ah;
+    a.T.km(function (b) {
+      var d = a.Y;
+      c.Nd.lb(d - e);
+      c.Nd.l(b);
+      c.Xm++;
+      e = d;
+    });
+  }
+  ac.b = !0;
+  ac.prototype = {
+    stop: function () {
+      this.hj.fc = null;
+      this.hj.T.km(null);
+      this.Nd.o.setUint16(0, this.Xm, this.Nd.Sa);
+      this.Nd.Vb(this.Df.Sb());
+      var a = pako.deflateRaw(this.Nd.Sb()),
+        b = w.ha(a.byteLength + 32);
+      b.Og("HBR2");
+      b.tb(this.version);
+      b.tb(this.hj.Y - this.ah);
+      b.Vb(a);
+      return b.Sb();
+    },
+    f: ac,
+  };
   
+  function Jb(a, b, c, callbacks) {
+    this.Vk = [
+    ];
+    this.pl = 0/*5*/;
+    this.Fd = - 1;// destination time
+    this.hg = this.Qb = this.Wh = this.sk = 0;
+    V.call(this, b);
+    a = new F(new DataView(a.buffer), !1);
+    if (1212305970 != a.hb()) throw new q('');
+    b = a.hb();
+    if (c != b) throw new q(new Kb(b));
+    this.mf = a.hb();
+    c = pako.inflateRaw(a.sb());
+    this.Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength));
+    this.Cq(this.Lc);
+    c = this.Lc.sb();
+    this.Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength), !1);
+    this.ui();
+    this.Wh = /*window.*/performance.now();
+    this.uc = - 1;
+    this.callbacks = callbacks;
+    this.parentVb = null;
+    this.obj = null;
+  }
+  Jb.b = !0;
+  Jb.ma = V;
+  Jb.prototype = C(V.prototype, {
+    Cq: function (a) {
+      for (var b = a.Ob(), c = 0, d = 0; d < b; ) {
+        ++d;
+        var c = c + a.Ab(),
+        e = a.B();
+        this.Vk.push({
+          mj: c / this.mf,
+          kind: e
+        })
+      }
+    },
+    Dl: function () {
+      var a = this.Lc;
+      if (0 < a.o.byteLength - a.a){
+        a = this.Lc.Ab();
+        this.hg += a;
+        a = this.Lc.Ob();
+        this.gg = m.fh(this.Lc, true);
+        this.gg.P = a;
+      } 
+      else 
+        this.gg = null;
+    },
+    Go: function () {
+      return this.Y / this.mf
+    },
+    ra: function () {
+    },
+    Sf: function () {
+      this.C();
+      ya.zc++;
+      var a = this.T.sc();
+      a.C(this.sk);
+      return a
+    },
+    C: function () {
+      var a = /*window.*/performance.now(),
+      b = a - this.Wh;
+      this.Wh = a;
+      var reachedFd = false, reachedEnd = false;
+      if (this.Fd >= 0){
+        this.Qb += 10000;
+        if (this.Qb > this.Fd){
+          this.Qb = this.Fd;
+          this.Fd = - 1;
+          reachedFd = true;
+        }
+      }
+      else
+        this.Qb += b * this.pl;
+      a = this.mf * this.mh;
+      if (this.Qb > a){
+        this.Qb = a;
+        reachedEnd = true;
+      }
+      b = this.Qb * this.Ac;
+      a = b | 0;
+      for (this.sk = b - a; this.Y < a; ) {
+        while (null != this.gg && this.hg == this.Y){
+          b = this.gg;
+          b.apply(this.T);
+          null != this.fc && this.fc(b);
+          this.Dl();
+        }
+        this.Y++;
+        this.T.C(1)
+      }
+      if (reachedFd){
+        this.parentVb.assignCallbacks();
+        this.obj?.onDestinationTimeReached && this.obj.onDestinationTimeReached();
+      }
+      if (reachedEnd){
+        this.pl = 0;
+        this.parentVb.clearCallbacks();
+        this.obj?.onEnd && this.obj.onEnd();
+      }
+    },
+    er: function (a) {
+      this.parentVb.clearCallbacks();
+      this.Fd = a;
+      a < this.Qb && this.ui()
+    },
+    ui: function () {
+      this.hg = 0;
+      this.Qb = this.Y = this.Lc.a = 0;
+      this.T.ja(this.Lc);
+      this.Dl();
+    },
+    f: Jb
+  });
+
+  function Vb(ya, callbacks, options) {
+    var $c = /*window.*/performance.now();
+    var /*this.sd =*/De = 0;
+    var raf = options?.requestAnimationFrame || requestAnimationFrame;
+    var caf = options?.cancelAnimationFrame || cancelAnimationFrame;
+    var fps_limit = options?.fps_limit; // null | 30
+    var render = callbacks?.render;
+
+    var Kc = render && function () {
+      //this.je.C();
+      var a = /*window.*/performance.now();
+      null != fps_limit && fps_limit > a - $c || (
+        $c = a, 
+        //this.sd++, 
+        //this.uf(n.A.Tb.L()), 
+        0 < ya.Fd || (
+          //this.j.C(ya)
+          render(ya.Sf())
+        )
+      )
+    };
+    var bf = function () {
+      De = /*window.*/raf(bf);
+      ya.C();
+      render && Kc();
+    };
+    /*
+    var Bd = function (a) {
+      switch (a.keyCode) {
+        case 27:
+          var b = this.j;
+          b.me(!b.Gd);
+          a.preventDefault();
+          break;
+        case 49:
+          n.A.Tb.Xa(1);
+          break;
+        case 50:
+          n.A.Tb.Xa(2);
+          break;
+        case 51:
+          n.A.Tb.Xa(3);
+          break;
+        case 52:
+          n.A.Tb.Xa(0)
+      }
+    };
+    var uf = function (a) {
+      var b = this.j.Fb;
+      0 >= a ? (b.Gg(!0), b.Eb.kf = 1, b.Eb.xf = 0) : (b.Gg(!1), b.Eb.xf = 35, b.Eb.kf = 1 + 0.25 * (a - 1))
+    };
+    var Cd = function () {
+    };
+    */
+
+    //var b = this;
+    //this.j = new ja(a.uc);
+    //var c = new Gb(this.j);
+    //c.ri(a.T);
+    //window.document.addEventListener('keydown', G(this, this.Bd));
+    //window.document.addEventListener('keyup', G(this, this.Cd));
+    /*window.*/raf(bf);
+    /*this.Gh = window.setInterval(function () {
+      b.j.pe.hm(b.sd);
+      b.sd = 0
+    }, 1000);*/
+    //this.uf(n.A.Tb.L());
+    //this.j.g.classList.add('replayer');
+    //this.je = new ha(a);
+    /*this.je.Vp = function () {
+      c.Lr(a.T) // reset callbacks
+    };*/
+    //this.je.Up = function () {
+      //b.j.me(null == a.T.K);
+      //c.ri(a.T); // assign callbacks
+
+    this.clearCallbacks = function () {
+      ya.T.iq = null;
+      ya.T.tl = null;
+      ya.T.ji = null;
+      ya.T.Ni = null;
+      ya.T.Oi = null;
+      ya.T.ml = null;
+      ya.T.Ki = null;
+      ya.T.Os = null;
+      ya.T._KO_ = null;
+      ya.T._LF_ = null;
+      ya.T._CDD_ = null;
+      ya.T._CDP_ = null;
+      ya.T._CDS_ = null;
+      ya.T._AT_ = null;
+      ya.T._TLC_ = null;
+      ya.T._SLC_ = null;
+      ya.T._PAC_ = null;
+      ya.T._PTC_ = null;
+      ya.T._TCC_ = null;
+      ya.T._TLC2_ = null;
+      /*
+      ya.T._CCI_ = null;
+      */
+      ya.T._CE_ = null;
+      ya.T._SDP_ = null;
+      ya.T._PD_ = null;
+      /*
+      ya.T._HP_ = null;
+      ya.T._RI_ = null;
+      */
+      ya.T._HC_ = null;
+      ya.T._EC_ = null;
+      ya.T.Pi = null;
+      ya.T.lq = null;
+      ya.T.rl = null;
+      ya.T.Vl = null;
+      ya.T.vf = null;
+      ya.T.Ii = null;
+      ya.T.sl = null;
+      ya.T.ii = null;
+      ya.T.Hk = null;
+      ya.T.ul = null;
+      ya.T.wl = null;
+    };
+
+    this.assignCallbacks = function(){
+      if (ya.T.iq!=null)
+        return;
+      ya.T.iq = (b)=>{
+        callbacks.onPlayerInputChange && callbacks.onPlayerInputChange(b.V, b.ob);
+      };
+      ya.T.tl = (b)=>{ // +
+        callbacks.onPlayerJoin && callbacks.onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+      };
+      ya.T.ji = (d)=>{ // +
+        callbacks.onPlayerBallKick && callbacks.onPlayerBallKick(d?.V);
+      };
+      ya.T.Ni = (team)=>{ // +
+        callbacks.onTeamGoal && callbacks.onTeamGoal(team?.$);
+      };
+      ya.T.Oi = (team)=>{ // +
+        callbacks.onGameEnd && callbacks.onGameEnd(team.$); // winningTeamId
+      };
+      ya.T.ml = (c, Bf, e)=>{ // +
+        (!e) && callbacks.onGamePauseChange && callbacks.onGamePauseChange(Bf, c?.V) // paused, byId
+      };
+      ya.T.Ki = function(a){ // +
+        callbacks.onGameStart && callbacks.onGameStart(a?.V); // byId
+      }
+      ya.T.Os = ()=>{
+        callbacks.onGameTick && callbacks.onGameTick();
+      };
+      ya.T._KO_ = ()=>{
+        callbacks.onKickOff && callbacks.onKickOff();
+      };
+      ya.T._LF_ = (a)=>{
+        callbacks.onLocalFrame && callbacks.onLocalFrame(a);
+      }
+      ya.T._CDD_ = (a, b, c, d)=>{
+        callbacks.onCollisionDiscVsDisc && callbacks.onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+      };
+      ya.T._CDP_ = (a, b, c)=>{
+        callbacks.onCollisionDiscVsPlane && callbacks.onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+      };
+      ya.T._CDS_ = (a, b, c)=>{
+        callbacks.onCollisionDiscVsSegment && callbacks.onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+      };
+      ya.T._AT_ = (a, b, c, d, e) => {
+        callbacks.onAutoTeams && callbacks.onAutoTeams(a, b, c, d, e);
+      };
+      ya.T._TLC_ = (a, b) => {
+        callbacks.onTimeLimitChange && callbacks.onTimeLimitChange(a, b);
+      };
+      ya.T._SLC_ = (a, b) => {
+        callbacks.onScoreLimitChange && callbacks.onScoreLimitChange(a, b);
+      };
+      ya.T._PAC_ = (a, b) => {
+        callbacks.onPlayerAvatarChange && callbacks.onPlayerAvatarChange(a, b);
+      };
+      ya.T._PTC_ = (a, b, c) => { // + (xl)
+        callbacks.onPlayerTeamChange && callbacks.onPlayerTeamChange(a, b, c);
+      };
+      ya.T._TCC_ = (a, b, c) => {
+        callbacks.onTeamColorsChange && callbacks.onTeamColorsChange(a, b, c);
+      };
+      ya.T._TLC2_ = (a, b) => {
+        callbacks.onTeamsLockChange && callbacks.onTeamsLockChange(a, b);
+      };
+      /*
+      ya.T._CCI_ = (x, y, z) => {
+        if (haxball.__internalData.isHost){
+          if (z==1){
+            x.customClient = true;
+            haxball.__internalData.customClientIds.add(b.V);
+          }
+        }
+        else if (z==0){
+          x.customClient = true;
+          haxball.__internalData.customClientIds.add(b.V);
+          x = a.na(y);
+          if (x)
+            x.customClient = true;
+          haxball.__internalData.customClientIds.add(y);
+          a.ra(na.la(1, y, 1), 0, true);
+        }
+      };
+      */
+      ya.T._CE_ = (a, b, c)=>{
+        callbacks.onCustomEvent && callbacks.onCustomEvent(a, b, c); // type, data, byUser
+      };
+      ya.T._SDP_ = (a, b, c, d)=>{
+        callbacks.onSetDiscProperties && callbacks.onSetDiscProperties(a, b, c, d); // id, type, data1, data2
+      };
+      ya.T._PD_ = (a)=>{
+        callbacks.onPingData && callbacks.onPingData(a); // ping array
+      };
+      /*
+      ya.T._HP_ = ()=>{
+        return haxball?.room?.hostPing || 0
+      };
+      ya.T._RI_ = ()=>{
+        b.ob.al();
+      };
+      */
+      ya.T._HC_ = (a)=>{
+        callbacks.onHandicapChange && callbacks.onHandicapChange(a);
+      };
+      ya.T._EC_ = (a)=>{
+        callbacks.onExtrapolationChange && callbacks.onExtrapolationChange(a);
+      };
+      ya.T.Pi = ()=>{ // +
+        callbacks.onTimeIsUp && callbacks.onTimeIsUp();
+      };
+      ya.T.lq = ()=>{
+        callbacks.onPositionsReset && callbacks.onPositionsReset();
+      };
+      ya.T.rl = function(b, Tc){ // +
+        callbacks.onPlayerChat && callbacks.onPlayerChat(b.V, Tc); // id, message
+      };
+      ya.T.Vl = function(msg, color, style, sound){ // +
+        callbacks.onAnnouncement && callbacks.onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+      };
+      ya.T.vf = function(b){ // +
+        callbacks.onGameStop && callbacks.onGameStop(b?.V);  //byId
+      };
+      ya.T.Ii = function(a, e){ // +
+        callbacks.onStadiumChange && callbacks.onStadiumChange(e, a?.V); // map, byId
+      };
+      ya.T.sl = function(b){ // +
+        callbacks.onPlayerSyncChange && callbacks.onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+      };
+      ya.T.ii = function(b, c){ // +
+        callbacks.onPlayerAdminChange && callbacks.onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+      };
+      ya.T.Hk = function(a, b, c, d){ // +
+        callbacks.onKickRateLimitChange && callbacks.onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+      };
+      ya.T.ul = function (d, e, f, g) { // +
+        /*
+        y.i(b.Op, d.V);
+        null != e && (
+          vb.i(b.Np, d.V, e, null != g ? g.w : null, f)
+        );
+        */
+        callbacks.onPlayerLeave && callbacks.onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
+      };
+      ya.T.wl = function(a, b){ // +
+        callbacks.onPlayerChatIndicatorChange && callbacks.onPlayerChatIndicatorChange(a?.V, !b); // id, value
+      };
+    };
+
+    this.ia = function () {
+      /*
+      window.document.removeEventListener('keydown', G(this, this.Bd));
+      window.document.removeEventListener('keyup', G(this, this.Cd));
+      window.onbeforeunload = null;
+      */
+      /*window.*/caf(De);
+      //window.clearInterval(this.Gh)
+      this.clearCallbacks();
+    };
+
+    this.ui = ()=>{
+      ya.ui();
+    };
+    /*
+    this.je.el = function () {
+      b.j.Fb.Eb.Xq() // renderer function
+    };
+    */
+    //this.j.g.appendChild(this.je.g)
+  }
 
   
 
@@ -7309,6 +7727,43 @@ function abcHaxballAPI(window, config){
 
 
 
+
+  function readReplay(uint8Array, callbacks, options){
+    var b, jb, roomState = new fa;
+    try {
+      jb = new Jb(uint8Array, roomState, 3, callbacks);
+      b = new Vb(jb, callbacks, options);
+      jb.parentVb = b;
+    } catch (e) {
+      var c = e instanceof q ? e.Ta : e;
+      if (c instanceof Kb)
+        throw "The replay data is of a different version";
+      else
+        throw "Couldn't load replay data.";
+    }
+    var obj = {
+      roomData: roomState,
+      setSpeed: (coefficient)=>{ // fastmo: coefficient>1, normal: coefficient=1, slowmo: 0<coefficient<1, stop: coefficient=0
+        b.assignCallbacks();
+        jb.pl = coefficient;
+      },
+      getTime: ()=>{ // get current time in msecs.
+        return jb.Qb;
+      },
+      length: ()=>{ // get the total length of replay data in msecs.
+        return jb.mh * jb.mf;
+      },
+      setTime: (destinationTime)=>{ // jump to destinationTime in msecs.
+        jb.er(destinationTime);
+        //c.Wf || (c.Wf = !0, c.Vp(), c.el())
+      },
+      destroy: ()=>{
+        b.ia();
+      }
+    };
+    jb.obj = obj;
+    return obj;
+  }
 
   function fixStorage(options){
     var storage = options?.storage;
@@ -8691,7 +9146,7 @@ function abcHaxballAPI(window, config){
 
     this.setSync = function(value){ // host-only
       internalData.roomObj?.ya?.T.ko(value);
-    }
+    };
 
     this.leave = function(){
       internalData.roomObj?.de();
@@ -9004,6 +9459,10 @@ function abcHaxballAPI(window, config){
     Room: {
       join: joinRoom,
       create: createRoom
+    },
+    Replay: {
+      read: readReplay
+      //Recorder: ac
     },
     Plugin
   };

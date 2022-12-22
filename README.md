@@ -139,6 +139,32 @@ Room.create({
     - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "wss://p2p.haxball.com/" for host and "wss://p2p2.haxball.com/" for client.
     - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "https://www.haxball.com/rs/".
 
+- `Replay`: Functions/classes related to replays.
+
+  - `read(uint8Array, callbacks, options)`: Creates and returns a non-blocking replay reader object. 
+
+    - Parameters: 
+      - `uint8Array`: Must be an Uint8Array containing the contents of a .hbr file. (Currently, only version 3 is supported.)
+      - `callbacks`: An object that follows the renderer template. (maybe except the `onCustomEvent` callback that the replay files do not contain its corresponding event.)
+      - `options`: An object that may contain the following keys:
+        - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (null = use library's default `requestAnimationFrame`.)
+        - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (null = use library's default `cancelAnimationFrame`.)
+        - `fps_limit`: Any positive number that will be used as the fps limit. (null = no limit)
+
+    - Returning replay reader object(`replayReaderObj`) contents:
+      - `roomData`: An object containing all information about the current room state.
+      - `length()`: Returns the length of replay content in milliseconds.
+      - `getTime()`: Returns the current time in milliseconds.
+      - `setTime(destinationTime)`: Plays the replay until the `destinationTime`(in milliseconds) or end of replay is reached. Note that it may take some time to reach the destination 
+      time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
+      `replayReaderObj.onDestinationTimeReached` or `replayReaderObj.onEnd` 
+      - `setSpeed(coefficient)`: Changes the speed of playing the replay. `coefficient` must be a real number >=0. 
+        - `coefficient` = 0 : stop replay.
+        - 0 < `coefficient` < 1 : slow-motion replay.
+        - `coefficient` = 1 : normal speed replay.
+        - `coefficient` > 1 : fast-motion replay.
+      - `destroy()`: Frees the resources that are used by this object.
+
 - `Utils`: Some static utility functions.
 
   - `generateAuth()`: generates a new `player_auth_key` along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in `Room.join`. returns `Promise([authKey, authObj])`

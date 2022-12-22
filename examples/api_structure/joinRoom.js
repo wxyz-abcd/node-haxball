@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Room, Utils, Plugin } = require("../../src/index");
+const { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = require("../../src/index");
 
 Utils.generateAuth().then(([authKey, authObj])=>{
   Room.join({

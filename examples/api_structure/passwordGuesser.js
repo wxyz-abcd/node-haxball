@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Room, Utils, Plugin } = require("../src/index");
+const { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = require("../src/index");
 
 function PasswordGuesser(){
   const guessDictionary = ["password", "111", "222", "333", "123", "12345"]; // write as many guesses as you wish here.

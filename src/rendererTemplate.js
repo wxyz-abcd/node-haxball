@@ -1,7 +1,9 @@
 /* 
 Example usage:  
 
-var client = new Haxball({
+var client = Room.join({ // or Room.create
+  ... // all stuff that you want
+}, {
   ..., // all other stuff that you want
   renderer: new Renderer(document.getElementsByTagName("canvas")[0]),
 });
