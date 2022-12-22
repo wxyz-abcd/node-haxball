@@ -151,7 +151,7 @@ Room.create({
         - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (null = use library's default `cancelAnimationFrame`.)
         - `fps_limit`: Any positive number that will be used as the fps limit. (null = no limit)
 
-    - Returning replay reader object(`replayReaderObj`):
+    - Returning replay reader object:
       - properties:
         - `roomData`: An object containing all information about the current room state.
       - functions:
@@ -166,8 +166,8 @@ Room.create({
           - `coefficient` > 1 : fast-motion replay.
         - `destroy()`: Frees the resources that are used by this object.
       - callbacks:
-        - `onDestinationTimeReached`: Destination time has been reached. Runs after a call to `setTime(destinationTime)`.
-        - `onEnd`: The end of replay data has been reached.
+        - `onDestinationTimeReached()`: Destination time has been reached. Runs after a call to `setTime(destinationTime)`.
+        - `onEnd()`: The end of replay data has been reached.
 
 - `Utils`: Some static utility functions.
 
