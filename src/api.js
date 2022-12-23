@@ -9336,7 +9336,7 @@ function abcHaxballAPI(window, config){
       fakeSend(byId, ma.la(min, rate, burst));
     };
 
-    this.fakeSetTeamColors = function(teamId, angle, byId){
+    this.fakeSetTeamColors = function(teamId, angle, colors, byId){
       fakeSend(byId, ub.__cq__(teamId, angle, ...colors));
     };
 

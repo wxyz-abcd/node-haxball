@@ -319,24 +319,24 @@ Room.create({
   - `fake event triggers`: these functions are intended to be used in host mode to create/control in-memory bot players that will run much more efficiently than standard networking bot players. they also work for normal player objects, and can be used to create some events belonging to a player that did not originate from that player. most of these fake events also trigger an onOperationReceived call before being sent to clients.
     - `fakePlayerJoin(id, name, flag, avatar, conn, auth)`: triggers a fake join room event; which in turn creates a new in-memory player object. If there was a player before with this id, old resources are automatically reassigned to this new player object, and that player will wake up. 0 <= `id` <= 65535, all the other parameters must be a string. 
     - `fakePlayerLeave(id)`: triggers a fake leave room event. returns the player's properties so that you may pass them to `fakePlayerJoin` at a later time to wake that player. passing `id` = 0 causes desync on clients (because there's a special check for the case `id` = 0 in original clients). the player, although seemingly leaving the room, still watches the room, waiting for a fake player join event. all parameters except `id` may be different in the new `fakePlayerJoin` call, which allows player's `name`, `flag`, `avatar`, `conn` and `auth` to change without the player entirely leaving the room.
-    - `fakeSendPlayerInput(input, byId)`: triggers a fake input(keys) event that apparently came from `player(byId)`. 
-    - `fakeSendPlayerChat(msg, byId)`: triggers a fake chat event that apparently came from `player(byId)`. 
-    - `fakeSetPlayerChatIndicator(value, byId)`: triggers a fake chat indicator change event that apparently came from `player(byId)`. 
-    - `fakeSetPlayerAvatar(value, byId)`: triggers a fake avatar change event that apparently came from `player(byId)`. 
-    - `fakeSetPlayerAdmin(playerId, value, byId)`: triggers a player admin status change event that apparently came from `player(byId)`. 
-    - `fakeSetPlayerSync(value, byId)`: triggers a fake player sync status change event that apparently came from `player(byId)`. 
-    - `fakeSetStadium(value, byId)`:  triggers a fake stadium change event that apparently came from `player(byId)`. only works if game is stopped.
-    - `fakeStartGame(byId)`: triggers a fake game start event that apparently came from `player(byId)`. 
-    - `fakeStopGame(byId)`: triggers a fake game stop event that apparently came from `player(byId)`. 
-    - `fakeSetGamePaused(value, byId)`: triggers a fake game pause/resume event that apparently came from `player(byId)`. 
-    - `fakeSetScoreLimit(value, byId)`: triggers a fake score limit change event that apparently came from `player(byId)`. 
-    - `fakeSetTimeLimit(value, byId)`: triggers a fake time limit change event that apparently came from `player(byId)`. 
-    - `fakeSetTeamsLock(value, byId)`: triggers a fake teams lock change event that apparently came from `player(byId)`. 
-    - `fakeAutoTeams(byId)`: triggers a fake auto teams event that apparently came from `player(byId)`. 
-    - `fakeSetPlayerTeam(playerId, teamId, byId)`: triggers a fake player team change event that apparently came from `player(byId)`. 
-    - `fakeSetKickRateLimit(min, rate, burst, byId)`: triggers a fake kick rate limit change event that apparently came from `player(byId)`. 
-    - `fakeSetTeamColors(teamId, angle, colors, byId)`: triggers a fake team colors change event that apparently came from `player(byId)`. 
-    - `fakeKickPlayer(playerId, reason, ban, byId)`: triggers a fake player kick/ban event that apparently came from `player(byId)`. 
+    - `fakeSendPlayerInput(input, byId)`: triggers a fake input(keys) event that apparently came from `player(byId)`. 0<=`input`<=31.
+    - `fakeSendPlayerChat(msg, byId)`: triggers a fake chat event that apparently came from `player(byId)`. `msg` must be a string.
+    - `fakeSetPlayerChatIndicator(value, byId)`: triggers a fake chat indicator change event that apparently came from `player(byId)`. `value` must be `true` or `false`.
+    - `fakeSetPlayerAvatar(value, byId)`: triggers a fake avatar change event that apparently came from `player(byId)`. `value` must be a string.
+    - `fakeSetPlayerAdmin(playerId, value, byId)`: triggers `player(playerId)`'s admin status change fake event that apparently came from `player(byId)`. `value` must be `true` or `false`.
+    - `fakeSetPlayerSync(value, byId)`: triggers a fake player sync status change event that apparently came from `player(byId)`. `value` must be `true` or `false`.
+    - `fakeSetStadium(value, byId)`:  triggers a fake stadium change event that apparently came from `player(byId)`. only works if game is stopped. `value` must be a valid stadium object.
+    - `fakeStartGame(byId)`: triggers a fake game start event that apparently came from `player(byId)`.
+    - `fakeStopGame(byId)`: triggers a fake game stop event that apparently came from `player(byId)`.
+    - `fakeSetGamePaused(value, byId)`: triggers a fake game pause/resume event that apparently came from `player(byId)`. `value` must be `true` or `false`.
+    - `fakeSetScoreLimit(value, byId)`: triggers a fake score limit change event that apparently came from `player(byId)`. `value`>=0.
+    - `fakeSetTimeLimit(value, byId)`: triggers a fake time limit change event that apparently came from `player(byId)`. `value`>=0.
+    - `fakeSetTeamsLock(value, byId)`: triggers a fake teams lock change event that apparently came from `player(byId)`. `value` must be `true` or `false`.
+    - `fakeAutoTeams(byId)`: triggers a fake auto teams event that apparently came from `player(byId)`.
+    - `fakeSetPlayerTeam(playerId, teamId, byId)`: triggers `player(playerId)`'s player team change fake event that apparently came from `player(byId)`. 0<=`teamId`<=2.
+    - `fakeSetKickRateLimit(min, rate, burst, byId)`: triggers a fake kick rate limit change event that apparently came from `player(byId)`. `min`, `rate`, `burst`>=0.
+    - `fakeSetTeamColors(teamId, angle, colors, byId)`: triggers `team(teamId)`'s colors change event that apparently came from `player(byId)`. 0<=`angle`<=180, `colors` must be an array of type (0 <= `integer` <= 16777215) that contains at most 4 integers.
+    - `fakeKickPlayer(playerId, reason, ban, byId)`: triggers `player(playerId)`'s kick/ban fake event that apparently came from `player(byId)`. `reason` must be a string, `ban` must be `true` or `false`.
 
   - `modifier callbacks`:
     - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedNick, modifiedAvatar, modifiedFlag]`. if `dataArray` is null, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
