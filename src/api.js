@@ -9248,7 +9248,7 @@ function abcHaxballAPI(window, config){
     };
 
     this.fakePlayerLeave = function(playerId){ // playerId=0 -> desync.
-      var playerObj = internalData.roomObj?.ya.T.I[playerId];
+      var playerObj = internalData.roomObj?.ya.T.na(playerId);
       if (!playerObj)
         return;
       var msg = Y.la(playerId, null, true);

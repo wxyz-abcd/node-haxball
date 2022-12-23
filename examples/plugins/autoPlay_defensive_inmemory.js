@@ -2,30 +2,37 @@ var { Utils, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
-  Plugin.call(this, "autoPlay_defensive", true, Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom); // "autoPlay_defensive" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "autoPlay_defensive_inmemory", false, Plugin.AllowFlags.CreateRoom); // "autoPlay_defensive_inmemory" is plugin's name, "false" means "not activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on CreateRoom only.
 
   // parameters are exported so that they can be edited outside this class.
   this.minCoordAlignDelta = 0.5;
   this.minKickDistance = 2;
   this.maxDistanceToFollowBallCoeff = 0.2;
 
-  var _room = null, that = this;
+  var room = null, that = this;
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
+  };
+
+  this.onActiveChanged = function(){
+    if (that.active)
+      room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
+    else
+      room.fakePlayerLeave(65535);
   };
 
   this.onGameTick = function(customData){
-    var { o, p, ep } = _room.getRoomDataOriginal();
+    var { o, p, ep } = room.getRoomDataOriginal();
     if (ep)
       p = ep;
 
-    var cp = p.Ma.I.filter((p)=>(p.V==_room.currentPlayerId))[0];
-    var playerDisc = cp.H;
+    var cp = p.Ma.I.filter((p)=>(p.V==65535))[0];
+    var playerDisc = cp?.H;
     if (!playerDisc)
       return;
     var teamId = cp.ea.$, opponentTeamId = 3 - teamId;
@@ -86,6 +93,7 @@ module.exports = function(){
     */
     
     // apply current keys
-    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    room.fakeSendPlayerInput(/*input:*/ Utils.keyState(dirX, dirY, kick), /*byId:*/ 65535);
   };
+
 };

@@ -2,26 +2,33 @@ var { Utils, Plugin } = require("../../src/index");
 
 module.exports = function(){
 
-  Plugin.call(this, "autoPlay_followBall", true, Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom); // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "autoPlay_followBall_inmemory", false, Plugin.AllowFlags.CreateRoom); // "autoPlay_followBall_inmemory" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name. We allow this plugin to be activated on CreateRoom only.
 
   // parameters are exported so that they can be edited outside this class.
   this.minCoordAlignDelta = 0.5;
   this.minKickDistance = 2;
 
-  var _room = null, that = this;
+  var room = null, that = this;
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
+  };
+
+  this.onActiveChanged = function(){
+    if (that.active)
+      room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
+    else
+      room.fakePlayerLeave(65535);
   };
 
   this.onGameTick = function(customData){
     
     // get the original data object of the current player
-    var playerDisc = _room.getPlayerDiscOriginal(_room.currentPlayerId);
+    var playerDisc = room.getPlayerDiscOriginal(65535);
 
     // coordinates: playerDisc.a.x, playerDisc.a.y
     // speed: playerDisc.D.x, playerDisc.D.y
@@ -31,7 +38,7 @@ module.exports = function(){
       return;
 
     // get the original data object of the ball
-    var ball = _room.getBallOriginal();
+    var ball = room.getBallOriginal();
 
     // coordinates: ball.a.x, ball.a.y
     // speed: ball.D.x, ball.D.y
@@ -56,6 +63,7 @@ module.exports = function(){
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
 
     // apply current keys
-    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    room.fakeSendPlayerInput(/*input:*/ Utils.keyState(dirX, dirY, kick), /*byId:*/ 65535);
   };
+
 };
