@@ -818,6 +818,11 @@ function abcHaxballAPI(window, config){
     red: p.fa,
     blue: p.xa
   };
+  var teamsById = [
+    p.Ia,
+    p.fa,
+    p.xa
+  ];
 
   H.b = !0;
   H.prototype = { f: H };
@@ -7849,10 +7854,10 @@ function abcHaxballAPI(window, config){
           return true;
         return haxball.room._onOperationReceived(c, msg); // c = oo[0]
       },
-      execOperationReceivedOnHost: function(msg, targetId) {
+      execOperationReceivedOnHost: function(msg, targetId, fakeId) {
         if (!internalData.isHost)
           return;
-        msg.P = 0;
+        msg.P = fakeId || 0;
         msg._TP = targetId; // this can not be modified
         return internalData.onOperationReceived(msg);
       }
@@ -9228,9 +9233,138 @@ function abcHaxballAPI(window, config){
     };
 
     this.kickPlayer = function(playerId, reason, isBanning){
-      var msg = Y.la(playerId, reason, isBanning);
+      var msg = Y.la(playerId, reason || "", isBanning);
       internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya?.ra(msg);
     };
+
+
+
+    
+    // all fake functions here are host-only:
+
+    this.fakePlayerJoin = function(id, name, flag, avatar, conn, auth){ // id is uint16. to avoid desync, use 0<=id<=65535 and follow basro's all other limitations. 
+      var msg = oa.la(id, name, flag, avatar, conn, auth);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya?.ra(msg);
+    };
+
+    this.fakePlayerLeave = function(playerId){ // playerId=0 -> desync.
+      var playerObj = internalData.roomObj?.ya.T.I[playerId];
+      if (!playerObj)
+        return;
+      var msg = Y.la(playerId, null, true);
+      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya?.ra(msg);
+      return { // return the old data in case you want to use it to reconstruct the original player object.
+        id: playerObj.V, 
+        name: playerObj.w, 
+        flag: playerObj.Kd, 
+        avatar: playerObj.Xb, 
+        conn: playerObj.conn, 
+        auth: playerObj.auth
+      };
+    };
+
+    function fakeSend(id, msg){
+      internalData.execOperationReceivedOnHost(msg, undefined, id)!=false && internalData.roomObj?.ya?.ra(msg);
+    }
+
+    this.fakeSendPlayerInput = function(input, byId){
+      var b = new Ga();
+      b.input = input;
+      fakeSend(byId, b);
+    };
+
+    this.fakeSendPlayerChat = function(msg, byId){
+      var b = new Na();
+      b.Tc = msg;
+      fakeSend(byId, b);
+    };
+
+    this.fakeSetPlayerChatIndicator = function(value, byId){
+      fakeSend(byId, na.la(value));
+    };
+
+    this.fakeSetPlayerAvatar = function(value, byId){
+      fakeSend(byId, ra.la(value));
+    };
+
+    this.fakeSetStadium = function(value, byId){ // only works if game is stopped
+      fakeSend(byId, qa.la(value));
+    };
+    /*
+    this.fakeSendAnnouncement = function(msg, color=-1, style=0, sound=1, targetId, byId){ // host-only, so it does not work.
+      fakeSend(byId, rb.la(msg, color, style, sound));
+    };
+    */
+    this.fakeStartGame = function(byId){
+      fakeSend(byId, new Ma());
+    };
+
+    this.fakeStopGame = function(byId){
+      fakeSend(byId, new La());
+    };
+
+    this.fakeSetGamePaused = function(value, byId){
+      var a = new Oa();
+      a.Bf = value;
+      fakeSend(byId, a);
+    };
+
+    this.fakeSetScoreLimit = function(value, byId){
+      fakeSend(byId, da.la(0, value));
+    };
+
+    this.fakeSetTimeLimit = function(value, byId){
+      fakeSend(byId, da.la(1, value));
+    };
+
+    this.fakeSetTeamsLock = function(value, byId){
+      fakeSend(byId, pa.la(value));
+    };
+
+    this.fakeAutoTeams = function(byId){
+      fakeSend(byId, new Qa());
+    };
+
+    this.fakeSetPlayerTeam = function(playerId, teamId, byId){
+      var team = teamsById[teamId];
+      if (!team)
+        return;
+      fakeSend(byId, S.la(playerId, team));
+    };
+
+    this.fakeSetKickRateLimit = function(min, rate, burst, byId){
+      fakeSend(byId, ma.la(min, rate, burst));
+    };
+
+    this.fakeSetTeamColors = function(teamId, angle, byId){
+      fakeSend(byId, ub.__cq__(teamId, angle, ...colors));
+    };
+
+    this.fakeSetPlayerAdmin = function(playerId, value, byId){
+      fakeSend(byId, sa.la(playerId, value));
+    };
+
+    this.fakeKickPlayer = function(playerId, reason, ban, byId){
+      fakeSend(byId, Y.la(playerId, reason, ban));
+    };
+
+    this.fakeSetPlayerSync = function(value, byId){
+      fakeSend(byId, ta.la(value));
+    };
+    /*
+    this.fakeSendPingData = function(valueFunc, byId){ // host-only, so it does not work.
+      for (var b = new la(), c = internalData.roomObj?.ya?.T?.I, d = [], e = 0; e < c.length; )
+        d.push(valueFunc(c[e++]));
+      b.we = d;
+      fakeSend(byId, b);
+    };
+
+    this.fakeSetDiscProperties = function(discId, type, data, byId){ // host-only, so it does not work.
+      fakeSend(byId, ob._Kf_(discId, type, data));
+    };
+    */
+
+
 
     this.getPlayerOriginal = function(id){
       return internalData.roomObj?.ya?.T?.I?.filter((x)=>x.V==id)[0];

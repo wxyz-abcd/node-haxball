@@ -47,7 +47,7 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
     </head>
     <body>
       <script>
-        var { OperationType, ConnectionState, Room, Utils, Plugin } = abcHaxballAPI(window, {
+        var { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = abcHaxballAPI(window, {
           WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
           HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
         });
@@ -68,7 +68,7 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
     </head>
     <body>
       <script>
-        var { OperationType, ConnectionState, Room, Utils, Plugin } = abcHaxballAPI(window); 
+        var { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -94,9 +94,6 @@ Utils.generateAuth().then(([authKey, authObj])=>{
     onSuccess: (room)=>{
       const { name } = room.getRoomData();
       room.sendChat("Hello " + name);
-      room.onAfterRoomLink = (roomLink)=>{
-        console.log("room link:", roomLink);
-      };
     }
   });
 });
@@ -120,6 +117,9 @@ Room.create({
   onSuccess: (room)=>{
     const { name } = room.getRoomData();
     room.sendChat("Hello " + name);
+    room.onAfterRoomLink = (roomLink)=>{
+      console.log("room link:", roomLink);
+    };
   }
 });
 ```
@@ -315,7 +315,29 @@ Room.create({
     - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.
     - `isRecording()`: returns true if recording has started; false otherwise.
     - `setRenderer(renderer)`: sets the renderer object that will render the game. The object should follow the provided `Renderer` template.
-    
+
+  - `fake event triggers`: these functions are intended to be used in host mode to create/control in-memory bot players that will run much more efficiently than standard networking bot players. they also work for normal player objects, and can be used to create some events belonging to a player that did not originate from that player.
+    - `fakePlayerJoin(id, name, flag, avatar, conn, auth)`: triggers a fake join room event; which in turn creates a new in-memory player object. If there was a player before with this id, old resources are automatically reassigned to this new player object, and that player will wake up. 0<=`id`<=65535, all the other parameters must be a string. 
+    - `fakePlayerLeave(id)`: triggers a fake leave room event. returns the player's properties so that you may pass them to `fakePlayerJoin` at a later time to wake that player. passing `id` = 0 causes desync on clients. the player, although seemingly leaving the room, still watches the room, waiting for a fake player join event. all parameters except `id` may be different in the new `fakePlayerJoin` call, which allows player's `name`, `flag`, `avatar`, `conn` and `auth` to change without the player entirely leaving the room.
+    - `fakeSendPlayerInput(input, byId)`: triggers a fake input(keys) event that apparently came from `player(byId)`. 
+    - `fakeSendPlayerChat(msg, byId)`: triggers a fake chat event that apparently came from `player(byId)`. 
+    - `fakeSetPlayerChatIndicator(value, byId)`: triggers a fake chat indicator change event that apparently came from `player(byId)`. 
+    - `fakeSetPlayerAvatar(value, byId)`: triggers a fake avatar change event that apparently came from `player(byId)`. 
+    - `fakeSetPlayerAdmin(playerId, value, byId)`: triggers a player admin status change event that apparently came from `player(byId)`. 
+    - `fakeSetPlayerSync(value, byId)`: triggers a fake player sync status change event that apparently came from `player(byId)`. 
+    - `fakeSetStadium(value, byId)`:  triggers a fake stadium change event. only works if game is stopped that apparently came from `player(byId)`.
+    - `fakeStartGame(byId)`: triggers a fake game start event that apparently came from `player(byId)`. 
+    - `fakeStopGame(byId)`: triggers a fake game stop event that apparently came from `player(byId)`. 
+    - `fakeSetGamePaused(value, byId)`: triggers a fake game pause/resume event that apparently came from `player(byId)`. 
+    - `fakeSetScoreLimit(value, byId)`: triggers a fake score limit change event that apparently came from `player(byId)`. 
+    - `fakeSetTimeLimit(value, byId)`: triggers a fake time limit change event that apparently came from `player(byId)`. 
+    - `fakeSetTeamsLock(value, byId)`: triggers a fake teams lock change event that apparently came from `player(byId)`. 
+    - `fakeAutoTeams(byId)`: triggers a fake auto teams event that apparently came from `player(byId)`. 
+    - `fakeSetPlayerTeam(playerId, teamId, byId)`: triggers a fake player team change event that apparently came from `player(byId)`. 
+    - `fakeSetKickRateLimit(min, rate, burst, byId)`: triggers a fake kick rate limit change event that apparently came from `player(byId)`. 
+    - `fakeSetTeamColors(teamId, angle, colors, byId)`: triggers a fake team colors change event that apparently came from `player(byId)`. 
+    - `fakeKickPlayer(playerId, reason, ban, byId)`: triggers a fake player kick/ban event that apparently came from `player(byId)`. 
+
   - `modifier callbacks`:
     - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedNick, modifiedAvatar, modifiedFlag]`. if `dataArray` is null, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. host-only.
