@@ -1,4 +1,4 @@
-var { Utils, Plugin } = require("../../src/index");
+var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
 
 module.exports = function(){
 

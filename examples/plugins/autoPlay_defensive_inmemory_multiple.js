@@ -1,4 +1,4 @@
-var { Utils, Plugin } = require("../../src/index");
+var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
 
 module.exports = function(){
 
@@ -8,6 +8,7 @@ module.exports = function(){
   this.minCoordAlignDelta = 0.5;
   this.minKickDistance = 2;
   this.maxDistanceToFollowBallCoeff = 0.2;
+  this.maxConcurrentBotCount = 20;
 
   var room = null, that = this;
 
@@ -19,15 +20,19 @@ module.exports = function(){
     room = null;
   };
 
-  var smallestBotId = 65535, largestBotId = 65535, botIds = [];
+  var smallestBotId = 65535, largestBotId = 65535, botIds = [], keyStates = {}, dummyPromise = Promise.resolve();
 
   var addBot = function(name, flag, avatar, conn, auth){
+    if (botIds.length >= that.maxConcurrentBotCount)
+      return;
     botIds.push(smallestBotId);
+    keyStates[smallestBotId] = 0;
     room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
   };
 
   var removeBot = function(){
     if (smallestBotId < largestBotId){
+      delete keyStates[largestBotId];
       botIds.splice(botIds.indexOf(largestBotId), 1);
       room.fakePlayerLeave(largestBotId--);
     }
@@ -63,10 +68,18 @@ module.exports = function(){
     if (ep)
       p = ep;
     botIds.forEach((botId)=>{
+
+      // get the original data object of the next bot
       var cp = p.Ma.I.filter((p)=>(p.V==botId))[0];
       var playerDisc = cp?.H;
-      if (!playerDisc)
+
+      // coordinates: playerDisc.a.x, playerDisc.a.y
+      // speed: playerDisc.D.x, playerDisc.D.y
+      // radius: playerDisc.Z
+
+      if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
         return;
+      
       var teamId = cp.ea.$, opponentTeamId = 3 - teamId;
       var goals = o.S.tc, ball = p.ta.F[0];
       /*
@@ -125,7 +138,24 @@ module.exports = function(){
       */
       
       // apply current keys
-      room.fakeSendPlayerInput(/*input:*/ Utils.keyState(dirX, dirY, kick), /*byId:*/ botId);
+      var keyState = Utils.keyState(dirX, dirY, kick);
+      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+        if (keyState != keyStates[botId]){ // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. this happens because requestAnimationFrame is being used. therefore, we are trying to limit consequent sending.
+          room.fakeSendPlayerInput(/*input:*/ keyState, /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
+          keyStates[botId] = keyState;
+        }
+      });
+      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+        // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
+        // this happens because requestAnimationFrame is being used. 
+        // therefore, we are trying to limit consequent sending.
+        if (keyState!=keyStates[botId] || kick!=cp.Wb){ // Wb: whether x key is active in-game (the circle around players is painted white if Wb is true)
+          if ((keyState==keyStates[botId]) && kick && !cp.Wb) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
+            room.fakeSendPlayerInput(/*input:*/ keyState & -17, /*byId:*/ botId); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
+          room.fakeSendPlayerInput(/*input:*/ keyState, /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
+          keyStates[botId] = keyState;
+        }
+      });
     });
   };
 

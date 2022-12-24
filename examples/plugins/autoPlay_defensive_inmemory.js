@@ -1,4 +1,4 @@
-var { Utils, Plugin } = require("../../src/index");
+var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
 
 module.exports = function(){
 
@@ -9,7 +9,7 @@ module.exports = function(){
   this.minKickDistance = 2;
   this.maxDistanceToFollowBallCoeff = 0.2;
 
-  var room = null, that = this;
+  var room = null, that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
 
   this.initialize = function(_room){
     room = _room;
@@ -91,9 +91,20 @@ module.exports = function(){
       dirY=-dirY;
     }
     */
-    
+
     // apply current keys
-    room.fakeSendPlayerInput(/*input:*/ Utils.keyState(dirX, dirY, kick), /*byId:*/ 65535);
+    var newKeyState = Utils.keyState(dirX, dirY, kick);
+    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+      // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
+      // this happens because requestAnimationFrame is being used. 
+      // therefore, we are trying to limit consequent sending.
+      if (newKeyState!=oldKeyState || kick!=cp.Wb){ // Wb: whether x key is active in-game (the circle around players is painted white if Wb is true)
+        if ((newKeyState==oldKeyState) && kick && !cp.Wb) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
+          room.fakeSendPlayerInput(/*input:*/ newKeyState & -17, /*byId:*/ 65535); // we have to release x key before pressing it again. (newKeyState & -17) changes only the 5th(kick) bit of newKeyState to 0.
+        room.fakeSendPlayerInput(/*input:*/ newKeyState, /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
+        oldKeyState = newKeyState;
+      }
+    });
   };
 
 };
