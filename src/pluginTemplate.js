@@ -1,7 +1,12 @@
 const { Plugin } = require(".");
 
 module.exports = function(){
-  Plugin.call(this, "template", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "template", true, { // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This is a template plugin`,
+    allowFlags: Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
   this.initialize = function(room){};
   this.finalize = function(){};

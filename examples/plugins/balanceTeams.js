@@ -1,10 +1,13 @@
-var { Plugin } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
+  Plugin.call(this, "balanceTeams", true, { // "balanceTeams" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin balances the player counts of teams automatically whenever a player joins/leaves the room or changes team.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
-  Plugin.call(this, "balanceTeams", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "balanceTeams" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
-
-  var _room = null, teams = [[], [], []], playerTeams = {};
+  var _room = null, teams = [[], [], []], playerTeams = {}, that = this;
 
   this.initialize = function(room){
     _room = room;
@@ -61,6 +64,11 @@ module.exports = function(){
 
     // balance teeams
     balanceTeams();
+  };
+
+  this.onActiveChanged = function(){
+    if (that.active)
+      balanceTeams();
   };
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){

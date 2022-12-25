@@ -1,12 +1,52 @@
-var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "autoPlay_followBall_inmemory_multiple", true, Plugin.AllowFlags.CreateRoom); // "autoPlay_followBall_inmemory_multiple" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name. We allow this plugin to be activated on CreateRoom only.
+  Plugin.call(this, "autoPlay_followBall_inmemory_multiple", true, { // "autoPlay_followBall_inmemory_multiple" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
+    This bot is capable of creating/removing fake bot players(id descending from 65535) in host's memory and controlling all of them at the same time using fake events.
+    Available commands:
+    - !add_bot [name="in-memory-bot"] [flag="tr"] [avatar="XX"] [conn="fake-ip-do-not-believe-it"] [auth="fake-auth-do-not-believe-it"]: Adds a new bot with given properties.
+    - !remove_bot: Removes the first added bot that is still not removed.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+  });
 
   // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = 0.5;
-  this.minKickDistance = 2;
+  this.minCoordAlignDelta = this.defineVariable({
+    name: "minCoordAlignDelta",
+    description: "Minimum delta value for coordinate alignment", 
+    type: Plugin.VariableType.Number,
+    value: 0.5, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.minKickDistance = this.defineVariable({
+    name: "minKickDistance",
+    description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
+    type: Plugin.VariableType.Number,
+    value: 2, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.maxConcurrentBotCount = this.defineVariable({
+    name: "maxConcurrentBotCount",
+    description: "Maximum number of concurrently running bots.", 
+    type: Plugin.VariableType.Integer,
+    value: 20, 
+    range: {
+      min: 1,
+      max: Infinity,
+      step: 1
+    }
+  });
 
   var room = null, that = this;
 
@@ -21,6 +61,8 @@ module.exports = function(){
   var smallestBotId = 65535, largestBotId = 65535, botIds = [], keyStates = {}, dummyPromise = Promise.resolve();
 
   var addBot = function(name, flag, avatar, conn, auth){
+    if (botIds.length >= that.maxConcurrentBotCount)
+      return;
     botIds.push(smallestBotId);
     keyStates[smallestBotId] = 0;
     room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");

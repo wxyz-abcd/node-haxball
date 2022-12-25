@@ -9566,15 +9566,35 @@ function abcHaxballAPI(window, config){
     }
   }
 
-  function Plugin(name, active=false, allowFlags=3){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
+  function PluginBase(){ // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+    this.defineMetadata = function(x){};//x={version, author, description}
+    this.defineVariable = function(x){//x={name, type, value, range, description}
+      return x?.value; // Do not forget to return this value. It is used even inside constructor.
+    };
+  }
+
+  function Plugin(name, active=false, metadata=null){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
+    PluginBase.call(this);
     this.name = name;
-    this.active = active;
-    this.allowFlags = allowFlags;
+    this.defineMetadata(metadata);
+    this.active = this.defineVariable({
+      name: "active",
+      description: "Whether this plugin is active or not.", 
+      type: Plugin.VariableType.Boolean,
+      value: active
+    });
   }
 
   Plugin.AllowFlags = {
     JoinRoom: 1,
     CreateRoom: 2
+  };
+
+  Plugin.VariableType = {
+    Boolean: 0,
+    Integer: 1,
+    Number: 2,
+    String: 3
   };
 
   return {
@@ -9598,6 +9618,7 @@ function abcHaxballAPI(window, config){
       read: readReplay
       //Recorder: ac
     },
+    PluginBase,
     Plugin
   };
 }

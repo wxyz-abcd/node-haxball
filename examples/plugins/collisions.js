@@ -1,8 +1,11 @@
-var { Plugin } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "collisions", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "collisions" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "collisions", true, { // "collisions" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin only logs messages in console when a collision happens. We will improve this later.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
   this.onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2, customData){
     console.log("Disc vs disc collision : ", discPlayerId1, discId1, discPlayerId2, discId2);

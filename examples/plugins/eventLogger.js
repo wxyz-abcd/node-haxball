@@ -1,7 +1,10 @@
-var { Plugin } = require("../../src/index");
-
-module.exports = function(){
-  Plugin.call(this, "eventLogger", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
+  Plugin.call(this, "eventLogger", true, { // "eventLogger" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin logs all events in console except those that would cause flooding. Improvement could be to add an option to show flooding logs.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
   this.initialize = function(room){
     console.log("initialize...", room);

@@ -1,12 +1,36 @@
-var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "autoPlay_followBall", true, Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom); // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "autoPlay_followBall", true, { // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. This bot uses real events and controls real players.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
   // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = 0.5;
-  this.minKickDistance = 2;
+  this.minCoordAlignDelta = this.defineVariable({
+    name: "minCoordAlignDelta",
+    description: "Minimum delta value for coordinate alignment", 
+    type: Plugin.VariableType.Number,
+    value: 0.5, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.minKickDistance = this.defineVariable({
+    name: "minKickDistance",
+    description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
+    type: Plugin.VariableType.Number,
+    value: 2, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
 
   var _room = null, that = this;
 

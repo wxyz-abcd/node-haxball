@@ -1,15 +1,76 @@
-var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, Plugin.AllowFlags.CreateRoom); // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on CreateRoom only.
+  Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This is an auto-playing bot that has 2 different modes. 
+    - followBall mode always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
+    - defensive mode follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking.
+    This bot is capable of creating/removing fake bot players(id descending from 65535) in host's memory and controlling all of them at the same time using fake events.
+    Available commands:
+    - !add_bot [type = {-1, 0, 1}] [active = {0, 1}] [count] [name="in-memory-bot"] [flag="tr"] [avatar="XX"] [conn="fake-ip-do-not-believe-it"] [auth="fake-auth-do-not-believe-it"]: Adds a new bot with given properties. 0<[count]<=100, [type] = {-1: standing still, 0: followBall, 1: defensive}.
+    - !remove_bot [count]: Removes the first [count] added bots that is still not removed. 0<[count]<=100.
+    - !max_bot_count [count]: Sets the maximum allowed concurrent bot count to [count].
+    - !bot_active [id] [active = {0, 1}]: Changes the activity of the bot player whose playerId is [id].
+    - !bot_type [id] [type = {-1, 0, 1}]: Sets the bot type of the bot player whose playerId is [id]. [type] = {-1: standing still, 0: followBall, 1: defensive}.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+  });
 
   // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = 0.5;
-  this.minKickDistance = 10;
-  this.maxDistanceToFollowBallCoeff = 0.2;
-  this.maxConcurrentBotCount = 100;
-  this.botsActive = true;
+  this.minCoordAlignDelta = this.defineVariable({
+    name: "minCoordAlignDelta",
+    description: "Minimum delta value for coordinate alignment", 
+    type: Plugin.VariableType.Number,
+    value: 0.5, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.minKickDistance = this.defineVariable({
+    name: "minKickDistance",
+    description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
+    type: Plugin.VariableType.Number,
+    value: 2, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+    name: "maxDistanceToFollowBallCoeff",
+    description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
+    type: Plugin.VariableType.Number,
+    value: 0.2, 
+    range: {
+      min: 0,
+      max: 1,
+      step: 0.01
+    }
+  });
+
+  this.maxConcurrentBotCount = this.defineVariable({
+    name: "maxConcurrentBotCount",
+    description: "Maximum number of concurrently running bots.", 
+    type: Plugin.VariableType.Integer,
+    value: 100, 
+    range: {
+      min: 1,
+      max: Infinity,
+      step: 1
+    }
+  });
+
+  this.botsActive = this.defineVariable({
+    name: "botsActive",
+    description: "Whether all the bots are active or not.", 
+    type: Plugin.VariableType.Boolean,
+    value: true
+  });
 
   var room = null, that = this, dummyPromise = Promise.resolve(), originalRoomData;
 

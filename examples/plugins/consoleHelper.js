@@ -1,9 +1,14 @@
-var { Plugin } = require("../../src/index");
 const vm = require("vm"); // you need to install this package manually in order to use it. (npm install vm)
 
-module.exports = function(){
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
   
-  Plugin.call(this, "consoleHelper", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "consoleHelper" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "consoleHelper", true, { // "consoleHelper" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin lets us write commands in the console and executes them. We do not need this inside a browser, this is useful for node.js. Only commands inside the room object are supported.
+    Example usage: If you want to use room.setKeyState(5), just write setKeyState(5) and press enter.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
   var _room, stdin, listener = function(d) {
     vm.runInContext(d.toString().trim(), _room); // process the string as a command in the room context.

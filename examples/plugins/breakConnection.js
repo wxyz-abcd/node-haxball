@@ -1,8 +1,13 @@
-var { OperationType, Plugin } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "breakConnection", true, Plugin.AllowFlags.CreateRoom); // "breakConnection" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on only CreateRoom.
+  Plugin.call(this, "breakConnection", true, { // "breakConnection" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin can make a player leave not by kicking him, but by breaking his connection. This should be improved with a permission mechanism.
+    Available commands: 
+    - !breakKick [id]: Break the connection of the player whose playerId=[id].`,
+    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+  });
 
   var connectionShouldBreak = {};
 

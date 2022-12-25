@@ -437,7 +437,13 @@ Room.create({
       - `onAfterCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
     - `onPluginActiveChange(plugin)`: a plugin was activated/deactivated. triggered individually.
 
-- `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
+- `PluginBase`: A class that defines all plugins' base functions. Only used to show metadata in a GUI application.
+
+  - `functions`:
+    - `defineMetadata(version, author, description)`: Does nothing, returns nothing by default. You may store the information by overriding this function.
+    - `defineVariable(name, type, value, range, description)`: Does nothing, returns `value` by default. You may store the information by overriding this function. Just do not forget to return `value` at the end of the function.
+
+- `Plugin`: A class that defines a plugin that derives from PluginBase class. Any plugin should be based on this class.
 
   - `constructor(name, active, allowFlags)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true.
 

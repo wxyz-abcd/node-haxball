@@ -1,8 +1,14 @@
-var { OperationType, Plugin } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "controlOtherPlayers", true, Plugin.AllowFlags.CreateRoom); // "controlOtherPlayers" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. Every plugin should have a unique name. We allow this plugin to be activated on only CreateRoom.
+  Plugin.call(this, "controlOtherPlayers", true, { // "controlOtherPlayers" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin lets you take control of every player in the room. This should be improved with a permission mechanism.
+    Available commands: 
+    - !control [id]: Take control of the player whose playerId=[id].
+    - !blockControl [id] [value={0, 1}]: Block/unblock taking control of the player whose playerId=[id].`,
+    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+  });
 
   var _room = room, controlSwitch = {}, controlSwitchBlocked = {};
 

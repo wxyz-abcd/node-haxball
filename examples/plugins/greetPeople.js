@@ -1,8 +1,11 @@
-var { Plugin } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "greetPeople", true, Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom); // "greetPeople" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  Plugin.call(this, "greetPeople", true, { // "greetPeople" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This plugin greets the players and makes them admin as soon as they come to the room, and says goodbye to them when they leave.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+  });
 
   var _room = null;
 

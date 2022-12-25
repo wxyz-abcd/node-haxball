@@ -1,14 +1,64 @@
-var { OperationType, ConnectionState, Utils, Plugin, Replay, Room } = require("../../src/index");
+module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
-module.exports = function(){
-
-  Plugin.call(this, "autoPlay_defensive_inmemory_multiple", true, Plugin.AllowFlags.CreateRoom); // "autoPlay_defensive_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name. We allow this plugin to be activated on CreateRoom only.
+  Plugin.call(this, "autoPlay_defensive_inmemory_multiple", true, { // "autoPlay_defensive_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+    version: "0.1",
+    author: "abc",
+    description: `This is an auto-playing bot that follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking.
+    This bot is capable of creating/removing fake bot players(id descending from 65535) in host's memory and controlling all of them at the same time using fake events.
+    Available commands:
+    - !add_bot [name="in-memory-bot"] [flag="tr"] [avatar="XX"] [conn="fake-ip-do-not-believe-it"] [auth="fake-auth-do-not-believe-it"]: Adds a new bot with given properties.
+    - !remove_bot: Removes the first added bot that is still not removed.`,
+    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+  });
 
   // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = 0.5;
-  this.minKickDistance = 2;
-  this.maxDistanceToFollowBallCoeff = 0.2;
-  this.maxConcurrentBotCount = 20;
+  this.minCoordAlignDelta = this.defineVariable({
+    name: "minCoordAlignDelta",
+    description: "Minimum delta value for coordinate alignment", 
+    type: Plugin.VariableType.Number,
+    value: 0.5, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.minKickDistance = this.defineVariable({
+    name: "minKickDistance",
+    description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
+    type: Plugin.VariableType.Number,
+    value: 2, 
+    range: {
+      min: 0,
+      max: 10,
+      step: 0.5
+    }
+  });
+
+  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+    name: "maxDistanceToFollowBallCoeff",
+    description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
+    type: Plugin.VariableType.Number,
+    value: 0.2, 
+    range: {
+      min: 0,
+      max: 1,
+      step: 0.01
+    }
+  });
+
+  this.maxConcurrentBotCount = this.defineVariable({
+    name: "maxConcurrentBotCount",
+    description: "Maximum number of concurrently running bots.", 
+    type: Plugin.VariableType.Integer,
+    value: 20, 
+    range: {
+      min: 1,
+      max: Infinity,
+      step: 1
+    }
+  });
 
   var room = null, that = this;
 
