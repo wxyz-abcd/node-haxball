@@ -437,13 +437,7 @@ Room.create({
       - `onAfterCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
     - `onPluginActiveChange(plugin)`: a plugin was activated/deactivated. triggered individually.
 
-- `PluginBase`: A class that defines all plugins' base functions. Only used to show metadata in a GUI application.
-
-  - `functions`:
-    - `defineMetadata(version, author, description)`: Does nothing, returns nothing by default. You may store the information by overriding this function.
-    - `defineVariable(name, type, value, range, description)`: Does nothing, returns `value` by default. You may store the information by overriding this function. Just do not forget to return `value` at the end of the function.
-
-- `Plugin`: A class that defines a plugin that derives from PluginBase class. Any plugin should be based on this class.
+- `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 
   - `constructor(name, active, metadata)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. Metadata is the information that you would want to show/update inside a GUI application.
 
@@ -452,8 +446,8 @@ Room.create({
     - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
 
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating the Plugin objects.
-    - `defineMetadata(metadata)`: This function should define the given metadata object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following metadata structure: {version, author, description}.
-    - `defineVariable(variable)`: This function should define the given variable object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following variable structure: {name, type, value, range, description}. This function should return the value of the variable since it is used once in the constructor for the plugin's "active" property.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given metadata object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following metadata structure: {version, author, description}.
+    - `defineVariable(variable)`: Does nothing, returns variable's value by default. This function should define the given variable object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following variable structure: {name, type, value, range, description}. This function should return the value of the variable since it is used once in the constructor for the plugin's "active" property.
 
   - `modifier callbacks`:
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
