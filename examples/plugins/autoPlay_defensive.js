@@ -1,7 +1,7 @@
 module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "autoPlay_defensive", true, Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom, { // "autoPlay_defensive" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "autoPlay_defensive", true, { // "autoPlay_defensive" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc",
     description: `This is an auto-playing bot that follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking. This bot uses real events and controls real players.`,
