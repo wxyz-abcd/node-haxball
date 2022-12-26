@@ -445,12 +445,15 @@ Room.create({
 
 - `Plugin`: A class that defines a plugin that derives from PluginBase class. Any plugin should be based on this class.
 
-  - `constructor(name, active, allowFlags)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true.
+  - `constructor(name, active, metadata)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. Metadata is the information that you would want to show/update inside a GUI application.
 
   - `properties`:
     - `name`: name of the plugin. Must be unique, and is used internally in `Room.setPluginActive`. All Plugins can be accessed with their names via `Room.pluginsMap[name]`.
     - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
-    - `allowFlags`: determines whether the plugin is allowed to run in created or joined rooms. its default value is `Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom`.
+
+  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating the Plugin objects.
+    - `defineMetadata(metadata)`: This function should define the given metadata object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following metadata structure: {version, author, description}.
+    - `defineVariable(variable)`: This function should define the given variable object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following variable structure: {name, type, value, range, description}. This function should return the value of the variable since it is used once in the constructor for the plugin's "active" property.
 
   - `modifier callbacks`:
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.

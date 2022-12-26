@@ -1,5 +1,6 @@
 module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
 
+  Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall", true, { // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc",

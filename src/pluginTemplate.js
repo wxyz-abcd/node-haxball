@@ -1,6 +1,8 @@
 const { Plugin } = require(".");
 
 module.exports = function(){
+
+  Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "template", true, { // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc",
@@ -57,4 +59,5 @@ module.exports = function(){
   this.onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId, customData){};
   this.onCollisionDiscVsPlane = function(discId, discPlayerId, planeId, customData){};
   this.onCustomEvent = function(type, data, byId, customData){};
+
 };
