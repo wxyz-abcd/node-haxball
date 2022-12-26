@@ -439,15 +439,19 @@ Room.create({
 
 - `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 
+  - `static constants`: 
+    - `AllowFlags`: These flags allow us to understand whether the plugin is able to work correctly while joining or creating a room. Should be used in a GUI environment.
+    - `VariableType`: Different types of variables that can be defined in a Plugin with `Plugin.defineVariable` function. Should be used in a GUI environment.
+
   - `constructor(name, active, metadata)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. Metadata is the information that you would want to show/update inside a GUI application.
 
   - `properties`:
     - `name`: name of the plugin. Must be unique, and is used internally in `Room.setPluginActive`. All Plugins can be accessed with their names via `Room.pluginsMap[name]`.
     - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
 
-  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating the Plugin objects.
-    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given metadata object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following metadata structure: {version, author, description}.
-    - `defineVariable(variable)`: Does nothing, returns variable's value by default. This function should define the given variable object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following variable structure: {name, type, value, range, description}. This function should return the value of the variable since it is used once in the constructor for the plugin's "active" property.
+  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating the Plugin objects. These are defined in Plugin.prototype.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given metadata object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following metadata structure: {version, author, description, allowFlags}.
+    - `defineVariable(variable)`: Does nothing, returns variable's value by default. This function should define the given variable object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following variable structure: {name, type, value, range, description}. This function should return the value of the variable since it is used once in the constructor for the plugin's "active" property. This function should be used whenever a variable whose value is changeable from outside will be defined. 
 
   - `modifier callbacks`:
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
