@@ -11,10 +11,10 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var staticInputs = {}, _room = null;
+  var staticInputs = {}, room = null;
 
   var setPlayerInput = function(playerId, value){
-    if (!_room.getPlayerOriginal(playerId))
+    if (!room.getPlayerOriginal(playerId))
       return;
     /*
     if (!inputPermitted[byPlayerId]) // example for custom permission logic
@@ -23,12 +23,12 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     staticInputs[playerId] = (isNaN(value) || value<0 || value>31) ? null : value;  // store a static input value for this player
   };
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
   };
 
   this.onOperationReceived = function(operation, msg, customData){

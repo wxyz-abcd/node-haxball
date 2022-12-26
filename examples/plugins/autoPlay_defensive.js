@@ -45,22 +45,22 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     }
   });
 
-  var _room = null, that = this;
+  var room = null, that = this;
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
   };
 
   this.onGameTick = function(customData){
-    var { o, p, ep } = _room.getRoomDataOriginal();
+    var { o, p, ep } = room.getRoomDataOriginal();
     if (ep)
       p = ep;
 
-    var cp = p.Ma.I.filter((p)=>(p.V==_room.currentPlayerId))[0];
+    var cp = p.Ma.I.filter((p)=>(p.V==room.currentPlayerId))[0];
     var playerDisc = cp.H;
     if (!playerDisc)
       return;
@@ -122,6 +122,6 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     */
     
     // apply current keys
-    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

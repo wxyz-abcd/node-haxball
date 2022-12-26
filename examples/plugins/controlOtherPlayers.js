@@ -11,14 +11,14 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var _room = room, controlSwitch = {}, controlSwitchBlocked = {};
+  var room, controlSwitch = {}, controlSwitchBlocked = {};
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
     controlSwitch = null;
     controlSwitchBlocked = null;
   };
@@ -30,7 +30,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     if (!controlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!_room.getPlayerOriginal(playerIdToBeControlled))
+    if (!room.getPlayerOriginal(playerIdToBeControlled))
       playerIdToBeControlled = byPlayerId;
     controlSwitch[byPlayerId] = playerIdToBeControlled;
   };
@@ -42,7 +42,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     if (!blockControlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!_room.getPlayerOriginal(playerId))
+    if (!room.getPlayerOriginal(playerId))
       return;
     controlSwitchBlocked[playerId] = (value == 1);
   };

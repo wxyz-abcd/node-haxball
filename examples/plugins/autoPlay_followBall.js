@@ -33,20 +33,20 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     }
   });
 
-  var _room = null, that = this;
+  var room = null, that = this;
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
   };
 
   this.onGameTick = function(customData){
     
     // get the original data object of the current player
-    var playerDisc = _room.getPlayerDiscOriginal(_room.currentPlayerId);
+    var playerDisc = room.getPlayerDiscOriginal(room.currentPlayerId);
 
     // coordinates: playerDisc.a.x, playerDisc.a.y
     // speed: playerDisc.D.x, playerDisc.D.y
@@ -56,7 +56,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
       return;
 
     // get the original data object of the ball
-    var ball = _room.getBallOriginal();
+    var ball = room.getBallOriginal();
 
     // coordinates: ball.a.x, ball.a.y
     // speed: ball.D.x, ball.D.y
@@ -81,6 +81,6 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
 
     // apply current keys
-    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

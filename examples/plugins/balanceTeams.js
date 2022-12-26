@@ -8,14 +8,14 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  var _room = null, teams = [[], [], []], playerTeams = {}, that = this;
+  var room = null, teams = [[], [], []], playerTeams = {}, that = this;
 
-  this.initialize = function(room){
-    _room = room;
+  this.initialize = function(_room){
+    room = _room;
   };
 
   this.finalize = function(){
-    _room = null;
+    room = null;
     teams = null;
     playerTeams = null;
   };
@@ -29,15 +29,15 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
 
       // if red team has more players, add the player to blue team
       if (redCount>blueCount)
-        _room.setPlayerTeam(teams[0][0], 2);
+        room.setPlayerTeam(teams[0][0], 2);
       
       // if blue team has more players, add the player to red team
       else if (blueCount>redCount)
-        _room.setPlayerTeam(teams[0][0], 1);
+        room.setPlayerTeam(teams[0][0], 1);
       
       // if player counts are equal for both teams, add the player to a random team
       else
-        _room.setPlayerTeam(teams[0][0], 1+Math.floor(Math.random()*2));
+        room.setPlayerTeam(teams[0][0], 1+Math.floor(Math.random()*2));
     }
 
     // if there is no spectator
@@ -45,11 +45,11 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
 
       // if red team has more than 1 extra player than blue team, move the last red player to blue
       if (redCount>blueCount+1)
-        _room.setPlayerTeam(teams[1][teams[1].length-1], 2);
+        room.setPlayerTeam(teams[1][teams[1].length-1], 2);
 
       // if blue team has more than 1 extra player than red team, move the last blue player to red
       else if (blueCount>redCount+1)
-        _room.setPlayerTeam(teams[2][teams[2].length-1], 1);
+        room.setPlayerTeam(teams[2][teams[2].length-1], 1);
     }
   };
 
