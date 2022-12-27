@@ -2845,6 +2845,7 @@ function abcHaxballAPI(window, config){
         255 < this.U.length ||
         255 < this.qa.length ||
         255 < this.tc.length ||
+        1 > this.F.length ||
         255 < this.F.length
       )
         throw new q("Error");
