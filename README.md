@@ -33,8 +33,9 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
 
 #### 💻 Usage on Browser
 
-  - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>.
+  - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>. (Will expire at the end of each month and not work for several days.)
   - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at haxballOriginModifier project.)
+  - <a href="https://abc-haxball-proxy.infinityfreeapp.com/?no_proxy_server=true">Alternate URL</a> (No proxy server yet.)
 
   #### 💻 Usage on Browser (via Proxy Server)
 
