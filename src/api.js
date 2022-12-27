@@ -6654,6 +6654,8 @@ function abcHaxballAPI(window, config){
         this.haxball.__internalData.roomObj?.ya.ra_custom(e, e.P, true);
         return;
       }
+      else if (e.__proto__.f.name=="qa" && e.Pd.F.length==0)
+        return;
       f = this.Y;
       g = this.Y + 120;
       e.ue = d;
