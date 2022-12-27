@@ -34,10 +34,10 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: Plugin.VariableType.Number,
-    value: 2, 
+    value: 8, 
     range: {
       min: 0,
-      max: 10,
+      max: 15,
       step: 0.5
     }
   });
