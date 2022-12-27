@@ -41,7 +41,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
               breakConnection(playerId, parseInt(arr[1]));
               break;
           }
-          return false; // block this event from being further processed and sent to clients
+          //return false; // do not block this event from being processed. it is done automatically in onAfterOperationReceived. 
         }
         break;
       }

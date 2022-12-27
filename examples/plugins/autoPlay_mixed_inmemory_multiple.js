@@ -162,7 +162,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
               break;
             }
           }
-          return false; // block this event from being processed
+          //return false; // do not block this event from being processed. it is done automatically in onAfterOperationReceived. 
         }
         break;
       }

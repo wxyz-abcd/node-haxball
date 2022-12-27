@@ -68,7 +68,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
               blockControlPlayer(playerId, parseInt(arr[1]), parseInt(arr[2])); // must use original playerId to be able to take back control of your own player
               break;
           }
-          return false; // block this event from being processed
+          //return false; // do not block this event from being processed. it is done automatically in onAfterOperationReceived. 
         }
         break;
       }

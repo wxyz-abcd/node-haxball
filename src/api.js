@@ -8460,6 +8460,12 @@ function abcHaxballAPI(window, config){
         };
       };
 
+      this.onAfterOperationReceived = function(obj, msg, customData){
+        if (obj.type != OperationType.SendChat)
+          return true;
+        return !customData?.isCommand;
+      };
+
       this._onOperationReceived = function(obj, msg){
         var customData = that.onBeforeOperationReceived && that.onBeforeOperationReceived(obj, msg), b = (customData!==false);
         that.activePlugins.forEach((p)=>{
