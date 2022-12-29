@@ -8354,6 +8354,8 @@ function abcHaxballAPI(window, config){
     return stadium.se();
   };
 
+  var eventCallbacks = [];
+
   function Room(internalData, plugins){
     var renderer = internalData.renderer;
     if (!internalData.isHost)
@@ -8407,15 +8409,15 @@ function abcHaxballAPI(window, config){
         var p = that.plugins[oIdx];
         */
         var p = that.plugins.filter((x)=>x.name==name)[0];
-        if (!p)
+        if (!p || p.active==active)
           return;
-        if (p.active && !active){
+        if (!active){
           var idx = that.activePlugins.findIndex((x)=>x.name==name);
           if (idx<0)
             return;
           that.activePlugins.splice(idx, 1);
         }
-        else if (!p.active && active){
+        else{
           var idx = that.activePlugins.findIndex((x)=>x.name==name);
           if (idx>=0)
             return;
@@ -8435,6 +8437,7 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.modifyPlayerData && a && (a = p.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
           });
+          that.modifyPlayerData && a && (a = that.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
           that.modifyPlayerDataAfter && a && (a = that.modifyPlayerDataAfter(playerId, a[0], a[1], a[2], conn, auth, customData));
         }
         return a;
@@ -8447,6 +8450,7 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.modifyPlayerPing && (ping = p.modifyPlayerPing(playerId, ping, customData));
           });
+          that.modifyPlayerPing && (ping = that.modifyPlayerPing(playerId, ping, customData));
           that.modifyPlayerPingAfter && (ping = that.modifyPlayerPingAfter(playerId, ping, customData));
         }
         return ping;
@@ -8486,509 +8490,25 @@ function abcHaxballAPI(window, config){
         return b;
       };
 
-      this._onPlayerObjectCreated = function(playerObject){
-        var customData = that.onBeforePlayerObjectCreated && that.onBeforePlayerObjectCreated(playerObject);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerObjectCreated && p.onPlayerObjectCreated(playerObject, customData);
-          });
-          that.onPlayerObjectCreated && that.onPlayerObjectCreated(playerObject, customData);
-          renderer?.onPlayerObjectCreated && renderer.onPlayerObjectCreated(playerObject, customData);
-          that.onAfterPlayerObjectCreated && that.onAfterPlayerObjectCreated(playerObject, customData);
-        }
+      // metadata is not used or stored, it's just for general information about the event. 
+      // we should not use the original variable names inside metadata as string, otherwise they will not be minified.
+      var createEventCallback = function(eventName, metadata){
+        that["_on" + eventName] = function(...params){
+          var f = that["onBefore" + eventName], customData = f && f(...params);
+          if (customData!==false){
+            that.activePlugins.forEach((p)=>{
+              f = p["on" + eventName], (f && f(...params, customData));
+            });
+            f = that["on" + eventName], (f && f(...params, customData));
+            f = renderer && renderer["on" + eventName], (f && f(...params, customData));
+            f = that["onAfter" + eventName], (f && f(...params, customData));
+          }
+        };
       };
 
-      this._onRoomLink = function(link){
-        var customData = that.onBeforeRoomLink && that.onBeforeRoomLink(link);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onRoomLink && p.onRoomLink(link, customData);
-          });
-          that.onRoomLink && that.onRoomLink(link, customData);
-          renderer?.onRoomLink && renderer.onRoomLink(link, customData);
-          that.onAfterRoomLink && that.onAfterRoomLink(link, customData);
-        }
-      };
-
-      this._onPlayerBallKick = function(playerId){
-        var customData = that.onBeforePlayerBallKick && that.onBeforePlayerBallKick(playerId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerBallKick && p.onPlayerBallKick(playerId, customData);
-          });
-          that.onPlayerBallKick && that.onPlayerBallKick(playerId, customData);
-          renderer?.onPlayerBallKick && renderer.onPlayerBallKick(playerId, customData);
-          that.onAfterPlayerBallKick && that.onAfterPlayerBallKick(playerId, customData);
-        }
-      };
-
-      this._onTeamGoal = function(teamId){
-        var customData = that.onBeforeTeamGoal && that.onBeforeTeamGoal(teamId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onTeamGoal && p.onTeamGoal(teamId, customData);
-          });
-          that.onTeamGoal && that.onTeamGoal(teamId, customData);
-          renderer?.onTeamGoal && renderer.onTeamGoal(teamId, customData);
-          that.onAfterTeamGoal && that.onAfterTeamGoal(teamId, customData);
-        }
-      };
-
-      this._onGameEnd = function(winningTeamId){
-        var customData = that.onBeforeGameEnd && that.onBeforeGameEnd(winningTeamId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onGameEnd && p.onGameEnd(winningTeamId, customData);
-          });
-          that.onGameEnd && that.onGameEnd(winningTeamId, customData);
-          renderer?.onGameEnd && renderer.onGameEnd(winningTeamId, customData);
-          that.onAfterGameEnd && that.onAfterGameEnd(winningTeamId, customData);
-        }
-      };
-
-      this._onGameTick = function(){
-        var customData = that.onBeforeGameTick && that.onBeforeGameTick();
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onGameTick && p.onGameTick(customData);
-          });
-          that.onGameTick && that.onGameTick(customData);
-          renderer?.onGameTick && renderer.onGameTick(customData);
-          that.onAfterGameTick && that.onAfterGameTick(customData);
-        }
-      };
-
-      this._onPlayerSyncChange = function(playerId, value){
-        var customData = that.onBeforePlayerSyncChange && that.onBeforePlayerSyncChange(playerId, value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerSyncChange && p.onPlayerSyncChange(playerId, value, customData);
-          });
-          that.onPlayerSyncChange && that.onPlayerSyncChange(playerId, value, customData);
-          renderer?.onPlayerSyncChange && renderer.onPlayerSyncChange(playerId, value, customData);
-          that.onAfterPlayerSyncChange && that.onAfterPlayerSyncChange(playerId, value, customData);
-        }
-      };
-
-      this._onAnnouncement = function(msg, color, style, sound){
-        var customData = that.onBeforeAnnouncement && that.onBeforeAnnouncement(msg, color, style, sound);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onAnnouncement && p.onAnnouncement(msg, color, style, sound, customData);
-          });
-          that.onAnnouncement && that.onAnnouncement(msg, color, style, sound, customData);
-          renderer?.onAnnouncement && renderer.onAnnouncement(msg, color, style, sound, customData);
-          that.onAfterAnnouncement && that.onAfterAnnouncement(msg, color, style, sound, customData);
-        }
-      };
-
-      this._onKickOff = function(){
-        var customData = that.onBeforeKickOff && that.onBeforeKickOff();
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onKickOff && p.onKickOff(customData);
-          });
-          that.onKickOff && that.onKickOff(playerId, teamId, byId, customData);
-          renderer?.onKickOff && renderer.onKickOff(playerId, teamId, byId, customData);
-          that.onAfterKickOff && that.onAfterKickOff(playerId, teamId, byId, customData);
-        }
-      };
-
-      this._onLocalFrame = function(localFrameNo){
-        var customData = that.onBeforeLocalFrame && that.onBeforeLocalFrame(localFrameNo);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onLocalFrame && p.onLocalFrame(localFrameNo, customData);
-          });
-          that.onLocalFrame && that.onLocalFrame(localFrameNo, customData);
-          renderer?.onLocalFrame && renderer.onLocalFrame(localFrameNo, customData);
-          that.onAfterLocalFrame && that.onAfterLocalFrame(localFrameNo, customData);
-        }
-      };
-
-      this._onAutoTeams = function(playerId1, teamId1, playerId2, teamId2, byId){
-        var customData = that.onBeforeAutoTeams && that.onBeforeAutoTeams(playerId1, teamId1, playerId2, teamId2, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onAutoTeams && p.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-          });
-          that.onAutoTeams && that.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-          renderer?.onAutoTeams && renderer.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-          that.onAfterAutoTeams && that.onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
-        }
-      };
-
-      this._onScoreLimitChange = function(value, byId){
-        var customData = that.onBeforeScoreLimitChange && that.onBeforeScoreLimitChange(value, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onScoreLimitChange && p.onScoreLimitChange(value, byId, customData);
-          });
-          that.onScoreLimitChange && that.onScoreLimitChange(value, byId, customData);
-          renderer?.onScoreLimitChange && renderer.onScoreLimitChange(value, byId, customData);
-          that.onAfterScoreLimitChange && that.onAfterScoreLimitChange(value, byId, customData);
-        }
-      };
-
-      this._onTimeLimitChange = function(value, byId){
-        var customData = that.onBeforeTimeLimitChange && that.onBeforeTimeLimitChange(value, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onTimeLimitChange && p.onTimeLimitChange(value, byId, customData);
-          });
-          that.onTimeLimitChange && that.onTimeLimitChange(value, byId, customData);
-          renderer?.onTimeLimitChange && renderer.onTimeLimitChange(value, byId, customData);
-          that.onAfterTimeLimitChange && that.onAfterTimeLimitChange(value, byId, customData);
-        }
-      };
-
-      this._onPlayerAdminChange = function(id, isAdmin, byId){
-        var customData = that.onBeforePlayerAdminChange && that.onBeforePlayerAdminChange(id, isAdmin, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerAdminChange && p.onPlayerAdminChange(id, isAdmin, byId, customData);
-          });
-          that.onPlayerAdminChange && that.onPlayerAdminChange(id, isAdmin, byId, customData);
-          renderer?.onPlayerAdminChange && renderer.onPlayerAdminChange(id, isAdmin, byId, customData);
-          that.onAfterPlayerAdminChange && that.onAfterPlayerAdminChange(id, isAdmin, byId, customData);
-        }
-      };
-
-      this._onPlayerAvatarChange = function(id, value){
-        var customData = that.onBeforePlayerAvatarChange && that.onBeforePlayerAvatarChange(id, value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerAvatarChange && p.onPlayerAvatarChange(id, value, customData);
-          });
-          that.onPlayerAvatarChange && that.onPlayerAvatarChange(id, value, customData);
-          renderer?.onPlayerAvatarChange && renderer.onPlayerAvatarChange(id, value, customData);
-          that.onAfterPlayerAvatarChange && that.onAfterPlayerAvatarChange(id, value, customData);
-        }
-      };
-
-      this._onPlayerTeamChange = function(id, teamId, byId){
-        var customData = that.onBeforePlayerTeamChange && that.onBeforePlayerTeamChange(id, teamId, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerTeamChange && p.onPlayerTeamChange(id, teamId, byId, customData);
-          });
-          that.onPlayerTeamChange && that.onPlayerTeamChange(id, teamId, byId, customData);
-          renderer?.onPlayerTeamChange && renderer.onPlayerTeamChange(id, teamId, byId, customData);
-          that.onAfterPlayerTeamChange && that.onAfterPlayerTeamChange(id, teamId, byId, customData);
-        }
-      };
-
-      this._onStadiumChange = function(stadium, byId){
-        var customData = that.onBeforeStadiumChange && that.onBeforeStadiumChange(stadium, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onStadiumChange && p.onStadiumChange(stadium, byId, customData);
-          });
-          that.onStadiumChange && that.onStadiumChange(stadium, byId, customData);
-          renderer?.onStadiumChange && renderer.onStadiumChange(stadium, byId, customData);
-          that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
-        }
-      };
-
-      this._onTeamColorsChange = function(teamId, value, byId){
-        var customData = that.onBeforeTeamColorsChange && that.onBeforeTeamColorsChange(teamId, value, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onTeamColorsChange && p.onTeamColorsChange(teamId, value, byId, customData);
-          });
-          that.onTeamColorsChange && that.onTeamColorsChange(teamId, value, byId, customData);
-          renderer?.onTeamColorsChange && renderer.onTeamColorsChange(teamId, value, byId, customData);
-          that.onAfterTeamColorsChange && that.onAfterTeamColorsChange(teamId, value, byId, customData);
-        }
-      };
-
-      this._onTeamsLockChange = function(value, byId){
-        var customData = that.onBeforeTeamsLockChange && that.onBeforeTeamsLockChange(value, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onTeamsLockChange && p.onTeamsLockChange(value, byId, customData);
-          });
-          that.onTeamsLockChange && that.onTeamsLockChange(value, byId, customData);
-          renderer?.onTeamsLockChange && renderer.onTeamsLockChange(value, byId, customData);
-          that.onAfterTeamsLockChange && that.onAfterTeamsLockChange(value, byId, customData);
-        }
-      };
-
-      this._onPlayerJoin = function(pObj){
-        var customData = that.onBeforePlayerJoin && that.onBeforePlayerJoin(pObj);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerJoin && p.onPlayerJoin(pObj, customData);
-          });
-          that.onPlayerJoin && that.onPlayerJoin(pObj, customData);
-          renderer?.onPlayerJoin && renderer.onPlayerJoin(pObj, customData);
-          that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
-        }
-      };
-
-      this._onGamePauseChange = function(isPaused, byId){
-        var customData = that.onBeforeGamePauseChange && that.onBeforeGamePauseChange(isPaused, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onGamePauseChange && p.onGamePauseChange(isPaused, byId, customData);
-          });
-          that.onGamePauseChange && that.onGamePauseChange(isPaused, byId, customData);
-          renderer?.onGamePauseChange && renderer.onGamePauseChange(isPaused, byId, customData);
-          that.onAfterGamePauseChange && that.onAfterGamePauseChange(isPaused, byId, customData);
-        }
-      };
-
-      this._onPlayerChat = function(id, message){
-        var customData = that.onBeforePlayerChat && that.onBeforePlayerChat(id, message);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerChat && p.onPlayerChat(id, message, customData);
-          });
-          that.onPlayerChat && that.onPlayerChat(id, message, customData);
-          renderer?.onPlayerChat && renderer.onPlayerChat(id, message, customData);
-          that.onAfterPlayerChat && that.onAfterPlayerChat(id, message, customData);
-        }
-      };
-
-      this._onPlayerInputChange = function(id, value){
-        var customData = that.onBeforePlayerInputChange && that.onBeforePlayerInputChange(id, value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerInputChange && p.onPlayerInputChange(id, value, customData);
-          });
-          that.onPlayerInputChange && that.onPlayerInputChange(id, value, customData);
-          renderer?.onPlayerInputChange && renderer.onPlayerInputChange(id, value, customData);
-          that.onAfterPlayerInputChange && that.onAfterPlayerInputChange(id, value, customData);
-        }
-      };
-
-      this._onPlayerChatIndicatorChange = function(id, value){
-        var customData = that.onBeforePlayerChatIndicatorChange && that.onBeforePlayerChatIndicatorChange(id, value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerChatIndicatorChange && p.onPlayerChatIndicatorChange(id, value, customData);
-          });
-          that.onPlayerChatIndicatorChange && that.onPlayerChatIndicatorChange(id, value, customData);
-          renderer?.onPlayerChatIndicatorChange && renderer.onPlayerChatIndicatorChange(id, value, customData);
-          that.onAfterPlayerChatIndicatorChange && that.onAfterPlayerChatIndicatorChange(id, value, customData);
-        }
-      };
-
-      this._onPlayerLeave = function(pObj, reason, isBanned, byId){
-        var customData = that.onBeforePlayerLeave && that.onBeforePlayerLeave(pObj, reason, isBanned, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPlayerLeave && p.onPlayerLeave(pObj, reason, isBanned, byId, customData);
-          });
-          that.onPlayerLeave && that.onPlayerLeave(pObj, reason, isBanned, byId, customData);
-          renderer?.onPlayerLeave && renderer.onPlayerLeave(pObj, reason, isBanned, byId, customData);
-          that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
-        }
-      };
-
-      this._onSetDiscProperties = function(id, type, data1, data2){
-        var customData = that.onBeforeSetDiscProperties && that.onBeforeSetDiscProperties(id, type, data1, data2);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onSetDiscProperties && p.onSetDiscProperties(id, type, data1, data2, customData);
-          });
-          that.onSetDiscProperties && that.onSetDiscProperties(id, type, data1, data2, customData);
-          renderer?.onSetDiscProperties && renderer.onSetDiscProperties(id, type, data1, data2, customData);
-          that.onAfterSetDiscProperties && that.onAfterSetDiscProperties(id, type, data1, data2, customData);
-        }
-      };
-
-      this._onKickRateLimitChange = function(min, rate, burst, byId){
-        var customData = that.onBeforeKickRateLimitChange && that.onBeforeKickRateLimitChange(min, rate, burst, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onKickRateLimitChange && p.onKickRateLimitChange(min, rate, burst, byId, customData);
-          });
-          that.onKickRateLimitChange && that.onKickRateLimitChange(min, rate, burst, byId, customData);
-          renderer?.onKickRateLimitChange && renderer.onKickRateLimitChange(min, rate, burst, byId, customData);
-          that.onAfterKickRateLimitChange && that.onAfterKickRateLimitChange(min, rate, burst, byId, customData);
-        }
-      };
-
-      this._onGameStart = function(byId){
-        var customData = that.onBeforeGameStart && that.onBeforeGameStart(byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onGameStart && p.onGameStart(byId, customData);
-          });
-          that.onGameStart && that.onGameStart(byId, customData);
-          renderer?.onGameStart && renderer.onGameStart(byId, customData);
-          that.onAfterGameStart && that.onAfterGameStart(byId, customData);
-        }
-      };
-
-      this._onGameStop = function(byId){
-        var customData = that.onBeforeGameStop && that.onBeforeGameStop(byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onGameStop && p.onGameStop(byId, customData);
-          });
-          that.onGameStop && that.onGameStop(byId, customData);
-          renderer?.onGameStop && renderer.onGameStop(byId, customData);
-          that.onAfterGameStop && that.onAfterGameStop(byId, customData);
-        }
-      };
-
-      this._onPingData = function(array){
-        var customData = that.onBeforePingData && that.onBeforePingData(array);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPingData && p.onPingData(array, customData);
-          });
-          that.onPingData && that.onPingData(array, customData);
-          renderer?.onPingData && renderer.onPingData(array, customData);
-          that.onAfterPingData && that.onAfterPingData(array, customData);
-        }
-      };
-
-      this._onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2){
-        var customData = that.onBeforeCollisionDiscVsDisc && that.onBeforeCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onCollisionDiscVsDisc && p.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-          });
-          that.onCollisionDiscVsDisc && that.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-          renderer?.onCollisionDiscVsDisc && renderer.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-          that.onAfterCollisionDiscVsDisc && that.onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
-        }
-      };
-
-      this._onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId){
-        var customData = that.onBeforeCollisionDiscVsSegment && that.onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onCollisionDiscVsSegment && p.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-          });
-          that.onCollisionDiscVsSegment && that.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-          renderer?.onCollisionDiscVsSegment && renderer.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-          that.onAfterCollisionDiscVsSegment && that.onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
-        }
-      };
-
-      this._onCollisionDiscVsPlane = function(discId, discPlayerId, planeId){
-        var customData = that.onBeforeCollisionDiscVsPlane && that.onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onCollisionDiscVsPlane && p.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-          });
-          that.onCollisionDiscVsPlane && that.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-          renderer?.onCollisionDiscVsPlane && renderer.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-          that.onAfterCollisionDiscVsPlane && that.onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
-        }
-      };
-
-      this._onTimeIsUp = function(){
-        var customData = that.onBeforeTimeIsUp && that.onBeforeTimeIsUp();
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onTimeIsUp && p.onTimeIsUp(customData);
-          });
-          that.onTimeIsUp && that.onTimeIsUp(customData);
-          renderer?.onTimeIsUp && renderer.onTimeIsUp(customData);
-          that.onAfterTimeIsUp && that.onAfterTimeIsUp(customData);
-        }
-      };
-
-      this._onPositionsReset = function(){
-        var customData = that.onBeforePositionsReset && that.onBeforePositionsReset();
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onPositionsReset && p.onPositionsReset(customData);
-          });
-          that.onPositionsReset && that.onPositionsReset(customData);
-          renderer?.onPositionsReset && renderer.onPositionsReset(customData);
-          that.onAfterPositionsReset && that.onAfterPositionsReset(customData);
-        }
-      };
-
-      this._onBansClear = function(){
-        var customData = that.onBeforeBansClear && that.onBeforeBansClear();
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onBansClear && p.onBansClear(customData);
-          });
-          that.onBansClear && that.onBansClear(customData);
-          renderer?.onBansClear && renderer.onBansClear(customData);
-          that.onAfterBansClear && that.onAfterBansClear(customData);
-        }
-      };
-
-      this._onExtrapolationChange = function(value){
-        var customData = that.onBeforeExtrapolationChange && that.onBeforeExtrapolationChange(value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onExtrapolationChange && p.onExtrapolationChange(value, customData);
-          });
-          that.onExtrapolationChange && that.onExtrapolationChange(value, customData);
-          renderer?.onExtrapolationChange && renderer.onExtrapolationChange(value, customData);
-          that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
-        }
-      };
-
-      this._onHandicapChange = function(value){
-        var customData = that.onBeforeHandicapChange && that.onBeforeHandicapChange(value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onHandicapChange && p.onHandicapChange(value, customData);
-          });
-          that.onHandicapChange && that.onHandicapChange(value, customData);
-          renderer?.onHandicapChange && renderer.onHandicapChange(value, customData);
-          that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
-        }
-      };
-
-      this._onRoomRecaptchaModeChange = function(on){
-        var customData = that.onBeforeRoomRecaptchaModeChange && that.onBeforeRoomRecaptchaModeChange(on);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onRoomRecaptchaModeChange && p.onRoomRecaptchaModeChange(on, customData);
-          });
-          that.onRoomRecaptchaModeChange && that.onRoomRecaptchaModeChange(on, customData);
-          renderer?.onRoomRecaptchaModeChange && renderer.onRoomRecaptchaModeChange(on, customData);
-          that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
-        }
-      };
-
-      this._onRoomRecordingChange = function(value){
-        var customData = that.onBeforeRoomRecordingChange && that.onBeforeRoomRecordingChange(value);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onRoomRecordingChange && p.onRoomRecordingChange(value, customData);
-          });
-          that.onRoomRecordingChange && that.onRoomRecordingChange(value, customData);
-          renderer?.onRoomRecordingChange && renderer.onRoomRecordingChange(value, customData);
-          that.onAfterRoomRecordingChange && that.onAfterRoomRecordingChange(value, customData);
-        }
-      };
-
-      this._onRoomPropertiesChange = function(props){
-        var customData = that.onBeforeRoomPropertiesChange && that.onBeforeRoomPropertiesChange(props);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onRoomPropertiesChange && p.onRoomPropertiesChange(props, customData);
-          });
-          that.onRoomPropertiesChange && that.onRoomPropertiesChange(props, customData);
-          renderer?.onRoomPropertiesChange && renderer.onRoomPropertiesChange(props, customData);
-          that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
-        }
-      };
-
-      this._onCustomEvent = function(type, data, byId){
-        var customData = that.onBeforeCustomEvent && that.onBeforeCustomEvent(type, data, byId);
-        if (customData!==false){
-          that.activePlugins.forEach((p)=>{
-            p.onCustomEvent && p.onCustomEvent(type, data, byId, customData);
-          });
-          that.onCustomEvent && that.onCustomEvent(type, data, byId, customData);
-          renderer?.onCustomEvent && renderer.onCustomEvent(type, data, byId, customData);
-          that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
-        }
-      };
+      eventCallbacks.forEach(({name, metadata})=>{
+        createEventCallback(name, metadata);
+      });
     }
 
     this.setProperties = function(properties) { // { name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword }
@@ -9652,9 +9172,67 @@ function abcHaxballAPI(window, config){
     String: 3
   };
 
+  function createEventCallback(name, metadata){
+    eventCallbacks.push({ name });
+  }
+
+  function destroyEventCallback(name){
+    var idx = eventCallbacks.findIndex((x)=>x.name==name);
+    if (idx<0)
+      return;
+    eventCallbacks.splice(idx, 1);
+  }
+
+  createEventCallback("PlayerObjectCreated", { params: ["player object"] });
+  createEventCallback("RoomLink", { params: ["room link"] });
+  createEventCallback("BallKick", { params: ["id of the player that triggered this event"] });
+  createEventCallback("TeamGoal", { params: ["team id"] });
+  createEventCallback("GameEnd", { params: ["team id that won the game"] });
+  createEventCallback("GameTick", { params: [] });
+  createEventCallback("PlayerSyncChange", { params: ["player id", "new sync value"] });
+  createEventCallback("Announcement", { params: ["announcement message", "announcement color in #rrggbb format", "announcement style (a small number)", "announcement sound type (a small number)"] });
+  createEventCallback("KickOff", { params: [] });
+  createEventCallback("LocalFrame", { params: ["local frame number"] });
+  createEventCallback("AutoTeams", { params: ["1st player id", "1st team id", "2nd player id (or null)", "2nd team id (or null)", "id of the player that triggered this event"] });
+  createEventCallback("ScoreLimitChange", { params: ["new score limit value", "id of the player that triggered this event"] });
+  createEventCallback("TimeLimitChange", { params: ["new time limit value", "id of the player that triggered this event"] });
+  createEventCallback("PlayerAdminChange", { params: ["id of the player whose admin status has changed", "new admin status value of the player", "id of the player that triggered this event"] });
+  createEventCallback("PlayerAvatarChange", { params: ["id of the player that triggered this event", "new avatar value of the player"] });
+  createEventCallback("PlayerTeamChange", { params: ["id of the player whose team is changed", "id of the new team of the player", "id of the player that triggered this event"] });
+  createEventCallback("StadiumChange", { params: ["new stadium object that is being applied to the room", "id of the player that triggered this event"] });
+  createEventCallback("TeamColorsChange", { params: ["id of the team whose colors are being changed", "new team colors", "id of the player that triggered this event"] });
+  createEventCallback("TeamsLockChange", { params: ["new teams lock value", "id of the player that triggered this event"] });
+  createEventCallback("PlayerJoin", { params: ["original object for the player that has just joined the room"] });
+  createEventCallback("GamePauseChange", { params: ["new paused status of the room", "id of the player that triggered this event"] });
+  createEventCallback("PlayerChat", { params: ["id of the player that triggered this event", "chat message that was sent"] });
+  createEventCallback("PlayerInputChange", { params: ["id of the player that triggered this event", "new input value of the player"] });
+  createEventCallback("PlayerChatIndicatorChange", { params: ["id of the player that triggered this event", "new chat indicator value of the player"] });
+  createEventCallback("PlayerLeave", { params: ["original object for the player that has just left the room", "reason for leaving the room", "whether the player was banned or not", "id of the player that triggered this event"] });
+  createEventCallback("SetDiscProperties", { params: ["id of the disc or the player that just had its properties changed", "whether the changed object is a disc or a player", "data array 1", "data array 2"] });
+  createEventCallback("KickRateLimitChange", { params: ["new min value of kick rate limit", "new rate value of kick rate limit", "new burst value of kick rate limit", "id of the player that triggered this event"] });
+  createEventCallback("GameStart", { params: ["id of the player that triggered this event"] });
+  createEventCallback("GameStop", { params: ["id of the player that triggered this event"] });
+  createEventCallback("PingData", { params: ["all ping values of the current room as an array"] });
+  createEventCallback("CollisionDiscVsDisc", { params: ["id of the collided 1st disc", "player id(if exists) of the collided 1st disc", "id of the collided 2nd disc", "player id(if exists) of the collided 2nd disc"] });
+  createEventCallback("CollisionDiscVsSegment", { params: ["id of the collided disc", "player id(if exists) of the collided disc", "id of the collided segment"] });
+  createEventCallback("CollisionDiscVsPlane", { params: ["id of the collided disc", "player id(if exists) of the collided disc", "id of the collided plane"] });
+  createEventCallback("TimeIsUp", { params: [] });
+  createEventCallback("PositionsReset", { params: [] });
+  createEventCallback("BansClear", { params: [] });
+  createEventCallback("ExtrapolationChange", { params: ["new extrapolation value"] });
+  createEventCallback("HandicapChange", { params: ["new handicap value"] });
+  createEventCallback("RoomRecaptchaModeChange", { params: ["new recaptcha mode value"] });
+  createEventCallback("RoomRecordingChange", { params: ["new value indicating whether the game is being recorded"] });
+  createEventCallback("RoomPropertiesChange", { params: ["new room properties"] });
+  createEventCallback("CustomEvent", { params: ["custom event type", "custom event data", "id of the player that triggered this event"] });
+
   return {
     OperationType,
     ConnectionState,
+    Callback: {
+      add: createEventCallback,
+      remove: destroyEventCallback
+    },
     Utils: {
       generateAuth, 
       authFromKey,

@@ -140,6 +140,10 @@ Room.create({
     - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "wss://p2p.haxball.com/" for host and "wss://p2p2.haxball.com/" for client.
     - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "https://www.haxball.com/rs/".
 
+- `Callback`: Global functions to add/remove callbacks.
+    - `add(eventName, metadata)`: creates all callbacks about a new event called `eventName` which should start with a capital letter. `metadata` is not used, but this is the library's current metadata structure: `{ params: array of string }`. should be used (and maybe overridden for usage of metadata) in a gui application to define custom event callbacks related to gui events such as keyboard, mouse, touch, timer etc. the main event callback defined in this room object to trigger all callbacks is `"_on" + eventName`.
+    - `remove(eventName)`: destroys the callbacks created by `Callback.add`.
+
 - `Replay`: Functions/classes related to replays.
 
   - `read(uint8Array, callbacks, options)`: Creates and returns a non-blocking replay reader object. 
