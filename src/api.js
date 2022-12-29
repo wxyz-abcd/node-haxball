@@ -7913,9 +7913,11 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       //haxball.emit("roomJoin", haxball.room);
       y.i(haxball.onSuccess, haxball.room);
-      haxball.room._onPlayerObjectCreated && internalData.roomObj.ya.T.I.forEach((x)=>{
-        haxball.room._onPlayerObjectCreated(x);
-      });
+      haxball.room._onPlayerObjectCreated && (
+        internalData.roomObj.ya.T.I.forEach((x)=>{
+          haxball.room._onPlayerObjectCreated(x);
+        })
+      );
     };
     haxball._onConnectionStateChange = function(state){
       console.log("internal event: ConnectionStateChange");
@@ -8119,9 +8121,11 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       haxball.room.hostPing = 0;
       y.i(haxball.onSuccess, haxball.room);
-      haxball.room._onPlayerObjectCreated && internalData.roomObj.ya.T.I.forEach((x)=>{
-        haxball.room._onPlayerObjectCreated(x);
-      });
+      haxball.room._onPlayerObjectCreated && (
+        internalData.roomObj.ya.T.I.forEach((x)=>{
+          haxball.room._onPlayerObjectCreated(x);
+        })
+      );
     };
     var b = {
       name: name, 
@@ -8475,6 +8479,8 @@ function abcHaxballAPI(window, config){
           if (b && p.onOperationReceived && !p.onOperationReceived(obj, msg, customData))
             b = false;
         });
+        if (b && that.onOperationReceived && !that.onOperationReceived(obj, msg, customData))
+          b = false;
         if (b && that.onAfterOperationReceived && !that.onAfterOperationReceived(obj, msg, customData))
           b = false;
         return b;
@@ -8486,8 +8492,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerObjectCreated && p.onPlayerObjectCreated(playerObject, customData);
           });
-          that.onAfterPlayerObjectCreated && that.onAfterPlayerObjectCreated(playerObject, customData);
+          that.onPlayerObjectCreated && that.onPlayerObjectCreated(playerObject, customData);
           renderer?.onPlayerObjectCreated && renderer.onPlayerObjectCreated(playerObject, customData);
+          that.onAfterPlayerObjectCreated && that.onAfterPlayerObjectCreated(playerObject, customData);
         }
       };
 
@@ -8497,8 +8504,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onRoomLink && p.onRoomLink(link, customData);
           });
-          that.onAfterRoomLink && that.onAfterRoomLink(link, customData);
+          that.onRoomLink && that.onRoomLink(link, customData);
           renderer?.onRoomLink && renderer.onRoomLink(link, customData);
+          that.onAfterRoomLink && that.onAfterRoomLink(link, customData);
         }
       };
 
@@ -8508,8 +8516,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerBallKick && p.onPlayerBallKick(playerId, customData);
           });
-          that.onAfterPlayerBallKick && that.onAfterPlayerBallKick(playerId, customData);
+          that.onPlayerBallKick && that.onPlayerBallKick(playerId, customData);
           renderer?.onPlayerBallKick && renderer.onPlayerBallKick(playerId, customData);
+          that.onAfterPlayerBallKick && that.onAfterPlayerBallKick(playerId, customData);
         }
       };
 
@@ -8519,8 +8528,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onTeamGoal && p.onTeamGoal(teamId, customData);
           });
-          that.onAfterTeamGoal && that.onAfterTeamGoal(teamId, customData);
+          that.onTeamGoal && that.onTeamGoal(teamId, customData);
           renderer?.onTeamGoal && renderer.onTeamGoal(teamId, customData);
+          that.onAfterTeamGoal && that.onAfterTeamGoal(teamId, customData);
         }
       };
 
@@ -8530,8 +8540,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onGameEnd && p.onGameEnd(winningTeamId, customData);
           });
-          that.onAfterGameEnd && that.onAfterGameEnd(winningTeamId, customData);
+          that.onGameEnd && that.onGameEnd(winningTeamId, customData);
           renderer?.onGameEnd && renderer.onGameEnd(winningTeamId, customData);
+          that.onAfterGameEnd && that.onAfterGameEnd(winningTeamId, customData);
         }
       };
 
@@ -8541,8 +8552,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onGameTick && p.onGameTick(customData);
           });
-          that.onAfterGameTick && that.onAfterGameTick(customData);
+          that.onGameTick && that.onGameTick(customData);
           renderer?.onGameTick && renderer.onGameTick(customData);
+          that.onAfterGameTick && that.onAfterGameTick(customData);
         }
       };
 
@@ -8552,8 +8564,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerSyncChange && p.onPlayerSyncChange(playerId, value, customData);
           });
-          that.onAfterPlayerSyncChange && that.onAfterPlayerSyncChange(playerId, value, customData);
+          that.onPlayerSyncChange && that.onPlayerSyncChange(playerId, value, customData);
           renderer?.onPlayerSyncChange && renderer.onPlayerSyncChange(playerId, value, customData);
+          that.onAfterPlayerSyncChange && that.onAfterPlayerSyncChange(playerId, value, customData);
         }
       };
 
@@ -8563,8 +8576,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onAnnouncement && p.onAnnouncement(msg, color, style, sound, customData);
           });
-          that.onAfterAnnouncement && that.onAfterAnnouncement(msg, color, style, sound, customData);
+          that.onAnnouncement && that.onAnnouncement(msg, color, style, sound, customData);
           renderer?.onAnnouncement && renderer.onAnnouncement(msg, color, style, sound, customData);
+          that.onAfterAnnouncement && that.onAfterAnnouncement(msg, color, style, sound, customData);
         }
       };
 
@@ -8574,8 +8588,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onKickOff && p.onKickOff(customData);
           });
-          that.onAfterKickOff && that.onAfterKickOff(playerId, teamId, byId, customData);
+          that.onKickOff && that.onKickOff(playerId, teamId, byId, customData);
           renderer?.onKickOff && renderer.onKickOff(playerId, teamId, byId, customData);
+          that.onAfterKickOff && that.onAfterKickOff(playerId, teamId, byId, customData);
         }
       };
 
@@ -8585,8 +8600,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onLocalFrame && p.onLocalFrame(localFrameNo, customData);
           });
-          that.onAfterLocalFrame && that.onAfterLocalFrame(localFrameNo, customData);
+          that.onLocalFrame && that.onLocalFrame(localFrameNo, customData);
           renderer?.onLocalFrame && renderer.onLocalFrame(localFrameNo, customData);
+          that.onAfterLocalFrame && that.onAfterLocalFrame(localFrameNo, customData);
         }
       };
 
@@ -8596,8 +8612,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onAutoTeams && p.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
           });
-          that.onAfterAutoTeams && that.onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+          that.onAutoTeams && that.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
           renderer?.onAutoTeams && renderer.onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
+          that.onAfterAutoTeams && that.onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData);
         }
       };
 
@@ -8607,8 +8624,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onScoreLimitChange && p.onScoreLimitChange(value, byId, customData);
           });
-          that.onAfterScoreLimitChange && that.onAfterScoreLimitChange(value, byId, customData);
+          that.onScoreLimitChange && that.onScoreLimitChange(value, byId, customData);
           renderer?.onScoreLimitChange && renderer.onScoreLimitChange(value, byId, customData);
+          that.onAfterScoreLimitChange && that.onAfterScoreLimitChange(value, byId, customData);
         }
       };
 
@@ -8618,8 +8636,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onTimeLimitChange && p.onTimeLimitChange(value, byId, customData);
           });
-          that.onAfterTimeLimitChange && that.onAfterTimeLimitChange(value, byId, customData);
+          that.onTimeLimitChange && that.onTimeLimitChange(value, byId, customData);
           renderer?.onTimeLimitChange && renderer.onTimeLimitChange(value, byId, customData);
+          that.onAfterTimeLimitChange && that.onAfterTimeLimitChange(value, byId, customData);
         }
       };
 
@@ -8629,8 +8648,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerAdminChange && p.onPlayerAdminChange(id, isAdmin, byId, customData);
           });
-          that.onAfterPlayerAdminChange && that.onAfterPlayerAdminChange(id, isAdmin, byId, customData);
+          that.onPlayerAdminChange && that.onPlayerAdminChange(id, isAdmin, byId, customData);
           renderer?.onPlayerAdminChange && renderer.onPlayerAdminChange(id, isAdmin, byId, customData);
+          that.onAfterPlayerAdminChange && that.onAfterPlayerAdminChange(id, isAdmin, byId, customData);
         }
       };
 
@@ -8640,8 +8660,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerAvatarChange && p.onPlayerAvatarChange(id, value, customData);
           });
-          that.onAfterPlayerAvatarChange && that.onAfterPlayerAvatarChange(id, value, customData);
+          that.onPlayerAvatarChange && that.onPlayerAvatarChange(id, value, customData);
           renderer?.onPlayerAvatarChange && renderer.onPlayerAvatarChange(id, value, customData);
+          that.onAfterPlayerAvatarChange && that.onAfterPlayerAvatarChange(id, value, customData);
         }
       };
 
@@ -8651,8 +8672,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerTeamChange && p.onPlayerTeamChange(id, teamId, byId, customData);
           });
-          that.onAfterPlayerTeamChange && that.onAfterPlayerTeamChange(id, teamId, byId, customData);
+          that.onPlayerTeamChange && that.onPlayerTeamChange(id, teamId, byId, customData);
           renderer?.onPlayerTeamChange && renderer.onPlayerTeamChange(id, teamId, byId, customData);
+          that.onAfterPlayerTeamChange && that.onAfterPlayerTeamChange(id, teamId, byId, customData);
         }
       };
 
@@ -8662,8 +8684,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onStadiumChange && p.onStadiumChange(stadium, byId, customData);
           });
-          that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
+          that.onStadiumChange && that.onStadiumChange(stadium, byId, customData);
           renderer?.onStadiumChange && renderer.onStadiumChange(stadium, byId, customData);
+          that.onAfterStadiumChange && that.onAfterStadiumChange(stadium, byId, customData);
         }
       };
 
@@ -8673,8 +8696,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onTeamColorsChange && p.onTeamColorsChange(teamId, value, byId, customData);
           });
-          that.onAfterTeamColorsChange && that.onAfterTeamColorsChange(teamId, value, byId, customData);
+          that.onTeamColorsChange && that.onTeamColorsChange(teamId, value, byId, customData);
           renderer?.onTeamColorsChange && renderer.onTeamColorsChange(teamId, value, byId, customData);
+          that.onAfterTeamColorsChange && that.onAfterTeamColorsChange(teamId, value, byId, customData);
         }
       };
 
@@ -8684,8 +8708,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onTeamsLockChange && p.onTeamsLockChange(value, byId, customData);
           });
-          that.onAfterTeamsLockChange && that.onAfterTeamsLockChange(value, byId, customData);
+          that.onTeamsLockChange && that.onTeamsLockChange(value, byId, customData);
           renderer?.onTeamsLockChange && renderer.onTeamsLockChange(value, byId, customData);
+          that.onAfterTeamsLockChange && that.onAfterTeamsLockChange(value, byId, customData);
         }
       };
 
@@ -8695,8 +8720,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerJoin && p.onPlayerJoin(pObj, customData);
           });
-          that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
+          that.onPlayerJoin && that.onPlayerJoin(pObj, customData);
           renderer?.onPlayerJoin && renderer.onPlayerJoin(pObj, customData);
+          that.onAfterPlayerJoin && that.onAfterPlayerJoin(pObj, customData);
         }
       };
 
@@ -8706,8 +8732,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onGamePauseChange && p.onGamePauseChange(isPaused, byId, customData);
           });
-          that.onAfterGamePauseChange && that.onAfterGamePauseChange(isPaused, byId, customData);
+          that.onGamePauseChange && that.onGamePauseChange(isPaused, byId, customData);
           renderer?.onGamePauseChange && renderer.onGamePauseChange(isPaused, byId, customData);
+          that.onAfterGamePauseChange && that.onAfterGamePauseChange(isPaused, byId, customData);
         }
       };
 
@@ -8717,8 +8744,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerChat && p.onPlayerChat(id, message, customData);
           });
-          that.onAfterPlayerChat && that.onAfterPlayerChat(id, message, customData);
+          that.onPlayerChat && that.onPlayerChat(id, message, customData);
           renderer?.onPlayerChat && renderer.onPlayerChat(id, message, customData);
+          that.onAfterPlayerChat && that.onAfterPlayerChat(id, message, customData);
         }
       };
 
@@ -8728,8 +8756,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerInputChange && p.onPlayerInputChange(id, value, customData);
           });
-          that.onAfterPlayerInputChange && that.onAfterPlayerInputChange(id, value, customData);
+          that.onPlayerInputChange && that.onPlayerInputChange(id, value, customData);
           renderer?.onPlayerInputChange && renderer.onPlayerInputChange(id, value, customData);
+          that.onAfterPlayerInputChange && that.onAfterPlayerInputChange(id, value, customData);
         }
       };
 
@@ -8739,8 +8768,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerChatIndicatorChange && p.onPlayerChatIndicatorChange(id, value, customData);
           });
-          that.onAfterPlayerChatIndicatorChange && that.onAfterPlayerChatIndicatorChange(id, value, customData);
+          that.onPlayerChatIndicatorChange && that.onPlayerChatIndicatorChange(id, value, customData);
           renderer?.onPlayerChatIndicatorChange && renderer.onPlayerChatIndicatorChange(id, value, customData);
+          that.onAfterPlayerChatIndicatorChange && that.onAfterPlayerChatIndicatorChange(id, value, customData);
         }
       };
 
@@ -8750,8 +8780,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPlayerLeave && p.onPlayerLeave(pObj, reason, isBanned, byId, customData);
           });
-          that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
+          that.onPlayerLeave && that.onPlayerLeave(pObj, reason, isBanned, byId, customData);
           renderer?.onPlayerLeave && renderer.onPlayerLeave(pObj, reason, isBanned, byId, customData);
+          that.onAfterPlayerLeave && that.onAfterPlayerLeave(pObj, reason, isBanned, byId, customData);
         }
       };
 
@@ -8761,8 +8792,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onSetDiscProperties && p.onSetDiscProperties(id, type, data1, data2, customData);
           });
-          that.onAfterSetDiscProperties && that.onAfterSetDiscProperties(id, type, data1, data2, customData);
+          that.onSetDiscProperties && that.onSetDiscProperties(id, type, data1, data2, customData);
           renderer?.onSetDiscProperties && renderer.onSetDiscProperties(id, type, data1, data2, customData);
+          that.onAfterSetDiscProperties && that.onAfterSetDiscProperties(id, type, data1, data2, customData);
         }
       };
 
@@ -8772,8 +8804,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onKickRateLimitChange && p.onKickRateLimitChange(min, rate, burst, byId, customData);
           });
-          that.onAfterKickRateLimitChange && that.onAfterKickRateLimitChange(min, rate, burst, byId, customData);
+          that.onKickRateLimitChange && that.onKickRateLimitChange(min, rate, burst, byId, customData);
           renderer?.onKickRateLimitChange && renderer.onKickRateLimitChange(min, rate, burst, byId, customData);
+          that.onAfterKickRateLimitChange && that.onAfterKickRateLimitChange(min, rate, burst, byId, customData);
         }
       };
 
@@ -8783,8 +8816,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onGameStart && p.onGameStart(byId, customData);
           });
-          that.onAfterGameStart && that.onAfterGameStart(byId, customData);
+          that.onGameStart && that.onGameStart(byId, customData);
           renderer?.onGameStart && renderer.onGameStart(byId, customData);
+          that.onAfterGameStart && that.onAfterGameStart(byId, customData);
         }
       };
 
@@ -8794,8 +8828,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onGameStop && p.onGameStop(byId, customData);
           });
-          that.onAfterGameStop && that.onAfterGameStop(byId, customData);
+          that.onGameStop && that.onGameStop(byId, customData);
           renderer?.onGameStop && renderer.onGameStop(byId, customData);
+          that.onAfterGameStop && that.onAfterGameStop(byId, customData);
         }
       };
 
@@ -8805,8 +8840,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPingData && p.onPingData(array, customData);
           });
-          that.onAfterPingData && that.onAfterPingData(array, customData);
+          that.onPingData && that.onPingData(array, customData);
           renderer?.onPingData && renderer.onPingData(array, customData);
+          that.onAfterPingData && that.onAfterPingData(array, customData);
         }
       };
 
@@ -8816,8 +8852,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onCollisionDiscVsDisc && p.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
           });
-          that.onAfterCollisionDiscVsDisc && that.onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
+          that.onCollisionDiscVsDisc && that.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
           renderer?.onCollisionDiscVsDisc && renderer.onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
+          that.onAfterCollisionDiscVsDisc && that.onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData);
         }
       };
 
@@ -8827,8 +8864,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onCollisionDiscVsSegment && p.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
           });
-          that.onAfterCollisionDiscVsSegment && that.onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
+          that.onCollisionDiscVsSegment && that.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
           renderer?.onCollisionDiscVsSegment && renderer.onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
+          that.onAfterCollisionDiscVsSegment && that.onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData);
         }
       };
 
@@ -8838,8 +8876,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onCollisionDiscVsPlane && p.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
           });
-          that.onAfterCollisionDiscVsPlane && that.onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
+          that.onCollisionDiscVsPlane && that.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
           renderer?.onCollisionDiscVsPlane && renderer.onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
+          that.onAfterCollisionDiscVsPlane && that.onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData);
         }
       };
 
@@ -8849,8 +8888,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onTimeIsUp && p.onTimeIsUp(customData);
           });
-          that.onAfterTimeIsUp && that.onAfterTimeIsUp(customData);
+          that.onTimeIsUp && that.onTimeIsUp(customData);
           renderer?.onTimeIsUp && renderer.onTimeIsUp(customData);
+          that.onAfterTimeIsUp && that.onAfterTimeIsUp(customData);
         }
       };
 
@@ -8860,8 +8900,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onPositionsReset && p.onPositionsReset(customData);
           });
-          that.onAfterPositionsReset && that.onAfterPositionsReset(customData);
+          that.onPositionsReset && that.onPositionsReset(customData);
           renderer?.onPositionsReset && renderer.onPositionsReset(customData);
+          that.onAfterPositionsReset && that.onAfterPositionsReset(customData);
         }
       };
 
@@ -8871,8 +8912,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onBansClear && p.onBansClear(customData);
           });
-          that.onAfterBansClear && that.onAfterBansClear(customData);
+          that.onBansClear && that.onBansClear(customData);
           renderer?.onBansClear && renderer.onBansClear(customData);
+          that.onAfterBansClear && that.onAfterBansClear(customData);
         }
       };
 
@@ -8882,8 +8924,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onExtrapolationChange && p.onExtrapolationChange(value, customData);
           });
-          that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
+          that.onExtrapolationChange && that.onExtrapolationChange(value, customData);
           renderer?.onExtrapolationChange && renderer.onExtrapolationChange(value, customData);
+          that.onAfterExtrapolationChange && that.onAfterExtrapolationChange(value, customData);
         }
       };
 
@@ -8893,8 +8936,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onHandicapChange && p.onHandicapChange(value, customData);
           });
-          that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
+          that.onHandicapChange && that.onHandicapChange(value, customData);
           renderer?.onHandicapChange && renderer.onHandicapChange(value, customData);
+          that.onAfterHandicapChange && that.onAfterHandicapChange(value, customData);
         }
       };
 
@@ -8904,8 +8948,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onRoomRecaptchaModeChange && p.onRoomRecaptchaModeChange(on, customData);
           });
-          that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
+          that.onRoomRecaptchaModeChange && that.onRoomRecaptchaModeChange(on, customData);
           renderer?.onRoomRecaptchaModeChange && renderer.onRoomRecaptchaModeChange(on, customData);
+          that.onAfterRoomRecaptchaModeChange && that.onAfterRoomRecaptchaModeChange(on, customData);
         }
       };
 
@@ -8915,8 +8960,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onRoomRecordingChange && p.onRoomRecordingChange(value, customData);
           });
-          that.onAfterRoomRecordingChange && that.onAfterRoomRecordingChange(value, customData);
+          that.onRoomRecordingChange && that.onRoomRecordingChange(value, customData);
           renderer?.onRoomRecordingChange && renderer.onRoomRecordingChange(value, customData);
+          that.onAfterRoomRecordingChange && that.onAfterRoomRecordingChange(value, customData);
         }
       };
 
@@ -8926,8 +8972,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onRoomPropertiesChange && p.onRoomPropertiesChange(props, customData);
           });
-          that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
+          that.onRoomPropertiesChange && that.onRoomPropertiesChange(props, customData);
           renderer?.onRoomPropertiesChange && renderer.onRoomPropertiesChange(props, customData);
+          that.onAfterRoomPropertiesChange && that.onAfterRoomPropertiesChange(props, customData);
         }
       };
 
@@ -8937,8 +8984,9 @@ function abcHaxballAPI(window, config){
           that.activePlugins.forEach((p)=>{
             p.onCustomEvent && p.onCustomEvent(type, data, byId, customData);
           });
-          that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
+          that.onCustomEvent && that.onCustomEvent(type, data, byId, customData);
           renderer?.onCustomEvent && renderer.onCustomEvent(type, data, byId, customData);
+          that.onAfterCustomEvent && that.onAfterCustomEvent(type, data, byId, customData);
         }
       };
     }

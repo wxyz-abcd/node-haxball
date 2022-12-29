@@ -351,90 +351,133 @@ Room.create({
 
   - `callbacks`:
     - `customData = onBeforeXXXXXXX(...)`: (where XXXXXXX is the name of the event) called before plugin callbacks. return a customData object to be used for each `plugin.onXXXXXXX(..., customData)` and then `room.onAfterXXXXXXX(..., customData)`. return false to stop propagation. 
-    - `onAfterXXXXXXX(..., customData)`: (where XXXXXXX is the name of the event) called after plugin callbacks. the last parameter, customData, is the data object that was returned from `room.onBeforeXXXXXXX(...)`.
+    - `onXXXXXXX(..., customData)`: (where XXXXXXX is the name of the event) called after plugin callbacks, just before renderer callback. the last parameter, customData, is the data object that was returned from `room.onBeforeXXXXXXX(...)`.
+    - `onAfterXXXXXXX(..., customData)`: (where XXXXXXX is the name of the event) called after renderer callback. the last parameter, customData, is the data object that was returned from `room.onBeforeXXXXXXX(...)`.
       - `customData = onBeforeRoomLink(link)`: room link was received. host-only.
+      - `onRoomLink(link, customData)`: room link was received. host-only.
       - `onAfterRoomLink(link, customData)`: room link was received. host-only.
       - `customData = onBeforePlayerBallKick(playerId)`: ball was kicked by player(playerId). triggered individually.
+      - `onPlayerBallKick(playerId, customData)`: ball was kicked by player(playerId). triggered individually.
       - `onAfterPlayerBallKick(playerId, customData)`: ball was kicked by player(playerId). triggered individually.
       - `customData = onBeforeTeamGoal(teamId)`: goal was scored by team(teamId). triggered individually.
+      - `onTeamGoal(teamId, customData)`: goal was scored by team(teamId). triggered individually.
       - `onAfterTeamGoal(teamId, customData)`: goal was scored by team(teamId). triggered individually.
       - `customData = onBeforeGameEnd(winningTeamId)`: game was won by team(winningTeamId). triggered individually.
+      - `onGameEnd(winningTeamId, customData)`: game was won by team(winningTeamId). triggered individually.
       - `onAfterGameEnd(winningTeamId, customData)`: game was won by team(winningTeamId). triggered individually.
       - `customData = onBeforeGameTick()`: runs on each game tick. (lots of times per second) triggered individually.
+      - `onGameTick(customData)`: runs on each game tick. (lots of times per second) triggered individually.
       - `onAfterGameTick(customData)`: runs on each game tick. (lots of times per second) triggered individually.
       - `customData = onBeforePlayerSyncChange(playerId, value)`: player(playerId)'s synchronized status has changed to (value).
+      - `onPlayerSyncChange(playerId, value, customData)`: player(playerId)'s synchronized status has changed to (value).
       - `onAfterPlayerSyncChange(playerId, value, customData)`: player(playerId)'s synchronized status has changed to (value).
       - `customData = onBeforeAnnouncement(msg, color, style, sound)`: a message(msg) with properties(color, style, sound) was announced by the room host. may only be triggered by host.
+      - `onAnnouncement(msg, color, style, sound, customData)`: a message(msg) with properties(color, style, sound) was announced by the room host. may only be triggered by host.
       - `onAfterAnnouncement(msg, color, style, sound, customData)`: a message(msg) with properties(color, style, sound) was announced by the room host. may only be triggered by host.
       - `customData = onBeforeAutoTeams(playerId1, teamId1, playerId2, teamId2, byId)`: "auto" button was used by player(byId), it caused player(playerId1) to join team(teamId1) and player(playerId2) to join team(teamId2).
+      - `onAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData)`: "auto" button was used by player(byId), it caused player(playerId1) to join team(teamId1) and player(playerId2) to join team(teamId2).
       - `onAfterAutoTeams(playerId1, teamId1, playerId2, teamId2, byId, customData)`: "auto" button was used by player(byId), it caused player(playerId1) to join team(teamId1) and player(playerId2) to join team(teamId2).
       - `customData = onBeforeScoreLimitChange(value, byId)`: score limit was changed to (value) by player(byId).
+      - `onScoreLimitChange(value, byId, customData)`: score limit was changed to (value) by player(byId).
       - `onAfterScoreLimitChange(value, byId, customData)`: score limit was changed to (value) by player(byId).
       - `customData = onBeforeTimeLimitChange(value, byId)`: time limit was changed to (value) by player(byId).
+      - `onTimeLimitChange(value, byId, customData)`: time limit was changed to (value) by player(byId).
       - `onAfterTimeLimitChange(value, byId, customData)`: time limit was changed to (value) by player(byId).
       - `customData = onBeforePlayerAdminChange(id, isAdmin, byId)`: player(id)'s admin status was changed to (isAdmin) by player(byId).
+      - `onPlayerAdminChange(id, isAdmin, byId, customData)`: player(id)'s admin status was changed to (isAdmin) by player(byId).
       - `onAfterPlayerAdminChange(id, isAdmin, byId, customData)`: player(id)'s admin status was changed to (isAdmin) by player(byId).
       - `customData = onBeforePlayerAvatarChange(id, value)`: player(id) changed its avatar to (value).
+      - `onPlayerAvatarChange(id, value, customData)`: player(id) changed its avatar to (value).
       - `onAfterPlayerAvatarChange(id, value, customData)`: player(id) changed its avatar to (value).
       - `customData = onBeforePlayerTeamChange(id, teamId, byId)`: player(id) was moved to team(teamId) by player(byId).
+      - `onPlayerTeamChange(id, teamId, byId, customData)`: player(id) was moved to team(teamId) by player(byId).
       - `onAfterPlayerTeamChange(id, teamId, byId, customData)`: player(id) was moved to team(teamId) by player(byId).
       - `customData = onBeforeStadiumChange(stadium, byId)`: room's current stadium was set to (stadium) by player(byId).
+      - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (stadium) by player(byId).
       - `onAfterStadiumChange(stadium, byId, customData)`: room's current stadium was set to (stadium) by player(byId).
       - `customData = onBeforeTeamsLockChange(value, byId)`: room's team lock status was set to (value) by player(byId).
+      - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (value) by player(byId).
       - `onAfterTeamsLockChange(value, byId, customData)`: room's team lock status was set to (value) by player(byId).
       - `customData = onBeforePlayerObjectCreated(playerObj)`: a player object(playerObj) was created.
+      - `onPlayerObjectCreated(playerObj, customData)`: a player object(playerObj) was created.
       - `onAfterPlayerObjectCreated(playerObj, customData)`: a player object(playerObj) was created.
       - `customData = onBeforePlayerJoin(playerObj)`: a player(playerObj) joined the room.
+      - `onPlayerJoin(playerObj, customData)`: a player(playerObj) joined the room.
       - `onAfterPlayerJoin(playerObj, customData)`: a player(playerObj) joined the room.
       - `customData = onBeforeGamePauseChange(isPaused, byId)`: room's game paused status was set to (isPaused) by player(byId).
+      - `onGamePauseChange(isPaused, byId, customData)`: room's game paused status was set to (isPaused) by player(byId).
       - `onAfterGamePauseChange(isPaused, byId, customData)`: room's game paused status was set to (isPaused) by player(byId).
       - `customData = onBeforePlayerChat(id, message)`: a chat message with content(message) was received from player(id).
+      - `onPlayerChat(id, message, customData)`: a chat message with content(message) was received from player(id).
       - `onAfterPlayerChat(id, message, customData)`: a chat message with content(message) was received from player(id).
       - `customData = onBeforePlayerInputChange(id, value)`: player(id)'s input has changed to (value).
+      - `onPlayerInputChange(id, value, customData)`: player(id)'s input has changed to (value).
       - `onAfterPlayerInputChange(id, value, customData)`: player(id)'s input has changed to (value).
       - `customData = onBeforePlayerChatIndicatorChange(id, value)`: player(id)'s chat indicator status has changed to (value).
+      - `onPlayerChatIndicatorChange(id, value, customData)`: player(id)'s chat indicator status has changed to (value).
       - `onAfterPlayerChatIndicatorChange(id, value, customData)`: player(id)'s chat indicator status has changed to (value).
       - `customData = onBeforePlayerLeave(playerObj, reason, isBanned, byId)`: player(playerObj) has left the room, (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
+      - `onPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
       - `onAfterPlayerLeave(playerObj, reason, isBanned, byId, customData)`: player(playerObj) has left the room, (or was kicked or banned, i.e. `isBanned`) by player(byId) with reason(reason).
       - `customData = onBeforeSetDiscProperties(id, type, data1, data2)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
+      - `onSetDiscProperties(id, type, data1, data2, customData)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
       - `onAfterSetDiscProperties(id, type, data1, data2, customData)`: (type=0: disc, type=1: player)(id)'s properties was set to (data1, data2). may only be triggered by host.
       - `customData = onBeforeTeamColorsChange(teamId, value, byId)`: team(teamId)'s colors were changed to (value) by player(byId).
+      - `onTeamColorsChange(teamId, value, byId, customData)`: team(teamId)'s colors were changed to (value) by player(byId).
       - `onAfterTeamColorsChange(teamId, value, byId, customData)`: team(teamId)'s colors were changed to (value) by player(byId).
       - `customData = onBeforeKickRateLimitChange(min, rate, burst, byId)`: room's kick rate limit was set to (min, rate, burst) by player(byId).
+      - `onKickRateLimitChange(min, rate, burst, byId, customData)`: room's kick rate limit was set to (min, rate, burst) by player(byId).
       - `onAfterKickRateLimitChange(min, rate, burst, byId, customData)`: room's kick rate limit was set to (min, rate, burst) by player(byId).
       - `customData = onBeforeGameStart(byId)`: game was started by player(byId).
+      - `onGameStart(byId, customData)`: game was started by player(byId).
       - `onAfterGameStart(byId, customData)`: game was started by player(byId).
       - `customData = onBeforeKickOff()`: game kicked off. triggered individually.
+      - `onKickOff(customData)`: game kicked off. triggered individually.
       - `onAfterKickOff(customData)`: game kicked off. triggered individually.
       - `customData = onBeforeTimeIsUp()`: time is up. triggered individually.
+      - `onTimeIsUp(customData)`: time is up. triggered individually.
       - `onAfterTimeIsUp(customData)`: time is up. triggered individually.
       - `customData = onBeforePositionsReset()`: positions were reset just after a goal. triggered individually.
+      - `onPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
       - `onAfterPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
       - `customData = onBeforeLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
+      - `onLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
       - `onAfterLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
       - `customData = onBeforeGameStop(byId)`: game was stopped by player(byId).
+      - `onGameStop(byId, customData)`: game was stopped by player(byId).
       - `onAfterGameStop(byId, customData)`: game was stopped by player(byId).
       - `customData = onBeforePingData(array)`: ping values for all players was received. may only be triggered by host.
+      - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onAfterPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `customData = onBeforeExtrapolationChange(value)`: extrapolation was set to (value). triggered individually.
+      - `onExtrapolationChange(value, customData)`: extrapolation was set to (value). triggered individually.
       - `onAfterExtrapolationChange(value, customData)`: extrapolation was set to (value). triggered individually.
       - `customData = onBeforeHandicapChange(value)`: handicap was set to (value). triggered individually.
+      - `onHandicapChange(value, customData)`: handicap was set to (value). triggered individually.
       - `onAfterHandicapChange(value, customData)`: handicap was set to (value). triggered individually.
       - `customData = onBeforeBansClear()`: all bans were cleared. host-only.
+      - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onAfterBansClear(customData)`: all bans were cleared. host-only.
       - `customData = onBeforeRoomRecaptchaModeChange(on)`: room's recaptcha mode was set to (on). host-only.
+      - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (on). host-only.
       - `onAfterRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (on). host-only.
       - `customData = onBeforeRoomRecordingChange(value)`: recording started(value=true) or stopped(value is arraybuffer). triggered individually.
+      - `onRoomRecordingChange(value, customData)`: recording started(value=true) or stopped(value is arraybuffer). triggered individually.
       - `onAfterRoomRecordingChange(value, customData)`: recording started(value=true) or stopped(value is arraybuffer). triggered individually.
       - `customData = onBeforeRoomPropertiesChange(props)`: room's properties(props) were changed. host-only.
+      - `onRoomPropertiesChange(props, customData)`: room's properties(props) were changed. host-only.
       - `onAfterRoomPropertiesChange(props, customData)`: room's properties(props) were changed. host-only.
       - `customData = onBeforeCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2)`: a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2). triggered individually.
+      - `onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData)`: a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2). triggered individually.
       - `onAfterCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData)`: a collision happened between disc(discId1, playerId1) and disc(discId2, playerId2). triggered individually.
       - `customData = onBeforeCollisionDiscVsSegment(discId, discPlayerId, segmentId)`: a collision happened between disc(discId, discPlayerId) and segment(segmentId). triggered individually.
+      - `onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData)`: a collision happened between disc(discId, discPlayerId) and segment(segmentId). triggered individually.
       - `onAfterCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData)`: a collision happened between disc(discId, discPlayerId) and segment(segmentId). triggered individually.
       - `customData = onBeforeCollisionDiscVsPlane(discId, discPlayerId, planeId)`: a collision happened between disc(discId, discPlayerId) and plane(planeId). triggered individually.
+      - `onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData)`: a collision happened between disc(discId, discPlayerId) and plane(planeId). triggered individually.
       - `onAfterCollisionDiscVsPlane(discId, discPlayerId, planeId, customData)`: a collision happened between disc(discId, discPlayerId) and plane(planeId). triggered individually.
       - `customData = onBeforeCustomEvent(type, data, byId)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
+      - `onCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
       - `onAfterCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
     - `onPluginActiveChange(plugin)`: a plugin was activated/deactivated. triggered individually.
 
