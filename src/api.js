@@ -5802,7 +5802,7 @@ function abcHaxballAPI(window, config){
       this.Di.push(a);
       var b = this.sg.$g(0.5) | 0,
         c = w.ha();
-      this.haxball.room?.modifyClientPing && (b = this.haxball.room.modifyClientPing(b));
+      this.haxball.room?._modifyClientPing && (b = this.haxball.room._modifyClientPing(b));
       c.l(2);
       c.s(a);
       c.lb(b);
@@ -5821,7 +5821,7 @@ function abcHaxballAPI(window, config){
         a.zf.Aa && (c = this.Y + (this.Xc | 0) + this.bc);
         var d = w.ha();
         d.l(1);
-        this.haxball.room?.modifyFrameNo && (c = this.haxball.room.modifyFrameNo(c));
+        this.haxball.room?._modifyFrameNo && (c = this.haxball.room._modifyFrameNo(c));
         d.tb(c);
         d.tb(b);
         m.lj(a, d);
@@ -8454,6 +8454,32 @@ function abcHaxballAPI(window, config){
           that.modifyPlayerPingAfter && (ping = that.modifyPlayerPingAfter(playerId, ping, customData));
         }
         return ping;
+      };
+
+      this._modifyClientPing = function(ping){
+        var customData;
+        that.modifyClientPingBefore && ([ping, customData] = that.modifyClientPingBefore(ping));
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.modifyClientPing && (ping = p.modifyClientPing(ping, customData));
+          });
+          that.modifyClientPing && (ping = that.modifyClientPing(ping, customData));
+          that.modifyClientPingAfter && (ping = that.modifyClientPingAfter(ping, customData));
+        }
+        return ping;
+      };
+
+      this._modifyFrameNo = function(frameNo){
+        var customData;
+        that.modifyFrameNoBefore && ([frameNo, customData] = that.modifyFrameNoBefore(frameNo));
+        if (customData!==false){
+          that.activePlugins.forEach((p)=>{
+            p.modifyFrameNo && (frameNo = p.modifyFrameNo(frameNo, customData));
+          });
+          that.modifyFrameNo && (frameNo = that.modifyFrameNo(frameNo, customData));
+          that.modifyFrameNoAfter && (frameNo = that.modifyFrameNoAfter(frameNo, customData));
+        }
+        return frameNo;
       };
 
       this.onBeforeOperationReceived = function(obj, msg){
