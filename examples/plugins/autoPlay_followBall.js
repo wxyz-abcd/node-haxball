@@ -1,4 +1,4 @@
-module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Replay, Room }){
+module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall", true, { // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -12,7 +12,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
   this.minCoordAlignDelta = this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
-    type: Plugin.VariableType.Number,
+    type: VariableType.Number,
     value: 0.5, 
     range: {
       min: 0,
@@ -24,7 +24,7 @@ module.exports = function({ OperationType, ConnectionState, Utils, Plugin, Repla
   this.minKickDistance = this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
-    type: Plugin.VariableType.Number,
+    type: VariableType.Number,
     value: 8, 
     range: {
       min: 0,

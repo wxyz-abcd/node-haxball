@@ -27,7 +27,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-haxball");
+const { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callback, Replay, Renderer } = require("node-haxball");
 // Use example code here.
 ```
 
@@ -48,7 +48,7 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
     </head>
     <body>
       <script>
-        var { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callback, Replay, Renderer } = abcHaxballAPI(window, {
           WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
           HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
         });
@@ -69,7 +69,7 @@ const { OperationType, ConnectionState, Room, Utils, Plugin } = require("node-ha
     </head>
     <body>
       <script>
-        var { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callback, Replay, Renderer } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -140,6 +140,10 @@ Room.create({
     - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "wss://p2p.haxball.com/" for host and "wss://p2p2.haxball.com/" for client.
     - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a "/". Is appended "host" or "client" at the end while being used. Defaults to: "https://www.haxball.com/rs/".
 
+- `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
+- `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
+- `ConnectionState`: Different connection state values. Should be used while joining a room using `Room.join`.
+
 - `Callback`: Global functions to add/remove callbacks.
     - `add(eventName, metadata)`: creates all callbacks about a new event called `eventName` which should start with a capital letter. `metadata` is not used, but this is the library's current metadata structure: `{ params: array of string }`. should be used (and maybe overridden for usage of metadata) in a gui application to define custom event callbacks related to gui events such as keyboard, mouse, touch, timer etc. the main event callback defined in this room object to trigger all callbacks is `"_on" + eventName`.
     - `remove(eventName)`: destroys the callbacks created by `Callback.add`.
@@ -150,7 +154,7 @@ Room.create({
 
     - Parameters: 
       - `uint8Array`: Must be an Uint8Array containing the contents of a .hbr file. (Currently, only version 3 is supported.)
-      - `callbacks`: An object that follows the renderer template. (maybe except the `onCustomEvent` callback that the replay files do not contain its corresponding event.)
+      - `callbacks`: An object that has the same callbacks as the renderer template. (maybe except the `onCustomEvent` callback that the replay files do not contain its corresponding event.)
       - `options`: An object that may contain the following keys:
         - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (null = use library's default `requestAnimationFrame`.)
         - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (null = use library's default `cancelAnimationFrame`.)
@@ -494,7 +498,6 @@ Room.create({
 
   - `static constants`: 
     - `AllowFlags`: These flags allow us to understand whether the plugin is able to work correctly while joining or creating a room. Should be used in a GUI environment.
-    - `VariableType`: Different types of variables that can be defined in a Plugin with `Plugin.defineVariable` function. Should be used in a GUI environment.
 
   - `constructor(name, active, metadata)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. Metadata is the information that you would want to show/update inside a GUI application.
 
@@ -502,9 +505,9 @@ Room.create({
     - `name`: name of the plugin. Must be unique, and is used internally in `Room.setPluginActive`. All Plugins can be accessed with their names via `Room.pluginsMap[name]`.
     - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
 
-  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating the Plugin objects. These are defined in Plugin.prototype.
-    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given metadata object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following metadata structure: {version, author, description, allowFlags}.
-    - `defineVariable(variable)`: Does nothing, returns variable's value by default. This function should define the given variable object inside this plugin object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the example folder use the following variable structure: {name, type, value, range, description}. This function should return the value of the variable since it is used once in the constructor for the plugin's "active" property. This function should be used whenever a variable whose value is changeable from outside will be defined. 
+  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Plugin` object. These are defined in `Plugin.prototype`.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Plugin` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following metadata structure: `{version, author, description, allowFlags}`.
+    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Plugin` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable` since it is used once in the constructor for the plugin's `active` property. This function should be used whenever a variable whose value is changeable from outside will be defined. 
 
   - `modifier callbacks`:
     - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. return null -> player is not allowed to join. customData is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
@@ -559,9 +562,13 @@ Room.create({
       - `onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData)`: a collision happened between disc(discId, discPlayerId) and plane(planeId). triggered individually.
       - `onCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
 
-- `Renderer`: A class that defines a renderer for Haxball client.
+- `Renderer`: A class that defines a renderer. Any renderer should be based on this class.
 
-  - `constructor(anything)`: creates a new Renderer instance. the renderer instance will be initialized outside this library, so the constructor is not of our business.
+  - `constructor(metadata)`: creates a new `Renderer` instance. `metadata` is the information that you would want to show/update inside a GUI application.
+
+  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Renderer` object. These are defined in `Renderer.prototype`.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Renderer` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default renderer in the examples folder uses the following `metadata` structure: `{name, version, author, description}`.
+    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Renderer` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default renderer in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable`, and should be used whenever a variable whose value is changeable from outside will be defined. 
 
   - `callbacks`:
     - `initialize(roomObj)`: only called once while creating or joining a room.
@@ -658,7 +665,7 @@ Room.create({
 
 <h2 id="license">🔏 License</h2>
 
-MIT License, Copyright © 2022 [abc](https://github.com/wxyz-abcd)
+MIT License, Copyright © 2022-2023 [abc](https://github.com/wxyz-abcd)
 
 Absolutely no rights reserved. Do whatever you want with the codes. 
 

@@ -52,6 +52,13 @@ function abcHaxballAPI(window, config){
     CustomEvent: 18
   };
 
+  const VariableType = {
+    Boolean: 0,
+    Integer: 1,
+    Number: 2,
+    String: 3
+  };
+
   function HaxballEvent(type, fName, nameMapping, extraCondition){
     this.type = type;
     this.fName = fName;
@@ -9175,7 +9182,7 @@ function abcHaxballAPI(window, config){
     this.active = this.defineVariable({
       name: "active",
       description: "Whether this plugin is active or not.", 
-      type: Plugin.VariableType.Boolean,
+      type: VariableType.Boolean,
       value: active
     });
   }
@@ -9191,11 +9198,14 @@ function abcHaxballAPI(window, config){
     CreateRoom: 2
   };
 
-  Plugin.VariableType = {
-    Boolean: 0,
-    Integer: 1,
-    Number: 2,
-    String: 3
+  function Renderer(metadata=null){
+    this.defineMetadata(metadata);
+  }
+
+   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  Renderer.prototype.defineMetadata = function(x){},//x={name, version, author, description}
+  Renderer.prototype.defineVariable = function(x){//x={name, type, value, range, description}
+    return x?.value;
   };
 
   function createEventCallback(name, metadata){
@@ -9254,6 +9264,7 @@ function abcHaxballAPI(window, config){
 
   return {
     OperationType,
+    VariableType,
     ConnectionState,
     Callback: {
       add: createEventCallback,
@@ -9277,7 +9288,8 @@ function abcHaxballAPI(window, config){
       read: readReplay
       //Recorder: ac
     },
-    Plugin
+    Plugin,
+    Renderer
   };
 }
 

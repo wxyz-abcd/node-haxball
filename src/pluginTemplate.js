@@ -1,6 +1,4 @@
-const { Plugin } = require(".");
-
-module.exports = function(){
+module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "template", true, { // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.

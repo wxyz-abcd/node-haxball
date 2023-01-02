@@ -5,14 +5,26 @@ var client = Room.join({ // or Room.create
   ... // all stuff that you want
 }, {
   ..., // all other stuff that you want
-  renderer: new Renderer(document.getElementsByTagName("canvas")[0]),
+  renderer: new TemplateRenderer(document.getElementsByTagName("canvas")[0]),
 });
 */
-function Renderer(canvas){
+
+module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }, canvas){
+
+  Object.setPrototypeOf(this, Renderer.prototype);
+  Renderer.call(this, {
+    name: "templateRenderer",
+    version: "0.1",
+    author: "abc",
+    description: `This is a template renderer`
+  });
+
   this.initialize = function(roomObj){};
   this.finalize = function(){};
   
-  this.render = function(extrapolatedRoomPhysicsObj){}; // render logic here. called inside requestAnimationFrame callback
+  this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
+    // use "extrapolatedRoomPhysicsObj" contents to get all information about the current extrapolated game state and draw whatever you want into the "canvas" object.
+  };
   
   // you can keep track of changes using these callbacks, and apply them in your render logic:
   this.onPluginActiveChange = function(plugin){};
