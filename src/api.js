@@ -8401,11 +8401,12 @@ function abcHaxballAPI(window, config){
 
       var that = this;
 
-      this.setRenderer = function(_renderer, auto = false){ // do not call this function with auto = true, it will not work properly.
-        if (auto)
-          renderer = _renderer;
-        else
-          that.client.setRenderer(_renderer);
+      this.setRenderer = function(_renderer){
+        A.i(renderer?.finalize);
+        y.i(_renderer?.initialize, internalData.roomObj);
+        that.client.renderer = _renderer;
+        internalData.renderer = _renderer;
+        renderer = _renderer;
       };
 
       this.setPluginActive = function(name, active){
@@ -9162,16 +9163,15 @@ function abcHaxballAPI(window, config){
     };
 
     if (internalData.pluginMechanismActive){
-      if (renderer)
-        renderer.initialize && renderer.initialize(internalData.roomObj);
+      y.i(renderer?.initialize, internalData.roomObj);
 
       this.plugins.forEach((p)=>{
-        p.initialize && p.initialize(that);
+        y.i(p.initialize, that);
       });
 
       this.activePlugins.forEach((p)=>{
-        p.onActiveChanged && p.onActiveChanged();
-        that.onPluginActiveChange && that.onPluginActiveChange(p);
+        A.i(p.onActiveChanged);
+        y.i(that.onPluginActiveChange, p);
       });
     }
   }
