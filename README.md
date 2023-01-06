@@ -323,7 +323,8 @@ Room.create({
     - `startRecording()`: start recording replay data. returns true if succeeded, false otherwise. recording should not be started before calling this.
     - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.
     - `isRecording()`: returns true if recording has started; false otherwise.
-    - `setRenderer(renderer)`: sets the renderer object that will render the game. The object should follow the provided `Renderer` template.
+    - `setRenderer(renderer)`: sets the renderer object that will render the game. the object should follow the provided `Renderer` template.
+    - `updatePlugin(pluginIndex, newPluginObj)`: sets the plugin at the specified index to the newPluginObj object, initialization and activation are automatic. plugin names must be the same.
 
   - `fake event triggers`: these functions are intended to be used in host mode to create/control in-memory bot players that will run much more efficiently than standard networking bot players. they also work for normal player objects, and can be used to create some events belonging to a player that did not originate from that player. most of these fake events also trigger an onOperationReceived call before being sent to clients.
     - `fakePlayerJoin(id, name, flag, avatar, conn, auth)`: triggers a fake join room event; which in turn creates a new in-memory player object. If there was a player before with this id, old resources are automatically reassigned to this new player object, and that player will wake up. 0 <= `id` <= 65535, all the other parameters must be a string. 
@@ -493,6 +494,8 @@ Room.create({
       - `onCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
       - `onAfterCustomEvent(type, data, byId, customData)`: a custom event(type, data) was triggered by player(byId). custom-(host,client)s-only.
     - `onPluginActiveChange(plugin)`: a plugin was activated/deactivated. triggered individually.
+    - `onPluginUpdate(oldPluginObj, newPluginObj)`: an old plugin object(oldPluginObj) was replaced by a new plugin object(newPluginObj).
+    - `onRendererUpdate(oldRendererObj, newRendererObj)`: an old renderer object(oldRendererObj) was replaced by a new renderer object(newRendererObj).
 
 - `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 

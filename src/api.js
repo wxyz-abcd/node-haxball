@@ -7899,7 +7899,7 @@ function abcHaxballAPI(window, config){
       haxball._onConnectionStateChange = null;
       fLeaveRoom = null;
       haxball.plugins && (haxball.plugins.forEach((p)=>{
-        p.finalize && p.finalize();
+        A.i(p.finalize);
       }));
       A.i(haxball.renderer?.finalize);
       haxball._onRoomLeave = null;
@@ -8108,7 +8108,7 @@ function abcHaxballAPI(window, config){
       fLeaveRoom = null;
       fCreateRoomSucceeded = null;
       haxball.plugins && (haxball.plugins.forEach((p)=>{
-        p.finalize && p.finalize();
+        A.i(p.finalize);
       }));
       A.i(haxball.renderer?.finalize);
       fLeaveRoom = null;
@@ -8401,21 +8401,17 @@ function abcHaxballAPI(window, config){
 
       var that = this;
 
-      this.setRenderer = function(_renderer){
+      this.setRenderer = function(newRenderer){
         A.i(renderer?.finalize);
-        y.i(_renderer?.initialize, internalData.roomObj);
-        that.client.renderer = _renderer;
-        internalData.renderer = _renderer;
-        renderer = _renderer;
+        y.i(newRenderer?.initialize, internalData.roomObj);
+        var oldRenderer = renderer;
+        that.client.renderer = newRenderer;
+        internalData.renderer = newRenderer;
+        renderer = newRenderer;
+        ia.i(that.onRendererUpdate, oldRenderer, newRenderer);
       };
 
       this.setPluginActive = function(name, active){
-        /*
-        var oIdx = that.plugins.findIndex((x)=>x.name==name);
-        if (oIdx<0)
-          return;
-        var p = that.plugins[oIdx];
-        */
         var p = that.plugins.filter((x)=>x.name==name)[0];
         if (!p || p.active==active)
           return;
@@ -9160,6 +9156,26 @@ function abcHaxballAPI(window, config){
         map: mapData
       });
       return ret;
+    };
+
+    this.updatePlugin = function(pluginIndex, newPluginObj){
+      var oldPluginObj = that.plugins[pluginIndex];
+      if (!oldPluginObj)
+        throw "Plugin not found at index " + pluginIndex;
+      var {name, active} = oldPluginObj;
+      if (name != newPluginObj.name) // plugin name should not change, otherwise some bugs are possible.
+        throw "Plugin name should not change";
+      if (active)
+        that.setPluginActive(name, false);
+      A.i(oldPluginObj.finalize);
+      that.plugins[pluginIndex] = newPluginObj;
+      that.pluginsMap[name] = newPluginObj;
+      y.i(newPluginObj.initialize, that);
+      ia.i(that.onPluginUpdate, oldPluginObj, newPluginObj);
+      if (active){
+        newPluginObj.active = false; // to force-trigger plugin activation event
+        that.setPluginActive(name, true);
+      }
     };
 
     if (internalData.pluginMechanismActive){
