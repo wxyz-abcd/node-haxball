@@ -8224,7 +8224,7 @@ function abcHaxballAPI(window, config){
         var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
         if (!newPlayerData)
           throw "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth;
-        [d, e, f] = newPlayerData;
+        [d, f, e] = newPlayerData;
       }
       d = oa.la(a, d, e, f, conn, auth);
       if (internalData.execOperationReceivedOnHost(d)==false)

@@ -48,7 +48,7 @@ const { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callb
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callback, Replay, Renderer } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = abcHaxballAPI(window, {
           WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
           HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
         });
@@ -69,7 +69,7 @@ const { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callb
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callback, Replay, Renderer } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>

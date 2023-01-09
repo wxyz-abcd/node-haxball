@@ -100,7 +100,7 @@ function roomCallback(room){ // examples start from here.
     return 100000 + ping*ping*ping; // if host, set everybody(except host)'s ping to 100000 + its original value cubed; otherwise, only set your own ping to that value.
   };
 
-  room.onOperationReceived = function(obj, msg, customData){ // this is host-only
+  room.onOperationReceived = function(operation, msg, customData){ // this is host-only
 
     var playerId = operation.getValue(msg, "byPlayerId"); // find out who sent this message
     if (connectionShouldBreak[playerId]) // if player is marked
