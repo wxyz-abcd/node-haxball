@@ -1,11 +1,12 @@
 module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
-  Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "eventLogger", true, { // "eventLogger" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Object.setPrototypeOf(this, RoomConfig.prototype);
+  RoomConfig.call(this, { // Every roomConfig should have a unique name.
+    name: "eventLogger",
     version: "0.1",
     author: "abc",
-    description: `This plugin logs all events in console except those that would cause flooding. Improvement could be to add an option to show flooding logs.`,
-    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+    description: `This roomConfig logs all events in console except those that would cause flooding. Improvement could be to add an option to show flooding logs.`,
+    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
   });
 
   this.initialize = function(room){
@@ -15,11 +16,10 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.finalize = function(){
     console.log("finalize...");
   };
-
+  
   this.onPluginActiveChange = function(plugin, customData){
     console.log("onPluginActiveChange...", plugin, customData);
   };
-
   /*
   // this is not technically an event.
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){

@@ -1,6 +1,6 @@
 function roomCallback(room){ // examples start from here.
 
-  room.onAfterPlayerJoin = (playerObj, customData) => {
+  room.onPlayerJoin = (playerObj, customData) => {
     // get player's id and name
     var id = playerObj.V, name = playerObj.w;
     
@@ -8,7 +8,7 @@ function roomCallback(room){ // examples start from here.
     room.setPlayerAdmin(id, true); // make everybody admin
   };
 
-  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+  room.onPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
     // get player's name
     var name = playerObj.w;
     

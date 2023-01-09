@@ -1,4 +1,4 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory_multiple", true, { // "autoPlay_followBall_inmemory_multiple" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
@@ -9,7 +9,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
     Available commands:
     - !add_bot [name="in-memory-bot"] [flag="tr"] [avatar="XX"] [conn="fake-ip-do-not-believe-it"] [auth="fake-auth-do-not-believe-it"]: Adds a new bot with given properties.
     - !remove_bot: Removes the first added bot that is still not removed.`,
-    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+    allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
   // parameters are exported so that they can be edited outside this class.

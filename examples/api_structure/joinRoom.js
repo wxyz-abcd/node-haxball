@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = require("../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = API = require("../../src/index");
 
 Utils.generateAuth().then(([authKey, authObj])=>{
   Room.join({
@@ -11,8 +11,9 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       player_auth_key: authKey
     }, 
     authObj: authObj,
-    plugins: [], // example plugin usage: [new autoPlay_followBall()]
-    onSuccess: roomCallback,
+    config: null, // example roomConfig usage: new autoPlay_followBall(API) // look at examples/roomConfigs/method2 folder for related examples.
+    plugins: [], // example plugin usage: [new autoPlay_followBall(API)] // look at examples/plugins folder for related examples.
+    onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
     onFailure: (error)=>{
       console.log("Unable to join room...", error);
       process.exit(0);
@@ -24,6 +25,6 @@ Utils.generateAuth().then(([authKey, authObj])=>{
   });
 });
 
-function roomCallback(room){ // "roomCallbacks" examples start from here.
+function roomCallbacks(room){ // "roomCallbacks" examples start from here. // look at examples/roomConfigs/method1 folder for related examples.
   console.log("joined room");
 }

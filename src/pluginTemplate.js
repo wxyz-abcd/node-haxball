@@ -1,4 +1,4 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "template", true, { // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -11,10 +11,10 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
   this.initialize = function(room){};
   this.finalize = function(){};
 
-  this.onActiveChanged = function(){};
-
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){return [modifiedNick, modifiedAvatar, modifiedFlag];};
   this.modifyPlayerPing = function(playerId, ping, customData){return newPing;};
+  this.modifyClientPing = function(ping, customData){return newPing;};
+  this.modifyFrameNo = function(frameNo){return newFrameNo;};
   this.onOperationReceived = function(obj, msg, customData){return true;};
 
   this.onRoomLink = function(link, customData){};
@@ -44,6 +44,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
   this.onTeamColorsChange = function(teamId, value, byId, customData){};
   this.onGameStart = function(byId, customData){};
   this.onKickOff = function(customData){};
+  this.onTimeIsUp = function(customData){};
+  this.onPositionsReset = function(customData){};
   this.onLocalFrame = function(localFrameNo, customData){};
   this.onGameStop = function(byId, customData){};
   this.onPingData = function(array, customData){};
@@ -57,5 +59,9 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
   this.onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId, customData){};
   this.onCollisionDiscVsPlane = function(discId, discPlayerId, planeId, customData){};
   this.onCustomEvent = function(type, data, byId, customData){};
+  this.onPluginActiveChange = function(plugin, customData){};
+  this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){};
+  this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){};
+  this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
 
 };

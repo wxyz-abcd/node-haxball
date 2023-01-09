@@ -1,6 +1,25 @@
-function roomCallback(room){ // examples start from here.
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
-  var teams = [[], [], []], playerTeams = {};
+  Object.setPrototypeOf(this, RoomConfig.prototype);
+  RoomConfig.call(this, { // Every roomConfig should have a unique name.
+    name: "balanceTeams",
+    version: "0.1",
+    author: "abc",
+    description: `This roomConfig balances the player counts of teams automatically whenever a player joins/leaves the room or changes team.`,
+    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
+  });
+
+  var room = null, teams = [[], [], []], playerTeams = {}, that = this;
+
+  this.initialize = function(_room){
+    room = _room;
+  };
+
+  this.finalize = function(){
+    room = null;
+    teams = null;
+    playerTeams = null;
+  };
 
   var balanceTeams = function(){
     // count players for each team
@@ -35,7 +54,7 @@ function roomCallback(room){ // examples start from here.
     }
   };
 
-  room.onAfterPlayerJoin = (playerObj, customData) => {
+  this.onPlayerJoin = function(playerObj, customData){
     // get player's id
     var id = playerObj.V;
     
@@ -49,10 +68,10 @@ function roomCallback(room){ // examples start from here.
     balanceTeams();
   };
 
-  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+  this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id
     var id = playerObj.V;
-    
+
     // remove player from his/her team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));
     if (idx>=0)
@@ -63,7 +82,7 @@ function roomCallback(room){ // examples start from here.
     balanceTeams();
   };
 
-  room.onAfterPlayerTeamChange = (id, teamId, byId, customData) => {
+  this.onPlayerTeamChange = function(id, teamId, byId, customData){
     // remove player from his/her old team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));
     if (idx>=0)
@@ -79,4 +98,4 @@ function roomCallback(room){ // examples start from here.
     balanceTeams();
   };
 
-}
+};

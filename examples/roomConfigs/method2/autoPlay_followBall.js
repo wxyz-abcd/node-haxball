@@ -1,11 +1,12 @@
 module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
-  Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "autoPlay_followBall_inmemory", false, { // "autoPlay_followBall_inmemory" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
+  Object.setPrototypeOf(this, RoomConfig.prototype);
+  RoomConfig.call(this, { // Every roomConfig should have a unique name.
+    name: "autoPlay_followBall",
     version: "0.1",
     author: "abc",
-    description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. This bot creates a fake player(id=65535) in host's memory and controls it using fake events.`,
-    allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+    description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. This bot uses real events and controls real players.`,
+    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
   });
 
   // parameters are exported so that they can be edited outside this class.
@@ -33,7 +34,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     }
   });
 
-  var room = null, that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
+  var room = null, that = this;
 
   this.initialize = function(_room){
     room = _room;
@@ -43,20 +44,10 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     room = null;
   };
 
-  this.onPluginActiveChange = function(plugin, customData){
-    if (plugin.name!=that.name)
-      return;
-    if (that.active)
-      room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
-    else
-      room.fakePlayerLeave(65535);
-  };
-
   this.onGameTick = function(customData){
-
-    // get the original data object of the next bot
-    var cp = room.getPlayerOriginal(65535);
-    var playerDisc = cp?.H;
+    
+    // get the original data object of the current player
+    var playerDisc = room.getPlayerDiscOriginal(room.currentPlayerId);
 
     // coordinates: playerDisc.a.x, playerDisc.a.y
     // speed: playerDisc.D.x, playerDisc.D.y
@@ -91,18 +82,6 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
 
     // apply current keys
-    var newKeyState = Utils.keyState(dirX, dirY, kick);
-    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-      // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
-      // this happens because requestAnimationFrame is being used. 
-      // therefore, we are trying to limit consequent sending.
-      if (newKeyState!=oldKeyState || kick!=cp.Wb){ // Wb: whether x key is active in-game (the circle around players is painted white if Wb is true)
-        if ((newKeyState==oldKeyState) && kick && !cp.Wb) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
-          room.fakeSendPlayerInput(/*input:*/ newKeyState & -17, /*byId:*/ 65535); // we have to release x key before pressing it again. (newKeyState & -17) changes only the 5th(kick) bit of newKeyState to 0.
-        room.fakeSendPlayerInput(/*input:*/ newKeyState, /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
-        oldKeyState = newKeyState;
-      }
-    });
+    room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
-
 };

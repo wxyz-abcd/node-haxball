@@ -1,5 +1,5 @@
 function roomCallback(room){ // examples start from here.
-  room.modifyPlayerDataAfter = function(id, nick, avatar, flag, conn, auth, customData){ // this is host-only.
+  room.modifyPlayerData = function(id, nick, avatar, flag, conn, auth, customData){ // this is host-only.
     if (nick=="abc")
       return null;  // block anyone trying to join the room with nick "abc", before he can join the room.
     return [

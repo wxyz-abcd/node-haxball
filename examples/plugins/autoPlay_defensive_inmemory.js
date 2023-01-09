@@ -1,11 +1,11 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive_inmemory", false, { // "autoPlay_defensive_inmemory" is plugin's name, "false" means "not activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc",
     description: `This is an auto-playing bot that follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking. This bot creates a fake player(id=65535) in host's memory and controls it using fake events.`,
-    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+    allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
   // parameters are exported so that they can be edited outside this class.
@@ -55,7 +55,9 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
     room = null;
   };
 
-  this.onActiveChanged = function(){
+  this.onPluginActiveChange = function(plugin, customData){
+    if (plugin.name!=that.name)
+      return;
     if (that.active)
       room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
     else

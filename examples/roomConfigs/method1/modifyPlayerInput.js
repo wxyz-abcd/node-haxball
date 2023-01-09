@@ -17,7 +17,7 @@ function roomCallback(room){ // examples start from here.
   // keep in mind that room.onBeforeOperationReceived already has a default callback value. It parses chat messages and returns the result as customData.
   // if you need to insert custom logic before plugins are running, and you still want the original to also run, you may store the original callback value 
   // in a variable just after room is created and later use it inside your own room.onBeforeOperationReceived.
-  room.onAfterOperationReceived = function(operation, msg, customData){ // this is host-only
+  room.onOperationReceived = function(operation, msg, customData){ // this is host-only
     var playerId = operation.getValue(msg, "byPlayerId");
     switch (operation.type){
       case OperationType.SendChat: {
@@ -32,7 +32,9 @@ function roomCallback(room){ // examples start from here.
               setPlayerInput(parseInt(arr[1]), parseInt(arr[2]));
               break;
           }
-          return false; // block this event from being processed
+          //return false; // You may block this event from being processed by doing this. 
+          // However, room.onAfterOperationReceived already has a default value. It blocks all command chat messages from being sent to clients, 
+          // after it is received by all plugins. You may modify it to your needs.
         }
         break;
       }
@@ -46,7 +48,7 @@ function roomCallback(room){ // examples start from here.
     return true;
   };
 
-  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+  room.onPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
     // get player's id
     var id = playerObj.V;
 

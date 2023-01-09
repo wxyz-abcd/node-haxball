@@ -6599,6 +6599,7 @@ function abcHaxballAPI(window, config){
               c.hr(b);
             }
           } catch (l) {
+            console.log(l);
             c.xk(b, l instanceof q ? l.Ta : l);
           }
         });
@@ -7834,6 +7835,7 @@ function abcHaxballAPI(window, config){
       renderer: haxball.renderer,
       storage: haxball.storage,
       pluginMechanismActive: !haxball.noPluginMechanism,
+      useDefaultChatCommandMechanism: haxball.useDefaultChatCommandMechanism,
       //n_A: n_A,
       onOperationReceived: function(msg) {
         //var op = {
@@ -7877,19 +7879,11 @@ function abcHaxballAPI(window, config){
   }
 
   function joinRoom(roomParams, haxballParams) { 
-    /*
-      cancelJoinRoom signal -> cancel function, 
-      joinRoomFailed event -> onFailure callback,
-      joinRoomReverse event -> onReverseConnection callback,
-      joinRoomSucceeded event -> onSuccess callback,
-      RequestRecaptcha event -> onRequestRecaptcha callback,
-      roomLeave event -> onLeave callback,
-      connectionStateChange event -> onConnectionStateChange callback,
-    */
     var {id, password, token, authObj} = roomParams;
     if (!id || !authObj)
       throw "id and authObj cannot be null. (inside 1st parameter)";
     var haxball = Object.assign({}, haxballParams);
+    haxball.config = haxball.config || {};
     fixStorage(haxball);
     (password == "") && (password = null);
     (haxball.version == null) && (haxball.version = defaultVersion);
@@ -7902,6 +7896,7 @@ function abcHaxballAPI(window, config){
         A.i(p.finalize);
       }));
       A.i(haxball.renderer?.finalize);
+      A.i(haxball.config.finalize);
       haxball._onRoomLeave = null;
       internalData.roomObj = null;
       internalData.roomPhysicsObj = null;
@@ -7915,7 +7910,7 @@ function abcHaxballAPI(window, config){
       //haxball._onRoomLeave = null;
       haxball._onConnectionStateChange = null;
       fJoinRoomSucceeded = null;
-      haxball.room = new Room(internalData, haxball.plugins);
+      haxball.room = new Room(internalData, haxball.config, haxball.plugins);
       haxball.room.client = haxball;
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       //haxball.emit("roomJoin", haxball.room);
@@ -8098,6 +8093,7 @@ function abcHaxballAPI(window, config){
       roomLeave event -> onLeave callback,
     */
     var haxball = Object.assign({}, haxballParams);
+    haxball.config = haxball.config || {};
     fixStorage(haxball);
     var {name, password, token, noPlayer, geo, playerCount, maxPlayerCount, unlimitedPlayerCount, fakePassword, showInRoomList} = roomParams;
     (password == "") && (password = null);
@@ -8111,6 +8107,7 @@ function abcHaxballAPI(window, config){
         A.i(p.finalize);
       }));
       A.i(haxball.renderer?.finalize);
+      A.i(haxball.config.finalize);
       fLeaveRoom = null;
       internalData.roomObj = null;
       internalData.roomPhysicsObj = null;
@@ -8123,7 +8120,7 @@ function abcHaxballAPI(window, config){
       console.log("internal event: CreateRoomSucceeded");
       //fLeaveRoom = null;
       fCreateRoomSucceeded = null;
-      haxball.room = new Room(internalData, haxball.plugins);
+      haxball.room = new Room(internalData, haxball.config, haxball.plugins);
       haxball.room.client = haxball;
       haxball.room.kickTimeout = haxball.kickTimeout || 20;
       haxball.room.hostPing = 0;
@@ -8363,8 +8360,8 @@ function abcHaxballAPI(window, config){
 
   var eventCallbacks = [];
 
-  function Room(internalData, plugins){
-    var renderer = internalData.renderer;
+  function Room(internalData, config, plugins){
+    var renderer = internalData.renderer, cfg = config;
     if (!internalData.isHost)
       this.sdp = internalData.roomObj.ya.pa.Ra.remoteDescription.sdp; // usage: require("sdp-transform").parse(sdp);
 
@@ -8401,14 +8398,41 @@ function abcHaxballAPI(window, config){
 
       var that = this;
 
+      this.setConfig = function(newCfg){
+        var oldCfg = cfg;
+        A.i(oldCfg.finalize);
+        newCfg = newCfg || {};
+        y.i(newCfg.initialize, that);
+        that.client.config = newCfg;
+        cfg = newCfg;
+        ia.i(that._onConfigUpdate, oldCfg, newCfg);
+      };
+
+      this.mixConfig = function(newCfg){
+        Object.keys(newCfg).forEach((key)=>{
+          var f2 = newCfg[key];
+          if (typeof f2=="function"){
+            var f1 = cfg[key];
+            if (!f1)
+              cfg[key] = f2;
+            else if (typeof f1=="function"){
+              cfg[key] = function(...args){
+                f1(...args);
+                f2(...args);
+              };
+            }
+          }
+        });
+      };
+
       this.setRenderer = function(newRenderer){
         A.i(renderer?.finalize);
-        y.i(newRenderer?.initialize, internalData.roomObj);
+        y.i(newRenderer?.initialize, that);
         var oldRenderer = renderer;
         that.client.renderer = newRenderer;
         internalData.renderer = newRenderer;
         renderer = newRenderer;
-        ia.i(that.onRendererUpdate, oldRenderer, newRenderer);
+        ia.i(that._onRendererUpdate, oldRenderer, newRenderer);
       };
 
       this.setPluginActive = function(name, active){
@@ -8429,111 +8453,142 @@ function abcHaxballAPI(window, config){
           addInOrder(that.plugins, that.activePlugins, p); // insert plugin to its old index. 
         }
         p.active = active;
-        p.onActiveChanged && p.onActiveChanged();
-        that.onPluginActiveChange && that.onPluginActiveChange(p);
-        renderer?.onPluginActiveChange && renderer.onPluginActiveChange(p);
+        y.i(that._onPluginActiveChange, p);
       };
 
+      function defineCfgProperty(name){
+        Object.defineProperty(that, name, {
+          get(){
+            return cfg[name];
+          },
+          set(value){
+            cfg[name] = value;
+          }
+        });
+      }
+
+      function defineCfgModifierCallback(name){
+        defineCfgProperty(name + "Before");
+        defineCfgProperty(name);
+        defineCfgProperty(name + "After");
+      }
+
       this._modifyPlayerData = function(playerId, name, flag, avatar, conn, auth){
-        var a = [name, flag, avatar], customData;
-        that.modifyPlayerDataBefore && ([a, customData] = that.modifyPlayerDataBefore(playerId, a[0], a[1], a[2], conn, auth));
+        var a = [name, avatar, flag], customData;
+        cfg.modifyPlayerDataBefore && ([a, customData] = cfg.modifyPlayerDataBefore(playerId, a[0], a[1], a[2], conn, auth));
         if (customData!==false){
           that.activePlugins.forEach((p)=>{
             p.modifyPlayerData && a && (a = p.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
           });
-          that.modifyPlayerData && a && (a = that.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
-          that.modifyPlayerDataAfter && a && (a = that.modifyPlayerDataAfter(playerId, a[0], a[1], a[2], conn, auth, customData));
+          cfg.modifyPlayerData && a && (a = cfg.modifyPlayerData(playerId, a[0], a[1], a[2], conn, auth, customData));
+          cfg.modifyPlayerDataAfter && a && (a = cfg.modifyPlayerDataAfter(playerId, a[0], a[1], a[2], conn, auth, customData));
         }
         return a;
       };
+      defineCfgModifierCallback("modifyPlayerData");
 
       this._modifyPlayerPing = function(playerId, ping){
         var customData;
-        that.modifyPlayerPingBefore && ([ping, customData] = that.modifyPlayerPingBefore(playerId, ping));
+        cfg.modifyPlayerPingBefore && ([ping, customData] = cfg.modifyPlayerPingBefore(playerId, ping));
         if (customData!==false){
           that.activePlugins.forEach((p)=>{
             p.modifyPlayerPing && (ping = p.modifyPlayerPing(playerId, ping, customData));
           });
-          that.modifyPlayerPing && (ping = that.modifyPlayerPing(playerId, ping, customData));
-          that.modifyPlayerPingAfter && (ping = that.modifyPlayerPingAfter(playerId, ping, customData));
+          cfg.modifyPlayerPing && (ping = cfg.modifyPlayerPing(playerId, ping, customData));
+          cfg.modifyPlayerPingAfter && (ping = cfg.modifyPlayerPingAfter(playerId, ping, customData));
         }
         return ping;
       };
+      defineCfgModifierCallback("modifyPlayerPing");
 
       this._modifyClientPing = function(ping){
         var customData;
-        that.modifyClientPingBefore && ([ping, customData] = that.modifyClientPingBefore(ping));
+        cfg.modifyClientPingBefore && ([ping, customData] = cfg.modifyClientPingBefore(ping));
         if (customData!==false){
           that.activePlugins.forEach((p)=>{
             p.modifyClientPing && (ping = p.modifyClientPing(ping, customData));
           });
-          that.modifyClientPing && (ping = that.modifyClientPing(ping, customData));
-          that.modifyClientPingAfter && (ping = that.modifyClientPingAfter(ping, customData));
+          cfg.modifyClientPing && (ping = cfg.modifyClientPing(ping, customData));
+          cfg.modifyClientPingAfter && (ping = cfg.modifyClientPingAfter(ping, customData));
         }
         return ping;
       };
+      defineCfgModifierCallback("modifyClientPing");
 
       this._modifyFrameNo = function(frameNo){
         var customData;
-        that.modifyFrameNoBefore && ([frameNo, customData] = that.modifyFrameNoBefore(frameNo));
+        cfg.modifyFrameNoBefore && ([frameNo, customData] = cfg.modifyFrameNoBefore(frameNo));
         if (customData!==false){
           that.activePlugins.forEach((p)=>{
             p.modifyFrameNo && (frameNo = p.modifyFrameNo(frameNo, customData));
           });
-          that.modifyFrameNo && (frameNo = that.modifyFrameNo(frameNo, customData));
-          that.modifyFrameNoAfter && (frameNo = that.modifyFrameNoAfter(frameNo, customData));
+          cfg.modifyFrameNo && (frameNo = cfg.modifyFrameNo(frameNo, customData));
+          cfg.modifyFrameNoAfter && (frameNo = cfg.modifyFrameNoAfter(frameNo, customData));
         }
         return frameNo;
       };
+      defineCfgModifierCallback("modifyFrameNo");
 
-      this.onBeforeOperationReceived = function(obj, msg){
-        if (obj.type != OperationType.SendChat)
-          return;
-        var m = obj.getValue(msg, "text");
-        if (m.startsWith("!")){  // custom chat logic for extra commands
-          return {
-            isCommand: true, 
-            data: m.trimEnd().split(" ")
+      if (internalData.useDefaultChatCommandMechanism!==false){
+        if (!cfg.onBeforeOperationReceived){
+          cfg.onBeforeOperationReceived = function(obj, msg){
+            if (obj.type != OperationType.SendChat)
+              return;
+            var m = obj.getValue(msg, "text");
+            if (m.startsWith("!")){  // custom chat logic for extra commands
+              return {
+                isCommand: true, 
+                data: m.trimEnd().split(" ")
+              };
+            };
+            return {
+              isCommand: false
+            };
           };
-        };
-        return {
-          isCommand: false
-        };
-      };
-
-      this.onAfterOperationReceived = function(obj, msg, customData){
-        if (obj.type != OperationType.SendChat)
-          return true;
-        return !customData?.isCommand;
-      };
+        }
+        
+        if (!cfg.onAfterOperationReceived){
+          cfg.onAfterOperationReceived = function(obj, msg, customData){
+            if (obj.type != OperationType.SendChat)
+              return true;
+            return !customData?.isCommand;
+          };
+        }
+      }
 
       this._onOperationReceived = function(obj, msg){
-        var customData = that.onBeforeOperationReceived && that.onBeforeOperationReceived(obj, msg), b = (customData!==false);
+        var customData = cfg.onBeforeOperationReceived && cfg.onBeforeOperationReceived(obj, msg), b = (customData!==false);
         that.activePlugins.forEach((p)=>{
           if (b && p.onOperationReceived && !p.onOperationReceived(obj, msg, customData))
             b = false;
         });
-        if (b && that.onOperationReceived && !that.onOperationReceived(obj, msg, customData))
+        if (b && cfg.onOperationReceived && !cfg.onOperationReceived(obj, msg, customData))
           b = false;
-        if (b && that.onAfterOperationReceived && !that.onAfterOperationReceived(obj, msg, customData))
+        if (b && cfg.onAfterOperationReceived && !cfg.onAfterOperationReceived(obj, msg, customData))
           b = false;
         return b;
       };
+      defineCfgProperty("onBeforeOperationReceived");
+      defineCfgProperty("onOperationReceived");
+      defineCfgProperty("onAfterOperationReceived");
 
       // metadata is not used or stored, it's just for general information about the event. 
       // we should not use the original variable names inside metadata as string, otherwise they will not be minified.
       var createEventCallback = function(eventName, metadata){
         that["_on" + eventName] = function(...params){
-          var f = that["onBefore" + eventName], customData = f && f(...params);
+          var f = cfg["onBefore" + eventName], customData = f && f(...params);
           if (customData!==false){
             that.activePlugins.forEach((p)=>{
               f = p["on" + eventName], (f && f(...params, customData));
             });
-            f = that["on" + eventName], (f && f(...params, customData));
+            f = cfg["on" + eventName], (f && f(...params, customData));
             f = renderer && renderer["on" + eventName], (f && f(...params, customData));
-            f = that["onAfter" + eventName], (f && f(...params, customData));
+            f = cfg["onAfter" + eventName], (f && f(...params, customData));
           }
         };
+        defineCfgProperty("onBefore" + eventName);
+        defineCfgProperty("on" + eventName);
+        defineCfgProperty("onAfter" + eventName);
       };
 
       eventCallbacks.forEach(({name, metadata})=>{
@@ -9087,7 +9142,8 @@ function abcHaxballAPI(window, config){
       return {
         o: o,
         p: internalData.roomPhysicsObj?.K,
-        ep: internalData.extrapolatedRoomPhysicsObj?.K
+        ep: internalData.extrapolatedRoomPhysicsObj?.K,
+        q: internalData.roomObj
       };
     };
 
@@ -9171,7 +9227,7 @@ function abcHaxballAPI(window, config){
       that.plugins[pluginIndex] = newPluginObj;
       that.pluginsMap[name] = newPluginObj;
       y.i(newPluginObj.initialize, that);
-      ia.i(that.onPluginUpdate, oldPluginObj, newPluginObj);
+      ia.i(that._onPluginUpdate, oldPluginObj, newPluginObj);
       if (active){
         newPluginObj.active = false; // to force-trigger plugin activation event
         that.setPluginActive(name, true);
@@ -9179,18 +9235,38 @@ function abcHaxballAPI(window, config){
     };
 
     if (internalData.pluginMechanismActive){
-      y.i(renderer?.initialize, internalData.roomObj);
+      y.i(cfg.initialize, this);
+      y.i(renderer?.initialize, this);
 
       this.plugins.forEach((p)=>{
         y.i(p.initialize, that);
       });
 
       this.activePlugins.forEach((p)=>{
-        A.i(p.onActiveChanged);
-        y.i(that.onPluginActiveChange, p);
+        y.i(that._onPluginActiveChange, p);
       });
     }
   }
+
+  function RoomConfig(metadata=null){
+    this.defineMetadata(metadata);
+  }
+
+   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  RoomConfig.prototype.defineMetadata = function(x){},//x={name, version, author, description, allowFlags}
+  RoomConfig.prototype.defineVariable = function(x){//x={name, type, value, range, description}
+    return x?.value;
+  };
+
+  function Renderer(metadata=null){
+    this.defineMetadata(metadata);
+  }
+
+   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  Renderer.prototype.defineMetadata = function(x){},//x={name, version, author, description}
+  Renderer.prototype.defineVariable = function(x){//x={name, type, value, range, description}
+    return x?.value;
+  };
 
   function Plugin(name, active=false, metadata=null){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
     this.name = name;
@@ -9204,24 +9280,14 @@ function abcHaxballAPI(window, config){
   }
 
    // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
-  Plugin.prototype.defineMetadata = function(x){},//x={version, author, description}
+  Plugin.prototype.defineMetadata = function(x){},//x={version, author, description, allowFlags}
   Plugin.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     return x?.value; // Do not forget to return this value. It is used once inside constructor for variable "active".
   };
 
-  Plugin.AllowFlags = {
+  var AllowFlags = {
     JoinRoom: 1,
     CreateRoom: 2
-  };
-
-  function Renderer(metadata=null){
-    this.defineMetadata(metadata);
-  }
-
-   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
-  Renderer.prototype.defineMetadata = function(x){},//x={name, version, author, description}
-  Renderer.prototype.defineVariable = function(x){//x={name, type, value, range, description}
-    return x?.value;
   };
 
   function createEventCallback(name, metadata){
@@ -9237,7 +9303,7 @@ function abcHaxballAPI(window, config){
 
   createEventCallback("PlayerObjectCreated", { params: ["player object"] });
   createEventCallback("RoomLink", { params: ["room link"] });
-  createEventCallback("BallKick", { params: ["id of the player that triggered this event"] });
+  createEventCallback("PlayerBallKick", { params: ["id of the player that triggered this event"] });
   createEventCallback("TeamGoal", { params: ["team id"] });
   createEventCallback("GameEnd", { params: ["team id that won the game"] });
   createEventCallback("GameTick", { params: [] });
@@ -9277,11 +9343,16 @@ function abcHaxballAPI(window, config){
   createEventCallback("RoomRecordingChange", { params: ["new value indicating whether the game is being recorded"] });
   createEventCallback("RoomPropertiesChange", { params: ["new room properties"] });
   createEventCallback("CustomEvent", { params: ["custom event type", "custom event data", "id of the player that triggered this event"] });
+  createEventCallback("PluginActiveChange", { params: ["the plugin object that has its active property changed"] });
+  createEventCallback("ConfigUpdate", { params: ["old roomConfig object", "new roomConfig object"] });
+  createEventCallback("RendererUpdate", { params: ["old renderer object", "new renderer object"] });
+  createEventCallback("PluginUpdate", { params: ["old plugin object", "new plugin object"] });
 
   return {
     OperationType,
     VariableType,
     ConnectionState,
+    AllowFlags,
     Callback: {
       add: createEventCallback,
       remove: destroyEventCallback
@@ -9304,6 +9375,7 @@ function abcHaxballAPI(window, config){
       read: readReplay
       //Recorder: ac
     },
+    RoomConfig,
     Plugin,
     Renderer
   };

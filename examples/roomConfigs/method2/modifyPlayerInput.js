@@ -1,14 +1,15 @@
 module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
-  Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "modifyPlayerInput", true, { // "modifyPlayerInput" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Object.setPrototypeOf(this, RoomConfig.prototype);
+  RoomConfig.call(this, { // Every roomConfig should have a unique name.
+    name: "modifyPlayerInput",
     version: "0.1",
     author: "abc",
-    description: `This plugin lets players modify other players' input key events.
+    description: `This roomConfig lets players modify other players' input key events.
     Key input value can be calculated as ([kick]*16+[right]*8+[left]*4+[up]*2+[down]*1) where [kick], [right], [left], [up], [down] are all 0(not pressed) or 1(pressed).
     Available commands: 
     - !input [id] [value]: Set the key input value for the player whose playerId=[id] as [value]. 0<=value<=31.`,
-    allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+    allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only.
   });
 
   var staticInputs = {}, room = null;

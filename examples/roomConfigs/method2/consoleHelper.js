@@ -2,13 +2,14 @@ const vm = require("vm"); // you need to install this package manually in order 
 
 module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
-  Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "consoleHelper", true, { // "consoleHelper" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Object.setPrototypeOf(this, RoomConfig.prototype);
+  RoomConfig.call(this, { // Every roomConfig should have a unique name.
+    name: "consoleHelper",
     version: "0.1",
     author: "abc",
-    description: `This plugin lets us write commands in the console and executes them. We do not need this inside a browser, this is useful for node.js. Only commands inside the room object are supported.
+    description: `This roomConfig lets us write commands in the console and executes them. We do not need this inside a browser, this is useful for node.js. Only commands inside the room object are supported.
     Example usage: If you want to use room.setKeyState(5), just write setKeyState(5) and press enter.`,
-    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
   });
 
   var room, stdin, listener = function(d) {

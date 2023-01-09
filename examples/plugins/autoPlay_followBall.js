@@ -1,11 +1,11 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall", true, { // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc",
     description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. This bot uses real events and controls real players.`,
-    allowFlags: Plugin.AllowFlags.CreateRoom | Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
   // parameters are exported so that they can be edited outside this class.

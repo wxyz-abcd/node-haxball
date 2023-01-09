@@ -9,7 +9,7 @@ var client = Room.join({ // or Room.create
 });
 */
 
-module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }, canvas){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }, canvas){
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, {
@@ -19,17 +19,15 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
     description: `This is a template renderer`
   });
 
-  this.initialize = function(roomObj){};
+  this.initialize = function(room){};
   this.finalize = function(){};
   
   this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
     // use "extrapolatedRoomPhysicsObj" contents to get all information about the current extrapolated game state and draw whatever you want into the "canvas" object.
   };
   
-  // you can keep track of changes using these callbacks, and apply them in your render logic:
-  this.onPluginActiveChange = function(plugin){};
-
-  // these callbacks are available for all plugins also:
+  // you can keep track of changes using these callbacks, and apply them in your render logic.
+  // these callbacks are also available for all plugins.
   this.onRoomLink = function(link, customData){};
   this.onPlayerBallKick = function(playerId, customData){};
   this.onTeamGoal = function(teamId, customData){};
@@ -57,6 +55,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
   this.onTeamColorsChange = function(teamId, value, byId, customData){};
   this.onGameStart = function(byId, customData){};
   this.onKickOff = function(customData){};
+  this.onTimeIsUp = function(customData){};
+  this.onPositionsReset = function(customData){};
   this.onLocalFrame = function(localFrameNo, customData){};
   this.onGameStop = function(byId, customData){};
   this.onPingData = function(array, customData){};
@@ -70,4 +70,9 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
   this.onCollisionDiscVsSegment = function(discId, discPlayerId, segmentId, customData){};
   this.onCollisionDiscVsPlane = function(discId, discPlayerId, planeId, customData){};
   this.onCustomEvent = function(type, data, byId, customData){};
+  this.onPluginActiveChange = function(plugin, customData){};
+  this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){};
+  this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){};
+  this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
+
 };

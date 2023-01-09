@@ -14,7 +14,7 @@ function roomCallback(room){ // examples start from here.
   1 - start project to create room.
   2 - wait until room is created.
   3 - join the room from a web browser. (to observe)
-  4 - write setPlayerTeam(0, 1) in the console to move yourself to red team.
+  4 - write setPlayerTeam(0, 1) in node.js console to move yourself to red team.
 
   you can use every function in Room class this way.
   */

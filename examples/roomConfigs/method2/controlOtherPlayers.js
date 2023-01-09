@@ -1,8 +1,28 @@
-var { OperationType } = require("../../src/index");
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
-function roomCallback(room){ // examples start from here.
+  Object.setPrototypeOf(this, RoomConfig.prototype);
+  RoomConfig.call(this, { // Every roomConfig should have a unique name.
+    name: "controlOtherPlayers",
+    version: "0.1",
+    author: "abc",
+    description: `This roomConfig lets you take control of every player in the room. This should be improved with a permission mechanism.
+    Available commands: 
+    - !control [id]: Take control of the player whose playerId=[id].
+    - !blockControl [id] [value={0, 1}]: Block/unblock taking control of the player whose playerId=[id].`,
+    allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only.
+  });
 
-  var controlSwitch = {}, controlSwitchBlocked = {};
+  var room, controlSwitch = {}, controlSwitchBlocked = {};
+
+  this.initialize = function(_room){
+    room = _room;
+  };
+
+  this.finalize = function(){
+    room = null;
+    controlSwitch = null;
+    controlSwitchBlocked = null;
+  };
 
   var setControlledPlayer = function(byPlayerId, playerIdToBeControlled){
     if (isNaN(byPlayerId) || isNaN(playerIdToBeControlled) || controlSwitchBlocked[playerIdToBeControlled])
@@ -28,10 +48,7 @@ function roomCallback(room){ // examples start from here.
     controlSwitchBlocked[playerId] = (value == 1);
   };
 
-  // keep in mind that room.onBeforeOperationReceived already has a default callback value. It parses chat messages and returns the result as customData.
-  // if you need to insert custom logic before plugins are running, and you still want the original to also run, you may store the original callback value 
-  // in a variable just after room is created and later use it inside your own room.onBeforeOperationReceived.
-  room.onAfterOperationReceived = function(operation, msg, customData){ // this is host-only
+  this.onOperationReceived = function(operation, msg, customData){
     var playerId = operation.getValue(msg, "byPlayerId");
     var cs = controlSwitch[playerId];
     if (cs != null && !controlSwitchBlocked[playerId]) // if the player is marked to be controlled by someone else, and the player has not protected himself being controlled,
@@ -52,7 +69,7 @@ function roomCallback(room){ // examples start from here.
               blockControlPlayer(playerId, parseInt(arr[1]), parseInt(arr[2])); // must use original playerId to be able to take back control of your own player
               break;
           }
-          return false; // block this event from being processed
+          //return false; // do not block this event from being processed. it is done automatically in onAfterOperationReceived. 
         }
         break;
       }
@@ -60,13 +77,12 @@ function roomCallback(room){ // examples start from here.
     return true;
   };
 
-  room.onAfterPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
+  this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id
     var id = playerObj.V;
-    
+
     // free extra memory allocated
     delete controlSwitch[id];
     delete controlSwitchBlocked[id];
   };
-
-}
+};

@@ -1,4 +1,4 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, Utils, Plugin, Replay, Room }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -14,7 +14,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, Utils,
     - !max_bot_count [count]: Sets the maximum allowed concurrent bot count to [count].
     - !bot_active [id] [active = {0, 1}]: Changes the activity of the bot player whose playerId is [id].
     - !bot_type [id] [type = {-1, 0, 1}]: Sets the bot type of the bot player whose playerId is [id]. [type] = {-1: standing still, 0: followBall, 1: defensive}.`,
-    allowFlags: Plugin.AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
+    allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
   // parameters are exported so that they can be edited outside this class.

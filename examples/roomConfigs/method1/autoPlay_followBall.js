@@ -4,25 +4,27 @@ const minCoordAlignDelta = 0.5, minKickDistance = 2;
 
 function roomCallback(room){ // examples start from here.
 
-  room.onBeforeGameTick = () => {
-    var { o, p, ep } = _room.getRoomDataOriginal();
-    p = ep || p;
-    var cp = p.Ma.I.filter((x)=>(x.V==_room.currentPlayerId))[0];
+  room.onGameTick = () => {
+    
     // get the original data object of the current player
-    var playerDisc = cp.H;
+    var playerDisc = room.getPlayerDiscOriginal(room.currentPlayerId);
+
+    // coordinates: playerDisc.a.x, playerDisc.a.y
+    // speed: playerDisc.D.x, playerDisc.D.y
+    // radius: playerDisc.Z
+
     if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
       return;
-    var teamId = cp.ea.$; //, oppositeTeamId = 2 - cpTeamId;
-    var goals = o.S.tc, ball = p.ta.F[0];
 
-    var myGoal = goals.filter((g)=>(g.qe.$==teamId))[0]; //, opponentGoal = goals[oppositeTeamId - 1];
-    if (!myGoal)
-      return;
-    var MPofMyGoalX = (myGoal.ca.x + myGoal.W.x) / 2, MPofMyGoalY = (myGoal.ca.y + myGoal.W.y) / 2;
-    var midpointOfBallToMPofMyGoalX = (ball.a.x + MPofMyGoalX) / 2, midpointOfBallToMPofMyGoalY = (ball.a.y + MPofMyGoalY) / 2;
-  
+    // get the original data object of the ball
+    var ball = room.getBallOriginal();
+
+    // coordinates: ball.a.x, ball.a.y
+    // speed: ball.D.x, ball.D.y
+    // radius: ball.Z
+
     // calculate delta difference for both x and y axis.
-    var deltaX = midpointOfBallToMPofMyGoalX - playerDisc.a.x, deltaY = midpointOfBallToMPofMyGoalY - playerDisc.a.y;
+    var deltaX = ball.a.x - playerDisc.a.x, deltaY = ball.a.y - playerDisc.a.y;
 
     // x direction:
     if (Math.abs(deltaX) < minCoordAlignDelta) // we can omit small delta.
@@ -40,6 +42,6 @@ function roomCallback(room){ // examples start from here.
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + minKickDistance) * (playerDisc.Z + ball.Z + minKickDistance));
 
     // apply current keys
-    _room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

@@ -1,36 +1,4 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
-
-  Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "eventLogger", true, { // "eventLogger" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.1",
-    author: "abc",
-    description: `This plugin logs all events in console except those that would cause flooding. Improvement could be to add an option to show flooding logs.`,
-    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
-  });
-
-  this.initialize = function(room){
-    console.log("initialize...", room);
-  };
-
-  this.finalize = function(){
-    console.log("finalize...");
-  };
-
-  this.onPluginActiveChange = function(plugin, customData){
-    console.log("onPluginActiveChange...", plugin, customData);
-  };
-
-  /*
-  // this is not technically an event.
-  this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){
-    return [modifiedNick, modifiedAvatar, modifiedFlag];
-  };
-
-  // this is not technically an event.
-  this.modifyPlayerPing = function(playerId, ping, customData){
-    return newPing;
-  };
-  */
+function roomCallback(room){ // examples start from here.
 
   this.onOperationReceived = function(obj, msg, customData){
     console.log("onOperationReceived...", obj, msg, customData);
@@ -54,8 +22,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   };
 
   this.onGameTick = function(customData){
-    // commented out to avoid console message flooding
-    // console.log("onGameTick...", customData);
+    //console.log("onGameTick...", customData);
   };
 
   this.onPlayerSyncChange = function(playerId, value, customData){
@@ -139,11 +106,10 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   };
 
   this.onKickOff = function(customData){
-    console.log("onKickOff event...", customData);
+    console.log("onKickOff...", customData);
   };
 
   this.onLocalFrame = function(localFrameNo, customData){
-    // commented out to avoid console message flooding
     //console.log("onLocalFrame...", localFrameNo, customData);
   };
 
@@ -152,8 +118,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   };
 
   this.onPingData = function(array, customData){
-    // commented out to avoid console message flooding
-    //console.log("onPingData...", array, customData);
+    console.log("onPingData...", array, customData);
   };
 
   this.onExtrapolationChange = function(value, customData){
@@ -176,6 +141,26 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     console.log("onRoomPropertiesChange...", props, customData);
   };
 
+  this.onTeamColorsChange = function(teamId, value, byId, customData){
+    console.log("onTeamColorsChange...", teamId, value, byId, customData);
+  };
+
+  this.onTimeIsUp = function(customData){
+    console.log("onTimeIsUp...", customData);
+  };
+
+  this.onPositionsReset = function(customData){
+    console.log("onPositionsReset...", customData);
+  };
+
+  this.onRoomRecordingChange = function(value, customData){
+    console.log("onRoomRecordingChange...", value, customData);
+  };
+
+  this.onPluginActiveChange = function(plugin, customData){
+    console.log("onPluginActiveChange...", plugin, customData);
+  };
+
   this.onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2, customData){
     console.log("onCollisionDiscVsDisc...", discId1, discPlayerId1, discId2, discPlayerId2, customData);
   };
@@ -190,6 +175,18 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   this.onCustomEvent = function(type, data, byId, customData){
     console.log("onCustomEvent...", type, data, byId, customData);
+  };
+
+  this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){
+    console.log("onConfigUpdate...", oldRoomConfigObj, newRoomConfigObj, customData);
+  };
+
+  this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){
+    console.log("onRendererUpdate...", oldRendererObj, newRendererObj, customData);
+  };
+
+  this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){
+    console.log("onPluginUpdate...", oldPluginObj, newPluginObj, customData);
   };
 
 };

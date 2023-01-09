@@ -1,4 +1,4 @@
-const { OperationType, ConnectionState, Room, Utils, Replay, Plugin } = require("../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = API = require("../src/index");
 
 function PasswordGuesser(){
   const guessDictionary = ["password", "111", "222", "333", "123", "12345"]; // write as many guesses as you wish here.
@@ -36,7 +36,9 @@ Utils.generateAuth().then(([authKey, authObj])=>{
     }, {
       authObj: authObj,
       storage: storage, 
-      onSuccess: roomCallback,
+      config: null, // example roomConfig usage: new autoPlay_followBall(API) // look at examples/roomConfigs/method2 folder for related examples.
+      plugins: [], // example plugin usage: [new autoPlay_followBall(API)] // look at examples/plugins folder for related examples.
+      onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
       onFailure: () => {
         joinRoom(id); // try again if failed.
       }
@@ -46,6 +48,6 @@ Utils.generateAuth().then(([authKey, authObj])=>{
   joinRoom("8Q059ls-QTQ"); // room id here.
 });
 
-function roomCallback(room){ // "roomCallbacks" examples start from here.
+function roomCallbacks(room){ // "roomCallbacks" examples start from here. // look at examples/roomConfigs/method1 folder for related examples.
   console.log("room password is: " + pg.currentGuess());  // finally found the room password.
 }

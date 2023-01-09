@@ -1,24 +1,6 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
+function roomCallback(room){ // examples start from here.
 
-  Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "balanceTeams", true, { // "balanceTeams" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.1",
-    author: "abc",
-    description: `This plugin balances the player counts of teams automatically whenever a player joins/leaves the room or changes team.`,
-    allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
-  });
-
-  var room = null, teams = [[], [], []], playerTeams = {}, that = this;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-    teams = null;
-    playerTeams = null;
-  };
+  var teams = [[], [], []], playerTeams = {};
 
   var balanceTeams = function(){
     // count players for each team
@@ -53,7 +35,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     }
   };
 
-  this.onPlayerJoin = function(playerObj, customData){
+  room.onPlayerJoin = (playerObj, customData) => {
     // get player's id
     var id = playerObj.V;
     
@@ -67,17 +49,10 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     balanceTeams();
   };
 
-  this.onPluginActiveChange = function(plugin, customData){
-    if (plugin.name!=that.name)
-      return;
-    if (that.active)
-      balanceTeams();
-  };
-
-  this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
+  room.onPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
     // get player's id
     var id = playerObj.V;
-
+    
     // remove player from his/her team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));
     if (idx>=0)
@@ -88,7 +63,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     balanceTeams();
   };
 
-  this.onPlayerTeamChange = function(id, teamId, byId, customData){
+  room.onPlayerTeamChange = (id, teamId, byId, customData) => {
     // remove player from his/her old team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));
     if (idx>=0)
@@ -104,4 +79,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     balanceTeams();
   };
 
-};
+}
