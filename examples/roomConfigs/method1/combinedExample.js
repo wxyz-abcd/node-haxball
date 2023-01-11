@@ -90,9 +90,9 @@ function roomCallback(room){ // examples start from here.
     if (name=="abc")
       return null;  // block anyone trying to join the room with name "abc", before he can join the room.
     return [
-      "[" + playerId + "] " + name, // prefix everyone's name with [id]
-      avatar, // do not change avatars
-      "tr" // set everyone's flag to tr
+      "[" + playerId + "] " + name, // prefix everyone's name with [playerId]
+      "tr", // set everyone's flag to tr
+      avatar // do not change avatars
     ];
   };
 

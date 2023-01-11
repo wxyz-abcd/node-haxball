@@ -10,12 +10,12 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   });
 
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){
-    if (nick=="abc")
-      return null;  // block anyone trying to join the room with nick "abc", before he can join the room.
+    if (name=="abc")
+      return null;  // block anyone trying to join the room with name "abc", before he can join the room.
     return [
-      "[" + id + "] " + nick, // prefix everyone's nick with [id]
-      avatar, // do not change avatars
-      "tr" // set everyone's flag to tr
+      "[" + playerId + "] " + name, // prefix everyone's name with [playerId]
+      "tr", // set everyone's flag to tr
+      avatar // do not change avatars
     ];
   };
 

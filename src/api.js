@@ -8224,7 +8224,7 @@ function abcHaxballAPI(window, config){
         var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
         if (!newPlayerData)
           throw "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth;
-        [d, f, e] = newPlayerData;
+        [d, e, f] = newPlayerData;
       }
       d = oa.la(a, d, e, f, conn, auth);
       if (internalData.execOperationReceivedOnHost(d)==false)
@@ -8474,7 +8474,7 @@ function abcHaxballAPI(window, config){
       }
 
       this._modifyPlayerData = function(playerId, name, flag, avatar, conn, auth){
-        var a = [name, avatar, flag], customData;
+        var a = [name, flag, avatar], customData;
         cfg.modifyPlayerDataBefore && ([a, customData] = cfg.modifyPlayerDataBefore(playerId, a[0], a[1], a[2], conn, auth));
         if (customData!==false){
           that.activePlugins.forEach((p)=>{

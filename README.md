@@ -1,6 +1,6 @@
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball) [![NPM Version](https://img.shields.io/npm/v/node-haxball?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/node-haxball?style=flat-square)](https://npmjs.org/package/node-haxball) [![Proxy Server Status](https://img.shields.io/endpoint?label=proxy%20server&style=flat-square&url=https%3A%2F%2Fabc-haxball-proxy.up.railway.app%2Fstatus)](https://abc-haxball-proxy.up.railway.app)
 
-[![License](https://img.shields.io/github/license/wxyz-abcd/node-haxball?style=flat-square)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/wxyz-abcd/node-haxball?style=flat-square) [![Implementations](https://img.shields.io/badge/%F0%9F%92%A1-implementations-8C8E93.svg?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/issues) ![Repository Size](https://img.shields.io/github/repo-size/wxyz-abcd/node-haxball?style=flat-square)
+[![License](https://img.shields.io/github/license/wxyz-abcd/node-haxball?style=flat-square)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/wxyz-abcd/node-haxball?style=flat-square) ![Repository Size](https://img.shields.io/github/repo-size/wxyz-abcd/node-haxball?style=flat-square)
 
 [![Forks](https://img.shields.io/github/forks/wxyz-abcd/node-haxball?style=social)](https://github.com/wxyz-abcd/node-haxball/network/members) [![Stars](https://img.shields.io/github/stars/wxyz-abcd/node-haxball?style=social)](https://github.com/wxyz-abcd/node-haxball/stargazers) [![Watches](https://img.shields.io/github/watchers/wxyz-abcd/node-haxball?style=social)](https://github.com/wxyz-abcd/node-haxball/watchers)
 
@@ -14,7 +14,6 @@
 - 🎊 [Mini-Documentation](#docs)
 - 💡 [How To Contribute](#how-to-contribute)
 - 🤗 [Contributors](#contributors)
-- 👤 [Author](#author)
 - 🔏 [License](#license)
 
 ---
@@ -27,7 +26,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, Room, Utils, Plugin, Callback, Replay, Renderer } = require("node-haxball");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Room, Utils, Plugin, Callback, Replay, Renderer } = require("node-haxball");
 // Use example code here.
 ```
 
@@ -143,6 +142,7 @@ Room.create({
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
 - `ConnectionState`: Different connection state values. Should be used while joining a room using `Room.join`.
+- `AllowFlags`: These flags allow us to understand whether a plugin or a roomConfig is able to work correctly while joining or creating a room. Especially useful in a GUI environment.
 
 - `Callback`: Global functions to add/remove callbacks.
     - `add(eventName, metadata)`: creates all callbacks about a new event called `eventName` which should start with a capital letter. `metadata` is not used, but this is the library's current metadata structure: `{ params: array of string }`. should be used (and maybe overridden for usage of `metadata`) in a gui application to define custom event callbacks related to gui events such as keyboard, mouse, touch, timer etc. the main event callback defined in this room object to trigger all callbacks is `"_on" + eventName`.
@@ -345,13 +345,13 @@ Room.create({
   - `constructor(metadata)`: creates a new `RoomConfig` instance. `metadata` is the information that you would want to show/update inside a GUI application.
 
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `RoomConfig` object. These are defined in `RoomConfig.prototype`.
-    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `RoomConfig` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default roomConfig in the examples folder uses the following `metadata` structure: `{name, version, author, description}`.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `RoomConfig` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default roomConfig in the examples folder uses the following `metadata` structure: `{name, version, author, description, allowFlags}`.
     - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `RoomConfig` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default roomConfig in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable`, and should be used whenever a variable whose value is changeable from outside will be defined. 
 
   - `modifier callbacks`:
-    - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedNick, modifiedAvatar, modifiedFlag]`. if `dataArray` is `null`, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
-    - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. host-only.
-    - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. host-only.
+    - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedName, modifiedFlag, modifiedAvatar]`. if `dataArray` is `null`, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
+    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. host-only.
+    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. host-only.
     - `[newPing, customData] = modifyPlayerPingBefore(playerId, ping)`: prepares a custom data object to send to all plugins while setting player's `ping`. `customData=false` means "don't call callbacks". host-only.
     - `newPing = modifyPlayerPing(playerId, ping, customData)`: set player's `ping`. host-only.
     - `newPing = modifyPlayerPingAfter(playerId, ping, customData)`: set player's `ping`. host-only.
@@ -512,9 +512,6 @@ Room.create({
 
 - `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 
-  - `static constants`: 
-    - `AllowFlags`: These flags allow us to understand whether the plugin is able to work correctly while joining or creating a room. Should be used in a GUI environment.
-
   - `constructor(name, active, metadata)`: creates a new Plugin instance. A plugin is automatically activated just after initialization, while a Room object is being created, if active is true. Metadata is the information that you would want to show/update inside a GUI application.
 
   - `properties`:
@@ -526,7 +523,7 @@ Room.create({
     - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Plugin` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable` since it is used once in the constructor for the plugin's `active` property. This function should be used whenever a variable whose value is changeable from outside will be defined. 
 
   - `modifier callbacks`:
-    - `[modifiedNick, modifiedAvatar, modifiedFlag] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. `customData` is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
+    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. `customData` is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
     - `newPing = modifyPlayerPing(playerId, ping, customData)`: set player's `ping`. `customData` is an optional data object returned from `room.modifyPlayerPingBefore`. host-only.
     - `newPing = modifyClientPing(ping, customData)`: set current player's `ping`. `customData` is an optional data object returned from `room.modifyClientPingBefore`. client-only.
     - `newFrameNo = modifyFrameNo(frameNo, customData)`: set current player's `frameNo`. causes your player to look laggy to your opponents, especially on extrapolated clients. `customData` is an optional data object returned from `room.modifyFrameNoBefore`. client-only.
