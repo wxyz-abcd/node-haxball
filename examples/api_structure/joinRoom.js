@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = API = require("../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API = require("../../src/index");
 
 Utils.generateAuth().then(([authKey, authObj])=>{
   Room.join({

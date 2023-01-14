@@ -26,7 +26,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, AllowFlags, Room, Utils, Plugin, Callback, Replay, Renderer } = require("node-haxball");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = require("node-haxball");
 // Use example code here.
 ```
 
@@ -47,7 +47,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Room, Utils, P
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window, {
           WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
           HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
         });
@@ -68,7 +68,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Room, Utils, P
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -639,6 +639,28 @@ Room.create({
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+
+- `Impl`: Implementation of Haxball's inner classes. All important classes are exported and more detailed explanations will hopefully be available soon. Names might be fixed later. These classes are enough to run your own Haxball website.
+
+  - `Core`: Most important core classes used inside Haxball.
+    - `H`: Point class
+    - `ka`: TeamColors class
+    - `p`: Team class
+    - `T`: GeoLocation class
+
+  - `Stream`: These classes are used to read/write data from/to replay files and/or network/WebRTC stream.
+    - `F`: StreamReader class
+    - `w`: StreamWriter class
+
+  - `Utils`: Some utility classes (all of them may not be necessarily useful but still, why not export them?)
+    - `U`: string operations 1
+    - `D`: string operations 2
+    - `J`: string operations 3
+    - `K`: string operations 4
+    - `r`: mostly used for object casting
+    - `M`: webserver api operations
+    - `n`: connection constants
+    - `va`: RoomList operations
 
 
 [Back To The Top](#title)

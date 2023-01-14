@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer } = require("../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = require("../src/index");
 const fs = require("fs");
 
 var data = fs.readFileSync("test.hbr2", null);

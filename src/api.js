@@ -209,16 +209,16 @@ function abcHaxballAPI(window, config){
   lc.b = !0;
   lc.Dr = function (a, b) {
     return new Promise(function (c, d) {
-      var e = /*window.*/setTimeout(function () {
+      var e = setTimeout(function () {
         d("Timed out");
       }, b);
       a.then(
         function (a) {
-          /*window.*/clearTimeout(e);
+          clearTimeout(e);
           c(a);
         },
         function (a) {
-          /*window.*/clearTimeout(e);
+          clearTimeout(e);
           d(a);
         }
       );
@@ -283,130 +283,6 @@ function abcHaxballAPI(window, config){
   function D() {}
   function J() {}
   function K() {}
-/*
-  function Xb() {}
-  function W() {
-    this.Yc = new Map();
-  }
-  function Yb(storage) {
-    function a(a) {
-      return new wa(
-        a,
-        e,
-        function (a) {
-          if (null == a) return null;
-          try {
-            return T.Hh(a);
-          } catch (k) {
-            return null;
-          }
-        },
-        function (a) {
-          if (null == a) return null;
-          try {
-            return a.se();
-          } catch (k) {
-            return null;
-          }
-        }
-      );
-    }
-    function b(a) {
-      return new wa(
-        a,
-        e,
-        function (a) {
-          return null != a ? "0" != a : !0;
-        },
-        function (a) {
-          return a ? "1" : "0";
-        }
-      );
-    }
-    function c(a, b) {
-      return new wa(
-        a,
-        e,
-        function (a) {
-          var c = b;
-          try {
-            null != a && (c = K.parseInt(a));
-          } catch (t) {}
-          return c;
-        },
-        function (a) {
-          return "" + a;
-        }
-      );
-    }
-    function d(a, b, c) {
-      return new wa(
-        a,
-        e,
-        function (a) {
-          return null == a ? b : U.Qc(a, c);
-        },
-        function (a) {
-          return a;
-        }
-      );
-    }
-    var e = Xb.Pm(storage);
-    this.fe = d("player_name", "", 25);
-    this.Tb = c("view_mode", -1);
-    this.Fh = c("fps_limit", 0);
-    this.sh = d("avatar", null, 2);
-    d("rctoken", null, 1024);
-    this.xm = b("team_colors");
-    this.Ak = b("show_indicators");
-    this.pm = b("sound_main");
-    this.Hi = b("sound_chat");
-    this.om = b("sound_highlight");
-    this.nm = b("sound_crowd");
-    this.Gj = d("player_auth_key", null, 1024);
-    this.rd = c("extrapolation", 0);
-    this.Sl = (function (a, b) {
-      return new wa(
-        a,
-        e,
-        function (a) {
-          var c = b;
-          try {
-            null != a && (c = parseFloat(a));
-          } catch (t) {}
-          return c;
-        },
-        function (a) {
-          return "" + a;
-        }
-      );
-    })("resolution_scale", 1);
-    this.lm = b("show_avatars");
-    this.Me = a("geo");
-    this.Ne = a("geo_override");
-    this.tg = (function () {
-      return new wa(
-        "player_keys",
-        e,
-        function (a) {
-          if (null == a) return W.$j();
-          try {
-            return W.Hh(a);
-          } catch (g) {
-            return W.$j();
-          }
-        },
-        function (a) {
-          try {
-            return a.se();
-          } catch (g) {
-            return null;
-          }
-        }
-      );
-    })();
-  }
-*/
   function M() {}
   function U() {}
   function Fb() {}
@@ -425,16 +301,6 @@ function abcHaxballAPI(window, config){
     this.Sa = b;
     this.a = 0;
   }
-  /*
-  function wa(a, b, c, d) {
-    this.w = a;
-    this.Ur = d;
-    this.Yh = b;
-    d = null;
-    null != b && (d = b.getItem(a));
-    this.Hm = c(d);
-  }
-  */
   function T() {
     this.ub = "";
     this.Ec = this.Gc = 0;
@@ -622,19 +488,7 @@ function abcHaxballAPI(window, config){
     for (var b = "", c = 0, d = a.byteLength; c < d; ) b += J.Vg(a[c++], 2);
     return b;
   };
-/*
-  Yb.b = !0;
-  Yb.prototype = {
-    Lh: function () {
-      return null != this.Ne.L()
-        ? this.Ne.L()
-        : null != this.Me.L()
-        ? this.Me.L()
-        : new T();
-    },
-    f: Yb,
-  };
-*/
+
   r.b = !0;
   r.Nm = function (a) {
     if (a instanceof Array && null == a.eb) return Array;
@@ -761,7 +615,7 @@ function abcHaxballAPI(window, config){
     return null != r.wj(a);
   };
   r.rn = function (a) {
-    return qc[a]; // qc does not exist??!! will use window/global.
+    return qc[a]; // qc does not exist??!! will use window/global, but the code never ever reaches here. ever!
   };
   r.sn = {}.toString;
 
@@ -776,23 +630,7 @@ function abcHaxballAPI(window, config){
     }
     return b;
   };
-/*
-  wa.b = !0;
-  wa.prototype = {
-    L: function () {
-      return this.Hm;
-    },
-    Xa: function (a) {
-      this.Hm = a;
-      if (null != this.Yh)
-        try {
-          var b = this.Ur(a);
-          null == b ? this.Yh.removeItem(this.w) : this.Yh.setItem(this.w, b);
-        } catch (c) {}
-    },
-    f: wa,
-  };
-*/
+
   ka.b = !0;
   ka.prototype = {
     ga: function (a) {
@@ -1562,83 +1400,7 @@ function abcHaxballAPI(window, config){
     );
     return isNaN(a) ? null : a;
   };
-/*
-  Xb.b = !0;
-  Xb.Pm = function (storage) {
-    try {
-      var a = storage;
-      a.getItem("");
-      if (0 == a.length) {
-        var b = "_hx_" + Math.random();
-        a.setItem(b, b);
-        a.removeItem(b);
-      }
-      return a;
-    } catch (c) {
-      return null;
-    }
-  };
 
-  W.b = !0;
-  W.Rf = function (a) {
-    for (var b = new W(), c = ec.Mm(a), d = 0; d < c.length; ) {
-      var e = c[d];
-      ++d;
-      b.Yc.set(e, a[e]);
-    }
-    return b;
-  };
-  W.Hh = function (a) {
-    return W.Rf(JSON.parse(a));
-  };
-  W.$j = function () {
-    var a = new W();
-    a.Pa("ArrowUp", "Up");
-    a.Pa("KeyW", "Up");
-    a.Pa("ArrowDown", "Down");
-    a.Pa("KeyS", "Down");
-    a.Pa("ArrowLeft", "Left");
-    a.Pa("KeyA", "Left");
-    a.Pa("ArrowRight", "Right");
-    a.Pa("KeyD", "Right");
-    a.Pa("KeyX", "Kick");
-    a.Pa("Space", "Kick");
-    a.Pa("ControlLeft", "Kick");
-    a.Pa("ControlRight", "Kick");
-    a.Pa("ShiftLeft", "Kick");
-    a.Pa("ShiftRight", "Kick");
-    a.Pa("Numpad0", "Kick");
-    return a;
-  };
-  W.prototype = {
-    Pa: function (a, b) {
-      this.Yc.set(a, b);
-    },
-    L: function (a) {
-      return this.Yc.get(a);
-    },
-    Jq: function (a) {
-      this.Yc["delete"](a);
-    },
-    Eo: function (a) {
-      for (var b = [], c = this.Yc.keys(), d = c.next(); !d.done; ) {
-        var e = d.value,
-          d = c.next();
-        this.Yc.get(e) == a && b.push(e);
-      }
-      return b;
-    },
-    se: function () {
-      for (var a = {}, b = this.Yc.keys(), c = b.next(); !c.done; ) {
-        var d = c.value,
-          c = b.next();
-        a[d] = this.Yc.get(d);
-      }
-      return JSON.stringify(a);
-    },
-    f: W,
-  };
-*/
   n.b = !0;
   n.Vr = "wss://p2p.haxball.com/";
   n.Ee = (config?.HttpProxyUrl ? config.HttpProxyUrl : "https://www.haxball.com/rs/");
@@ -3492,8 +3254,7 @@ function abcHaxballAPI(window, config){
               this.vc = 150,
               this.ae = d,
               d == p.fa ? this.Kb++ : this.Pb++,
-              null != this.Ma.Ni && this.Ma.Ni(d.pg)
-              /*null != this.Ma.Ol && this.Ma.Ol(d.$)*/)
+              null != this.Ma.Ni && this.Ma.Ni(d.pg))
             : 0 < this.Da &&
               this.Hc >= 60 * this.Da &&
               this.Pb != this.Kb &&
@@ -4274,25 +4035,6 @@ function abcHaxballAPI(window, config){
       if (null != b){
         if (this.id != null){
           a._CCI_ && a._CCI_(b, this.id, this.mode);
-          /*
-          if (internalData.isHost){
-            if (this.mode==1){
-              b.customClient = true;
-              internalData.customClientIds.add(b.V);
-            }
-          }
-          else{
-            if (this.mode==0){
-              b.customClient = true;
-              internalData.customClientIds.add(b.V);
-              b = a.na(this.id);
-              if (b)
-                b.customClient = true;
-              internalData.customClientIds.add(this.id);
-              internalData.roomObj?.ya.ra(na.la(1, this.id, 1), 0, true);
-            }
-          }
-          */
           return;
         }
         ia.i(a.wl, b, this.sj);
@@ -4655,9 +4397,6 @@ function abcHaxballAPI(window, config){
   la.za = m.Fa({ Ba: !1, Aa: !1 });
   CustomEvent.za = m.Fa({ Ba: !1, Aa: !1 });
 
-  /*function kc() {}
-  kc.b = !0;
-  kc.fj = function () {*/
   m.Ha(rb);
   m.Ha(na);
   m.Ha(Ua);
@@ -4683,44 +4422,11 @@ function abcHaxballAPI(window, config){
   m.Ha(qb);
   m.Ha(ob);
   m.Ha(CustomEvent);
-  /*};
-  kc.fj();*/
 
   function ub(a, b) {
     this.ya = a;
     this.ba = b;
   }
-  /*
-  ub.b = !0;
-  ub.cq = function (a) {
-    if (3 > a.length) throw new q("Not enough arguments");
-    if (7 < a.length) throw new q("Too many arguments");
-    var b = new Pa(),
-      c = new ka();
-    b.Sg = c;
-    switch (a[1]) {
-      case "blue":
-        c.fb = [p.xa.R];
-        b.ea = p.xa;
-        break;
-      case "red":
-        c.fb = [p.fa.R];
-        b.ea = p.fa;
-        break;
-      default:
-        throw new q('First argument must be either "red" or "blue"');
-    }
-    if ("clear" == a[2]) return b;
-    c.hd = ((256 * K.parseInt(a[2])) / 360) | 0;
-    c.ed = K.parseInt("0x" + a[3]);
-    if (4 < a.length) {
-      c.fb = [];
-      for (var d = 4, e = a.length; d < e; )
-        c.fb.push(K.parseInt("0x" + a[d++]));
-    }
-    return b;
-  };
-  */
   ub.__cq__ = function (teamId, angle, ...colors) {
     var b = new Pa(),
       c = new ka();
@@ -4750,141 +4456,6 @@ function abcHaxballAPI(window, config){
         c.fb.push(K.parseInt("0x" + colors[d++]));
     }
     return b;
-  };
-  ub.prototype = {
-  /*
-    gf: function (a) {
-      var b = this;
-      if ("/" != a.charAt(0)) return !1;
-      if (1 == a.length) return !0;
-      a = J.Gs(D.substr(a, 1, null)).split(" ");
-      var c = a[0];
-      switch (c) {
-        case "avatar":
-          2 == a.length && (this.fm(a[1]), this.ba("Avatar set"));
-          break;
-        case "checksum":
-          var d = this.ya.T.S;
-          a = d.w;
-          d.Pe()
-            ? this.ba('Current stadium is original: "' + a + '"')
-            : ((d = J.Vg(d.Sj(), 8)),
-              this.ba('Stadium: "' + a + '" (checksum: ' + d + ")"));
-          break;
-        case "clear_avatar":
-          this.fm(null);
-          this.ba("Avatar cleared");
-          break;
-        case "clear_bans":
-          null == this.Ud
-            ? this.ba("Only the host can clear bans")
-            : (this.Ud(), this.ba("All bans have been cleared"));
-          break;
-        case "clear_password":
-          null == this.Fg
-            ? this.ba("Only the host can change the password")
-            : (this.Fg(null), this.ba("Password cleared"));
-          break;
-        case "colors":
-          try {
-            (d = ub.cq(a)), (internalData.execOperationReceivedOnHost(d)!=false && this.ya.ra(d));
-          } catch (g) {
-            (a = g instanceof q ? g.Ta : g), "string" == typeof a && this.ba(a);
-          }
-          break;
-        case "extrapolation":
-          2 == a.length
-            ? ((a = K.parseInt(a[1])),
-              null != a // && -200 <= a && 200 >= a
-                ? (n_A.rd.Xa(a),
-                  this.ya.gm(a),
-                  this.ba("Extrapolation set to " + a + " msec"))
-                : this.ba(
-                    "Extrapolation must be a value between -200 and 50 milliseconds"
-                  ))
-            : this.ba("Extrapolation requires a value in milliseconds.");
-          break;
-        case "handicap":
-          2 == a.length
-            ? ((a = K.parseInt(a[1])),
-              null != a // && 0 <= a && 300 >= a
-                ? (this.ya.kr(a),
-                  this.ba("Ping handicap set to " + a + " msec"))
-                : this.ba(
-                    "Ping handicap must be a value between 0 and 300 milliseconds"
-                  ))
-            : this.ba("Ping handicap requires a value in milliseconds.");
-          break;
-        case "kick_ratelimit":
-          if (4 > a.length)
-            this.ba("Usage: /kick_ratelimit <min> <rate> <burst>");
-          else {
-            var d = K.parseInt(a[1]),
-              e = K.parseInt(a[2]), msg;
-            a = K.parseInt(a[3]);
-            null == d || null == e || null == a
-              ? this.ba("Invalid arguments")
-              : (msg = ma.la(d, e, a), (internalData.execOperationReceivedOnHost(msg)!=false && this.ya.ra(msg)));
-          }
-          break;
-        case "recaptcha":
-          if (null == this.jm) this.ba("Only the host can set recaptcha mode");
-          else
-            try {
-              if (2 == a.length) {
-                switch (a[1]) {
-                  case "off":
-                    e = !1;
-                    break;
-                  case "on":
-                    e = !0;
-                    break;
-                  default:
-                    throw new q(null);
-                }
-                this.jm(e);
-                this.ba("Room join Recaptcha " + (e ? "enabled" : "disabled"));
-              } else throw new q(null);
-            } catch (g) {
-              this.ba("Usage: /recaptcha <on|off>");
-            }
-          break;
-        case "set_password":
-          2 == a.length &&
-            (null == this.Fg
-              ? this.ba("Only the host can change the password")
-              : (this.Fg(a[1]), this.ba("Password set")));
-          break;
-        case "store":
-          var f = this.ya.T.S;
-          f.Pe()
-            ? this.ba("Can't store default stadium.")
-            : Z.Es()
-                .then(function () {
-                  return Z.add(f);
-                })
-                .then(
-                  function () {
-                    b.ba("Stadium stored");
-                  },
-                  function () {
-                    b.ba("Couldn't store stadium");
-                  }
-                );
-          break;
-        default:
-          this.ba('Unrecognized command: "' + c + '"');
-      }
-      return !0;
-    },
-    fm: function (a) {
-      null != a && (a = U.Qc(a, 2));
-      n_A.sh.Xa(a);
-      var msg = ra.la(a);
-      internalData.execOperationReceivedOnHost(msg)!=false && this.ya.ra(msg);
-    },
-    */
-    f: ub,
   };
   
   function Zb() {}
@@ -5106,7 +4677,7 @@ function abcHaxballAPI(window, config){
     this.Nj = a;
     this.Si = b;
     this.oc = a;
-    this.Ve = /*window.*/performance.now();
+    this.Ve = performance.now();
   }
   tb.b = !0;
   tb.prototype = {
@@ -5118,15 +4689,15 @@ function abcHaxballAPI(window, config){
     Cr: function (a) {
       this.C();
       a -= this.oc;
-      return 0 >= a ? 0 : this.Ve + a * this.Si - /*window.*/performance.now();
+      return 0 >= a ? 0 : this.Ve + a * this.Si - performance.now();
     },
     Zn: function (a, b) {
       var c = this.Cr(a);
       this.oc -= a;
-      /*window.*/setTimeout(b, c | 0);
+      setTimeout(b, c | 0);
     },
     C: function () {
-      var a = /*window.*/performance.now(),
+      var a = performance.now(),
         b = Math.floor((a - this.Ve) / this.Si);
       this.Ve += b * this.Si;
       this.oc += b;
@@ -5235,8 +4806,8 @@ function abcHaxballAPI(window, config){
   Va.prototype = {
     Mi: function (a) {
       null == a && (a = 1e4);
-      /*window.*/clearTimeout(this.re);
-      this.re = /*window.*/setTimeout(G(this, this.To), a);
+      clearTimeout(this.re);
+      this.re = setTimeout(G(this, this.To), a);
     },
     bo: function (a, b) {
       var c = this;
@@ -5294,7 +4865,7 @@ function abcHaxballAPI(window, config){
     },
     yj: function (a) {
       var b = this;
-      /*window.*/setTimeout(function () {
+      setTimeout(function () {
         return b.Ra.addIceCandidate(a);
       }, this.ak);
     },
@@ -5310,7 +4881,7 @@ function abcHaxballAPI(window, config){
       this.Ra.close();
     },
     Tj: function () {
-      /*window.*/clearTimeout(this.re);
+      clearTimeout(this.re);
       this.di = this.zd = this.jg = this.bd = null;
       this.Ra.onicecandidate = null;
       this.Ra.ondatachannel = null;
@@ -5337,14 +4908,14 @@ function abcHaxballAPI(window, config){
     this.Vc = a.Vc;
     this.oe = a.oe;
     this.gd = a.gd;
-    this.ym = /*window.*/performance.now();
+    this.ym = performance.now();
     var c = null,
       c = function () {
         var a = b.Eq - b.Br();
         0 >= a
           ? b.ia()
-          : (/*window.*/clearTimeout(b.Am),
-            (a = /*window.*/setTimeout(c, a + 1e3)),
+          : (clearTimeout(b.Am),
+            (a = setTimeout(c, a + 1e3)),
             (b.Am = a));
       };
     c();
@@ -5358,7 +4929,7 @@ function abcHaxballAPI(window, config){
       ++a;
       e.onmessage = function (a) {
         b.wd &&
-          ((b.ym = /*window.*/performance.now()), null != b.lg && b.lg(a.data));
+          ((b.ym = performance.now()), null != b.lg && b.lg(a.data));
       };
       e.onclose = function () {
         b.ia();
@@ -5368,7 +4939,7 @@ function abcHaxballAPI(window, config){
   Nb.b = !0;
   Nb.prototype = {
     Br: function () {
-      return /*window.*/performance.now() - this.ym;
+      return performance.now() - this.ym;
     },
     Rb: function (a, b) {
       if (this.wd) {
@@ -5378,13 +4949,13 @@ function abcHaxballAPI(window, config){
           try {
             c.send(d);
           } catch (e) {
-            /*window.*/console.log(e instanceof q ? e.Ta : e);
+            console.log(e instanceof q ? e.Ta : e);
           }
         }
       }
     },
     ia: function () {
-      /*window.*/clearTimeout(this.Am);
+      clearTimeout(this.Am);
       this.wd &&
         ((this.wd = !1), this.Ra.close(), null != this.cf && this.cf());
     },
@@ -5579,7 +5150,7 @@ function abcHaxballAPI(window, config){
             3 != c.pd && y.i(c.df, xb.ih("Connection closed"));
             c.ia();
           };
-          a = /*window.*/setTimeout(function () {
+          a = setTimeout(function () {
             y.i(c.df, xb.ih("Game state timeout"));
             c.ia();
           }, 1e4);
@@ -5634,7 +5205,7 @@ function abcHaxballAPI(window, config){
   xa.prototype = C(V.prototype, {
     ia: function (a) {
       null != this.pc && ((this.pc.bd = null), this.pc.Gn(), (this.pc = null));
-      /*window.*/clearTimeout(this.re);
+      clearTimeout(this.re);
       null != this.pa && ((this.pa.cf = null), this.pa.ia(), (this.pa = null));
       this.ek = null == a ? "Connection closed" : a;
       this.tf(4);
@@ -5647,15 +5218,15 @@ function abcHaxballAPI(window, config){
       return 3 == this.pd;
     },
     C: function () {
-      this.wd() && /*window.*/performance.now() - this.zm > this.nn && this.zi();
-      this.Xc = /*window.*/performance.now() * this.Ac + this.Qi.$g(0.5) - this.Y;
+      this.wd() && performance.now() - this.zm > this.nn && this.zi();
+      this.Xc = performance.now() * this.Ac + this.Qi.$g(0.5) - this.Y;
       this.Oj();
     },
     Sf: function () {
       return this.wd()
         ? (0 > this.bc && (this.bc = 0),
           this.wk(
-            /*window.*/performance.now() * this.Ac +
+            performance.now() * this.Ac +
               this.Qi.$g(0.5) -
               this.Y +
               this.bc +
@@ -5695,7 +5266,6 @@ function abcHaxballAPI(window, config){
     rq: function (a) {
       var b = this;
       a = a.sb(a.Ab());
-      //a.forEach((x, i)=>{a[i]=Math.floor(256*Math.random())}); // randomize conn ? unnecessary...
       var c = Promise.resolve(null);
       null != this.Je && (c = this.Je.wr(a));
       c["catch"](function () {
@@ -5712,8 +5282,8 @@ function abcHaxballAPI(window, config){
       this.te = a.hb();
       this.cc = a.Ab();
       this.Xc = 10;
-      for (this.T.ja(a/*, this.haxball*/); 0 < a.o.byteLength - a.a; ) this.Cg(this.Gm(a));
-      /*window.*/clearTimeout(this.re);
+      for (this.T.ja(a); 0 < a.o.byteLength - a.a; ) this.Cg(this.Gm(a));
+      clearTimeout(this.re);
       this.tf(3);
     },
     ir: function (a) {
@@ -5790,7 +5360,7 @@ function abcHaxballAPI(window, config){
     tq: function (a) {
       var b = a.u();
       a = a.u();
-      var c = /*window.*/performance.now() - a;
+      var c = performance.now() - a;
       this.Qi.add(b - a * this.Ac);
       this.sg.add(c);
       for (var d = (b = 0), e = this.Di; d < e.length; ) {
@@ -5804,7 +5374,7 @@ function abcHaxballAPI(window, config){
       this.Di.splice(0, b);
     },
     zi: function () {
-      var a = /*window.*/performance.now();
+      var a = performance.now();
       this.zm = a;
       this.Di.push(a);
       var b = this.sg.$g(0.5) | 0,
@@ -5866,10 +5436,10 @@ function abcHaxballAPI(window, config){
   };
   Sa.prototype = {
     ia: function () {
-      /*window.*/clearTimeout(this.Ul);
-      /*window.*/clearTimeout(this.ke);
+      clearTimeout(this.Ul);
+      clearTimeout(this.ke);
       this.ke = null;
-      /*window.*/clearInterval(this.ol);
+      clearInterval(this.ol);
       if (null != this.X) {
         try{
           this.X.onmessage = null;
@@ -5913,7 +5483,7 @@ function abcHaxballAPI(window, config){
           1 == this.X.readyState &&
           null == this.ke &&
           (this.Ai(),
-          (this.ke = /*window.*/setTimeout(function () {
+          (this.ke = setTimeout(function () {
             b.ke = null;
             1 == b.X.readyState && b.Ag && b.Ai();
           }, 1e4)));
@@ -5926,7 +5496,7 @@ function abcHaxballAPI(window, config){
       }
       var c = this;
       this.nf = a;
-      null == this.Ql && (b(), (this.Ql = /*window.*/setTimeout(b, 1e3)));
+      null == this.Ql && (b(), (this.Ql = setTimeout(b, 1e3)));
     },
     Ji: function (a) {
       function b(a) {
@@ -5997,7 +5567,7 @@ function abcHaxballAPI(window, config){
       var a = this;
       null != this.Mc && this.Ai();
       0 != this.nf && this.cm();
-      this.ol = /*window.*/setInterval(function () {
+      this.ol = setInterval(function () {
         a.zi();
       }, 4e4);
     },
@@ -6172,13 +5742,13 @@ function abcHaxballAPI(window, config){
     Mh: function (a) {
       var b = this;
       this.qk();
-      /*window.*/clearTimeout(this.ke);
+      clearTimeout(this.ke);
       this.ke = null;
       this.Ag = !1;
-      /*window.*/clearInterval(this.ol);
-      /*window.*/clearTimeout(this.Ul);
+      clearInterval(this.ol);
+      clearTimeout(this.Ul);
       a &&
-        (this.Ul = /*window.*/setTimeout(function () {
+        (this.Ul = setTimeout(function () {
           b.Ji();
         }, (this.Zq + Math.random() * this.$q) | 0));
     },
@@ -6200,11 +5770,11 @@ function abcHaxballAPI(window, config){
   I.b = !0;
   I.yo = function () {
     try {
-      return /*window.*/crypto.subtle
+      return crypto.subtle
         .generateKey(I.qh, !0, ["sign", "verify"])
         .then(function (a) {
           var b = a.privateKey;
-          return /*window.*/crypto.subtle.exportKey("jwk", b).then(function (a) {
+          return crypto.subtle.exportKey("jwk", b).then(function (a) {
             var c = a.y,
               e = a.d,
               f = new I();
@@ -6252,7 +5822,7 @@ function abcHaxballAPI(window, config){
       }
       return I.Wr(g, k)
         .then(function (a) {
-          return /*window.*/crypto.subtle.verify(I.mm, a, e, d);
+          return crypto.subtle.verify(I.mm, a, e, d);
         })
         .then(function (a) {
           if (!a) throw new q(null);
@@ -6264,7 +5834,7 @@ function abcHaxballAPI(window, config){
   };
   I.Xr = function (a, b, c) {
     try {
-      return /*window.*/crypto.subtle.importKey(
+      return crypto.subtle.importKey(
         "jwk",
         {
           crv: "P-256",
@@ -6285,7 +5855,7 @@ function abcHaxballAPI(window, config){
   };
   I.Wr = function (a, b) {
     try {
-      return /*window.*/crypto.subtle.importKey(
+      return crypto.subtle.importKey(
         "jwk",
         { crv: "P-256", ext: !0, key_ops: ["verify"], kty: "EC", x: a, y: b },
         I.qh,
@@ -6313,7 +5883,7 @@ function abcHaxballAPI(window, config){
         var e = b.a - d;
         b.o.setUint16(c, e, b.Sa);
         var f = new Uint8Array(b.o.buffer, b.o.byteOffset + d, e);
-        return /*window.*/crypto.subtle.sign(I.mm, this.Al, f).then(function (a) {
+        return crypto.subtle.sign(I.mm, this.Al, f).then(function (a) {
           b.Mg(a);
           return b.Sb();
         });
@@ -6359,7 +5929,7 @@ function abcHaxballAPI(window, config){
     this.up = 1;
     this.Jk = this.uc = 0;
     this.upc = false;
-    this.Li = /*window.*/performance.now();
+    this.Li = performance.now();
     this.Ic = new Sa(haxball, this.tp, a.iceServers, Zb.Km, a.gn);
     this.Ic.Vj = G(this, this.Oo);
     this.Ic.bl = function (a) {
@@ -6368,11 +5938,6 @@ function abcHaxballAPI(window, config){
     this.Ic.kg = function (a) {
       y.i(b.kg, a);
     };
-    /*
-    this.Ic.ef = function (a, d) {
-      null != b.ef && b.ef(a, d);
-    };
-    */
   }
   Lb.b = !0;
   Lb.ma = V;
@@ -6452,7 +6017,7 @@ function abcHaxballAPI(window, config){
       }
     },
     C: function () {
-      var a = (((/*window.*/performance.now() - this.Li) * this.Ac) | 0) - this.Y;
+      var a = (((performance.now() - this.Li) * this.Ac) | 0) - this.Y;
       0 < a && this.zj(a);
       7 <= this.Y - this.Kk && this.Ci();
       this.Y - this.Jk >= this.Mn && (this.Ci(), this.gr());
@@ -6460,7 +6025,7 @@ function abcHaxballAPI(window, config){
     Sf: function () {
       0 > this.bc && (this.bc = 0);
       return this.wk(
-        (/*window.*/performance.now() - this.Li) * this.Ac -
+        (performance.now() - this.Li) * this.Ac -
           this.Y +
           this.wi +
           this.bc +
@@ -6641,7 +6206,7 @@ function abcHaxballAPI(window, config){
         b.yb = this.haxball.room._modifyPlayerPing(b.$, a.Ab());
       var d = w.ha();
       d.l(4);
-      d.s((/*window.*/performance.now() - this.Li) * this.Ac + this.wi);
+      d.s((performance.now() - this.Li) * this.Ac + this.wi);
       d.s(c);
       b.Rb(d, 2);
     },
@@ -6676,31 +6241,9 @@ function abcHaxballAPI(window, config){
   function Ra(haxball) {
     this.$d = this.Yf = 0;
     this.internalData = haxball.__internalData;
-    //window.document.addEventListener("focusout", G(this, this.al));
   }
   Ra.b = !0;
-  /*
-  Ra.Fk = function (a) {
-    switch (n_A.tg.L().L(a)) {
-      case "Down":
-        return 2;
-      case "Kick":
-        return 16;
-      case "Left":
-        return 4;
-      case "Right":
-        return 8;
-      case "Up":
-        return 1;
-      default:
-        return 0;
-    }
-  };
-  */
   Ra.prototype = {
-    /*ia: function () {
-      window.document.removeEventListener("focusout", G(this, this.al));
-    },*/
     C: function () {
       var a = this.internalData.keyState;//this.$d
       if (null != this.ng && a != this.Yf) {
@@ -6710,12 +6253,6 @@ function abcHaxballAPI(window, config){
         this.ng(b);
       }
     },
-    /*Bd: function (a) {
-      this.$d |= Ra.Fk(a);
-    },
-    Cd: function (a) {
-      this.$d &= ~Ra.Fk(a);
-    },*/
     al: function () {
       if (null != this.ng && 0 != this.Yf) {
         this.Yf = this.$d = 0;
@@ -6727,25 +6264,19 @@ function abcHaxballAPI(window, config){
     f: Ra,
   };
   
-  function ba(haxball, a) { // to fix: haxball, __internalData, n_A
+  function ba(haxball, a) { // to fix: haxball, __internalData
     this.haxball = haxball;
     this.Nf = null;
-    this.Ik = /*this.zh =*/ !1;
-    this.$c = /*window.*/performance.now();
+    this.Ik = false;
+    this.$c = performance.now();
     this.Ed = null;
     this.De = 0;
     this.Jn = new tb(3, 1e3);
     this.ob = new Ra(haxball);
     this.Bg = "Waiting for link";
-    /*this.xi = */this.am = !1;
-    //this.sd = 0;
-    
-    //this.j = new ja(a.uc);
-  
+    this.am = false;
     var b = this;
-    this.Of = new ub(a, function (a) {
-      //b.j.Qa.Gb(a);
-    });
+    this.Of = new ub(a, function (a) {});
     this.ya = a;
     
     // a.T.xxx: these functions run only once; 
@@ -6880,17 +6411,6 @@ function abcHaxballAPI(window, config){
     a.T.Hk = function(a, b, c, d){
       haxball.room._onKickRateLimitChange && haxball.room._onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
     };
-  
-    /*
-    this.canvasUpdate = function(c){
-      canvas = c;
-      b.j.Fb.Eb = c && (new N());
-    };
-    this.canvasUpdate(canvas);
-  
-    this.Ih = new Gb(this.j, a.T.na(a.uc).w);
-    this.Ih.ri(a.T);
-    */
     a.T.ul = function (d, e, f, g) {
       y.i(b.Op, d.V);
       null != e && (
@@ -6901,109 +6421,7 @@ function abcHaxballAPI(window, config){
     a.T.wl = function(a, b){
       haxball.room._onPlayerChatIndicatorChange && haxball.room._onPlayerChatIndicatorChange(a?.V, !b); // id, value
     };
-    /*
-    this.j.Qa.fl = G(this, this.Gp);
-    this.j.Qa.ig = G(this, this.Fp);
-    window.document.addEventListener("keydown", G(this, this.Bd));
-    window.document.addEventListener("keyup", G(this, this.Cd));
-    window.onbeforeunload = function () {
-      return "Are you sure you want to leave the room?";
-    };
-    this.ob.ng = function (b) {
-      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
-    };
-    this.j.Wa.aq = function (b) {
-      b = da.la(1, b);
-      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
-    };
-    this.j.Wa.Tp = function (b) {
-      b = da.la(0, b);
-      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
-    };
-    this.j.og = function (b) {
-      b = qa.la(b);
-      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
-    };
-    this.j.Wa.Yp = function () {
-      var msg = new Ma();
-      internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
-    };
-    this.j.Wa.Zp = function () {
-      var msg = new La();
-      internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
-    };
-    this.j.Wa.Mp = function () {
-      b.Bm();
-    };
-    this.j.Wa.mg = function (b, c) {
-      var d = S.la(b, c);
-      internalData.execOperationReceivedOnHost(d)!=false && a.ra(d);
-    };
-    this.j.Wa.ee = this.Wq.bind(this); // G(this, this.Wq);
-    this.j.Wa.Dp = function () {
-      var msg = new Qa();
-      internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
-    };
-    this.j.Wa.Pp = function () {
-      ba.Bq(a);
-    };
-    this.j.Wa.$p = function (b) {
-      b = pa.la(b);
-      internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
-    };
-    this.j.Wa.ff = function (c) {
-      var d = a.T.na(c);
-      if (null != d) {
-        var e = new db(d, b.xi);
-        e.qb = function () {
-          b.j.bb(null);
-        };
-        e.Cp = function (b, c) {
-          var d = sa.la(b, c);
-          a.ra(d);
-        };
-        e.ei = function () {
-          b.vr(d);
-        };
-        b.j.bb(e.g, function () {
-          e.C(a.T, b.xi);
-        });
-      }
-    };
-    this.j.Wa.Wp = function () {
-      var a = new bb();
-      a.qb = function () {
-        b.j.bb(null);
-      };
-      b.j.bb(a.g, function () {
-        a.nr(b.Bg);
-      });
-    };
-    this.j.Wa.Qp = function () {
-      if (null == b.Ed) b.zr();
-      else {
-        var a = b.Ed.stop();
-        b.Ed = null;
-        ba.Yl(a);
-      }
-      b.j.Wa.rr(null != b.Ed);
-    };
-    this.j.Wa._Qp_ = function (start) {
-      if (start){
-        if (null != b.Ed)
-          return false;
-        b.zr();
-        return true;
-      }
-      else {
-        if (null == b.Ed)
-          return null;
-        var a = b.Ed.stop();
-        b.Ed = null;
-        return a;
-      }
-    };
-    */
+
     this.ob.ng = function (b) {
       haxball.__internalData.execOperationReceivedOnHost(b)!=false && a.ra(b);
     };
@@ -7063,45 +6481,18 @@ function abcHaxballAPI(window, config){
         return a;
       }
     };
-    /*window.*/requestAnimationFrame(G(this, this.bf));
-    /*
-    this.Gh = window.setInterval(function () {
-      b.j.pe.hm(b.sd);
-      b.sd = 0;
-    }, 1e3);
-    */
-    this.Qr = /*window.*/setInterval(function () {
+    requestAnimationFrame(G(this, this.bf));
+    this.Qr = setInterval(function () {
       a.C();
     }, 50);
-    //canvas && this.uf();
-    var c = haxball.__internalData.storage.extrapolation,//haxball.__internalData.n_A.rd.L(),
+    var c = haxball.__internalData.storage.extrapolation,
       c = -200 > c ? -200 : 200 < c ? 200 : c;
     if (0 != c) {
-      var d = haxball.__internalData.storage.extrapolation;//haxball.__internalData.n_A.rd.L();
+      var d = haxball.__internalData.storage.extrapolation;
       a.gm(d);
-      //this.j.Qa.Gb("Extrapolation set to " + c + " msec");
     }
   }
   ba.b = !0;
-  /*
-  ba.Yl = function (a) {
-    var b = new Date();
-    Ca.ar(
-      a,
-      "HBReplay-" +
-        b.getFullYear() +
-        "-" +
-        J.Af("" + (b.getMonth() + 1)) +
-        "-" +
-        J.Af("" + b.getDate()) +
-        "-" +
-        J.Af("" + b.getHours()) +
-        "h" +
-        J.Af("" + b.getMinutes()) +
-        "m.hbr2"
-    );
-  };
-  */
   ba.Bq = function (haxball, a) {
     for (var b = a.T.I, c = [], d = 0, e = 0, f = 0; f < b.length; ) {
       var g = b[f];
@@ -7123,29 +6514,10 @@ function abcHaxballAPI(window, config){
     zr: function () {
       this.Ed = new ac(this.ya, 3);
     },
-    /*
-    vr: function (a) {
-      var b = this;
-      a = new gb(a);
-      a.qb = function () {
-        b.j.bb(null);
-      };
-      a.ei = function (a, d, e) {
-        b.ya.ra(Y.la(a, d, e));
-        b.j.bb(null);
-      };
-      this.j.bb(a.g);
-    },
-    */
     ia: function () {
-      //window.document.removeEventListener("keydown", G(this, this.Bd));
-      //window.document.removeEventListener("keyup", G(this, this.Cd));
-      //window.onbeforeunload = null;
-      /*window.*/cancelAnimationFrame(this.De);
-      //this.ob.ia();
-      //window.clearInterval(this.Gh);
-      /*window.*/clearInterval(this.Qr);
-      /*window.*/clearTimeout(this.Nf);
+      cancelAnimationFrame(this.De);
+      clearInterval(this.Qr);
+      clearTimeout(this.Nf);
     },
     Wq: function (a) {
       for (var b = [], c = 0, d = this.ya.T.I; c < d.length; ) {
@@ -7159,49 +6531,19 @@ function abcHaxballAPI(window, config){
       }
     },
     bf: function () {
-      this.De = /*window.*/requestAnimationFrame(G(this, this.bf));
+      this.De = requestAnimationFrame(G(this, this.bf));
       this.ob.C();
       this.ya.C();
       this.Kc();
     },
     Kc: function () {
-      var a = /*window.*/performance.now();
-      if (/*this.haxball.__internalData.n_A.Fh.L()*/this.haxball.__internalData.storage.fps_limit == 1 && a - this.$c < 28.333333333333336)
+      var a = performance.now();
+      if (this.haxball.__internalData.storage.fps_limit == 1 && a - this.$c < 28.333333333333336)
         return;
       this.$c = a;
-      /*
-      this.sd++;
-      if (canvas)
-        this.uf();
-      a = this.ya.T.na(this.ya.uc);
-      if (null != a)
-        this.xi = a.cb;
-      this.j.C(this.ya);
-      */
       this.haxball.__internalData.extrapolatedRoomPhysicsObj = this.ya.Sf();
       this.haxball.__internalData.renderer?.render(this.haxball.__internalData.extrapolatedRoomPhysicsObj);
     },
-    /*
-    Gp: function (a) {
-      var b = this;
-      this.Of.gf(a) ||
-        this.Jn.Zn(1, function () {
-          var c = new Na();
-          c.Tc = a;
-          b.ya.ra(c);
-        });
-    },
-    Fp: function (a) {
-      var b = this;
-      this.zh = a;
-      null == this.Nf &&
-        ((this.Nf = window.setTimeout(function () {
-          b.Nf = null;
-          b.bm(b.zh);
-        }, 1e3)),
-        this.bm(this.zh));
-    },
-    */
     bm: function (a) {
       var msg;
       a != this.Ik && (
@@ -7219,56 +6561,6 @@ function abcHaxballAPI(window, config){
         this.haxball.__internalData.execOperationReceivedOnHost(a)!=false && this.ya.ra(a);
       }
     },
-    /*
-    Bd: function (a) {
-      switch (a.keyCode) {
-        case 9:
-        case 13:
-          this.j.Qa.gb.focus();
-          a.preventDefault();
-          break;
-        case 27:
-          if (this.j.Zo()) this.j.bb(null);
-          else {
-            var b = this.j;
-            b.me(!b.Gd);
-          }
-          a.preventDefault();
-          break;
-        case 49:
-          n_A.Tb.Xa(1);
-          break;
-        case 50:
-          n_A.Tb.Xa(2);
-          break;
-        case 51:
-          n_A.Tb.Xa(3);
-          break;
-        case 52:
-          n_A.Tb.Xa(0);
-          break;
-        case 80:
-          this.Bm();
-          break;
-        default:
-          this.ob.Bd(a.code);
-      }
-    },
-    uf: function () {
-      var a = n_A.Tb.L(),
-        b = this.j.Fb,
-        c = b.Eb;
-      c.zg = n_A.Sl.L();
-      0 == a
-        ? (b.Gg(!0), (c.kf = 1), (c.jf = 0), (c.xf = 0))
-        : (b.Gg(!1), 
-          (c.xf = 35),
-          -1 == a ? (c.jf = 450) : ((c.jf = 0), (c.kf = 1 + 0.25 * (a - 1))));
-    },
-    Cd: function (a) {
-      this.ob.Cd(a.code);
-    },
-    */
     f: ba,
   };
   
@@ -7325,10 +6617,9 @@ function abcHaxballAPI(window, config){
   };
   
   function Jb(a, b, c, callbacks) {
-    this.Vk = [
-    ];
-    this.pl = 0/*5*/;
-    this.Fd = - 1;// destination time
+    this.Vk = [];
+    this.pl = 0;
+    this.Fd = -1;// destination time
     this.hg = this.Qb = this.Wh = this.sk = 0;
     V.call(this, b);
     a = new F(new DataView(a.buffer), !1);
@@ -7342,7 +6633,7 @@ function abcHaxballAPI(window, config){
     c = this.Lc.sb();
     this.Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength), !1);
     this.ui();
-    this.Wh = /*window.*/performance.now();
+    this.Wh = performance.now();
     this.uc = - 1;
     this.callbacks = callbacks;
     this.parentVb = null;
@@ -7387,7 +6678,7 @@ function abcHaxballAPI(window, config){
       return a
     },
     C: function () {
-      var a = /*window.*/performance.now(),
+      var a = performance.now(),
       b = a - this.Wh;
       this.Wh = a;
       var reachedFd = false, reachedEnd = false;
@@ -7443,81 +6734,26 @@ function abcHaxballAPI(window, config){
   });
 
   function Vb(ya, callbacks, options) {
-    var $c = /*window.*/performance.now();
-    var /*this.sd =*/De = 0;
+    var $c = performance.now();
+    var De = 0;
     var raf = options?.requestAnimationFrame || requestAnimationFrame;
     var caf = options?.cancelAnimationFrame || cancelAnimationFrame;
-    var fps_limit = options?.fps_limit; // null | 30
+    var fps_limit = options?.fps_limit;
     var render = callbacks?.render;
 
     var Kc = render && function () {
-      //this.je.C();
-      var a = /*window.*/performance.now();
+      var a = performance.now();
       null != fps_limit && fps_limit > a - $c || (
         $c = a, 
-        //this.sd++, 
-        //this.uf(n.A.Tb.L()), 
-        0 < ya.Fd || (
-          //this.j.C(ya)
-          render(ya.Sf())
-        )
+        0 < ya.Fd || render(ya.Sf())
       )
     };
     var bf = function () {
-      De = /*window.*/raf(bf);
+      De = raf(bf);
       ya.C();
       render && Kc();
     };
-    /*
-    var Bd = function (a) {
-      switch (a.keyCode) {
-        case 27:
-          var b = this.j;
-          b.me(!b.Gd);
-          a.preventDefault();
-          break;
-        case 49:
-          n.A.Tb.Xa(1);
-          break;
-        case 50:
-          n.A.Tb.Xa(2);
-          break;
-        case 51:
-          n.A.Tb.Xa(3);
-          break;
-        case 52:
-          n.A.Tb.Xa(0)
-      }
-    };
-    var uf = function (a) {
-      var b = this.j.Fb;
-      0 >= a ? (b.Gg(!0), b.Eb.kf = 1, b.Eb.xf = 0) : (b.Gg(!1), b.Eb.xf = 35, b.Eb.kf = 1 + 0.25 * (a - 1))
-    };
-    var Cd = function () {
-    };
-    */
-
-    //var b = this;
-    //this.j = new ja(a.uc);
-    //var c = new Gb(this.j);
-    //c.ri(a.T);
-    //window.document.addEventListener('keydown', G(this, this.Bd));
-    //window.document.addEventListener('keyup', G(this, this.Cd));
-    /*window.*/raf(bf);
-    /*this.Gh = window.setInterval(function () {
-      b.j.pe.hm(b.sd);
-      b.sd = 0
-    }, 1000);*/
-    //this.uf(n.A.Tb.L());
-    //this.j.g.classList.add('replayer');
-    //this.je = new ha(a);
-    /*this.je.Vp = function () {
-      c.Lr(a.T) // reset callbacks
-    };*/
-    //this.je.Up = function () {
-      //b.j.me(null == a.T.K);
-      //c.ri(a.T); // assign callbacks
-
+    raf(bf);
     this.clearCallbacks = function () {
       ya.T.iq = null;
       ya.T.tl = null;
@@ -7539,16 +6775,9 @@ function abcHaxballAPI(window, config){
       ya.T._PTC_ = null;
       ya.T._TCC_ = null;
       ya.T._TLC2_ = null;
-      /*
-      ya.T._CCI_ = null;
-      */
       ya.T._CE_ = null;
       ya.T._SDP_ = null;
       ya.T._PD_ = null;
-      /*
-      ya.T._HP_ = null;
-      ya.T._RI_ = null;
-      */
       ya.T._HC_ = null;
       ya.T._EC_ = null;
       ya.T.Pi = null;
@@ -7627,25 +6856,6 @@ function abcHaxballAPI(window, config){
       ya.T._TLC2_ = (a, b) => {
         callbacks.onTeamsLockChange && callbacks.onTeamsLockChange(a, b);
       };
-      /*
-      ya.T._CCI_ = (x, y, z) => {
-        if (haxball.__internalData.isHost){
-          if (z==1){
-            x.customClient = true;
-            haxball.__internalData.customClientIds.add(b.V);
-          }
-        }
-        else if (z==0){
-          x.customClient = true;
-          haxball.__internalData.customClientIds.add(b.V);
-          x = a.na(y);
-          if (x)
-            x.customClient = true;
-          haxball.__internalData.customClientIds.add(y);
-          a.ra(na.la(1, y, 1), 0, true);
-        }
-      };
-      */
       ya.T._CE_ = (a, b, c)=>{
         callbacks.onCustomEvent && callbacks.onCustomEvent(a, b, c); // type, data, byUser
       };
@@ -7655,14 +6865,6 @@ function abcHaxballAPI(window, config){
       ya.T._PD_ = (a)=>{
         callbacks.onPingData && callbacks.onPingData(a); // ping array
       };
-      /*
-      ya.T._HP_ = ()=>{
-        return haxball?.room?.hostPing || 0
-      };
-      ya.T._RI_ = ()=>{
-        b.ob.al();
-      };
-      */
       ya.T._HC_ = (a)=>{
         callbacks.onHandicapChange && callbacks.onHandicapChange(a);
       };
@@ -7697,12 +6899,6 @@ function abcHaxballAPI(window, config){
         callbacks.onKickRateLimitChange && callbacks.onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
       };
       ya.T.ul = function (d, e, f, g) { // +
-        /*
-        y.i(b.Op, d.V);
-        null != e && (
-          vb.i(b.Np, d.V, e, null != g ? g.w : null, f)
-        );
-        */
         callbacks.onPlayerLeave && callbacks.onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
       };
       ya.T.wl = function(a, b){ // +
@@ -7711,25 +6907,13 @@ function abcHaxballAPI(window, config){
     };
 
     this.ia = function () {
-      /*
-      window.document.removeEventListener('keydown', G(this, this.Bd));
-      window.document.removeEventListener('keyup', G(this, this.Cd));
-      window.onbeforeunload = null;
-      */
-      /*window.*/caf(De);
-      //window.clearInterval(this.Gh)
+      caf(De);
       this.clearCallbacks();
     };
 
     this.ui = ()=>{
       ya.ui();
     };
-    /*
-    this.je.el = function () {
-      b.j.Fb.Eb.Xq() // renderer function
-    };
-    */
-    //this.j.g.appendChild(this.je.g)
   }
 
   
@@ -7836,35 +7020,13 @@ function abcHaxballAPI(window, config){
       storage: haxball.storage,
       pluginMechanismActive: !haxball.noPluginMechanism,
       useDefaultChatCommandMechanism: haxball.useDefaultChatCommandMechanism,
-      //n_A: n_A,
       onOperationReceived: function(msg) {
-        //var op = {
-          //type: null,
-          //msg: msg
-        //};
-
         var c = recognizeEvent(msg);
         if (!c)
           return true;
-        
-        //var c = OperationConstants[msg.__proto__.f.name], oo = c?.filter((x)=>(x[1]==null) || msg[x[1][0]]==x[1][1])[0];
-        //if (!oo)
-          //return true;
-        
-        //parse test:
-        //Object.assign(op, {
-          //type: oo[0],
-          //parsed: Object.keys(oo[2]).reduce((acc, e)=>{
-            //var t = oo[2][e], f = t[1];
-            //return Object.assign(acc, {
-              //[t[0]]: (f?f(msg[e]):msg[e])
-            //});
-          //}, {})
-        //});
-
         if (!haxball.room._onOperationReceived)
           return true;
-        return haxball.room._onOperationReceived(c, msg); // c = oo[0]
+        return haxball.room._onOperationReceived(c, msg);
       },
       execOperationReceivedOnHost: function(msg, targetId, fakeId) {
         if (!internalData.isHost)
@@ -7942,7 +7104,6 @@ function abcHaxballAPI(window, config){
       var g = n.Vf,
         k = n.Vr,
         l = f.Kg(),
-        //h = new jb(),
         t = new xa(haxball, id, {
           iceServers: g,
           ij: k,
@@ -7961,51 +7122,22 @@ function abcHaxballAPI(window, config){
         t.df = null;
         t.ia();
       };
-      // h.ba("Connecting to master...");
-      // h.vh.onclick = function () {
-        // t.Ad = null;
-        // t.df = null;
-        // t.ia();
-        // u.xb();
-      // };
-      // x.La(h.g);
       var m = function (a, b) {
         haxball.cancel = null;
         y.i(haxball.onFailure, a);
-        // u.xb();
-        // var c = new Ka(a, b);
-        // c.Va = function () {
-          // u.xb();
-        // };
-        // x.La(c.g);
       };
       var p = function () {
         haxball.cancel = null;
-        // var a = new P("Connection Failed", "", ["Ok"]);
-        // a.Vd.innerHTML =
-          // "<p>Failed to connect to room host.</p><p>If this problem persists please see the <a href='https://github.com/haxball/haxball-issues/wiki/Connection-Issues' target='_blank'>troubleshooting guide</a>.</p>";
-        // a.Va = function () {
-          // u.xb();
-        // };
-        // x.La(a.g);
         y.i(haxball.onFailure, "Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues");
       };
       var r = function () {
         haxball.cancel = null;
         var b = new ba(haxball, t);
-        // not used anymore:
-        // t.dl = function (a) {
-          // b.j.pe.qr(((10 * t.sg.$g(0.5)) | 0) / 10);
-          // b.j.pe.or(((10 * t.sg.max()) | 0) / 10);
-          // b.j.pe.nl.tn(a);
-        // };
         b.Bg = roomLink(id, !1);
-        //x.La(b.j.g);
         b.de = function () {
           t.Ad = null;
           t.ia();
           b.ia();
-          //u.xb();
           //haxball.emit("roomLeave");
         };
         t.Ad = function () {
@@ -8060,11 +7192,9 @@ function abcHaxballAPI(window, config){
         switch (a) {
           case 1:
             console.log("Connecting to peer...");
-            //h.ba("Connecting to peer...");
             break;
           case 2:
             console.log("Awaiting state...");
-            //h.ba("Awaiting state...");
             break;
           case 3:
             r();
@@ -8072,7 +7202,6 @@ function abcHaxballAPI(window, config){
       };
       t.Sp = function () {
         console.log("Trying reverse connection...");
-        //h.ba("Trying reverse connection...");
         A.i(haxball.onReverseConnection);
       };
     } catch (ic) {
@@ -8088,10 +7217,6 @@ function abcHaxballAPI(window, config){
   };
 
   function createRoom(roomParams, haxballParams){
-    /*
-      createRoomSucceeded event -> onSuccess callback,
-      roomLeave event -> onLeave callback,
-    */
     var haxball = Object.assign({}, haxballParams);
     haxball.config = haxball.config || {};
     fixStorage(haxball);
@@ -8163,7 +7288,6 @@ function abcHaxballAPI(window, config){
         l.Fi(a);
       }
     }
-    //x.La(new P("Creating room", "Connecting...", []).g);
     var e = null,
       f = null, // n_A.Lh(),
       g = new fa();
@@ -8197,15 +7321,7 @@ function abcHaxballAPI(window, config){
     l.fg = b.qs - 1;
     l.Ib = b.password;
     c();
-    var t = new ba(haxball, l),
-      h = !1;
-    //l.ef = function (a, b) {
-      //u.kk(a, function (a) {
-        //b(a);
-        //x.La(t.j.g);
-        //return (h = !0);
-      //});
-    //};
+    var t = new ba(haxball, l);
     var m = setInterval(function () {
       var a = la.la(l);
       internalData.execOperationReceivedOnHost(a)!=false && l.ra(a);
@@ -8241,7 +7357,6 @@ function abcHaxballAPI(window, config){
     l.kg = function (a) {
       e = a;
       t.Bg = roomLink(a, null != l.Ib);
-      //h || ((h = !0), x.La(t.j.g));
       haxball.room._onRoomLink && haxball.room._onRoomLink(t.Bg);
     };
     t.Np = function (a, b, c, d) {
@@ -8253,7 +7368,6 @@ function abcHaxballAPI(window, config){
     t.de = function () {
       l.ia();
       t.ia();
-      //u.xb();
       clearInterval(m);
       fLeaveRoom();
     };
@@ -8627,8 +7741,6 @@ function abcHaxballAPI(window, config){
     };
 
     this.setExtrapolation = function(extrapolation) {
-      //n_A.rd.Xa(extrapolation);
-      //that.client.setStorageValue("extrapolation", extrapolation);
       that.client.__internalData.storage.setValue("extrapolation", extrapolation);
       internalData.roomObj?.ya.gm(extrapolation);
     };
@@ -8641,8 +7753,6 @@ function abcHaxballAPI(window, config){
 
     this.setAvatar = function(avatar) {
       null != avatar && (avatar = avatar.substr(0, 2));
-      //n_A.sh.Xa(avatar);
-      //that.client.setStorageValue("avatar", avatar);
       that.client.__internalData.storage.setValue("avatar", avatar);
       var msg = ra.la(avatar);
       internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
@@ -8694,11 +7804,9 @@ function abcHaxballAPI(window, config){
         var x = internalData.roomObj?.ya;
         if (!x)
           return;
-        /*internalData.roomObj.Of.gf(msg) || (()=>{*/
         var c = new Na();
         c.Tc = msg;
         internalData.execOperationReceivedOnHost(c)!=false && x.ra(c);
-        //})();
       }
     };
 
@@ -8752,7 +7860,6 @@ function abcHaxballAPI(window, config){
 
     this.getKeyState = function(){
       return internalData.keyState;
-      //return internalData.roomObj?.ob.$d;
     };
 
     this.setKeyState = function(state){
@@ -9377,7 +8484,29 @@ function abcHaxballAPI(window, config){
     },
     RoomConfig,
     Plugin,
-    Renderer
+    Renderer,
+    Impl: {
+      Core: {
+        H, // Point
+        ka, // TeamColors
+        p, // Team
+        T, // GeoLocation
+      },
+      Stream: {
+        F, // StreamReader
+        w, // StreamWriter
+      },
+      Utils: {
+        U, // string operations 1
+        D, // string operations 2
+        J, // string operations 3
+        K, // string operations 4
+        r, // mostly used for object casting
+        M, // api operations
+        n, // connection constants
+        va, // RoomList operations
+      }
+    }
   };
 }
 

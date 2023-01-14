@@ -1,4 +1,4 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "breakConnection", true, { // "breakConnection" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -22,7 +22,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     connectionShouldBreak[playerId] = true; // mark player
   };
 
-  this.onOperationReceived = function(obj, msg, customData){ // this is host-only
+  this.onOperationReceived = function(operation, msg, customData){ // this is host-only
 
     var playerId = operation.getValue(msg, "byPlayerId"); // find out who sent this message
     if (connectionShouldBreak[playerId]) // if player is marked
