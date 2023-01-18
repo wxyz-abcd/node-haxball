@@ -1,15 +1,62 @@
-module.exports = function (API, localStorageObj, canvas, images, renderApi){
+module.exports = function(API, params){
   
-  var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
+
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.01",
+    version: "1.02",
     author: "basro & abc",
     description: `This is the un-minified version of the default renderer currently used in Haxball, with the exception that most if not all of the camera bugs have been fixed.`
   });
 
-  var { H: Point, p: Team, ka: TeamColors } = Impl.Core;
+  // parameters are exported so that they can be edited outside this class.
+  this.showTeamColors = this.defineVariable({ // team_colors
+    name: "showTeamColors",
+    description: "Show team colors?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.showAvatars = this.defineVariable({ // show_avatars
+    name: "showAvatars",
+    description: "Show player avatars?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.viewMode = this.defineVariable({ // view_mode
+    name: "viewMode",
+    description: "View Mode", 
+    type: VariableType.Integer,
+    value: 1,
+    range: {
+      min: -1,
+      max: 4,
+      step: 1
+    }
+  });
+
+  this.resolutionScale = this.defineVariable({ // resolution_scale
+    name: "resolutionScale",
+    description: "Resolution Scale", 
+    type: VariableType.Number,
+    value: 1,
+    range: {
+      min: 0,
+      max: Infinity,
+      step: 0.01
+    }
+  });
+
+  this.showChatIndicators = this.defineVariable({ // show_indicators
+    name: "showChatIndicators",
+    description: "Show Chat Indicators?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  var thisRenderer = this, { H: Point, p: Team, ka: TeamColors } = Impl.Core;
 
   // start of basro's renderer logic
 
@@ -178,9 +225,9 @@ module.exports = function (API, localStorageObj, canvas, images, renderApi){
     },
     update: function(playerObj, roomState){ // C
       if (playerObj.H) {
-        var teamColors = localStorageObj.xm.L() ? roomState.kb[playerObj.ea.$] : playerObj.ea.wm; // "team_colors"
+        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.kb[playerObj.ea.$] : playerObj.ea.wm; // "team_colors"
         var avatarText = (playerObj.Jd!=null) ? playerObj.Jd : playerObj.Xb;
-        var showAvatar = localStorageObj.lm.L() && (avatarText!=null); // "show_avatars"
+        var showAvatar = thisRenderer.showAvatars/*localStorageObj.lm.L()*/ && (avatarText!=null); // "show_avatars"
         if (!/*PlayerDecorator.*/compareTeamColors(this.teamColors, teamColors) || (!showAvatar && (playerObj.Jb!=this.avatarNumber)) || (showAvatar && (this.avatarText!=avatarText))){
           /*PlayerDecorator.*/copyTeamColors(this.teamColors, teamColors);
           if (showAvatar){
@@ -240,12 +287,12 @@ module.exports = function (API, localStorageObj, canvas, images, renderApi){
     this.origin = new Point(0, 0); // Ya
     this.gamePaused = false; // Dk
     this.textRenderer = new CanvasTextRenderer(); // td
-    this.canvas = canvas; // sa
+    this.canvas = params.canvas; // sa
     this.canvas.mozOpaque = true;
     this.ctx = this.canvas.getContext("2d", { alpha: false });
-    this.grassPattern = this.ctx.createPattern(/*n.Ko*/images?.grass, null); // Lo
-    this.concretePattern = this.ctx.createPattern(/*n.Vn*/images?.concrete, null); // Wn
-    this.concrete2Pattern = this.ctx.createPattern(/*n.Tn*/images?.concrete2, null); // Un
+    this.grassPattern = this.ctx.createPattern(/*n.Ko*/params.images?.grass, null); // Lo
+    this.concretePattern = this.ctx.createPattern(/*n.Vn*/params.images?.concrete, null); // Wn
+    this.concrete2Pattern = this.ctx.createPattern(/*n.Tn*/params.images?.concrete2, null); // Un
   }
   HaxballRenderer.numberToColor = function(number){ // lc
     return "rgba("+[(number&16711680)>>>16, (number&65280)>>>8, number&255].join()+",255)";
@@ -256,8 +303,8 @@ module.exports = function (API, localStorageObj, canvas, images, renderApi){
   };
   HaxballRenderer.prototype = {
     updateParams: function(){ // uf
-      this.resolutionScale = localStorageObj.Sl.L(); // "resolution_scale"
-      var viewMode = localStorageObj.Tb.L(); // "view_mode"
+      this.resolutionScale = thisRenderer.resolutionScale;/*localStorageObj.Sl.L()*/ // "resolution_scale"
+      var viewMode = thisRenderer.viewMode;/*localStorageObj.Tb.L()*/ // "view_mode"
       if (viewMode==0){
         this.zoomCoeff = 1;
         this.fixedHeight = 0;
@@ -535,15 +582,15 @@ module.exports = function (API, localStorageObj, canvas, images, renderApi){
       HaxballRenderer.setSmoothingEnabled(this.ctx, true);
     },
     drawPlayerDecoratorsAndChatIndicators: function(roomState, followPlayer){ // Nq
-      var showIndicators = localStorageObj.Ak.L(), players = roomState.I; // "show_indicators"
+      var showIndicators = thisRenderer.showChatIndicators/*localStorageObj.Ak.L()*/, players = roomState.I; // "show_indicators"
       for (var i=0;i<players.length;i++){
         var player = players[i];
         var disc = player.H;
         if (!disc)
           continue;
         var pos = disc.a, decorator = this.decoratorsById.get(player.V);
-        if (showIndicators && decorator.chatIndicatorActive && /*n.Dm*/images?.typing)
-          this.ctx.drawImage(images.typing, pos.x-0.5*images.typing.width, pos.y-35);
+        if (showIndicators && decorator.chatIndicatorActive && /*n.Dm*/params.images?.typing)
+          this.ctx.drawImage(params.images.typing, pos.x-0.5*params.images.typing.width, pos.y-35);
         if (player != followPlayer)
           decorator.drawToCanvas(this.ctx, pos.x, pos.y+50);
       }
@@ -684,11 +731,11 @@ module.exports = function (API, localStorageObj, canvas, images, renderApi){
   };
 
   this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
-    if (renderApi?.paintGame){
-      that.rendererObj.updateParams();
-      null != extrapolatedRoomPhysicsObj.K && that.rendererObj.render(extrapolatedRoomPhysicsObj, that.roomObj.ya.uc);
-    }
-    renderApi?.onRequestAnimationFrame(that.roomObj.ya, extrapolatedRoomPhysicsObj.K);
+    if (!params.paintGame || !extrapolatedRoomPhysicsObj.K)
+      return;
+    that.rendererObj.updateParams();
+    that.rendererObj.render(extrapolatedRoomPhysicsObj, that.roomObj.ya.uc);
+    params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomPhysicsObj);
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:
@@ -715,5 +762,30 @@ module.exports = function (API, localStorageObj, canvas, images, renderApi){
     var tr = that.rendererObj.textRenderer; // "Time is Up!"
     tr.addText(tr.timeUp);
   };
+
+  this.onKeyDown = function(e){
+    switch(e.keyCode){
+      case 49:{
+        thisRenderer.viewMode = 1;
+        //n_A.setStorageValue("view_mode", 1);
+        break;
+      }
+      case 50:{
+        thisRenderer.viewMode = 2;
+        //n_A.setStorageValue("view_mode", 2);
+        break;
+      }
+      case 51:{
+        thisRenderer.viewMode = 3;
+        //n_A.setStorageValue("view_mode", 3);
+        break;
+      }
+      case 52:{
+        thisRenderer.viewMode = 0;
+        //n_A.setStorageValue("view_mode", 0);
+        break;
+      }
+    }
+  }
 
 };

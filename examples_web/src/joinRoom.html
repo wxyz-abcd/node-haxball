@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./flagSelector.css" />
+    <link rel="stylesheet" href="./form.css" />
+    <script src="./addonImporter.js"></script>
+    <script src="./flagSelector.js"></script>
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
+  </head>
+  <body>
+    Steps to join a room:<br/>
+    ---------------------------<br/>
+    Step1: Fill the form below: (Leave Player Auth Key empty to auto-generate a new auth key.)<br/>
+    <div style="border:1px solid black;width:400px;padding:5px;display:flex;flex-direction:column;">
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Room Id:</span><input class="input" id="r_id" type="text" value=""/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Password:</span><input class="input" id="r_pass" type="text" value=""/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Auth Key:</span><input class="input" id="p_ak" type="text" value=""/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Name:</span><input class="input" id="p_name" type="text" value="abc"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Avatar:</span><input class="input" id="p_avatar" type="text" value="👾"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Latitude:</span><input class="input" id="p_lat" type="number" value="40"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Longitude:</span><input class="input" id="p_lon" type="number" value="40"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Flag:</span><div class="inputf" id="p_flag" type="text" value="tr"></div>
+      </div>
+    </div>
+    Step2: If you are trying to join a room with recaptcha protection, use our tokenGenerator project to generate a client token.<br/>
+    Step3: If you are trying to join a room with recaptcha protection, write the token here: <input class="inputLong" id="token" type="text" /><br/>
+    Step4: If you want to see the game in a canvas: <label class="input"><input id="notHeadless" type="checkbox" />check here</label><br/>
+    Step5: Click the button: <button id="cr" onclick="joinRoom()">Join Room</button><br/><br/>
+    NOTE: Remember to always keep one of these browser tabs/windows active, otherwise the host bot will <br/>
+    become unresponsive. Do not minimize or go to another tab. If you must, do what you have to do in <br/>
+    another browser window while this one is also still in the foreground. <br/>
+    <script src="./joinRoom.js"></script>
+  </body>
+</html>

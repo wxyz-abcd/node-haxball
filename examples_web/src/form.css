@@ -1,0 +1,12 @@
+.input{
+  width: 200px;
+  background-color: aqua;
+  border: 1px solid black;
+  cursor: pointer;
+}
+.inputf{
+  width: 198px;
+}
+.inputLong{
+  width: 400px;
+}

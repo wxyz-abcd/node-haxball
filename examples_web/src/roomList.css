@@ -1,0 +1,132 @@
+body {
+  font-family:'Open Sans', sans-serif;
+  font-size:14px;
+  color:white;
+  background-color:#73885c;
+  background:#939e7f url("./images/bg.png") fixed;
+  overflow: hidden;
+}
+ 
+.filters {
+  display: flex;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.filters .bool {
+  margin-right: 6px;
+  padding: 0px 6px;
+  background-color: #2f3c43;
+  border-radius: 5px;
+}
+
+.filters .bool:hover {
+  background-color: #3a4952;
+}
+
+.filters #name {
+  width: 320px;
+}
+
+.filters #lat, .filters #lon {
+  width: 60px;
+}
+
+.list {
+  height:100%;
+  flex:1;
+  background-color:#111619;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+}
+
+.list col:nth-child(1) {
+  width: 100%;
+}
+
+.list col:nth-child(2) {
+  width: 60px;
+}
+
+.list col:nth-child(3) {
+  width: 40px;
+}
+
+.list col:nth-child(4) {
+  width: 95px;
+}
+
+.list td {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.list td:not(:first-child) {
+  padding-left: 6px;
+}
+
+.list thead {
+  line-height: 25px;
+}
+
+.list .separator {
+  height: 2px;
+  width: 100%;
+  background-color: gray;
+}
+
+.list tbody tr {
+  line-height: 22px;
+}
+
+.list tbody tr.old {
+  color: #bfbfbf;
+}
+
+.list tbody tr:hover {
+  background-color: #2f3c43;
+}
+
+.list tbody tr.selected {
+  background-color: #3a4952;
+}
+
+.list tbody .flagico {
+  margin-right: 2px;
+}
+
+.list tbody .flashtag {
+  display: inline-block;
+  padding: 0px 4px;
+  background-color: #900;
+  border-radius: 3px;
+  margin-right: 5px;
+  line-height: 14px;
+}
+
+.list table {
+  table-layout: fixed;
+}
+
+.list table.header {
+  width: calc(100% - 12px);
+  margin-right: 15px;
+  flex: 0;
+  background-color: #1A2125;
+}
+
+.list .content {
+  position: relative;
+  overflow: auto;
+  flex: 1;
+}
+
+.list .content table {
+  margin-top: 5px;
+  width: calc(100% - 12px);
+}

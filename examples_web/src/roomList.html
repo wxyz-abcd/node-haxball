@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./roomList.css" />
+    <link rel="stylesheet" href="./scrollbar.css" />
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
+    <style>
+      .mainDiv {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+      }
+      .buttons {
+        flex-direction: row;
+        display: flex;
+        margin-bottom: 5px;
+      }
+      .grow {
+        flex-grow: 1;
+      }
+      button {
+        display: flex;
+        background-color: #244967;
+        position: relative;
+        padding: 5px 15px;
+        border: 0;
+        border-radius: 5px;
+        width: 100px;
+        color: white;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        line-height: 100%;
+        margin: 0;
+        vertical-align: baseline;
+        text-align: center;
+        align-items: flex-start;
+        justify-content: center;
+        cursor: default;
+        box-sizing: border-box;
+        text-transform: none;
+        text-indent: 0px;
+        text-shadow: none;
+        letter-spacing: normal;
+        text-rendering: auto;
+        appearance: auto;
+        writing-mode: horizontal-tb;
+      }
+      button:hover {
+        background-color:#2f5e85
+      }
+      button:active {
+        background-color:#193449
+      }
+      button:disabled {
+        background-color:#3e3e3e
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mainDiv">
+      <div class="buttons">
+        <button id="bCreate">Create</button>
+        <button id="bJoin">Join</button>
+        <span class="grow"></span>
+        <button id="bRefresh">Refresh</button>
+      </div>
+      <div class="list">
+        <table class="header">
+          <colgroup>
+            <col/><col/><col/><col/>
+          </colgroup>
+          <thead>
+            <tr>
+              <td>Name</td>
+              <td>Players</td>
+              <td>Pass</td>
+              <td>Distance</td>
+            </tr>
+          </thead>
+        </table>
+        <div class="separator"></div>
+        <div class="content">
+          <table>
+            <colgroup>
+              <col/><col/><col/><col/>
+            </colgroup>
+            <tbody id="listbody"></tbody>
+          </table>
+        </div>
+        <div class="filters">
+          <label class="bool">
+            <input type="checkbox" checked onclick="toggleLocked()" /> Show locked
+          </label>
+          <label class="bool">
+            <input type="checkbox" checked onclick="toggleFull()" /> Show full
+          </label>
+          <span class="grow"></span>
+          Name:<input id="name" type="text" maxlength="40" />
+          Lat:<input id="lat" type="number" min="-90" max="90" step="0.01" value="0" />
+          Lon:<input id="lon" type="number" min="-180" max="180" step="0.01" value="0" />
+        </div>
+      </div>
+    </div>
+    <script src="./roomList.js"></script>
+  </body>
+</html>

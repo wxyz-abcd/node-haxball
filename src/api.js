@@ -8,8 +8,6 @@ function abcHaxballAPI(window, config){
     requestAnimationFrame,
     cancelAnimationFrame,
     crypto,
-    //inherits,
-    //EventEmitter,
     WebSocket,
     XMLHttpRequest,
     performance,
@@ -6211,7 +6209,7 @@ function abcHaxballAPI(window, config){
       b.Rb(d, 2);
     },
     zq: function (a, b) {
-      var c = a.hb(),
+      var c = a.hb(), // c is the frameNo received from client. Should check if it is consistent.
         d = a.hb(),
         e = m.fh(a),
         f = e.zf.oj;

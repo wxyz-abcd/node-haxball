@@ -1,0 +1,995 @@
+.flagico {
+  width: 16px;
+  height: 11px;
+  background-image: url("./images/flags.png");
+  display: inline-block;
+  background-position: -80px -198px;
+}
+
+.f-id {
+  background-position: 0px 0px;
+}
+
+.f-qa {
+  background-position: -16px 0px;
+}
+
+.f-ge {
+  background-position: -32px 0px;
+}
+
+.f-al {
+  background-position: -48px 0px;
+}
+
+.f-ao {
+  background-position: -64px 0px;
+}
+
+.f-eng {
+  background-position: -80px 0px;
+}
+
+.f-gi {
+  background-position: -96px 0px;
+}
+
+.f-mt {
+  background-position: -112px 0px;
+}
+
+.f-tn {
+  background-position: -128px 0px;
+}
+
+.f-bh {
+  background-position: -144px 0px;
+}
+
+.f-tr {
+  background-position: -160px 0px;
+}
+
+.f-ye {
+  background-position: -176px 0px;
+}
+
+.f-pl {
+  background-position: -192px 0px;
+}
+
+.f-lv {
+  background-position: 0px -11px;
+}
+
+.f-pe {
+  background-position: -16px -11px;
+}
+
+.f-jp {
+  background-position: -32px -11px;
+}
+
+.f-tt {
+  background-position: -48px -11px;
+}
+
+.f-pg {
+  background-position: -64px -11px;
+}
+
+.f-gl {
+  background-position: -80px -11px;
+}
+
+.f-mc {
+  background-position: -96px -11px;
+}
+
+.f-ch {
+  background-position: -112px -11px;
+}
+
+.f-ma {
+  background-position: -128px -11px;
+}
+
+.f-at {
+  background-position: -144px -11px;
+}
+
+.f-cn {
+  background-position: -160px -11px;
+}
+
+.f-kg {
+  background-position: -176px -11px;
+}
+
+.f-vn {
+  background-position: -192px -11px;
+}
+
+.f-dk {
+  background-position: 0px -22px;
+}
+
+.f-sg {
+  background-position: -16px -22px;
+}
+
+.f-to {
+  background-position: -32px -22px;
+}
+
+.f-tl {
+  background-position: -48px -22px;
+}
+
+.f-cy {
+  background-position: -64px -22px;
+}
+
+.f-sy {
+  background-position: -80px -22px;
+}
+
+.f-eg {
+  background-position: -96px -22px;
+}
+
+.f-mk {
+  background-position: -112px -22px;
+}
+
+.f-hk {
+  background-position: -128px -22px;
+}
+
+.f-lb {
+  background-position: -144px -22px;
+}
+
+.f-pf {
+  background-position: -160px -22px;
+}
+
+.f-wf {
+  background-position: -176px -22px;
+}
+
+.f-be {
+  background-position: -192px -22px;
+}
+
+.f-no {
+  background-position: 0px -33px;
+}
+
+.f-bv {
+  background-position: -16px -33px;
+}
+
+.f-sj {
+  background-position: -32px -33px;
+}
+
+.f-ug {
+  background-position: -48px -33px;
+}
+
+.f-es {
+  background-position: -64px -33px;
+}
+
+.f-tj {
+  background-position: -80px -33px;
+}
+
+.f-ae {
+  background-position: -96px -33px;
+}
+
+.f-lr {
+  background-position: -112px -33px;
+}
+
+.f-sd {
+  background-position: -128px -33px;
+}
+
+.f-it {
+  background-position: -144px -33px;
+}
+
+.f-xx1 {
+  background-position: -160px -33px;
+}
+
+.f-de {
+  background-position: -176px -33px;
+}
+
+.f-mv {
+  background-position: -192px -33px;
+}
+
+.f-ag {
+  background-position: 0px -44px;
+}
+
+.f-om {
+  background-position: -16px -44px;
+}
+
+.f-bt {
+  background-position: -32px -44px;
+}
+
+.f-jo {
+  background-position: -48px -44px;
+}
+
+.f-hu {
+  background-position: -64px -44px;
+}
+
+.f-va {
+  background-position: -80px -44px;
+}
+
+.f-pt {
+  background-position: -96px -44px;
+}
+
+.f-gp {
+  background-position: -112px -44px;
+}
+
+.f-cl {
+  background-position: -128px -44px;
+}
+
+.f-kw {
+  background-position: -144px -44px;
+}
+
+.f-ps {
+  background-position: -160px -44px;
+}
+
+.f-mg {
+  background-position: -176px -44px;
+}
+
+.f-ci {
+  background-position: -192px -44px;
+}
+
+.f-bn {
+  background-position: 0px -55px;
+}
+
+.f-ie {
+  background-position: -16px -55px;
+}
+
+.f-af {
+  background-position: -32px -55px;
+}
+
+.f-eh {
+  background-position: -48px -55px;
+}
+
+.f-gd {
+  background-position: -64px -55px;
+}
+
+.f-vu {
+  background-position: -80px -55px;
+}
+
+.f-ne {
+  background-position: -96px -55px;
+}
+
+.f-lt {
+  background-position: -112px -55px;
+}
+
+.f-mw {
+  background-position: -128px -55px;
+}
+
+.f-by {
+  background-position: -144px -55px;
+}
+
+.f-bo {
+  background-position: -160px -55px;
+}
+
+.f-kn {
+  background-position: -176px -55px;
+}
+
+.f-bg {
+  background-position: -192px -55px;
+}
+
+.f-cg {
+  background-position: 0px -66px;
+}
+
+.f-ml {
+  background-position: -16px -66px;
+}
+
+.f-sn {
+  background-position: -32px -66px;
+}
+
+.f-ir {
+  background-position: -48px -66px;
+}
+
+.f-yt {
+  background-position: -64px -66px;
+}
+
+.f-zw {
+  background-position: -80px -66px;
+}
+
+.f-bf {
+  background-position: -96px -66px;
+}
+
+.f-fo {
+  background-position: -112px -66px;
+}
+
+.f-cm {
+  background-position: -128px -66px;
+}
+
+.f-jm {
+  background-position: -144px -66px;
+}
+
+.f-cz {
+  background-position: -160px -66px;
+}
+
+.f-gh {
+  background-position: -176px -66px;
+}
+
+.f-dz {
+  background-position: -192px -66px;
+}
+
+.f-bj {
+  background-position: 0px -77px;
+}
+
+.f-iq {
+  background-position: -16px -77px;
+}
+
+.f-wls {
+  background-position: -32px -77px;
+}
+
+.f-my {
+  background-position: -48px -77px;
+}
+
+.f-gn {
+  background-position: -64px -77px;
+}
+
+.f-tg {
+  background-position: -80px -77px;
+}
+
+.f-gw {
+  background-position: -96px -77px;
+}
+
+.f-fr {
+  background-position: -112px -77px;
+}
+
+.f-gf {
+  background-position: -128px -77px;
+}
+
+.f-re {
+  background-position: -144px -77px;
+}
+
+.f-an {
+  background-position: -160px -77px;
+}
+
+.f-um {
+  background-position: -176px -77px;
+}
+
+.f-tv {
+  background-position: -192px -77px;
+}
+
+.f-il {
+  background-position: 0px -88px;
+}
+
+.f-bd {
+  background-position: -16px -88px;
+}
+
+.f-tw {
+  background-position: -32px -88px;
+}
+
+.f-am {
+  background-position: -48px -88px;
+}
+
+.f-st {
+  background-position: -64px -88px;
+}
+
+.f-ws {
+  background-position: -80px -88px;
+}
+
+.f-lu {
+  background-position: -96px -88px;
+}
+
+.f-bi {
+  background-position: -112px -88px;
+}
+
+.f-pa {
+  background-position: -128px -88px;
+}
+
+.f-ec {
+  background-position: -144px -88px;
+}
+
+.f-np {
+  background-position: -160px -88px;
+}
+
+.f-vi {
+  background-position: -176px -88px;
+}
+
+.f-rs {
+  background-position: -192px -88px;
+}
+
+.f-dm {
+  background-position: 0px -99px;
+}
+
+.f-gq {
+  background-position: -16px -99px;
+}
+
+.f-us {
+  background-position: -32px -99px;
+}
+
+.f-mz {
+  background-position: -48px -99px;
+}
+
+.f-bm {
+  background-position: -64px -99px;
+}
+
+.f-gy {
+  background-position: -80px -99px;
+}
+
+.f-ee {
+  background-position: -96px -99px;
+}
+
+.f-nu {
+  background-position: -112px -99px;
+}
+
+.f-mm {
+  background-position: -128px -99px;
+}
+
+.f-zm {
+  background-position: -144px -99px;
+}
+
+.f-ng {
+  background-position: -160px -99px;
+}
+
+.f-ro {
+  background-position: -176px -99px;
+}
+
+.f-hr {
+  background-position: -192px -99px;
+}
+
+.f-md {
+  background-position: 0px -110px;
+}
+
+.f-et {
+  background-position: -16px -110px;
+}
+
+.f-mn {
+  background-position: -32px -110px;
+}
+
+.f-tm {
+  background-position: -48px -110px;
+}
+
+.f-sc {
+  background-position: -64px -110px;
+}
+
+.f-cs {
+  background-position: -80px -110px;
+}
+
+.f-pr {
+  background-position: -96px -110px;
+}
+
+.f-ad {
+  background-position: -112px -110px;
+}
+
+.f-kr {
+  background-position: -128px -110px;
+}
+
+.f-nf {
+  background-position: -144px -110px;
+}
+
+.f-ls {
+  background-position: -160px -110px;
+}
+
+.f-km {
+  background-position: -176px -110px;
+}
+
+.f-sz {
+  background-position: -192px -110px;
+}
+
+.f-py {
+  background-position: 0px -121px;
+}
+
+.f-tz {
+  background-position: -16px -121px;
+}
+
+.f-in {
+  background-position: -32px -121px;
+}
+
+.f-sa {
+  background-position: -48px -121px;
+}
+
+.f-pk {
+  background-position: -64px -121px;
+}
+
+.f-cf {
+  background-position: -80px -121px;
+}
+
+.f-gm {
+  background-position: -96px -121px;
+}
+
+.f-ki {
+  background-position: -112px -121px;
+}
+
+.f-do {
+  background-position: -128px -121px;
+}
+
+.f-lk {
+  background-position: -144px -121px;
+}
+
+.f-cc {
+  background-position: -160px -121px;
+}
+
+.f-co {
+  background-position: -176px -121px;
+}
+
+.f-th {
+  background-position: -192px -121px;
+}
+
+.f-bs {
+  background-position: 0px -132px;
+}
+
+.f-mr {
+  background-position: -16px -132px;
+}
+
+.f-bw {
+  background-position: -32px -132px;
+}
+
+.f-br {
+  background-position: -48px -132px;
+}
+
+.f-mo {
+  background-position: -64px -132px;
+}
+
+.f-li {
+  background-position: -80px -132px;
+}
+
+.f-ve {
+  background-position: -96px -132px;
+}
+
+.f-kp {
+  background-position: -112px -132px;
+}
+
+.f-sr {
+  background-position: -128px -132px;
+}
+
+.f-cr {
+  background-position: -144px -132px;
+}
+
+.f-ly {
+  background-position: -160px -132px;
+}
+
+.f-vc {
+  background-position: -176px -132px;
+}
+
+.f-ph {
+  background-position: -192px -132px;
+}
+
+.f-ke {
+  background-position: 0px -143px;
+}
+
+.f-td {
+  background-position: -16px -143px;
+}
+
+.f-ht {
+  background-position: -32px -143px;
+}
+
+.f-az {
+  background-position: -48px -143px;
+}
+
+.f-mu {
+  background-position: -64px -143px;
+}
+
+.f-er {
+  background-position: -80px -143px;
+}
+
+.f-si {
+  background-position: -96px -143px;
+}
+
+.f-kh {
+  background-position: -112px -143px;
+}
+
+.f-is {
+  background-position: -128px -143px;
+}
+
+.f-mx {
+  background-position: -144px -143px;
+}
+
+.f-rw {
+  background-position: -160px -143px;
+}
+
+.f-za {
+  background-position: -176px -143px;
+}
+
+.f-ua {
+  background-position: -192px -143px;
+}
+
+.f-as {
+  background-position: 0px -154px;
+}
+
+.f-ax {
+  background-position: -16px -154px;
+}
+
+.f-dj {
+  background-position: -32px -154px;
+}
+
+.f-ga {
+  background-position: -48px -154px;
+}
+
+.f-sl {
+  background-position: -64px -154px;
+}
+
+.f-sm {
+  background-position: -80px -154px;
+}
+
+.f-sk {
+  background-position: -96px -154px;
+}
+
+.f-se {
+  background-position: -112px -154px;
+}
+
+.f-sb {
+  background-position: -128px -154px;
+}
+
+.f-ca {
+  background-position: -144px -154px;
+}
+
+.f-ru {
+  background-position: -160px -154px;
+}
+
+.f-gb {
+  background-position: -176px -154px;
+}
+
+.f-me {
+  background-position: -192px -154px;
+}
+
+.f-pm {
+  background-position: 0px -165px;
+}
+
+.f-sct {
+  background-position: -16px -165px;
+}
+
+.f-la {
+  background-position: -32px -165px;
+}
+
+.f-ar {
+  background-position: -48px -165px;
+}
+
+.f-na {
+  background-position: -64px -165px;
+}
+
+.f-cv {
+  background-position: -80px -165px;
+}
+
+.f-nc {
+  background-position: -96px -165px;
+}
+
+.f-cu {
+  background-position: -112px -165px;
+}
+
+.f-uz {
+  background-position: -128px -165px;
+}
+
+.f-bb {
+  background-position: -144px -165px;
+}
+
+.f-bz {
+  background-position: -160px -165px;
+}
+
+.f-ni {
+  background-position: -176px -165px;
+}
+
+.f-gu {
+  background-position: -192px -165px;
+}
+
+.f-fi {
+  background-position: 0px -176px;
+}
+
+.f-kz {
+  background-position: -16px -176px;
+}
+
+.f-gt {
+  background-position: -32px -176px;
+}
+
+.f-cx {
+  background-position: -48px -176px;
+}
+
+.f-aw {
+  background-position: -64px -176px;
+}
+
+.f-cd {
+  background-position: -80px -176px;
+}
+
+.f-nl {
+  background-position: -96px -176px;
+}
+
+.f-ba {
+  background-position: -112px -176px;
+}
+
+.f-sv {
+  background-position: -128px -176px;
+}
+
+.f-uy {
+  background-position: -144px -176px;
+}
+
+.f-pw {
+  background-position: -160px -176px;
+}
+
+.f-tk {
+  background-position: -176px -176px;
+}
+
+.f-mq {
+  background-position: -192px -176px;
+}
+
+.f-nr {
+  background-position: 0px -187px;
+}
+
+.f-mp {
+  background-position: -16px -187px;
+}
+
+.f-hn {
+  background-position: -32px -187px;
+}
+
+.f-mh {
+  background-position: -48px -187px;
+}
+
+.f-tf {
+  background-position: -64px -187px;
+}
+
+.f-gs {
+  background-position: -80px -187px;
+}
+
+.f-lc {
+  background-position: -96px -187px;
+}
+
+.f-gr {
+  background-position: -112px -187px;
+}
+
+.f-fm {
+  background-position: -128px -187px;
+}
+
+.f-fam {
+  background-position: -144px -187px;
+}
+
+.f-ck {
+  background-position: -160px -187px;
+}
+
+.f-ky {
+  background-position: -176px -187px;
+}
+
+.f-io {
+  background-position: -192px -187px;
+}
+
+.f-so {
+  background-position: 0px -198px;
+}
+
+.f-pn {
+  background-position: -16px -198px;
+}
+
+.f-tc {
+  background-position: -32px -198px;
+}
+
+.f-sh {
+  background-position: -48px -198px;
+}
+
+.f-fj {
+  background-position: -64px -198px;
+}
+
+.f-xx2 {
+  background-position: -80px -198px;
+}
+
+.f-ai {
+  background-position: -96px -198px;
+}
+
+.f-vg {
+  background-position: -112px -198px;
+}
+
+.f-fk {
+  background-position: -128px -198px;
+}
+
+.f-ms {
+  background-position: -144px -198px;
+}
+
+.f-hm {
+  background-position: -160px -198px;
+}
+
+.f-au {
+  background-position: -176px -198px;
+}
+
+.f-nz {
+  background-position: -192px -198px;
+}
