@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./flagSelector.css" />
+    <link rel="stylesheet" href="./form.css" />
+    <script src="./addonImporter.js"></script>
+    <script src="./flagSelector.js"></script>
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
+  </head>
+  <body>
+    Steps to join a room multiple times:(This is headless-only for now)<br/>
+    Also, you cannot join a recaptcha-protected room multiple times for now; unless you use or write a bot to automate solving recaptchas.<br/>
+    ---------------------------<br/>
+    Step1: Open your browser's console and leave it open. (Errors are not shown on screen, otherwise it could cause alert flooding.)<br/>
+    Step2: Fill the form below: (Player Auth Key is auto-generated.)<br/>
+    The loop variable(starts from 1) can be accessed like this: '$i'<br/>
+    You can also generate a random number between 1 and N like this (where N is an integer) : '$rN'. Example: $r15<br/>
+    <div style="border:1px solid black;width:400px;padding:5px;display:flex;flex-direction:column;">
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Room Id:</span><input class="input" id="r_id" type="text" value=""/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Password:</span><input class="input" id="r_pass" type="text" value=""/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Join Count:</span><input class="input" id="jc" type="number" value="3"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Name:</span><input class="input" id="p_name" type="text" value="abc_bot$i"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Avatar:</span><input class="input" id="p_avatar" type="text" value="👾"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Latitude:</span><input class="input" id="p_lat" type="number" value="40"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Longitude:</span><input class="input" id="p_lon" type="number" value="40"/>
+      </div>
+      <div style="display:flex;flex-direction:row;justify-content: space-between;">
+        <span>Player Flag:</span><div class="inputf" id="p_flag" type="text" value="tr"></div>
+      </div>
+    </div>
+    Step3: Click the button: <button id="cr" onclick="joinRoom()">Join Room</button><br/><br/>
+    NOTE: Remember to always keep this browser tab/window active, otherwise the host bots will <br/>
+    become unresponsive. Do not minimize or go to another tab. If you must, do what you have to do in <br/>
+    another browser window while this one is also still in the foreground. <br/>
+    <script src="./multiJoinRoom.js"></script>
+  </body>
+</html>
