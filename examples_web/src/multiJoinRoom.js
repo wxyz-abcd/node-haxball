@@ -160,5 +160,6 @@ function Bot(id, pass, name, avatar, lat, lon, flag){
     // This is a headless bot test:
     room.sendChat("Hello, everybody! My name is "+name+",");
     room.sendChat("an auto-playing bot programmed by abc.");
+    room.sendChat("Project link here: https://github.com/wxyz-abcd/node-haxball");
   };
 }

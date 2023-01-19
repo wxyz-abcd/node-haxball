@@ -23,7 +23,7 @@ const API = abcHaxballAPI({
 
 const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
 
-var e_tbody, e_name, roomName="", geo, hideLocked = false, hideFull = false, roomList, selectedRoomId, e_refresh, e_create, e_join;
+var e_tbody, e_name, roomName="", geo, hideLocked = false, hideFull = false, roomList, selectedRoomId, e_refresh, e_create, e_join, e_multijoin;
 
 function debounce(cb, interval, immediate) { // this function is from here: https://codepen.io/wonism/pen/dXgrxE
   var timeout;
@@ -55,10 +55,13 @@ window.onload = ()=>{
   e_refresh = document.getElementById("bRefresh");
   e_create = document.getElementById("bCreate");
   e_join = document.getElementById("bJoin");
+  e_multijoin = document.getElementById("bMultiJoin");
   e_refresh.onclick = refreshList;
   e_create.onclick = createRoom;
   e_join.onclick = joinRoom;
   e_join.disabled = true;
+  e_multijoin.onclick = multiJoinRoom;
+  e_multijoin.disabled = true;
   e_name.oninput = debounce(onNameChange, 400);
   e_lat.oninput = debounce(onGeoLocationChange, 400);
   e_lon.oninput = debounce(onGeoLocationChange, 400);
@@ -97,6 +100,7 @@ function setSelectedRoomId(e){
   e.target.parentElement.classList.add("selected");
   selectedRoomId = id;
   e_join.disabled = false;
+  e_multijoin.disabled = false;
 }
 
 function updateList(){
@@ -127,10 +131,12 @@ function updateList(){
   });
   e_tbody.innerHTML = rows;
   e_join.disabled = !anySelected;
+  e_multijoin.disabled = !anySelected;
 }
 
 function refreshList(){
   e_join.disabled = true;
+  e_multijoin.disabled = true;
   Utils.getRoomList().then((list)=>{
     roomList = list;
     updateList();
@@ -153,4 +159,8 @@ function createRoom(){
 
 function joinRoom(){
   window.open("./joinRoom?id="+selectedRoomId,"Join Room","width=800,height=600");
+}
+
+function multiJoinRoom(){
+  window.open("./multiJoinRoom?id="+selectedRoomId,"MultiJoin Room","width=800,height=600");
 }

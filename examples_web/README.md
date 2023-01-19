@@ -20,7 +20,7 @@ If you don't want this, you need to modify the source codes to use our proxy ser
   You can select one of the html files to open it directly, or you can directly use the file by writing it in the address bar. For example, you will write 
   `http://localhost:5000/roomList` to go to `roomList.html` page.
 
-  There are 3 main files that you can directly start with:
+  There are 4 main files that you can directly start with:
 
     - `roomList.html`: This is the main interface, as it also is in the original Haxball webpage. It shows the list of rooms to join. You can create a new room, 
     join current rooms, or refresh the room list. All other pages are accessible from here. There are filters at the bottom of the page, you can experiment with 
@@ -29,6 +29,11 @@ If you don't want this, you need to modify the source codes to use our proxy ser
     - `joinRoom.html`: This is a page to adjust your settings before trying to join a room. It has its own instructions, you should follow them. There are some 
     more parameters for joining a room in our API, but this is enough for now. There is only the `id` parameter that you can add at the end of the link that 
     represents the room's id that you are trying to join. You can add it like this: `http://localhost:5000/joinRoom?id=nlhhGR9EoGA`.
+
+    - `multiJoinRoom.html`: This is a page to adjust your settings and multi-join a room. It has its own instructions, you should follow them. There is 
+    currently no canvas support for this mode, only headless is available. There are some more parameters for joining a room in our API, but this is enough 
+    for now. There is only the `id` parameter that you can add at the end of the link that represents the room's id that you are trying to join. You can add 
+    it like this: `http://localhost:5000/multiJoinRoom?id=nlhhGR9EoGA`.
 
     - `createRoom.html`: This is a page to adjust your settings before trying to create a room. It has its own instructions, you should follow them. There are some 
     more parameters for creating a room in our API, but this is enough for now. There is currently no parameter available for this page.
