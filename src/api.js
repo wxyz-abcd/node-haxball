@@ -6016,6 +6016,7 @@ function abcHaxballAPI(window, config){
     },
     C: function () {
       var a = (((performance.now() - this.Li) * this.Ac) | 0) - this.Y;
+      window.globalHostFrame = this.Y; // we export host's frame here
       0 < a && this.zj(a);
       7 <= this.Y - this.Kk && this.Ci();
       this.Y - this.Jk >= this.Mn && (this.Ci(), this.gr());
@@ -6213,6 +6214,44 @@ function abcHaxballAPI(window, config){
         d = a.hb(),
         e = m.fh(a),
         f = e.zf.oj;
+      
+      // THIS CODE RIGHT BELOW HERE IS 100% FUNCTIONAL AT CATCHING HACKERS,
+      // BUT SOMETIMES CAN GIVE (Bad Actor) TO LEGIT PLAYERS ASWELL !!MUST FIX!!
+      // SO WE SHOULD FOCUS TO AVOID LEGIT PLAYERS GETTING KICKED
+      
+      let playerFrameValue = c - window.globalHostFrame; // we do the hack detection by substracting
+      // c is players input frame, each time player press input host gets their frame value
+      // window.globalHostFrame is exported from other function, we can access it here in different way too but I decided to get it from other function
+         
+          if (window.playerFrameValue > c){
+              // user is cheating here but no one uses it like this because it will make game unplayable with high input lag
+          }
+          if (playerFrameValue == 3){
+              // 3 is okay value for legit user but not so much, but still it should not be considered as hack, so do nothing
+          }
+          if (playerFrameValue == 4){
+              // 4 and 5 is completely normal value, no hack will send that value to host so do nothing
+          }
+          if (playerFrameValue == 2){
+              throw ""; // hack detected, user is using frame-2 or frame-1 one of them, 100% correct
+          }
+          if (playerFrameValue == 1){
+              throw ""; // hack detected, user is using frame-2 or frame-1 one of them, 100% correct
+          }
+          
+          if (c >= 1 && c <= 100){
+            // this is also hack detection, but for opMode. this is not for legit hack catching, this is for people who overwrite frame with any number
+            throw ""; 
+          }
+          
+          if (playerFrameValue >= -100 && playerFrameValue <= -1){
+            // this is kinda workaround, because when a legit player opens chat, they send their current value but in negative way.
+            // for example room frame is at 19207 and user opens chat the incoming value to host is -19207
+            // to avoid getting kicked from opening chat, i put a limit between -100 and -1 so if someone sends frame-10 for example they will send -16
+            // and it will kick them because of using hacks
+            throw ""; 
+          }
+      
       if (null != f) {
         var g = b.xj.get(f);
         null == g && ((g = new tb(f.$i, f.uj)), b.xj.set(f, g));
