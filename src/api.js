@@ -7639,7 +7639,7 @@ function abcHaxballAPI(window, config){
 
       if (internalData.useDefaultChatCommandMechanism!==false){
         if (!cfg.onBeforeOperationReceived){
-          cfg.onBeforeOperationReceived = function(obj, msg){
+          cfg.onBeforeOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo){
             if (obj.type != OperationType.SendChat)
               return;
             var m = obj.getValue(msg, "text");
@@ -7656,7 +7656,7 @@ function abcHaxballAPI(window, config){
         }
         
         if (!cfg.onAfterOperationReceived){
-          cfg.onAfterOperationReceived = function(obj, msg, customData){
+          cfg.onAfterOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){
             if (obj.type != OperationType.SendChat)
               return true;
             return !customData?.isCommand;

@@ -17,9 +17,9 @@ function defineRoomCallbacks(room){
   room.modifyFrameNo = function(frameNo, customData){return newFrameNo;};
   room.modifyFrameNoAfter = function(frameNo, customData){return newFrameNo;};
 
-  room.onBeforeOperationReceived = function(obj, msg){/*return customData;*/};
-  room.onOperationReceived = function(obj, msg, customData){return true;};
-  room.onAfterOperationReceived = function(obj, msg, customData){return true;};
+  room.onBeforeOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo){/*return customData;*/};
+  room.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  room.onAfterOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
 
   // callbacks:
   room.onBeforeRoomLink = function(link){/*return customData;*/};

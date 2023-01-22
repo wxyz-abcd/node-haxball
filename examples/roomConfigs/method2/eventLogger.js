@@ -32,8 +32,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   };
   */
 
-  this.onOperationReceived = function(obj, msg, customData){
-    console.log("onOperationReceived...", obj, msg, customData);
+  this.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){
+    console.log("onOperationReceived...", obj, msg, globalFrameNo, clientFrameNo, customData);
     return true;
   };
 

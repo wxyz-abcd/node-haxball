@@ -48,7 +48,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     controlSwitchBlocked[playerId] = (value == 1);
   };
 
-  this.onOperationReceived = function(operation, msg, customData){
+  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){
     var playerId = operation.getValue(msg, "byPlayerId");
     var cs = controlSwitch[playerId];
     if (cs != null && !controlSwitchBlocked[playerId]) // if the player is marked to be controlled by someone else, and the player has not protected himself being controlled,

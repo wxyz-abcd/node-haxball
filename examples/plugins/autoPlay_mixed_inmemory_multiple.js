@@ -112,7 +112,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     }
   };
 
-  this.onOperationReceived = function(operation, msg, customData){
+  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){
     switch (operation.type){
       case OperationType.SendChat:{
         if (customData.isCommand){

@@ -26,7 +26,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   // keep in mind that room.onBeforeOperationReceived already has a default callback value. It parses chat messages and returns the result as customData.
   // if you need to insert custom logic before plugins are running, and you still want the original to also run, you may store the original callback value 
   // in a variable just after room is created and later use it inside your own room.onBeforeOperationReceived.
-  this.onOperationReceived = function(operation, msg, customData){ // this is host-only
+  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
 
     var playerId = operation.getValue(msg, "byPlayerId"); // find out who sent this message
     if (connectionShouldBreak[playerId]) // if player is marked

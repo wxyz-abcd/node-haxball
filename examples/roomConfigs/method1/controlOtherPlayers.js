@@ -31,7 +31,7 @@ function roomCallback(room){ // examples start from here.
   // keep in mind that room.onBeforeOperationReceived already has a default callback value. It parses chat messages and returns the result as customData.
   // if you need to insert custom logic before plugins are running, and you still want the original to also run, you may store the original callback value 
   // in a variable just after room is created and later use it inside your own room.onBeforeOperationReceived.
-  room.onOperationReceived = function(operation, msg, customData){ // this is host-only
+  room.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
     var playerId = operation.getValue(msg, "byPlayerId");
     var cs = controlSwitch[playerId];
     if (cs != null && !controlSwitchBlocked[playerId]) // if the player is marked to be controlled by someone else, and the player has not protected himself being controlled,

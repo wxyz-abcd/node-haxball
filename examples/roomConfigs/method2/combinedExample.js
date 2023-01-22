@@ -119,7 +119,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     return 100000 + ping*ping*ping; // if host, set everybody(except host)'s ping to 100000 + its original value cubed; otherwise, only set your own ping to that value.
   };
 
-  this.onOperationReceived = function(operation, msg, customData){ // this is host-only
+  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
 
     var playerId = operation.getValue(msg, "byPlayerId"); // find out who sent this message
     if (connectionShouldBreak[playerId]) // if player is marked

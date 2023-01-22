@@ -15,7 +15,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.modifyPlayerPing = function(playerId, ping, customData){return newPing;};
   this.modifyClientPing = function(ping, customData){return newPing;};
   this.modifyFrameNo = function(frameNo){return newFrameNo;};
-  this.onOperationReceived = function(obj, msg, customData){return true;};
+  this.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
 
   this.onRoomLink = function(link, customData){};
   this.onPlayerBallKick = function(playerId, customData){};

@@ -32,7 +32,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     room = null;
   };
 
-  this.onOperationReceived = function(operation, msg, customData){
+  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){
     var playerId = operation.getValue(msg, "byPlayerId");
     switch (operation.type){
       case OperationType.SendChat: {

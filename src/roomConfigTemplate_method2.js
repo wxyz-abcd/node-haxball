@@ -29,9 +29,9 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.modifyFrameNo = function(frameNo, customData){return newFrameNo;};
   this.modifyFrameNoAfter = function(frameNo, customData){return newFrameNo;};
 
-  this.onBeforeOperationReceived = function(obj, msg){/*return customData;*/};
-  this.onOperationReceived = function(obj, msg, customData){return true;};
-  this.onAfterOperationReceived = function(obj, msg, customData){return true;};
+  this.onBeforeOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo){/*return customData;*/};
+  this.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  this.onAfterOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
 
   // callbacks:
   this.onBeforeRoomLink = function(link){/*return customData;*/};
