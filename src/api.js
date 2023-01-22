@@ -6215,7 +6215,7 @@ function abcHaxballAPI(window, config){
         if (!g.Cm()) throw new q(3);
       }
       e.P = b.$;
-      if (!this.haxball.__internalData.onOperationReceived(e))
+      if (!this.haxball.__internalData.onOperationReceived(e, this.Y, c))
         return;
       if (e.__proto__.f.name=="CustomEvent"){
         this.haxball.__internalData.roomObj?.ya.ra_custom(e, e.P, true);
@@ -7014,13 +7014,13 @@ function abcHaxballAPI(window, config){
       storage: haxball.storage,
       pluginMechanismActive: !haxball.noPluginMechanism,
       useDefaultChatCommandMechanism: haxball.useDefaultChatCommandMechanism,
-      onOperationReceived: function(msg) {
+      onOperationReceived: function(msg, globalFrameNo, clientFrameNo) {
         var c = recognizeEvent(msg);
         if (!c)
           return true;
         if (!haxball.room._onOperationReceived)
           return true;
-        return haxball.room._onOperationReceived(c, msg);
+        return haxball.room._onOperationReceived(c, msg, globalFrameNo, clientFrameNo);
       },
       execOperationReceivedOnHost: function(msg, targetId, fakeId) {
         if (!internalData.isHost)
@@ -7664,15 +7664,15 @@ function abcHaxballAPI(window, config){
         }
       }
 
-      this._onOperationReceived = function(obj, msg){
-        var customData = cfg.onBeforeOperationReceived && cfg.onBeforeOperationReceived(obj, msg), b = (customData!==false);
+      this._onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo){
+        var customData = cfg.onBeforeOperationReceived && cfg.onBeforeOperationReceived(obj, msg, globalFrameNo, clientFrameNo), b = (customData!==false);
         that.activePlugins.forEach((p)=>{
-          if (b && p.onOperationReceived && !p.onOperationReceived(obj, msg, customData))
+          if (b && p.onOperationReceived && !p.onOperationReceived(obj, msg, globalFrameNo, clientFrameNo, customData))
             b = false;
         });
-        if (b && cfg.onOperationReceived && !cfg.onOperationReceived(obj, msg, customData))
+        if (b && cfg.onOperationReceived && !cfg.onOperationReceived(obj, msg, globalFrameNo, clientFrameNo, customData))
           b = false;
-        if (b && cfg.onAfterOperationReceived && !cfg.onAfterOperationReceived(obj, msg, customData))
+        if (b && cfg.onAfterOperationReceived && !cfg.onAfterOperationReceived(obj, msg, globalFrameNo, clientFrameNo, customData))
           b = false;
         return b;
       };
