@@ -4574,7 +4574,7 @@ function abcHaxballAPI(window, config){
   };
   
   function yb(a) {
-    this.Y = 0;
+    this.Y = 0; // frame no
     this.T = a;
   }
   yb.b = !0;
@@ -4582,7 +4582,8 @@ function abcHaxballAPI(window, config){
   
   function V(a) {
     this.Ri = new Ia();
-    this.te = this.cc = 0;
+    this.te = 0; // total number of received messages
+    this.cc = 0; // immediate number of received messages per frame
     this.le = new Ia();
     this.uc = this.bc = this.rd = 0;
     this.Ac = 0.06;
@@ -5919,13 +5920,14 @@ function abcHaxballAPI(window, config){
     this.Ie = new Map();
     this.ac = [];
     this.wi = 4;
-    this.Mn = 600;
+    this.Mn = 600; // quantization step value (frame count)
     var b = this;
     V.call(this, a.state);
     this.tp = a.ij;
     this.Sr = a.version;
     this.up = 1;
-    this.Jk = this.uc = 0;
+    this.Jk = 0; // Quantized frame no
+    this.uc = 0;
     this.upc = false;
     this.Li = performance.now();
     this.Ic = new Sa(haxball, this.tp, a.iceServers, Zb.Km, a.gn);
@@ -6016,19 +6018,13 @@ function abcHaxballAPI(window, config){
     },
     C: function () {
       var a = (((performance.now() - this.Li) * this.Ac) | 0) - this.Y;
-      0 < a && this.zj(a);
-      7 <= this.Y - this.Kk && this.Ci();
-      this.Y - this.Jk >= this.Mn && (this.Ci(), this.gr());
+      (a > 0) && this.zj(a);
+      (this.Y - this.Kk >= 7) && this.Ci();
+      (this.Y - this.Jk >= this.Mn) && (this.Ci(), this.gr());
     },
     Sf: function () {
-      0 > this.bc && (this.bc = 0);
-      return this.wk(
-        (performance.now() - this.Li) * this.Ac -
-          this.Y +
-          this.wi +
-          this.bc +
-          this.rd
-      );
+      (this.bc < 0) && (this.bc = 0);
+      return this.wk((performance.now() - this.Li) * this.Ac - this.Y + this.wi + this.bc + this.rd);
     },
     Oo: function (a, b) {
       if (!this.upc && this.ac.length >= this.fg) return gc.kh(4100);
@@ -6087,7 +6083,7 @@ function abcHaxballAPI(window, config){
         a.tb(this.Y);
         a.tb(this.te);
         this.Eg(a, 2);
-        this.Kk = this.Y;
+        this.Kk = this.Y; // Kk is the last frame no that network messages were sent to the clients. No clients means Kk does not get updated.
       }
     },
     Eg: function (a, b) {
@@ -6125,7 +6121,7 @@ function abcHaxballAPI(window, config){
     },
     gr: function () {
       this.Jk = this.Y;
-      if (0 != this.ac.length) {
+      if (this.ac.length != 0) {
         var a = new Ua();
         a.mb = this.Y;
         a.da = this.cc++;
@@ -6213,7 +6209,7 @@ function abcHaxballAPI(window, config){
         d = a.hb(),
         e = m.fh(a),
         f = e.zf.oj;
-      if (null != f) {
+        if (null != f) {
         var g = b.xj.get(f);
         null == g && ((g = new tb(f.$i, f.uj)), b.xj.set(f, g));
         if (!g.Cm()) throw new q(3);
