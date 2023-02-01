@@ -1,0 +1,404 @@
+body {
+  margin: 0px 0px 0px -2px;
+  overflow: hidden;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+
+.room-view {
+  position: absolute;
+  width: calc(100% - 2px);
+  height: calc(100% - 10px);
+  margin-left: 2px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.container {
+  background-color: #1A2125;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 5px;
+  position: relative;
+  min-height: 0;
+  max-width: 900px;
+  max-height: 550px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 30px;
+  z-index: 0;
+}
+
+.container>h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
+  border-bottom: 3px;
+  border-bottom-color: #c13535;
+  border-bottom-style: solid;
+}
+
+.container input {
+  color: white;
+  background-color: #111619;
+  border: none;
+  border-radius: 5px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 1px solid #111619;
+}
+
+.container input:focus {
+  border-color: #244967;
+}
+
+.container>:not(:last-child) {
+  margin-bottom: 6px;
+}
+
+.container>:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.container select {
+  border: 1px solid #111619;
+  background-color: #111619;
+  border-radius: 5px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: white;
+  padding: 0px 5px;
+}
+
+.container select:hover:not(:disabled) {
+  border-color: #244967;
+}
+
+.container>.header-btns {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 10px;
+}
+
+.container>.header-btns>:not(:last-child) {
+  margin-right: 6px;
+}
+
+.container>.teams {
+  margin-left: -3px;
+  margin-right: -3px;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-height: 60px;
+}
+
+.container>.teams>* {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.container>.teams>.tools {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 80px;
+}
+
+.container>.teams>.tools>:not(:last-child) {
+  margin-bottom: 6px;
+}
+
+.container>.teams>.spacer {
+  flex: 1 1 0;
+  max-width: 83px;
+  margin: 0 0;
+}
+
+.container>.teams .player-list-view {
+  min-width: 20px;
+  width: 220px;
+  display: flex;
+  flex-flow: column;
+}
+
+.container>.teams .player-list-view>:not(:last-child) {
+  margin-bottom: 6px;
+}
+
+.container>.teams .player-list-view .buttons {
+  display: flex;
+  justify-content: center;
+  flex-flow: row nowrap;
+}
+
+.container>.teams .player-list-view .buttons button.join-btn {
+  min-width: 100px;
+}
+
+.container>.teams .player-list-view .list {
+  flex: 1;
+  background-color: #111619;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.container>.teams .player-list-view.t-red button.join-btn {
+  color: #ff8686;
+}
+
+.container>.teams .player-list-view.t-red button.reset-btn {
+  margin-left: 6px;
+}
+
+.container>.teams .player-list-view.t-red button.reset-btn:before {
+  content: "\25b6";
+}
+
+.container>.teams .player-list-view.t-blue .buttons {
+  flex-direction: row-reverse;
+}
+
+.container>.teams .player-list-view.t-blue button.join-btn {
+  color: #b7b7ff;
+}
+
+.container>.teams .player-list-view.t-blue button.reset-btn {
+  margin-right: 6px;
+}
+
+.container>.teams .player-list-view.t-blue button.reset-btn:before {
+  content: "\25c0";
+}
+
+.rec-btn:before {
+  content: "\25c9";
+  color: #848484;
+  padding-right: 6px;
+}
+
+.rec-btn.active:before {
+  color: #dd3333;
+}
+
+.start-btn:before {
+  content: "\25b6";
+  padding-right: 4px;
+}
+
+.stop-btn:before {
+  content: "\25a0";
+  padding-right: 4px;
+  position: relative;
+  top: -4px;
+  font-size: 27px;
+}
+
+.pause-btn:before {
+  content: "\275A \275A";
+  padding-right: 4px;
+  font-size: 16px;
+}
+
+.leave-btn:before {
+  content: "\27A8";
+  padding-right: 12px;
+  position: relative;
+  left: 8px;
+  font-size: 16px;
+  z-index: 1;
+  color: #ff6f00;
+}
+
+.leave-btn:after {
+  position: absolute;
+  content: "\1F6AA";
+  font-size: 16px;
+}
+
+.link-btn:before {
+  content: "\1F517";
+  padding-right: 4px;
+  font-size: 16px;
+}
+
+.lock-btn:before {
+  content: "\1F513";
+  padding-right: 4px;
+  font-size: 16px;
+}
+
+.lock-btn.locked:before {
+  content: "\1F512";
+}
+
+.container>.settings {
+  width: 300px;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.container>.settings>div {
+  line-height: 22px;
+  margin-bottom: 5px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.container>.settings>div>.lbl {
+  flex: 0 0 90px;
+}
+
+.container>.settings>div>.val {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.container>.settings>div>.val.custom {
+  color: #ffdb72;
+}
+
+.container>.settings>div>select {
+  width: 100px;
+}
+
+.container>.controls {
+  display: flex;
+  align-self: center;
+}
+
+.container>.controls>* {
+  margin: 0 3px;
+}
+
+.player-list-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 20px;
+  vertical-align: middle;
+  padding: 4px;
+  margin: 2px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.player-list-item.admin .p-name {
+  color: #ffdb72;
+}
+
+.player-list-item .flagico {
+  margin-right: 3px;
+  position: relative;
+  top: 1px;
+}
+
+.player-list-item .p-name {
+  min-width: 10px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.player-list-item .p-ping {
+  min-width: 30px;
+  text-align: right;
+}
+
+.player-list-item:hover {
+  background-color: #1b2328;
+}
+
+.room-view:not(.admin) .admin-only {
+  display: none !important;
+}
+
+.center {
+  justify-content: center;
+}
+
+#ctxmenu {
+  visibility: hidden;
+  position: fixed;
+  background: white;
+  color: black;
+  cursor: pointer;
+  border: 1px black solid
+}
+
+#ctxmenu > h1 {
+  font-size: 20px;
+  font-weight: 700;
+  background-color: #555555;
+  color: white;
+  border-bottom: 3px solid #c13535;
+  padding: 0 1rem;
+  margin: 0;
+}
+
+#ctxmenu > div {
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+#ctxmenu > div > p {
+  padding: 0 1rem;
+  margin: 0;
+}
+
+#ctxmenu > div > p:hover {
+  background: black;
+  color: white;
+}
+
+#ctxmenu > div > p.disabled {
+  color: #a9a9a9;
+}
+
+#ctxmenu > div > p.disabled:hover {
+  background: #555555;
+}
+
+#inputpopup {
+  display: none;/*flex*/
+  flex-direction: column;
+  position: fixed;
+  left: calc(50% - 120px);
+  top: calc(50% - 40px);
+  width: 240px;
+  height: 80px;
+  color: white;
+  background: #ffffff50;
+  color: black;
+  border: 1px black solid;
+  padding: 6px;
+}
+
+#inputpopup > div {
+  display: flex;
+  flex-direction: row;
+  margin-top: 12px;
+  justify-content: space-evenly;
+}
+
+#inputpopup input {
+  flex-grow: 1;
+}

@@ -1,0 +1,66 @@
+.button {
+  display: flex;
+  position: relative;
+  padding: 5px 15px;
+  border: 0;
+  border-radius: 5px;
+  color: white;
+  background-color: #244967;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 100%;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.button:focus {
+  outline: none;
+}
+.button:hover {
+  background-color: #2f5e85;
+}
+.button:active {
+  background-color: #193449;
+}
+.button:disabled {
+  background-color: #3e3e3e;
+}
+.button .tooltip {
+  visibility: hidden;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  position: absolute;
+  z-index: 1;
+  bottom: 130%;
+  right: 0%;
+  opacity: 0;
+  transition: opacity 0s;
+}
+.button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .5s;
+  transition-delay: 1s;
+}
+.button.red {
+  background-color: #c13535;
+}
+.button.red:hover {
+  background-color: #cf5050;
+}
+.button.red:active {
+  background-color: #a12c2c;
+}
+.button.green {
+  background-color: #3a9933;
+}
+.button.green:hover {
+  background-color: #46b83d;
+}
+.button.green:active {
+  background-color: #2e7a29;
+}

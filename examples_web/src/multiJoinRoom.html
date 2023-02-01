@@ -3,11 +3,8 @@
     <link rel="stylesheet" href="./flags.css" />
     <link rel="stylesheet" href="./flagSelector.css" />
     <link rel="stylesheet" href="./form.css" />
-    <script src="./addonImporter.js"></script>
+    <script src="./htmlQueryHelper.js"></script>
     <script src="./flagSelector.js"></script>
-    <script src="./vendor/json5.min.js"></script>
-    <script src="./vendor/pako-jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
   </head>
   <body>
     Steps to join a room multiple times:(This is headless-only for now)<br/>
@@ -43,10 +40,8 @@
         <span>Player Flag:</span><div class="inputf" id="p_flag" type="text" value="tr"></div>
       </div>
     </div>
-    Step3: Click the button: <button id="cr" onclick="joinRoom()">Join Room</button><br/><br/>
-    NOTE: Remember to always keep this browser tab/window active, otherwise the host bots will <br/>
-    become unresponsive. Do not minimize or go to another tab. If you must, do what you have to do in <br/>
-    another browser window while this one is also still in the foreground. <br/>
+    Step3: Click the button: <button id="jr">Join Room</button><br/><br/>
+    NOTE: Remember to always keep the new window active, otherwise the host bot will become unresponsive. Do not minimize it.
     <script src="./multiJoinRoom.js"></script>
   </body>
 </html>

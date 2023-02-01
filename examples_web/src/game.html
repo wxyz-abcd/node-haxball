@@ -1,10 +1,66 @@
 <html>
   <head>
+    <script src="./htmlQueryHelper.js"></script>
+    <script src="./htmlParamsReader.js"></script>
+    <script src="./addonImporter.js"></script>
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
+    <script src="./init.js"></script>
+    <link rel="stylesheet" href="./scrollbar.css" />
+    <link rel="stylesheet" href="./button.css" />
     <link rel="stylesheet" href="./canvas.css" />
     <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./game.css" />
+    <style>
+      .top-section {
+        position:relative;
+        flex-grow:1;
+        min-height:0
+      }
+      .bottom-section {
+        flex-shrink:0;
+        display:flex;
+        justify-content:center;
+        background-color:#1A2125
+      }
+    </style>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <div class="canvasContainer">
+      <iframe src="room.html" class="canvasSubContainer"></iframe>
+      <div class="canvasSubContainer">
+        <canvas></canvas>
+        <div class="gameStateContainer">
+          <div class="scoreBoard">
+            <div class="teamicon red"></div>
+            <div class="score">0</div>
+            <div>-</div>
+            <div class="score">0</div>
+            <div class="teamicon blue"></div>
+          </div>
+          <div class="gameTime">
+            <span class="overtime">OVERTIME!</span>
+            <span class="digit">0</span>
+            <span class="digit">0</span>
+            <span>:</span>
+            <span class="digit">0</span>
+            <span class="digit">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chatContainer">
+      <div class="chatBox">
+        <div class="chatLog"></div>
+        <div class="chatInput">
+          <input class="customInput" type="text" maxLength=140 />
+          <button class="button">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
     <script src="./game.js"></script>
   </body>
 </html>

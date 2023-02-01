@@ -3,11 +3,8 @@
     <link rel="stylesheet" href="./flags.css" />
     <link rel="stylesheet" href="./flagSelector.css" />
     <link rel="stylesheet" href="./form.css" />
-    <script src="./addonImporter.js"></script>
+    <script src="./htmlQueryHelper.js"></script>
     <script src="./flagSelector.js"></script>
-    <script src="./vendor/json5.min.js"></script>
-    <script src="./vendor/pako-jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
   </head>
   <body>
     Steps to join a room:<br/>
@@ -41,11 +38,10 @@
     </div>
     Step2: If you are trying to join a room with recaptcha protection, use our tokenGenerator project to generate a client token.<br/>
     Step3: If you are trying to join a room with recaptcha protection, write the token here: <input class="inputLong" id="token" type="text" /><br/>
-    Step4: If you want to see the game in a canvas: <label class="input"><input id="notHeadless" type="checkbox" />check here</label><br/>
-    Step5: Click the button: <button id="cr" onclick="joinRoom()">Join Room</button><br/><br/>
-    NOTE: Remember to always keep one of these browser tabs/windows active, otherwise the host bot will <br/>
-    become unresponsive. Do not minimize or go to another tab. If you must, do what you have to do in <br/>
-    another browser window while this one is also still in the foreground. <br/>
+    Step4: If you want autoPlay plugin(This is only for illustration): <label class="input"><input id="autoPlay" type="checkbox" />check here</label><br/>
+    Step5: If you want to see the game in a canvas: <label class="input"><input id="notHeadless" type="checkbox" />check here</label><br/>
+    Step6: Click the button: <button id="jr">Join Room</button><br/><br/>
+    NOTE: Remember to always keep the new window active, otherwise the host bot will become unresponsive. Do not minimize it.
     <script src="./joinRoom.js"></script>
   </body>
 </html>

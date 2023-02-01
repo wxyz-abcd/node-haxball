@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./scrollbar.css" />
+    <link rel="stylesheet" href="./button.css" />
+    <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./room.css" />
+  </head>
+  <body>
+    <div class="room-view">
+      <div class="container">
+        <h1></h1>
+        <div class="header-btns">
+          <button class="button rec-btn">
+            Rec
+          </button>
+          <button class="button link-btn">
+            Link
+          </button>
+          <button class="button leave-btn">
+            Leave
+          </button>
+        </div>
+        <div class="teams">
+          <div class="tools admin-only">
+            <button class="button center">
+              Auto
+            </button>
+            <button class="button center">
+              Rand
+            </button>
+            <button class="button center lock-btn">
+              Lock
+            </button>
+            <button class="button center">
+              Reset
+            </button>
+          </div>
+          <div class="player-list-view"></div>
+          <div class="player-list-view"></div>
+          <div class="player-list-view"></div>
+          <div class="spacer admin-only"></div>
+        </div>
+        <div class="settings">
+          <div>
+            <label class="lbl">Time limit</label>
+            <select></select>
+          </div>
+          <div>
+            <label class="lbl">Score limit</label>
+            <select></select>
+          </div>
+          <div>
+            <label class="lbl">Stadium</label>
+            <label class="val"></label>
+            <button class="button admin-only">
+              Pick
+            </button>
+          </div>
+        </div>
+        <div class="controls admin-only">
+          <button class="button green start-btn">
+            Start game
+          </button>
+          <button class="button red stop-btn">
+            Stop game
+          </button>
+          <button class="button pause-btn">
+            Pause
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="ctxmenu"></div>
+    <div id="inputpopup">
+      <div>
+        <label></label>
+        <input type="text" />
+      </div>
+      <div>
+        <button class="button">OK</button>
+        <button class="button">Cancel</button>
+      </div>
+    </div>
+    <script src="room.js"></script>
+  </body>
+</html>

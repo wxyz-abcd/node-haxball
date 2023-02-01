@@ -656,12 +656,7 @@ function abcHaxballAPI(window, config){
   p.Ia.pg = p.Ia;
   p.fa.pg = p.xa;
   p.xa.pg = p.fa;
-  var teams = {
-    spec: p.Ia,
-    red: p.fa,
-    blue: p.xa
-  };
-  var teamsById = [
+  p.byId = [
     p.Ia,
     p.fa,
     p.xa
@@ -1805,7 +1800,7 @@ function abcHaxballAPI(window, config){
     for (var b = a.length, c = 0; c < b && J.ls(a, b - c - 1); ) ++c;
     return 0 < c ? D.substr(a, 0, b - c) : a;
   };
-  J.Af = function (a) {
+  J.Af = function (a) { // make2Digits
     var b,
       c = "";
     for (b = 2 - a.length; c.length < b; ) c += "0";
@@ -6347,7 +6342,7 @@ function abcHaxballAPI(window, config){
       else if (z==0){
         x.customClient = true;
         haxball.__internalData.customClientIds.add(b.V);
-        x = a.na(y);
+        x = a.T.na(y);
         if (x)
           x.customClient = true;
         haxball.__internalData.customClientIds.add(y);
@@ -7433,6 +7428,10 @@ function abcHaxballAPI(window, config){
     }
   };
 
+  function numberToColor(number){ // lc
+    return "rgba("+[(number&16711680)>>>16, (number&65280)>>>8, number&255].join()+",255)";
+  };
+
   function keyState(dirX, dirY, kick){ // dirX = oneof[-1:left, 0:still, 1:right], dirY = oneof[-1:up, 0:still, 1:down], kick = true/false
     return (kick?16:0) | (dirX>0?8:(dirX<0?4:0)) | (dirY>0?2:(dirY<0?1:0));
   };
@@ -7892,8 +7891,8 @@ function abcHaxballAPI(window, config){
     };
 
     this.resetTeams = function(){
-      internalData.roomObj?.ee(teams.blue);
-      internalData.roomObj?.ee(teams.red);
+      internalData.roomObj?.ee(p.fa);
+      internalData.roomObj?.ee(p.xa);
     };
 
     this.startRecording = function(){ // return true(success)/false(failure - already recording)
@@ -7942,15 +7941,15 @@ function abcHaxballAPI(window, config){
     this.changeTeam = function(teamId){
       switch (teamId){
         case 0: { 
-          internalData.roomObj?.mg(internalData.roomObj.ya.uc, teams.spec);
+          internalData.roomObj?.mg(internalData.roomObj.ya.uc, p.Ia);
           break; 
         }
         case 1: { 
-          internalData.roomObj?.mg(internalData.roomObj.ya.uc, teams.red);
+          internalData.roomObj?.mg(internalData.roomObj.ya.uc, p.fa);
           break; 
         }
         case 2: { 
-          internalData.roomObj?.mg(internalData.roomObj.ya.uc, teams.blue);
+          internalData.roomObj?.mg(internalData.roomObj.ya.uc, p.xa);
           break; 
         }
       }
@@ -7959,15 +7958,15 @@ function abcHaxballAPI(window, config){
     this.resetTeam = function(teamId){
       switch (teamId){
         case 0: { 
-          internalData.roomObj?.ee(teams.spec); 
+          internalData.roomObj?.ee(p.Ia); 
           break; 
         }
         case 1: { 
-          internalData.roomObj?.ee(teams.red); 
+          internalData.roomObj?.ee(p.fa); 
           break; 
         }
         case 2: { 
-          internalData.roomObj?.ee(teams.blue); 
+          internalData.roomObj?.ee(p.xa); 
           break; 
         }
       }
@@ -7976,15 +7975,15 @@ function abcHaxballAPI(window, config){
     this.setPlayerTeam = function(playerId, teamId){
       switch (teamId){
         case 0: { 
-          internalData.roomObj?.mg(playerId, teams.spec);
+          internalData.roomObj?.mg(playerId, p.Ia);
           break; 
         }
         case 1: { 
-          internalData.roomObj?.mg(playerId, teams.red);
+          internalData.roomObj?.mg(playerId, p.fa);
           break; 
         }
         case 2: { 
-          internalData.roomObj?.mg(playerId, teams.blue);
+          internalData.roomObj?.mg(playerId, p.xa);
           break; 
         }
       }
@@ -8089,7 +8088,7 @@ function abcHaxballAPI(window, config){
     };
 
     this.fakeSetPlayerTeam = function(playerId, teamId, byId){
-      var team = teamsById[teamId];
+      var team = p.byId[teamId];
       if (!team)
         return;
       fakeSend(byId, S.la(playerId, team));
@@ -8462,6 +8461,7 @@ function abcHaxballAPI(window, config){
       generateAuth, 
       authFromKey,
       getRoomList, 
+      numberToColor,
       keyState,
       getGeo,
       parseStadium,
@@ -8499,6 +8499,7 @@ function abcHaxballAPI(window, config){
         M, // api operations
         n, // connection constants
         va, // RoomList operations
+        q, // global error class
       }
     }
   };

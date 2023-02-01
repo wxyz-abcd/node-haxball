@@ -187,6 +187,7 @@ Room.create({
   - `generateAuth()`: generates a new `player_auth_key` along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in `Room.join`. returns `Promise([authKey, authObj])`
   - `authFromKey(authKey)`: recreates the auth object for given `authKey`. the object is used in `Room.join`. returns `Promise(authObj)`
   - `getRoomList()`: returns the current room list. returns `Promise(roomListArray)`
+  - `numberToColor(number)`: returns the html color string (rgba representation) of the given `number`. (0 <= `number` <= 16777215)
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. `dirX` = oneof\[`-1`:left, `0`:still, `1`:right\], `dirY` = oneof\[`-1`:up, `0`:still, `1`:down\], `kick` = `true`/`false`.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
   - `getDefaultStadiums()`: get default stadium array.
@@ -666,6 +667,7 @@ Room.create({
     - `M`: webserver api operations
     - `n`: connection constants
     - `va`: RoomList operations
+    - `q`: global error class
 
 
 [Back To The Top](#title)

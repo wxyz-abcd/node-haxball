@@ -1,4 +1,201 @@
-body{
+body {
+  margin: 0;
+  padding: 0;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
 }
+
+.canvasContainer {
+  position: relative;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.canvasSubContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.gameStateContainer {
+  position: absolute;
+  top: 0px;
+  left: calc(50% - 225px);
+  width: 450px;
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #1A2125;
+  padding: 5px;
+  border-radius: 0 0 5px 5px;
+  font: 900 20px Arial Black,Arial Bold,Gadget,sans-serif;
+}
+
+.teamIcon {
+  width: 23px;
+  height: 23px;
+  border-radius: 5px;
+}
+
+.teamIcon.red{
+  background-color: #E56E56;
+}
+
+.teamIcon.blue{
+  background-color: #5689E5;
+}
+
+.score{
+  width: 35px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.scoreBoard {
+  display: flex;
+  align-items: center;
+}
+
+.gameTime {
+  display: flex;
+  align-items: center;
+}
+
+.gameTime > .overtime {
+  margin-right: 20px;
+  visibility: hidden;
+}
+
+.gameTime > .overtime.on {
+  visibility: visible;
+  animation: 0.4s linear overtime-appear;
+}
+
+@keyframes overtime-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+}
+
+.gameTime.time-warn {
+  animation: 0.3s infinite alternate linear time-warn;
+}
+
+@keyframes time-warn {
+  from { 
+    color: white 
+  } 
+  to { 
+    color:#ff8080
+  }
+}
+
+.gameTime > .digit {
+  width: 15px;
+  text-align: center;
+}
+
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  min-height: 200px;
+  width: 100%;
+  min-width: 300px;
+  padding: 0px;
+  position: relative;
+  flex-grow: 1;
+}
+
+.chatBox {
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #1A2125;
+}
+
+.chatBox > :not(:first-child) {
+  margin-top: 5px
+}
+
+.chatLog {
+  position: relative;
+  flex-grow: 1;
+  overflow: auto;
+  line-height: 1.3
+}
+
+.chatLog p {
+  vertical-align: baseline;
+  min-height: 12px;
+  overflow: hidden;
+  margin: 0;
+}
+
+.chatLog > p:not(:last-child) {
+  margin-bottom: 3px
+}
+
+.chatLog p.notice {
+  color: #8ed2ab;
+}
+
+.chatLog p.highlight {
+  font-weight: bold;
+}
+
+.chatLog p.announcement {
+  border-left: 3px solid #c13535;
+  padding-left: 5px;
+  white-space: pre-wrap;
+}
+
+.chatInput {
+  display:flex;
+  flex-direction:row;
+  flex-shrink:0;
+}
+
+.customInput {
+  color: white;
+  background-color: #111619;
+  border: none;
+  border-radius: 5px;
+  padding: 0 10px;
+  margin-right: 4px;
+  flex-grow: 1;
+  align-self: stretch;
+  box-sizing: border-box;
+}
+
+.customInput:focus {
+  border: 1px solid #244967;
+  padding: 0 7px;
+}
+
+.chatInput button {
+  background-color:#244967
+}
+
+.chatInput button:hover {
+  background-color:#2f5e85
+}
+
+.chatInput button:active {
+  background-color:#193449
+}
+
+.chatInput button:disabled {
+  background-color:#3e3e3e
+}
+ 
