@@ -105,7 +105,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 
-  this.onPlayerTeamChange = function(){
+  this.onPlayerTeamChange = function(id){
     if (id === room.currentPlayerId) {
       lastPositionsReset = Date.now();
       moveInRandomY();

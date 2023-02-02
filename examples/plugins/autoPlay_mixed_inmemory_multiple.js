@@ -2,7 +2,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.1",
+    version: "0.2",
     author: "abc",
     description: `This is an auto-playing bot that has 2 different modes. 
     - followBall mode always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
@@ -74,6 +74,31 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   });
 
   var room = null, that = this, dummyPromise = Promise.resolve(), originalRoomData;
+
+  // is needed for ball follow logic to pause.
+  // notice that this is being updated not only onPositionsReset
+  var lastPositionsReset = 0;
+
+  // move bot in random Y direction
+  // to prevent stucking on hitting a ball on a same spot in a same manner.
+  // it also fixes a bug when the bot doesn't move after positions resets
+  var moveInRandomY = function(bot){
+    if (bot){
+      if (!bot.active)
+        return;
+      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
+      });
+      return;
+    }
+    bots.forEach((bot)=>{
+      if (!bot.active)
+        return;
+      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
+      });
+    });
+  };
 
   this.initialize = function(_room){
     room = _room;
@@ -246,15 +271,38 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     });
   };
 
+  this.onGameStart = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
+  };
+
   this.onGameTick = function(customData){
     if (!that.botsActive)
       return;
+
+    // do not apply ball follow logic for maybe 150ms.
+    // is needed for moveInRandomY() to work
+    if (Date.now() - lastPositionsReset < 150) return;
+
     var _originalRoomData = room.getRoomDataOriginal();
     bots.forEach((bot)=>{
       if (!bot.active)
         return;
       update(_originalRoomData, bot);
     });
+  };
+
+  this.onPlayerTeamChange = function(id){
+    var bot = bots.find((x)=>x.id==id);
+    if (bot) {
+      lastPositionsReset = Date.now();
+      moveInRandomY(bot);
+    }
+  };
+
+  this.onPositionsReset = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
   };
 
 };

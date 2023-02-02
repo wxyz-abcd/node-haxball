@@ -2,7 +2,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory_multiple", true, { // "autoPlay_followBall_inmemory_multiple" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
-    version: "0.1",
+    version: "0.2",
     author: "abc",
     description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
     This bot is capable of creating/removing fake bot players(id descending from 65535) in host's memory and controlling all of them at the same time using fake events.
@@ -50,6 +50,31 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   });
 
   var room = null, that = this;
+
+  // is needed for ball follow logic to pause.
+  // notice that this is being updated not only onPositionsReset
+  var lastPositionsReset = 0;
+
+  // move bot in random Y direction
+  // to prevent stucking on hitting a ball on a same spot in a same manner.
+  // it also fixes a bug when the bot doesn't move after positions resets
+
+  // move bot in random Y direction
+  // to prevent stucking on hitting a ball on a same spot in a same manner.
+  // it also fixes a bug when the bot doesn't move after positions resets
+  var moveInRandomY = function(botId){
+    if (botId!=null){
+      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
+      });
+      return;
+    }
+    botIds.forEach((botId)=>{
+      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
+      });
+    });
+  };
 
   this.initialize = function(_room){
     room = _room;
@@ -101,9 +126,17 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     }
     return true;
   };
+
+  this.onGameStart = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
+  };
   
   this.onGameTick = function(customData){
-    
+    // do not apply ball follow logic for maybe 150ms.
+    // is needed for moveInRandomY() to work
+    if (Date.now() - lastPositionsReset < 150) return;
+
     botIds.forEach((botId)=>{
 
       // get the original data object of the next bot
@@ -157,4 +190,17 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
       });
     });
   };
+
+  this.onPlayerTeamChange = function(id){
+    if (botIds.includes(id)) {
+      lastPositionsReset = Date.now();
+      moveInRandomY(id);
+    }
+  };
+
+  this.onPositionsReset = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
+  };
+
 };

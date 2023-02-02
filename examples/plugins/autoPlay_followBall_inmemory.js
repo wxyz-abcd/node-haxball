@@ -2,7 +2,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory", false, { // "autoPlay_followBall_inmemory" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
-    version: "0.1",
+    version: "0.2",
     author: "abc",
     description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. This bot creates a fake player(id=65535) in host's memory and controls it using fake events.`,
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
@@ -35,6 +35,19 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   var room = null, that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
 
+  // is needed for ball follow logic to pause.
+  // notice that this is being updated not only onPositionsReset
+  var lastPositionsReset = 0;
+
+  // move bot in random Y direction
+  // to prevent stucking on hitting a ball on a same spot in a same manner.
+  // it also fixes a bug when the bot doesn't move after positions resets
+  var moveInRandomY = function(){
+    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+      room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
+    });
+  };
+
   this.initialize = function(_room){
     room = _room;
   };
@@ -52,7 +65,15 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
       room.fakePlayerLeave(65535);
   };
 
+  this.onGameStart = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
+  };
+
   this.onGameTick = function(customData){
+    // do not apply ball follow logic for maybe 150ms.
+    // is needed for moveInRandomY() to work
+    if (Date.now() - lastPositionsReset < 150) return;
 
     // get the original data object of the next bot
     var cp = room.getPlayerOriginal(65535);
@@ -103,6 +124,18 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
         oldKeyState = newKeyState;
       }
     });
+  };
+
+  this.onPlayerTeamChange = function(id){
+    if (id === 65535) {
+      lastPositionsReset = Date.now();
+      moveInRandomY();
+    }
+  };
+
+  this.onPositionsReset = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
   };
 
 };
