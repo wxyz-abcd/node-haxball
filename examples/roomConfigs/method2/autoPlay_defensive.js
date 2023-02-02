@@ -3,7 +3,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
     name: "autoPlay_defensive",
-    version: "0.1",
+    version: "0.2",
     author: "abc",
     description: `This is an auto-playing bot that follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking. This bot uses real events and controls real players.`,
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
@@ -48,6 +48,19 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   var room = null, that = this;
 
+  // is needed for ball follow logic to pause.
+  // notice that this is being updated not only onPositionsReset
+  var lastPositionsReset = 0;
+
+  // move bot in random Y direction
+  // to prevent stucking on hitting a ball on a same spot in a same manner.
+  // it also fixes a bug when the bot doesn't move after positions resets
+  var moveInRandomY = function(){
+    room && room.setKeyState(
+      Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false)
+    );
+  };
+
   this.initialize = function(_room){
     room = _room;
   };
@@ -56,7 +69,16 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     room = null;
   };
 
+  this.onGameStart = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
+  };
+
   this.onGameTick = function(customData){
+    // do not apply ball follow logic for maybe 150ms.
+    // is needed for moveInRandomY() to work
+    if (Date.now() - lastPositionsReset < 150) return;
+
     var { o, p, ep } = room.getRoomDataOriginal();
     if (ep)
       p = ep;
@@ -124,5 +146,17 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     
     // apply current keys
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
+  };
+
+  this.onPlayerTeamChange = function(){
+    if (id === room.currentPlayerId) {
+      lastPositionsReset = Date.now();
+      moveInRandomY();
+    }
+  };
+
+  this.onPositionsReset = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
   };
 };

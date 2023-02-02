@@ -4,8 +4,29 @@ const minCoordAlignDelta = 0.5, minKickDistance = 2;
 
 function roomCallback(room){ // examples start from here.
 
+  // is needed for ball follow logic to pause.
+  // notice that this is being updated not only onPositionsReset
+  var lastPositionsReset = 0;
+
+  // move bot in random Y direction
+  // to prevent stucking on hitting a ball on a same spot in a same manner.
+  // it also fixes a bug when the bot doesn't move after positions resets
+  var moveInRandomY = function(){
+    room.setKeyState(
+      Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false)
+    );
+  };
+
+  room.onGameStart = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
+  };
+
   room.onGameTick = () => {
-    
+    // do not apply ball follow logic for maybe 150ms.
+    // is needed for moveInRandomY() to work
+    if (Date.now() - lastPositionsReset < 150) return;
+
     // get the original data object of the current player
     var playerDisc = room.getPlayerDiscOriginal(room.currentPlayerId);
 
@@ -43,5 +64,17 @@ function roomCallback(room){ // examples start from here.
 
     // apply current keys
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
+  };
+
+  room.onPlayerTeamChange = function(){
+    if (id === room.currentPlayerId) {
+      lastPositionsReset = Date.now();
+      moveInRandomY();
+    }
+  };
+
+  room.onPositionsReset = function(){
+    lastPositionsReset = Date.now();
+    moveInRandomY();
   };
 };
