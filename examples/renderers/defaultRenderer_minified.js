@@ -133,13 +133,6 @@ module.exports = function(API, params){
       }
       a.imageSmoothingEnabled = !1;
     },
-    lc: function (a) {
-      return (
-        "rgba(" +
-        [(a & 16711680) >>> 16, (a & 65280) >>> 8, a & 255].join() +
-        ",255)"
-      );
-    },
     sp: function (a, b) {
       var c = window.document.createElement("canvas"),
         d = c.getContext("2d", null);
@@ -151,7 +144,7 @@ module.exports = function(API, params){
       d.textBaseline = "middle";
       d.fillStyle = "black";
       d.fillText(a, 7, 52);
-      d.fillStyle = this.lc(b);
+      d.fillStyle = Utils.numberToColor(b);
       d.fillText(a, 0, 45);
       return c;
     },
@@ -271,11 +264,11 @@ module.exports = function(API, params){
         this.rb.translate(32, 32);
         this.rb.rotate((3.141592653589793 * this.kb.hd) / 128);
         for (var c = -32, d = 64 / b.length, e = 0; e < b.length; )
-          (this.rb.fillStyle = N.lc(b[e++])),
+          (this.rb.fillStyle = Utils.numberToColor(b[e++])),
             this.rb.fillRect(c, -32, d + 4, 64),
             (c += d);
         this.rb.restore();
-        this.rb.fillStyle = N.lc(this.kb.ed);
+        this.rb.fillStyle = Utils.numberToColor(this.kb.ed);
         this.rb.textAlign = "center";
         this.rb.textBaseline = "alphabetic";
         this.rb.font = "900 34px 'Arial Black','Arial Bold',Gadget,sans-serif";
@@ -305,13 +298,6 @@ module.exports = function(API, params){
     this.Un = this.c.createPattern(/*n.Tn*/params.images?.concrete2, null);
   }
   N.b = !0;
-  N.lc = function (a) {
-    return (
-      "rgba(" +
-      [(a & 16711680) >>> 16, (a & 65280) >>> 8, a & 255].join() +
-      ",255)"
-    );
-  };
   N.Gi = function (a, b) {
     a.imageSmoothingEnabled = b;
     a.mozImageSmoothingEnabled = b;
@@ -503,7 +489,7 @@ module.exports = function(API, params){
       if (1 == a.ld)
         this.c.save(),
         this.c.resetTransform(),
-        (this.c.fillStyle = N.lc(a.jd)),
+        (this.c.fillStyle = Utils.numberToColor(a.jd)),
         this.c.fillRect(0, 0, this.sa.width, this.sa.height),
         this.c.restore(),
         (this.c.strokeStyle = "#C7E6BD"),
@@ -556,7 +542,7 @@ module.exports = function(API, params){
       } else
         this.c.save(),
         this.c.resetTransform(),
-        (this.c.fillStyle = N.lc(a.jd)),
+        (this.c.fillStyle = Utils.numberToColor(a.jd)),
         this.c.fillRect(0, 0, this.sa.width, this.sa.height),
         this.c.restore();
       N.Gi(this.c, !0);
@@ -577,7 +563,7 @@ module.exports = function(API, params){
     Ll: function (a, b) {
       this.c.beginPath();
       null == b
-        ? ((this.c.fillStyle = N.lc(a.R)), (this.c.strokeStyle = "black"))
+        ? ((this.c.fillStyle = Utils.numberToColor(a.R)), (this.c.strokeStyle = "black"))
         : ((this.c.fillStyle = b.Ij), (this.c.strokeStyle = b.lo));
       this.c.beginPath();
       this.c.arc(a.a.x, a.a.y, a.Z, 0, 2 * Math.PI, !1);
@@ -601,7 +587,7 @@ module.exports = function(API, params){
     Mq: function (a, b) {
       if (!(0 > a.R)) {
         this.c.beginPath();
-        this.c.strokeStyle = N.lc(a.R);
+        this.c.strokeStyle = Utils.numberToColor(a.R);
         var c = b[a.Yd],
         d = b[a.Zd];
         null != c &&
@@ -616,7 +602,7 @@ module.exports = function(API, params){
     Qq: function (a) {
       if (a.Za) {
         this.c.beginPath();
-        this.c.strokeStyle = N.lc(a.R);
+        this.c.strokeStyle = Utils.numberToColor(a.R);
         var b = a.W.a,
         c = a.ca.a;
         if (0 != 0 * a.vb) this.c.moveTo(b.x, b.y), this.c.lineTo(c.x, c.y);
@@ -663,7 +649,7 @@ module.exports = function(API, params){
       900 < f * f + a * a &&
         ((this.c.fillStyle = "rgba(0,0,0,0.5)"),
         this.pk(c + 2, d + 2, Math.atan2(a, f)),
-        (this.c.fillStyle = N.lc(b)),
+        (this.c.fillStyle = Utils.numberToColor(b)),
         this.pk(c - 2, d - 2, Math.atan2(a, f)));
     },
     pk: function (a, b, c) {

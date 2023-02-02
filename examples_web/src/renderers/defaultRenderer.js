@@ -5,9 +5,9 @@ module.exports = function(API, params){
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.02",
+    version: "1.1",
     author: "basro & abc",
-    description: `This is the un-minified version of the default renderer currently used in Haxball, with the exception that most if not all of the camera bugs have been fixed.`
+    description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features.`
   });
 
   // parameters are exported so that they can be edited outside this class.
@@ -25,18 +25,18 @@ module.exports = function(API, params){
     value: true
   });
 
-  this.viewMode = this.defineVariable({ // view_mode
-    name: "viewMode",
-    description: "View Mode", 
-    type: VariableType.Integer,
-    value: 1,
+  this.zoomCoeff = this.defineVariable({
+    name: "zoomCoeff",
+    description: "Zoom Coefficient", 
+    type: VariableType.Number,
+    value: 1.0,
     range: {
-      min: -1,
-      max: 4,
-      step: 1
+      min: 0,
+      max: Infinity,
+      step: 0.01
     }
   });
-
+  
   this.resolutionScale = this.defineVariable({ // resolution_scale
     name: "resolutionScale",
     description: "Resolution Scale", 
@@ -52,6 +52,34 @@ module.exports = function(API, params){
   this.showChatIndicators = this.defineVariable({ // show_indicators
     name: "showChatIndicators",
     description: "Show Chat Indicators?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+  
+  this.followPlayerId = this.defineVariable({
+    name: "followPlayerId",
+    description: "Id of the player that the camera will follow", 
+    type: VariableType.Integer,
+    value: null
+  });
+
+  this.drawBackground = this.defineVariable({
+    name: "drawBackground",
+    description: "Draw Background?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+  
+  this.squarePlayers = this.defineVariable({
+    name: "squarePlayers",
+    description: "Draw Players as squares?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+  
+  this.currentPlayerDistinction = this.defineVariable({
+    name: "currentPlayerDistinction",
+    description: "Hide current player's name and draw halo around current player?", 
     type: VariableType.Boolean,
     value: true
   });
@@ -115,9 +143,6 @@ module.exports = function(API, params){
       }
       ctx.imageSmoothingEnabled = false;
     },
-    numberToColor: function(number){ // lc
-      return "rgba("+[(number&16711680)>>>16, (number&65280)>>>8, number&255].join()+",255)";
-    },
     createTextCanvas: function(text, color){ // sp
       var canvas = window.document.createElement("canvas");
       var ctx = canvas.getContext("2d", null);
@@ -129,7 +154,7 @@ module.exports = function(API, params){
       ctx.textBaseline = "middle";
       ctx.fillStyle = "black";
       ctx.fillText(text, 7, 52);
-      ctx.fillStyle = this.numberToColor(color);
+      ctx.fillStyle = Utils.numberToColor(color);
       ctx.fillText(text, 0, 45);
       return canvas;
     }
@@ -258,14 +283,14 @@ module.exports = function(API, params){
       this.ctx.rotate((3.141592653589793*this.teamColors.hd)/128); // team colors rotation by provided angle
       var stepWidth = 64/colorArray.length, x=-32; // here, 64 is the width of the canvas
       for (var i=0;i<colorArray.length;i++){
-        this.ctx.fillStyle = HaxballRenderer.numberToColor(colorArray[i]);
+        this.ctx.fillStyle = Utils.numberToColor(colorArray[i]);
         this.ctx.fillRect(x, -32, stepWidth+4, 64);
         x += stepWidth;
       }
       this.ctx.restore(); // origin and rotation returns back to normal
 
       // draw the avatar text
-      this.ctx.fillStyle = HaxballRenderer.numberToColor(this.teamColors.ed);
+      this.ctx.fillStyle = Utils.numberToColor(this.teamColors.ed);
       this.ctx.textAlign = "center";
       this.ctx.textBaseline = "alphabetic";
       this.ctx.font = "900 34px 'Arial Black','Arial Bold',Gadget,sans-serif";
@@ -280,10 +305,6 @@ module.exports = function(API, params){
     this.lastRenderTime = window.performance.now(); // $c
     this.decoratorsByObject = new Map(); // Jg
     this.decoratorsById = new Map(); // dd
-    this.resolutionScale = 1; // zg
-    this.heightDecrement = 35; // xf
-    this.fixedHeight = 0; // jf
-    this.zoomCoeff = 1.5; // kf
     this.origin = new Point(0, 0); // Ya
     this.gamePaused = false; // Dk
     this.textRenderer = new CanvasTextRenderer(); // td
@@ -294,32 +315,11 @@ module.exports = function(API, params){
     this.concretePattern = this.ctx.createPattern(/*n.Vn*/params.images?.concrete, null); // Wn
     this.concrete2Pattern = this.ctx.createPattern(/*n.Tn*/params.images?.concrete2, null); // Un
   }
-  HaxballRenderer.numberToColor = function(number){ // lc
-    return "rgba("+[(number&16711680)>>>16, (number&65280)>>>8, number&255].join()+",255)";
-  };
   HaxballRenderer.setSmoothingEnabled = function(ctx, enabled){ // Gi
     ctx.imageSmoothingEnabled = enabled;
     ctx.mozImageSmoothingEnabled = enabled;
   };
   HaxballRenderer.prototype = {
-    updateParams: function(){ // uf
-      this.resolutionScale = thisRenderer.resolutionScale;/*localStorageObj.Sl.L()*/ // "resolution_scale"
-      var viewMode = thisRenderer.viewMode;/*localStorageObj.Tb.L()*/ // "view_mode"
-      if (viewMode==0){
-        this.zoomCoeff = 1;
-        this.fixedHeight = 0;
-        this.heightDecrement = 0;
-      }
-      else{
-        this.heightDecrement = 35;
-        if (viewMode==-1)
-          this.fixedHeight = 450;
-        else{
-          this.fixedHeight = 0;
-          this.zoomCoeff = 1+0.25*(viewMode-1);
-        }
-      }
-    },
     updateChatIndicator: function(id, value){ // Po
       var decorator = this.decoratorsById.get(id);
       if (decorator)
@@ -328,14 +328,14 @@ module.exports = function(API, params){
     resizeCanvas: function(){ // Pr
       if (!this.canvas.parentElement)
         return;
-      var coeff = window.devicePixelRatio*this.resolutionScale, rect = this.canvas.getBoundingClientRect();
+      var coeff = window.devicePixelRatio*thisRenderer.resolutionScale, rect = this.canvas.getBoundingClientRect();
       var w = Math.round(coeff*rect.width), h = Math.round(coeff*rect.height);
       if (this.canvas.width!=w || this.canvas.height!=h) {
         this.canvas.width = w;
         this.canvas.height = h;
       }
     },
-    render: function(roomState, followPlayerId){ // Kc
+    render: function(roomState){ // Kc
       var time = window.performance.now(), deltaTime = (time-this.lastRenderTime)/1000;
       this.lastRenderTime = time;
       this.decoratorsByObject.clear();
@@ -344,14 +344,14 @@ module.exports = function(API, params){
       this.ctx.resetTransform();
       if (!roomState.K)
         return;
-      var gameState = roomState.K, mapObjects = gameState.ta, followPlayer = roomState.na(followPlayerId), followDisc = followPlayer?.H;
-      var zoomCoeff = (this.fixedHeight!=0) ? (this.canvas.height/this.fixedHeight) : (this.zoomCoeff*window.devicePixelRatio*this.resolutionScale);
-      var heightDecrement = this.heightDecrement*this.resolutionScale, maxViewWidth = gameState.S.Ye, viewWidth = this.canvas.width/zoomCoeff;
+      var gameState = roomState.K, mapObjects = gameState.ta, followPlayer = roomState.na(thisRenderer.followPlayerId), followDisc = followPlayer?.H;
+      var zoomCoeff = thisRenderer.zoomCoeff*window.devicePixelRatio*thisRenderer.resolutionScale;
+      var maxViewWidth = gameState.S.Ye, viewWidth = this.canvas.width/zoomCoeff;
       if (maxViewWidth>0 && maxViewWidth<viewWidth){
         viewWidth = maxViewWidth;
         zoomCoeff = this.canvas.width/maxViewWidth;
       }
-      var viewHeight = (this.canvas.height-heightDecrement)/zoomCoeff;
+      var viewHeight = this.canvas.height/zoomCoeff;
       this.updateCameraOrigin(gameState, followDisc, viewWidth, viewHeight, deltaTime);
       var playerObjects = roomState.I;
       for (var i=0;i<playerObjects.length;i++){
@@ -366,7 +366,7 @@ module.exports = function(API, params){
         playerDecorator.update(playerObject, roomState);
         this.decoratorsByObject.set(playerObject.H, playerDecorator);
       }
-      this.ctx.translate(this.canvas.width/2, (this.canvas.height+heightDecrement)/2);
+      this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.ctx.scale(zoomCoeff, zoomCoeff);
       this.ctx.translate(-this.origin.x, -this.origin.y);
       this.ctx.lineWidth = 3;
@@ -377,7 +377,7 @@ module.exports = function(API, params){
         this.drawJoint(joints[i], discs);
       this.indicateAllLocations(roomState, viewWidth, viewHeight);
       this.drawPlayerDecoratorsAndChatIndicators(roomState, followPlayer);
-      if (followDisc)
+      if (thisRenderer.currentPlayerDistinction && followDisc)
         this.drawHalo(followDisc.a);
       this.ctx.lineWidth = 2;
       for (var i=0;i<playerObjects.length;i++){
@@ -416,8 +416,8 @@ module.exports = function(API, params){
       }
     },
     updateCameraOrigin: function(gameState, followDisc, viewWidth, viewHeight, deltaTime){
-      var x, y;
-      if (followDisc && gameState.S.Ge==1){
+      var x, y, stadium = gameState.S;
+      if (followDisc && stadium.Ge==1){
         var pos = followDisc.a; // player's position
         x = pos.x;
         y = pos.y;
@@ -449,16 +449,16 @@ module.exports = function(API, params){
       var y0 = origin.y;
       origin.x = x0+(x-x0)*t;
       origin.y = y0+(y-y0)*t;
-      this.restrictCameraOrigin(viewWidth, viewHeight, gameState.S);
-    },
-    restrictCameraOrigin: function(viewWidth, viewHeight, stadium){ // Xn
+      
+      // restrictCameraOrigin
+      
       if (viewWidth>2*stadium.$b)
         this.origin.x = 0;
       else if (this.origin.x+0.5*viewWidth>stadium.$b)
         this.origin.x = stadium.$b-0.5*viewWidth;
       else if (this.origin.x-0.5*viewWidth<-stadium.$b)
         this.origin.x = -stadium.$b+0.5*viewWidth;
-      else if (isNaN(this.origin.x) || !isFinite(this.origin.x)) // fix all possible camera bugs
+      else if (this.origin.x*0 != 0) // fix all possible camera bugs
         this.origin.x = 0;
 
       if (viewHeight>2*stadium.qc)
@@ -467,14 +467,17 @@ module.exports = function(API, params){
         this.origin.y = stadium.qc-0.5*viewHeight;
       else if (this.origin.y-0.5*viewHeight<-stadium.qc)
         this.origin.y = -stadium.qc+0.5*viewHeight;
-      else if (isNaN(this.origin.y) || !isFinite(this.origin.y)) // fix all possible camera bugs
+      else if (this.origin.y*0 != 0) // fix all possible camera bugs
         this.origin.y = 0;
     },
     drawHalo: function(pos){ // Pq
       this.ctx.beginPath();
       this.ctx.strokeStyle = "white";
       this.ctx.globalAlpha = 0.3;
-      this.ctx.arc(pos.x, pos.y, 25, 0, 2*Math.PI, false);
+      if (thisRenderer.squarePlayers)
+        this.ctx.rect(pos.x-25, pos.y-25, 50, 50);
+      else
+        this.ctx.arc(pos.x, pos.y, 25, 0, 2*Math.PI, false);
       this.ctx.stroke();
       this.ctx.globalAlpha = 1;
     },
@@ -516,22 +519,24 @@ module.exports = function(API, params){
       if (stadium.ld==1) {
         this.ctx.save();
         this.ctx.resetTransform();
-        this.ctx.fillStyle = HaxballRenderer.numberToColor(stadium.jd);
+        this.ctx.fillStyle = Utils.numberToColor(stadium.jd);
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.restore();
-        this.ctx.strokeStyle = "#C7E6BD";
-        this.ctx.fillStyle = this.grassPattern;
-        this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.Uc);
-        this.ctx.save();
-        this.ctx.scale(2, 2);
-        this.ctx.fill();
-        this.ctx.restore();
-        this.ctx.moveTo(0, -height);
-        this.ctx.lineTo(0, height);
-        this.ctx.stroke();
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, stadium.kd, 0, 2*Math.PI);
-        this.ctx.stroke();
+        if (thisRenderer.drawBackground){
+          this.ctx.strokeStyle = "#C7E6BD";
+          this.ctx.fillStyle = this.grassPattern;
+          this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.Uc);
+          this.ctx.save();
+          this.ctx.scale(2, 2);
+          this.ctx.fill();
+          this.ctx.restore();
+          this.ctx.moveTo(0, -height);
+          this.ctx.lineTo(0, height);
+          this.ctx.stroke();
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, stadium.kd, 0, 2*Math.PI);
+          this.ctx.stroke();
+        }
       }
       else if (stadium.ld==2){
         this.ctx.strokeStyle = "#E9CC6E";
@@ -542,40 +547,42 @@ module.exports = function(API, params){
         this.ctx.fillStyle = this.concrete2Pattern;
         this.ctx.fill();
         this.ctx.restore();
-        this.ctx.save();
-        this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.Uc);
-        this.ctx.scale(2, 2);
-        this.ctx.fillStyle = this.concretePattern;
-        this.ctx.fill();
-        this.ctx.restore();
-        this.ctx.stroke();
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, -height);
-        this.ctx.setLineDash([15, 15]);
-        this.ctx.lineTo(0, height);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
-        var goalLine = stadium.Fe, delta = width-goalLine;
-        if (goalLine<stadium.Uc)
-          delta = 0;
-        var that = this;
-        var drawKickOff = function(color, x, ccw){
-          that.ctx.beginPath();
-          that.ctx.strokeStyle = color;
-          that.ctx.arc(0, 0, stadium.kd, -1.5707963267948966, 1.5707963267948966, ccw);
-          if (x!=0){
-            that.ctx.moveTo(x, -height);
-            that.ctx.lineTo(x, height);
-          }
-          that.ctx.stroke();
-        };
-        drawKickOff("#85ACF3", delta, false);
-        drawKickOff("#E18977", -delta, true);
+        if (thisRenderer.drawBackground){
+          this.ctx.save();
+          this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.Uc);
+          this.ctx.scale(2, 2);
+          this.ctx.fillStyle = this.concretePattern;
+          this.ctx.fill();
+          this.ctx.restore();
+          this.ctx.stroke();
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, -height);
+          this.ctx.setLineDash([15, 15]);
+          this.ctx.lineTo(0, height);
+          this.ctx.stroke();
+          this.ctx.setLineDash([]);
+          var goalLine = stadium.Fe, delta = width-goalLine;
+          if (goalLine<stadium.Uc)
+            delta = 0;
+          var that = this;
+          var drawKickOff = function(color, x, ccw){
+            that.ctx.beginPath();
+            that.ctx.strokeStyle = color;
+            that.ctx.arc(0, 0, stadium.kd, -1.5707963267948966, 1.5707963267948966, ccw);
+            if (x!=0){
+              that.ctx.moveTo(x, -height);
+              that.ctx.lineTo(x, height);
+            }
+            that.ctx.stroke();
+          };
+          drawKickOff("#85ACF3", delta, false);
+          drawKickOff("#E18977", -delta, true);
+        }
       }
       else {
         this.ctx.save();
         this.ctx.resetTransform();
-        this.ctx.fillStyle = HaxballRenderer.numberToColor(stadium.jd);
+        this.ctx.fillStyle = Utils.numberToColor(stadium.jd);
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.restore();
       }
@@ -591,7 +598,7 @@ module.exports = function(API, params){
         var pos = disc.a, decorator = this.decoratorsById.get(player.V);
         if (showIndicators && decorator.chatIndicatorActive && /*n.Dm*/params.images?.typing)
           this.ctx.drawImage(params.images.typing, pos.x-0.5*params.images.typing.width, pos.y-35);
-        if (player != followPlayer)
+        if (!thisRenderer.currentPlayerDistinction || player!=followPlayer)
           decorator.drawToCanvas(this.ctx, pos.x, pos.y+50);
       }
     },
@@ -602,12 +609,15 @@ module.exports = function(API, params){
         this.ctx.strokeStyle = playerDecorator.strokeStyle;
       }
       else{
-        this.ctx.fillStyle = HaxballRenderer.numberToColor(disc.R);
+        this.ctx.fillStyle = Utils.numberToColor(disc.R);
         this.ctx.strokeStyle = "black";
       }
       this.ctx.beginPath();
-      this.ctx.arc(disc.a.x, disc.a.y, disc.Z, 0, 2*Math.PI, false);
       if (playerDecorator){
+        if (thisRenderer.squarePlayers)
+          this.ctx.rect(disc.a.x-disc.Z, disc.a.y-disc.Z, 2*disc.Z, 2*disc.Z);
+        else
+          this.ctx.arc(disc.a.x, disc.a.y, disc.Z, 0, 2*Math.PI, false);
         this.ctx.save();
         var c = disc.Z/32;
         this.ctx.translate(disc.a.x, disc.a.y);
@@ -616,8 +626,10 @@ module.exports = function(API, params){
         this.ctx.fill();
         this.ctx.restore();
       }
-      else if ((disc.R|0)!=-1)
+      else if ((disc.R|0)!=-1){
+        this.ctx.arc(disc.a.x, disc.a.y, disc.Z, 0, 2*Math.PI, false);
         this.ctx.fill();
+      }
       this.ctx.stroke();
     },
     drawAllSegments: function(stadium){ // Rq
@@ -631,7 +643,7 @@ module.exports = function(API, params){
       if (joint.R<0)
         return;
       this.ctx.beginPath();
-      this.ctx.strokeStyle = HaxballRenderer.numberToColor(joint.R);
+      this.ctx.strokeStyle = Utils.numberToColor(joint.R);
       var disc1 = discs[joint.Yd], disc2 = discs[joint.Zd];
       if (!disc1 || !disc2)
         return;
@@ -645,7 +657,7 @@ module.exports = function(API, params){
       if (!segment.Za)
         return;
       this.ctx.beginPath();
-      this.ctx.strokeStyle = HaxballRenderer.numberToColor(segment.R);
+      this.ctx.strokeStyle = Utils.numberToColor(segment.R);
       var pos1 = segment.W.a, pos2 = segment.ca.a;
       if (0*segment.vb!=0){ // line
         this.ctx.moveTo(pos1.x, pos1.y);
@@ -687,7 +699,7 @@ module.exports = function(API, params){
       this.ctx.fillStyle = "rgba(0,0,0,0.5)";
       this.drawLocationIndicator(x+2, y+2, Math.atan2(deltaY, deltaX));
       // draw location indicator
-      this.ctx.fillStyle = HaxballRenderer.numberToColor(color);
+      this.ctx.fillStyle = Utils.numberToColor(color);
       this.drawLocationIndicator(x-2, y-2, Math.atan2(deltaY, deltaX));
     },
     drawLocationIndicator: function(x, y, angle){ // pk
@@ -717,72 +729,59 @@ module.exports = function(API, params){
   this.rendererObj = null; // Eb
   this.roomObj = null;
 
-  var that = this;
-
   this.initialize = function(room){
-    that.roomObj = room.getRoomDataOriginal().q;
-    that.rendererObj = new HaxballRenderer();
-    that.rendererObj.updateParams();
+    thisRenderer.roomObj = room.getRoomDataOriginal().q;
+    thisRenderer.followPlayerId = thisRenderer.roomObj.ya.uc;
+    thisRenderer.rendererObj = new HaxballRenderer();
   };
 
   this.finalize = function(){
-    that.rendererObj = null;
-    that.roomObj = null;
+    thisRenderer.rendererObj = null;
+    thisRenderer.roomObj = null;
   };
 
   this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
     if (!params.paintGame || !extrapolatedRoomPhysicsObj.K)
       return;
-    that.rendererObj.updateParams();
-    that.rendererObj.render(extrapolatedRoomPhysicsObj, that.roomObj.ya.uc);
+    thisRenderer.rendererObj.render(extrapolatedRoomPhysicsObj);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomPhysicsObj);
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:
 
   this.onPlayerChatIndicatorChange = function(id, value, customData){ // wl (a, b)
-    that.rendererObj.updateChatIndicator(id, value);
+    thisRenderer.rendererObj.updateChatIndicator(id, value);
   };
 
   this.onTeamGoal = function(teamId, customData){ // Ni (a)
-    var tr = that.rendererObj.textRenderer; // "Red Scores!", "Blue Scores!"
+    var tr = thisRenderer.rendererObj.textRenderer; // "Red Scores!", "Blue Scores!"
     tr.addText((teamId==Team.fa.$) ? tr.redScore : tr.blueScore);
   };
 
   this.onGameStart = function(byId, customData){ // Ki (a)
-    that.rendererObj.textRenderer.reset();
+    thisRenderer.rendererObj.textRenderer.reset();
   };
 
   this.onGameEnd = function(winningTeamId, customData){ // Oi (a)
-    var tr = that.rendererObj.textRenderer; // "Red is Victorious!", "Blue is Victorious!"
+    var tr = thisRenderer.rendererObj.textRenderer; // "Red is Victorious!", "Blue is Victorious!"
     tr.addText((winningTeamId==Team.fa.$) ? tr.redVictory : tr.blueVictory);
   };
 
   this.onTimeIsUp = function(customData){ // Pi ()
-    var tr = that.rendererObj.textRenderer; // "Time is Up!"
+    var tr = thisRenderer.rendererObj.textRenderer; // "Time is Up!"
     tr.addText(tr.timeUp);
   };
 
   this.onKeyDown = function(e){
     switch(e.keyCode){
-      case 49:{
-        thisRenderer.viewMode = 1;
-        //n_A.setStorageValue("view_mode", 1);
+      case 107:{ // Numpad '+' key
+        thisRenderer.zoomCoeff += 0.1;
         break;
       }
-      case 50:{
-        thisRenderer.viewMode = 2;
-        //n_A.setStorageValue("view_mode", 2);
-        break;
-      }
-      case 51:{
-        thisRenderer.viewMode = 3;
-        //n_A.setStorageValue("view_mode", 3);
-        break;
-      }
-      case 52:{
-        thisRenderer.viewMode = 0;
-        //n_A.setStorageValue("view_mode", 0);
+      case 109:{ // Numpad '-' key
+        thisRenderer.zoomCoeff -= 0.1;
+        if (thisRenderer.zoomCoeff<0)
+          thisRenderer.zoomCoeff = 0.01;
         break;
       }
     }
