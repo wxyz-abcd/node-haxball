@@ -1,6 +1,6 @@
 const vm = require("vm"); // you need to install this package manually in order to use it. (npm install vm)
 
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "consoleHelper", true, { // "consoleHelper" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.

@@ -66,7 +66,7 @@ function roomCallback(room){ // examples start from here.
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 
-  room.onPlayerTeamChange = function(){
+  room.onPlayerTeamChange = function(id){
     if (id === room.currentPlayerId) {
       lastPositionsReset = Date.now();
       moveInRandomY();

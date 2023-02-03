@@ -1,13 +1,13 @@
 module.exports = function(API, params){
   
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = API;
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.1",
+    version: "1.11",
     author: "basro & abc",
-    description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features.`
+    description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features. Use +, - keys for zoom in-out.`
   });
 
   // parameters are exported so that they can be edited outside this class.
@@ -302,6 +302,7 @@ module.exports = function(API, params){
   };
 
   function HaxballRenderer(){ // N
+    this.actualZoomCoeff = thisRenderer.zoomCoeff;
     this.lastRenderTime = window.performance.now(); // $c
     this.decoratorsByObject = new Map(); // Jg
     this.decoratorsById = new Map(); // dd
@@ -335,6 +336,25 @@ module.exports = function(API, params){
         this.canvas.height = h;
       }
     },
+    transformPixelCoordToMapCoord: function(x, y){
+      return {
+        x: (x-this.canvas.width/2)/this.actualZoomCoeff+this.origin.x, 
+        y: (y-this.canvas.height/2)/this.actualZoomCoeff+this.origin.y
+      };
+    },
+    transformMapCoordToPixelCoord: function(x, y){
+      return {
+        x: this.actualZoomCoeff*(x-this.origin.x)+this.canvas.width/2, 
+        y: this.actualZoomCoeff*(y-this.origin.y)+this.canvas.height/2
+      };
+    },
+    getDiscAtPixelCoord: function(x, y){
+      var coordX = (x-this.canvas.width/2)/this.actualZoomCoeff+this.origin.x, coordY = (y-this.canvas.height/2)/this.actualZoomCoeff+this.origin.y;
+      return thisRenderer.latestRoomState.K.ta.F.find((disc)=>{
+        var deltaX = disc.a.x-coordX, deltaY = disc.a.y-coordY;
+        return (deltaX*deltaX+deltaY*deltaY<=disc.Z*disc.Z);
+      });
+    },
     render: function(roomState){ // Kc
       var time = window.performance.now(), deltaTime = (time-this.lastRenderTime)/1000;
       this.lastRenderTime = time;
@@ -366,6 +386,7 @@ module.exports = function(API, params){
         playerDecorator.update(playerObject, roomState);
         this.decoratorsByObject.set(playerObject.H, playerDecorator);
       }
+      this.actualZoomCoeff = zoomCoeff;
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.ctx.scale(zoomCoeff, zoomCoeff);
       this.ctx.translate(-this.origin.x, -this.origin.y);
@@ -738,11 +759,13 @@ module.exports = function(API, params){
   this.finalize = function(){
     thisRenderer.rendererObj = null;
     thisRenderer.roomObj = null;
+    thisRenderer.latestRoomState = null;
   };
 
   this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
     if (!params.paintGame || !extrapolatedRoomPhysicsObj.K)
       return;
+    thisRenderer.latestRoomState = extrapolatedRoomPhysicsObj;
     thisRenderer.rendererObj.render(extrapolatedRoomPhysicsObj);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomPhysicsObj);
   };
@@ -785,6 +808,18 @@ module.exports = function(API, params){
         break;
       }
     }
-  }
+  };
+  
+  this.transformPixelCoordToMapCoord = function(x, y){
+    return thisRenderer.rendererObj.transformPixelCoordToMapCoord(x, y);
+  };
+  
+  this.transformMapCoordToPixelCoord = function(x, y){
+    return thisRenderer.rendererObj.transformMapCoordToPixelCoord(x, y);
+  };
+
+  this.getDiscAtPixelCoord = function(x, y){
+    return thisRenderer.rendererObj.getDiscAtPixelCoord(x, y);
+  };
 
 };

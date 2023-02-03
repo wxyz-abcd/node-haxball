@@ -7465,6 +7465,75 @@ function abcHaxballAPI(window, config){
     return stadium.se();
   };
 
+  function getVertexAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.K?.ta.J.find((vertex)=>{
+      var deltaX = vertex.a.x-x, deltaY = vertex.a.y-y;
+      return (deltaX*deltaX+deltaY*deltaY<=threshold*threshold);
+    });
+  }
+
+  function getSegmentAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.K?.ta.U.find((segment)=>{
+      var d;
+      if (0*segment.vb==0){
+        var dx = x-segment.Xd.x, dy = y-segment.Xd.y;
+        if ((segment.Hg.x*dx+segment.Hg.y*dy>0 && segment.Ig.x*dx+segment.Ig.y*dy>0)==(segment.vb<=0))
+          return false;
+        d = Math.sqrt(dx*dx+dy*dy)-segment.Yj;
+      }
+      else{
+        var p0 = segment.W.a, p1 = segment.ca.a, dx = p1.x-p0.x, dy = p1.y-p0.y, _dx = x-p1.x, _dy = y-p1.y;
+        if ((x-p0.x)*dx+(y-p0.y)*dy<=0 || _dx*dx+_dy*dy>=0)
+          return false;
+        d = segment.wa.x*_dx+segment.wa.y*_dy;
+      }
+      return Math.abs(d)<threshold;
+    });
+  }
+
+  function getGoalAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.S.tc.find((goal)=>{
+      var p0 = goal.W, p1 = goal.ca, dx = p1.x-p0.x, dy = p1.y-p0.y, _dx = x-p1.x, _dy = y-p1.y;
+      if ((x-p0.x)*dx+(y-p0.y)*dy<=0 || _dx*dx+_dy*dy>=0)
+        return false;
+      var d = Math.sqrt(dy*dy+dx*dx);
+      return (Math.abs(_dx*dy/d-_dy*dx/d)<threshold);
+    });
+  }
+
+  function getPlaneAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.K?.ta.qa.find((plane)=>{
+      return (Math.abs(plane.Ua-(plane.wa.x*x+plane.wa.y*y))<threshold);
+    });
+  }
+
+  function getJointAtMapCoord(roomState, {x, y}, threshold){
+    var mapObjects = roomState.K?.ta;
+    if (!mapObjects)
+      return false;
+    var discs = mapObjects.F;
+    return mapObjects.pb.find((joint)=>{
+      var disc1 = discs[joint.Zd]; // a
+      if (!disc1)
+        return false;
+      var disc2 = discs[joint.Yd]; // b
+      if (!disc2)
+        return false;
+      var p0 = disc1.a, p1 = disc2.a, dx = p1.x-p0.x, dy = p1.y-p0.y, _dx = x-p1.x, _dy = y-p1.y;
+      if ((x-p0.x)*dx+(y-p0.y)*dy<=0 || _dx*dx+_dy*dy>=0)
+        return false;
+      var d = Math.sqrt(dy*dy+dx*dx);
+      return (Math.abs(_dx*dy/d-_dy*dx/d)<threshold);
+    });
+  }
+
+  function getDiscAtMapCoord(roomState, {x, y}){
+    return roomState.K?.ta.F.find((disc)=>{
+      var deltaX = disc.a.x-x, deltaY = disc.a.y-y;
+      return (deltaX*deltaX+deltaY*deltaY<=disc.Z*disc.Z);
+    });
+  }
+
   var eventCallbacks = [];
 
   function Room(internalData, config, plugins){
@@ -8475,6 +8544,14 @@ function abcHaxballAPI(window, config){
     Replay: {
       read: readReplay
       //Recorder: ac
+    },
+    Query: {
+      getVertexAtMapCoord: getVertexAtMapCoord,
+      getSegmentAtMapCoord: getSegmentAtMapCoord,
+      getGoalAtMapCoord: getGoalAtMapCoord,
+      getPlaneAtMapCoord: getPlaneAtMapCoord,
+      getJointAtMapCoord: getJointAtMapCoord,
+      getDiscAtMapCoord: getDiscAtMapCoord
     },
     RoomConfig,
     Plugin,

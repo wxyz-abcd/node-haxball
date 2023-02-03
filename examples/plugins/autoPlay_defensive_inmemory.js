@@ -1,4 +1,4 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive_inmemory", false, { // "autoPlay_defensive_inmemory" is plugin's name, "false" means "not activated just after initialization". Every plugin should have a unique name.
@@ -54,9 +54,11 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
   // it also fixes a bug when the bot doesn't move after positions resets
-  dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-    room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
-  });
+  var moveInRandomY = function(){
+    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+      room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
+    });
+  };
 
   this.initialize = function(_room){
     room = _room;

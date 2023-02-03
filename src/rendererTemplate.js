@@ -9,7 +9,7 @@ var client = Room.join({ // or Room.create
 });
 */
 
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl }, canvas){
+module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }, canvas){
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, {

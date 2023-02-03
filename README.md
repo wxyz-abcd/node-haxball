@@ -52,7 +52,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window, {
           WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
           HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
         });
@@ -73,7 +73,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -193,6 +193,14 @@ Room.create({
   - `getDefaultStadiums()`: get default stadium array.
   - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
+
+- `Query`: Static functions to query map features. For now, `roomState` has to come from either `Room.getRoomDataOriginal` or the extrapolated parameter in `Renderer.render`.
+  - `getVertexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getSegmentAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first segment that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getGoalAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first goal that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getPlaneAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first plane that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getJointAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first joint that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getDiscAtMapCoord(roomState, mapCoordinate)`: Finds the first disc that has a distance to `mapCoordinate` lower than `threshold`.
 
 - `Room`: The class that currently hosts all room operations. Should only be initialized by either `Room.join` or `Room.create`.
   - `static functions`: These functions are used to create/join a room.

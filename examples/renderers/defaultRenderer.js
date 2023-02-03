@@ -1,11 +1,11 @@
 module.exports = function(API, params){
   
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = API;
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.1",
+    version: "1.11",
     author: "basro & abc",
     description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features. Use +, - keys for zoom in-out.`
   });
@@ -302,6 +302,7 @@ module.exports = function(API, params){
   };
 
   function HaxballRenderer(){ // N
+    this.actualZoomCoeff = thisRenderer.zoomCoeff;
     this.lastRenderTime = window.performance.now(); // $c
     this.decoratorsByObject = new Map(); // Jg
     this.decoratorsById = new Map(); // dd
@@ -335,6 +336,30 @@ module.exports = function(API, params){
         this.canvas.height = h;
       }
     },
+    transformPixelCoordToMapCoord: function(x, y){
+      return {
+        x: (x-this.canvas.width/2)/this.actualZoomCoeff+this.origin.x, 
+        y: (y-this.canvas.height/2)/this.actualZoomCoeff+this.origin.y
+      };
+    },
+    transformMapCoordToPixelCoord: function(x, y){
+      return {
+        x: this.actualZoomCoeff*(x-this.origin.x)+this.canvas.width/2, 
+        y: this.actualZoomCoeff*(y-this.origin.y)+this.canvas.height/2
+      };
+    },
+    transformPixelDistanceToMapDistance: function(dist){
+      return dist/this.actualZoomCoeff;
+    },
+    transformMapDistanceToPixelDistance: function(dist){
+      return dist*this.actualZoomCoeff;
+    },
+    transformMapCoordToPixelCoord: function(x, y){
+      return {
+        x: this.actualZoomCoeff*(x-this.origin.x)+this.canvas.width/2, 
+        y: this.actualZoomCoeff*(y-this.origin.y)+this.canvas.height/2
+      };
+    },
     render: function(roomState){ // Kc
       var time = window.performance.now(), deltaTime = (time-this.lastRenderTime)/1000;
       this.lastRenderTime = time;
@@ -366,6 +391,7 @@ module.exports = function(API, params){
         playerDecorator.update(playerObject, roomState);
         this.decoratorsByObject.set(playerObject.H, playerDecorator);
       }
+      this.actualZoomCoeff = zoomCoeff;
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.ctx.scale(zoomCoeff, zoomCoeff);
       this.ctx.translate(-this.origin.x, -this.origin.y);
@@ -726,49 +752,49 @@ module.exports = function(API, params){
 
   // end of basro's renderer logic
 
-  this.rendererObj = null; // Eb
-  this.roomObj = null;
+  var rendererObj = null; // Eb
+  var latestRoomState = null;
 
   this.initialize = function(room){
-    thisRenderer.roomObj = room.getRoomDataOriginal().q;
-    thisRenderer.followPlayerId = thisRenderer.roomObj.ya.uc;
-    thisRenderer.rendererObj = new HaxballRenderer();
+    thisRenderer.followPlayerId = room.getRoomDataOriginal().q.ya.uc;
+    rendererObj = new HaxballRenderer();
   };
 
   this.finalize = function(){
-    thisRenderer.rendererObj = null;
-    thisRenderer.roomObj = null;
+    rendererObj = null;
+    latestRoomState = null;
   };
 
   this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
     if (!params.paintGame || !extrapolatedRoomPhysicsObj.K)
       return;
-    thisRenderer.rendererObj.render(extrapolatedRoomPhysicsObj);
+    latestRoomState = extrapolatedRoomPhysicsObj;
+    rendererObj.render(extrapolatedRoomPhysicsObj);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomPhysicsObj);
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:
 
   this.onPlayerChatIndicatorChange = function(id, value, customData){ // wl (a, b)
-    thisRenderer.rendererObj.updateChatIndicator(id, value);
+    rendererObj.updateChatIndicator(id, value);
   };
 
   this.onTeamGoal = function(teamId, customData){ // Ni (a)
-    var tr = thisRenderer.rendererObj.textRenderer; // "Red Scores!", "Blue Scores!"
+    var tr = rendererObj.textRenderer; // "Red Scores!", "Blue Scores!"
     tr.addText((teamId==Team.fa.$) ? tr.redScore : tr.blueScore);
   };
 
   this.onGameStart = function(byId, customData){ // Ki (a)
-    thisRenderer.rendererObj.textRenderer.reset();
+    rendererObj.textRenderer.reset();
   };
 
   this.onGameEnd = function(winningTeamId, customData){ // Oi (a)
-    var tr = thisRenderer.rendererObj.textRenderer; // "Red is Victorious!", "Blue is Victorious!"
+    var tr = rendererObj.textRenderer; // "Red is Victorious!", "Blue is Victorious!"
     tr.addText((winningTeamId==Team.fa.$) ? tr.redVictory : tr.blueVictory);
   };
 
   this.onTimeIsUp = function(customData){ // Pi ()
-    var tr = thisRenderer.rendererObj.textRenderer; // "Time is Up!"
+    var tr = rendererObj.textRenderer; // "Time is Up!"
     tr.addText(tr.timeUp);
   };
 
@@ -785,6 +811,34 @@ module.exports = function(API, params){
         break;
       }
     }
-  }
+  };
+  
+  this.transformPixelCoordToMapCoord = function(x, y){
+    return rendererObj.transformPixelCoordToMapCoord(x, y);
+  };
+  
+  this.transformMapCoordToPixelCoord = function(x, y){
+    return rendererObj.transformMapCoordToPixelCoord(x, y);
+  };
 
+  this.transformPixelDistanceToMapDistance = function(dist){
+    return rendererObj.transformPixelDistanceToMapDistance(dist);
+  };
+
+  this.transformMapDistanceToPixelDistance = function(dist){
+    return rendererObj.transformMapDistanceToPixelDistance(dist);
+  };
+  
+  /*
+  this.onMouseDown = function(event){
+    var pos = thisRenderer.transformPixelCoordToMapCoord(event.pageX, event.pageY);
+    var threshold = thisRenderer.transformPixelDistanceToMapDistance(15);
+    console.log(Query.getVertexAtMapCoord(latestRoomState, pos, threshold));
+    console.log(Query.getSegmentAtMapCoord(latestRoomState, pos, threshold));
+    console.log(Query.getGoalAtMapCoord(latestRoomState, pos, threshold));
+    console.log(Query.getPlaneAtMapCoord(latestRoomState, pos, threshold));
+    console.log(Query.getJointAtMapCoord(latestRoomState, pos, threshold));
+    console.log(Query.getDiscAtMapCoord(latestRoomState, pos));
+  };
+  */
 };
