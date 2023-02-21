@@ -4,10 +4,10 @@ module.exports = function(API, params){
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
-    name: "default",
-    version: "1.25",
+    name: "sandbox",
+    version: "1.0",
     author: "basro & abc",
-    description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features. Use +, - keys for zoom in-out.`
+    description: `This is a customized renderer designed specifically for the new sandbox mode for Haxball.`
   });
 
   // parameters are exported so that they can be edited outside this class.
@@ -29,7 +29,7 @@ module.exports = function(API, params){
     name: "showPlayerIds",
     description: "Show player ids?", 
     type: VariableType.Boolean,
-    value: false
+    value: true
   });
 
   this.zoomCoeff = this.defineVariable({
@@ -88,7 +88,7 @@ module.exports = function(API, params){
     type: VariableType.Boolean,
     value: true
   });
-  
+
   this.followPlayerId = this.defineVariable({
     name: "followPlayerId",
     description: "Id of the player that the camera will follow", 
@@ -124,7 +124,71 @@ module.exports = function(API, params){
     value: false
   });
 
+  this.showInvisibleJoints = this.defineVariable({
+    name: "showInvisibleJoints",
+    description: "Show invisible joints?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.showPlanes = this.defineVariable({
+    name: "showPlanes",
+    description: "Show planes?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.showGoals = this.defineVariable({
+    name: "showGoals",
+    description: "Show goals?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.showVertices = this.defineVariable({
+    name: "showVertices",
+    description: "Show vertices?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.showSegments = this.defineVariable({
+    name: "showSegments",
+    description: "Show segments?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.showDiscs = this.defineVariable({
+    name: "showDiscs",
+    description: "Show discs?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.showJoints = this.defineVariable({
+    name: "showJoints",
+    description: "Show joints?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.showPlayers = this.defineVariable({
+    name: "showPlayers",
+    description: "Show players?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.showSpawnPoints = this.defineVariable({
+    name: "showSpawnPoints",
+    description: "Show spawn points?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
   var thisRenderer = this, { H: Point, p: Team, ka: TeamColors } = Impl.Core;
+  var selectedObj = null;
 
   // start of basro's renderer logic
 
@@ -377,16 +441,16 @@ module.exports = function(API, params){
         this.canvas.height = h;
       }
     },
-    transformPixelCoordToMapCoord: function(x, y){
+    transformPixelCoordToMapCoord: function(x, y, addMapOrigin = true){
       return {
-        x: (x-this.canvas.width/2)/this.actualZoomCoeff+this.origin.x, 
-        y: (y-this.canvas.height/2)/this.actualZoomCoeff+this.origin.y
+        x: (x-this.canvas.width/2)/this.actualZoomCoeff+(addMapOrigin ? this.origin.x : 0), 
+        y: (y-this.canvas.height/2)/this.actualZoomCoeff+(addMapOrigin ? this.origin.y : 0)
       };
     },
-    transformMapCoordToPixelCoord: function(x, y){
+    transformMapCoordToPixelCoord: function(x, y, addCanvasOrigin = true){
       return {
-        x: this.actualZoomCoeff*(x-this.origin.x)+this.canvas.width/2, 
-        y: this.actualZoomCoeff*(y-this.origin.y)+this.canvas.height/2
+        x: this.actualZoomCoeff*(x-this.origin.x)+(addCanvasOrigin ? this.canvas.width/2 : 0), 
+        y: this.actualZoomCoeff*(y-this.origin.y)+(addCanvasOrigin ? this.canvas.height/2 : 0)
       };
     },
     transformPixelDistanceToMapDistance: function(dist){
@@ -432,26 +496,43 @@ module.exports = function(API, params){
       this.ctx.translate(-this.origin.x, -this.origin.y);
       this.ctx.lineWidth = 3;
       this.drawBackground(gameState.S);
-      this.drawAllSegments(gameState.S);
+      if (thisRenderer.showPlanes)
+        this.drawAllPlanes(gameState.S);
+      if (thisRenderer.showGoals)
+        this.drawAllGoals(gameState.S);
+      if (thisRenderer.showVertices)
+        this.drawAllVertices(gameState.S);
+      if (thisRenderer.showSegments)
+        this.drawAllSegments(gameState.S);
       var discs = mapObjects.F, joints = mapObjects.pb;
-      for (var i=0;i<joints.length;i++)
-        this.drawJoint(joints[i], discs);
-      this.indicateAllLocations(roomState, viewWidth, viewHeight);
-      this.drawPlayerDecoratorsAndChatIndicators(roomState, followPlayer);
-      if (thisRenderer.currentPlayerDistinction && followDisc)
-        this.drawHalo(followDisc.a);
-      this.ctx.lineWidth = 2;
-      for (var i=0;i<playerObjects.length;i++){
-        var playerObject = playerObjects[i], playerDisc = playerObject.H;
-        if (!playerDisc)
-          continue;
-        this.drawDisc(playerDisc, this.decoratorsById.get(playerObject.V));
+      if (thisRenderer.showJoints){
+        for (var i=0;i<joints.length;i++)
+          this.drawJoint(joints[i], discs);
       }
-      for (var i=0;i<discs.length;i++){
-        var disc = discs[i];
-        if (this.decoratorsByObject.get(disc))
-          continue;
-        this.drawDisc(disc, null);
+      if (thisRenderer.showSpawnPoints)
+        this.drawAllSpawnPoints(gameState.S);
+      if (thisRenderer.showPlayers){
+        this.indicateAllLocations(roomState, viewWidth, viewHeight);
+        this.drawPlayerDecoratorsAndChatIndicators(roomState, followPlayer);
+        if (thisRenderer.currentPlayerDistinction && followDisc)
+          this.drawHalo(followDisc.a);
+        this.ctx.lineWidth = 2;
+        for (var i=0;i<playerObjects.length;i++){
+          var playerObject = playerObjects[i], playerDisc = playerObject.H;
+          if (!playerDisc)
+            continue;
+          this.drawDisc(playerDisc, this.decoratorsById.get(playerObject.V));
+        }
+      }
+      else
+        this.ctx.lineWidth = 2;
+      if (thisRenderer.showDiscs){
+        for (var i=0;i<discs.length;i++){
+          var disc = discs[i];
+          if (this.decoratorsByObject.get(disc))
+            continue;
+          this.drawDisc(disc, null);
+        }
       }
       this.ctx.lineWidth = 3;
       this.ctx.resetTransform();
@@ -521,7 +602,7 @@ module.exports = function(API, params){
           this.origin.x = stadium.$b-0.5*viewWidth;
         else if (this.origin.x-0.5*viewWidth<-stadium.$b)
           this.origin.x = -stadium.$b+0.5*viewWidth;
-        
+
         if (viewHeight>2*stadium.qc)
           this.origin.y = 0;
         else if (this.origin.y+0.5*viewHeight>stadium.qc)
@@ -678,6 +759,10 @@ module.exports = function(API, params){
         this.ctx.fillStyle = Utils.numberToColor(disc.R);
         this.ctx.strokeStyle = "black";
       }
+      if (selectedObj==disc){
+        this.ctx.strokeStyle = "#cc0000";
+        this.ctx.setLineDash([5, 5]);
+      }
       this.ctx.beginPath();
       if (playerDecorator){
         if (thisRenderer.squarePlayers)
@@ -697,6 +782,80 @@ module.exports = function(API, params){
         this.ctx.fill();
       }
       this.ctx.stroke();
+      this.ctx.setLineDash([]);
+    },
+    drawAllPlanes: function(stadium){
+      var planes = stadium.qa;
+      for (var i=0;i<planes.length;i++)
+        this.drawPlane(planes[i]);
+    },
+    calculatePlaneY: function(plane, x) {
+      return (-plane.wa.x/plane.wa.y)*(x-(plane.Ua*plane.wa.x))+(plane.Ua*plane.wa.y);
+    },
+    drawPlane: function(plane){
+      this.ctx.beginPath();
+      if (selectedObj==plane){
+        this.ctx.strokeStyle = "#cc0000";
+        this.ctx.setLineDash([5, 5]);
+      }
+      else{
+        this.ctx.strokeStyle = "#CC8833";
+        this.ctx.setLineDash([10, 3, 3, 3]);
+      }
+      var p1, p2;
+      if (plane.wa.y==0){
+        p1 = this.transformPixelCoordToMapCoord(0, 0);
+        p2 = this.transformPixelCoordToMapCoord(0, this.canvas.height);
+        p1.x = p2.x = plane.Ua*plane.wa.x;
+        this.ctx.moveTo(p1.x, p1.y);
+        this.ctx.lineTo(p2.x, p2.y);
+      }
+      else{
+        p1 = this.transformPixelCoordToMapCoord(0, 0);
+        p2 = this.transformPixelCoordToMapCoord(this.canvas.width, 0);
+        p1.y = this.calculatePlaneY(plane, p1.x);
+        p2.y = this.calculatePlaneY(plane, p2.x);
+        this.ctx.moveTo(p1.x, p1.y);
+        this.ctx.lineTo(p2.x, p2.y);
+      }
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+    },
+    drawAllGoals: function(stadium){
+      var goals = stadium.tc;
+      for (var i=0;i<goals.length;i++)
+        this.drawGoal(goals[i]);
+    },
+    drawGoal: function(goal){
+      this.ctx.beginPath();
+      if (selectedObj==goal){
+        this.ctx.strokeStyle = "#cc0000";
+        this.ctx.setLineDash([5, 5]);
+      }
+      else{
+        this.ctx.strokeStyle = goal.qe.$==2?"#85ACF3":"#E18977";
+        this.ctx.setLineDash([10, 3, 3, 3]);
+      }
+      this.ctx.moveTo(goal.W.x, goal.W.y);
+      this.ctx.lineTo(goal.ca.x, goal.ca.y);
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+    },
+    drawAllVertices: function(stadium){ // Rq
+      if (!stadium)
+        return;
+      var vertices = stadium.J;
+      for (var i=0;i<vertices.length;i++)
+        this.drawVertex(vertices[i]);
+    },
+    drawVertex: function(vertex){
+      this.ctx.beginPath();
+      if (selectedObj==vertex)
+        this.ctx.strokeStyle = "#cc0000";
+      else
+        this.ctx.strokeStyle = "#bb44cc";
+      this.ctx.arc(vertex.a.x, vertex.a.y, 5/this.actualZoomCoeff, 0, 2*Math.PI, false);
+      this.ctx.stroke();
     },
     drawAllSegments: function(stadium){ // Rq
       if (!stadium)
@@ -705,12 +864,49 @@ module.exports = function(API, params){
       for (var i=0;i<segments.length;i++)
         this.drawSegment(segments[i]);
     },
+    drawSpawnPoint: function(point, teamId, radius, selected = false){
+      this.ctx.beginPath();
+      if (selected){
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeStyle = "#cc0000";
+      }
+      else{
+        this.ctx.setLineDash([10, 3, 3, 3]);
+        if (teamId==1)
+          this.ctx.strokeStyle = "#E18977"
+        else
+          this.ctx.strokeStyle = "#85ACF3";
+      }
+      this.ctx.arc(point.x, point.y, radius, 0, 2*Math.PI, false);
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+    },
+    drawAllSpawnPoints: function(stadium){
+      if (!stadium)
+        return;
+      var radius = stadium.ge.Z;
+      var sp = stadium.Dd;
+      for (var i=0;i<sp.length;i++)
+        this.drawSpawnPoint(sp[i], 1, radius, selectedObj && selectedObj.type=="spawnPoint" && selectedObj.idx==i && selectedObj.team==1);
+      sp = stadium.md;
+      for (var i=0;i<sp.length;i++)
+        this.drawSpawnPoint(sp[i], 2, radius, selectedObj && selectedObj.type=="spawnPoint" && selectedObj.idx==i && selectedObj.team==2);
+    },
     drawJoint: function(joint, discs){ // Mq
       if (!thisRenderer.showInvisibleJoints && joint.R<0)
         return;
       this.ctx.beginPath();
-      this.ctx.strokeStyle = joint.R<0 ? "#006060" : Utils.numberToColor(joint.R);
-      var disc1 = discs[joint.Yd], disc2 = discs[joint.Zd];
+      if (selectedObj==joint){
+        this.ctx.strokeStyle = "#cc0000";
+        this.ctx.setLineDash([5, 5]);
+      }
+      else if (joint.R<0){
+        this.ctx.strokeStyle = "#600060a0";
+        this.ctx.setLineDash([10, 3, 3, 3]);
+      }
+      else
+        this.ctx.strokeStyle = Utils.numberToColor(joint.R);
+      var disc1 = joint._Yd_ || discs[joint.Yd], disc2 = joint._Zd_ || discs[joint.Zd];
       if (!disc1 || !disc2)
         return;
       var pos1 = disc1.a;
@@ -718,12 +914,22 @@ module.exports = function(API, params){
       this.ctx.moveTo(pos1.x, pos1.y);
       this.ctx.lineTo(pos2.x, pos2.y);
       this.ctx.stroke();
+      this.ctx.setLineDash([]);
     },
     drawSegment: function(segment){ // Qq
       if (!thisRenderer.showInvisibleSegments && !segment.Za)
         return;
       this.ctx.beginPath();
-      this.ctx.strokeStyle = Utils.numberToColor(segment.R);
+      if (selectedObj==segment){
+        this.ctx.strokeStyle = "#cc0000";
+        this.ctx.setLineDash([5, 5]);
+      }
+      else if (segment.Za)
+        this.ctx.strokeStyle = Utils.numberToColor(segment.R);
+      else{
+        this.ctx.strokeStyle = "#006060a0";
+        this.ctx.setLineDash([10, 3, 3, 3]);
+      }
       var pos1 = segment.W.a, pos2 = segment.ca.a;
       if (0*segment.vb!=0){ // line
         this.ctx.moveTo(pos1.x, pos1.y);
@@ -734,6 +940,7 @@ module.exports = function(API, params){
         this.ctx.arc(center.x, center.y, Math.sqrt(deltaX*deltaX+deltaY*deltaY), Math.atan2(deltaY, deltaX), Math.atan2(pos2.y-center.y, pos2.x-center.x));
       }
       this.ctx.stroke();
+      this.ctx.setLineDash([]);
     },
     indicateAllLocations: function(roomState, viewWidth, viewHeight){ // Lq
       var gameState = roomState.K;
@@ -850,12 +1057,12 @@ module.exports = function(API, params){
     }
   };
   
-  this.transformPixelCoordToMapCoord = function(x, y){
-    return rendererObj.transformPixelCoordToMapCoord(x, y);
+  this.transformPixelCoordToMapCoord = function(x, y, addMapOrigin = true){
+    return rendererObj.transformPixelCoordToMapCoord(x, y, addMapOrigin);
   };
   
-  this.transformMapCoordToPixelCoord = function(x, y){
-    return rendererObj.transformMapCoordToPixelCoord(x, y);
+  this.transformMapCoordToPixelCoord = function(x, y, addCanvasOrigin = true){
+    return rendererObj.transformMapCoordToPixelCoord(x, y, addCanvasOrigin);
   };
 
   this.transformPixelDistanceToMapDistance = function(dist){
@@ -864,6 +1071,10 @@ module.exports = function(API, params){
 
   this.transformMapDistanceToPixelDistance = function(dist){
     return rendererObj.transformMapDistanceToPixelDistance(dist);
+  };
+
+  this.setSelectedObject = function(object){
+    selectedObj = object;
   };
 
   this.getOrigin = function(){
@@ -890,7 +1101,7 @@ module.exports = function(API, params){
     m_to_p(x, y): [z*(x-Ox)+w/2, z*(y-Oy)+h/2],
 
     e_x_p = pixelCoordX, 
-    e_y_p = pixelCoordY, 
+    e_y_p = pixelCoordY,
 
     Origin Calculation:
     -------------------
@@ -927,4 +1138,87 @@ module.exports = function(API, params){
       thisRenderer.zoomOut(event.offsetX, event.offsetY, thisRenderer.wheelZoomCoeff);
   };
 
+  this.drawVertex = function(vertex){
+    rendererObj.drawVertex(vertex);
+  };
+
+  this.drawSegment = function(segment){
+    rendererObj.drawSegment(segment);
+  };
+
+  this.drawGoal = function(goal){
+    rendererObj.drawGoal(goal);
+  };
+
+  this.drawPlane = function(plane){
+    rendererObj.drawPlane(plane);
+  };
+
+  this.drawDisc = function(disc){
+    rendererObj.drawDisc(disc);
+  };
+
+  this.drawJoint = function(joint, discs){
+    rendererObj.drawJoint(joint, discs);
+  };
+
+  this.drawSpawnPoint = function(point, teamId, radius, selected = false){
+    rendererObj.drawSpawnPoint(point, teamId, radius, selected);
+  };
+
+  this.getState = function(){
+    return {
+      origin: new Point(rendererObj.origin.x, rendererObj.origin.y),
+      showTeamColors: this.showTeamColors,
+      showAvatars: this.showAvatars,
+      showPlayerIds: this.showPlayerIds,
+      zoomCoeff: this.zoomCoeff,
+      wheelZoomCoeff: this.wheelZoomCoeff,
+      resolutionScale: this.resolutionScale,
+      showChatIndicators: this.showChatIndicators,
+      restrictCameraOrigin: this.restrictCameraOrigin,
+      followMode: this.followMode,
+      followPlayerId: this.followPlayerId,
+      drawBackground: this.drawBackground,
+      squarePlayers: this.squarePlayers,
+      currentPlayerDistinction: this.currentPlayerDistinction,
+      showInvisibleSegments: this.showInvisibleSegments,
+      showInvisibleJoints: this.showInvisibleJoints,
+      showPlanes: this.showPlanes,
+      showGoals: this.showGoals,
+      showVertices: this.showVertices,
+      showSegments: this.showSegments,
+      showDiscs: this.showDiscs,
+      showJoints: this.showJoints,
+      showPlayers: this.showPlayers,
+      showSpawnPoints: this.showSpawnPoints,
+    };
+  };
+
+  this.setState = function(state){
+    this.setOrigin(state.origin);
+    this.showTeamColors = state.showTeamColors;
+    this.showAvatars = state.showAvatars;
+    this.showPlayerIds = state.showPlayerIds;
+    this.zoomCoeff = state.zoomCoeff;
+    this.wheelZoomCoeff = state.wheelZoomCoeff;
+    this.resolutionScale = state.resolutionScale;
+    this.showChatIndicators = state.showChatIndicators;
+    this.restrictCameraOrigin = state.restrictCameraOrigin;
+    this.followMode = state.followMode;
+    this.followPlayerId = state.followPlayerId;
+    this.drawBackground = state.drawBackground;
+    this.squarePlayers = state.squarePlayers;
+    this.currentPlayerDistinction = state.currentPlayerDistinction;
+    this.showInvisibleSegments = state.showInvisibleSegments;
+    this.showInvisibleJoints = state.showInvisibleJoints;
+    this.showPlanes = state.showPlanes;
+    this.showGoals = state.showGoals;
+    this.showVertices = state.showVertices;
+    this.showSegments = state.showSegments;
+    this.showDiscs = state.showDiscs;
+    this.showJoints = state.showJoints;
+    this.showPlayers = state.showPlayers;
+    this.showSpawnPoints = state.showSpawnPoints;
+  };
 };

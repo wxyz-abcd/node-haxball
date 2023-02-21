@@ -430,6 +430,7 @@ function abcHaxballAPI(window, config){
     this.Jb = 0;
     this.cb = !1;
     this.conn = null; // player conn
+    this.auth = null; // player auth
     this.customClient = false; // is player using our client?
   }
   function Fa() {
@@ -2099,8 +2100,34 @@ function abcHaxballAPI(window, config){
     null != a && (b.v = h.Fc(a));
     return b;
   };
+  h._np_ = function (a) {
+    var b = new B();
+    b.a.x = r.G(a.x, z);
+    b.a.y = r.G(a.y, z);
+    var c = a.bCoef;
+    null != c && (b.m = r.G(c, z));
+    c = a.cMask;
+    null != c && (b.h = r.G(c, Pb));
+    a = a.cGroup;
+    null != a && (b.v = r.G(a, Pb));
+    return b;
+  };
   h.fr = function (a, b) {
     var c = { v0: a.W.ud, v1: a.ca.ud };
+    h.ka(c, "bias", a.Cc, b.Cc);
+    h.ka(c, "bCoef", a.m, b.m);
+    var d = a.Co();
+    h.ka(c, "curve", d, 0);
+    0 != d && (c.curveF = a.vb);
+    h.ka(c, "vis", a.Za, b.Za);
+    h.Jc(c, "cMask", a.h, b.h);
+    h.Jc(c, "cGroup", a.v, b.v);
+    h.qg(c, a.R, b.R);
+    return c;
+  };
+  h._fr_ = function (roomState, a, b) {
+    var [v0, v1] = roomState.findVertexIndicesOfSegmentObj(a);
+    var c = { v0, v1 };
     h.ka(c, "bias", a.Cc, b.Cc);
     h.ka(c, "bCoef", a.m, b.m);
     var d = a.Co();
@@ -2132,6 +2159,50 @@ function abcHaxballAPI(window, config){
     null != l && (c.h = h.Fc(l));
     null != t && (c.v = h.Fc(t));
     null != m && (c.R = h.$f(m));
+    return c;
+  };
+  h._mp_ = function (a, b) {
+    var c = new E(),
+      d = r.G(a.v1, Pb);
+    c.W = b[r.G(a.v0, Pb)];
+    c.ca = b[d];
+    var d = a.bias,
+      e = a.bCoef,
+      f = a.curve,
+      g = a.curveF,
+      k = a.vis,
+      l = a.cMask,
+      t = a.cGroup,
+      m = a.color;
+    null != d && (c.Cc = r.G(d, z));
+    null != e && (c.m = r.G(e, z));
+    null != g ? (c.vb = r.G(g, z)) : null != f && c.Oc(r.G(f, z));
+    null != k && (c.Za = r.G(k, oc));
+    null != l && (c.h = r.G(l, Pb));
+    null != t && (c.v = r.G(t, Pb));
+    null != m && (c.R = r.G(m, Pb));
+    return c;
+  };
+  h.__mp__ = function (a, b) {
+    var c = new E(),
+      d = a.v1;
+    c.W = a.v0;
+    c.ca = d;
+    var d = a.bias,
+      e = a.bCoef,
+      f = a.curve,
+      g = a.curveF,
+      k = a.vis,
+      l = a.cMask,
+      t = a.cGroup,
+      m = a.color;
+    null != d && (c.Cc = r.G(d, z));
+    null != e && (c.m = r.G(e, z));
+    null != g ? (c.vb = r.G(g, z)) : null != f && c.Oc(r.G(f, z));
+    null != k && (c.Za = r.G(k, oc));
+    null != l && (c.h = r.G(l, Pb));
+    null != t && (c.v = r.G(t, Pb));
+    null != m && (c.R = r.G(m, Pb));
     return c;
   };
   h.ap = function (a) {
@@ -2168,6 +2239,59 @@ function abcHaxballAPI(window, config){
     null != f && (c.R = h.$f(f));
     return c;
   };
+  h._jp_ = function (a, b) {
+    var c = new nb(),
+      d = r.G(a.d0, Pb),
+      e = r.G(a.d1, Pb),
+      f = a.color,
+      g = a.strength,
+      k = a.length;
+    if (d >= b.length || 0 > d) throw new q(null);
+    if (e >= b.length || 0 > e) throw new q(null);
+    c.Yd = d;
+    c.Zd = e;
+    null == k
+      ? ((d = b[d]),
+        (k = b[e]),
+        null == d || null == k
+          ? (c.ec = c.Hb = 100)
+          : ((e = d.a),
+            (k = k.a),
+            (d = e.x - k.x),
+            (e = e.y - k.y),
+            (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
+      : k instanceof Array && null == k.eb
+      ? ((c.Hb = r.G(k[0], z)), (c.ec = r.G(k[1], z)))
+      : (c.ec = c.Hb = r.G(k, z));
+    c.ne = null == g || "rigid" == g ? 1 / 0 : r.G(g, z);
+    null != f && (c.R = r.G(f, Pb));
+    return c;
+  };
+  h.__jp__ = function (a, b) {
+    var c = new nb(),
+      d = a.d0,
+      e = a.d1,
+      f = a.color,
+      g = a.strength,
+      k = a.length;
+    c._Yd_ = d;
+    c._Zd_ = e;
+    null == k
+      ? ((k = e),
+        null == d || null == k
+          ? (c.ec = c.Hb = 100)
+          : ((e = d.a),
+            (k = k.a),
+            (d = e.x - k.x),
+            (e = e.y - k.y),
+            (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
+      : k instanceof Array && null == k.eb
+      ? ((c.Hb = r.G(k[0], z)), (c.ec = r.G(k[1], z)))
+      : (c.ec = c.Hb = r.G(k, z));
+    c.ne = null == g || "rigid" == g ? 1 / 0 : r.G(g, z);
+    null != f && (c.R = r.G(f, Pb));
+    return c;
+  };
   h.gq = function (a) {
     var b = { normal: [a.wa.x, a.wa.y], dist: a.Ua };
     h.ka(b, "bCoef", a.m, 1);
@@ -2191,6 +2315,24 @@ function abcHaxballAPI(window, config){
     null != d && (b.m = r.G(d, z));
     null != c && (b.h = h.Fc(c));
     null != a && (b.v = h.Fc(a));
+    return b;
+  };
+  h._kp_ = function (a) {
+    var b = new L(),
+      c = r.G(a.normal, Array),
+      d = r.G(c[0], z),
+      c = r.G(c[1], z),
+      e = b.wa,
+      f = Math.sqrt(d * d + c * c);
+    e.x = d / f;
+    e.y = c / f;
+    b.Ua = r.G(a.dist, z);
+    d = a.bCoef;
+    c = a.cMask;
+    a = a.cGroup;
+    null != d && (b.m = r.G(d, z));
+    null != c && (b.h = r.G(c, Pb));
+    null != a && (b.v = r.G(a, Pb));
     return b;
   };
   h.Jo = function (a) {
@@ -2304,6 +2446,33 @@ function abcHaxballAPI(window, config){
     null != t && (b.R = h.$f(t));
     null != m && (b.h = h.Fc(m));
     null != n && (b.v = h.Fc(n));
+    return b;
+  };
+  h._Mk_ = function (a, b) {
+    var c = a.pos,
+      d = a.speed,
+      e = a.gravity,
+      f = a.radius,
+      g = a.bCoef,
+      k = a.invMass,
+      l = a.damping,
+      t = a.color,
+      m = a.cMask,
+      n = a.cGroup;
+    if (null != c) {
+      var p = b.a;
+      p.x = c[0];
+      p.y = c[1];
+    }
+    null != d && ((c = b.D), (c.x = d[0]), (c.y = d[1]));
+    null != e && ((d = b.oa), (d.x = e[0]), (d.y = e[1]));
+    null != f && (b.Z = r.G(f, z));
+    null != g && (b.m = r.G(g, z));
+    null != k && (b.aa = r.G(k, z));
+    null != l && (b.Ca = r.G(l, z));
+    null != t && (b.R = r.G(t, Pb));
+    null != m && (b.h = r.G(m, Pb));
+    null != n && (b.v = r.G(n, Pb));
     return b;
   };
   h.ka = function (a, b, c, d) {
@@ -3350,7 +3519,7 @@ function abcHaxballAPI(window, config){
 
   fa.b = !0;
   fa.Rd = [Ta, cc];
-  fa.qd = function (a, b, haxball) {
+  fa.qd = function (a, b) {
     a.jc = b.jc;
     if (null == b.I) a.I = null;
     else {
@@ -3437,7 +3606,7 @@ function abcHaxballAPI(window, config){
       this.kb[1].ga(a);
       this.kb[2].ga(a);
     },
-    ja: function (a/*, haxball*/) {
+    ja: function (a) {
       this.jc = a.zb();
       this.Pc = 0 != a.B();
       this.ib = a.M();
@@ -3495,14 +3664,695 @@ function abcHaxballAPI(window, config){
       this.ce = this.Zc * d;
       vb.i(this.Hk, a, this.yd, this.Zc, d);
     },
-    sc: function (/*haxball*/) {
+    sc: function () {
       var a = ya.zc,
         b = this.gc;
       this.hc != a &&
-        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this/*, haxball*/), (this._LF_ && this._LF_(a)));
+        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this), (this._LF_ && this._LF_(a)));
       return b;
     },
+    copy: function () {
+      function copyStadium(b){ // (b = new h()), b.Kr(a)
+        var a = new h();
+        a.Bh = b.Bh;
+        a.w = b.w;
+        a.ld = b.ld;
+        a.Td = b.Td;
+        a.Sd = b.Sd;
+        a.kd = b.kd;
+        a.Uc = b.Uc;
+        a.Fe = b.Fe;
+        a.jd = b.jd;
+        a.$b = b.$b;
+        a.qc = b.qc;
+        a.kc = b.kc;
+        var o1 = a.ge, o2 = b.ge;
+        o1.m = o2.m;
+        o1.aa = o2.aa;
+        o1.Ca = o2.Ca;
+        o1.Ce = o2.Ce;
+        o1.Te = o2.Te;
+        o1.Ue = o2.Ue;
+        o1.Re = o2.Re;
+        o1.oa.x = o2.oa.x;
+        o1.oa.y = o2.oa.y;
+        o1.v = o2.v;
+        o1.Z = o2.Z;
+        o1.Se = o2.Se;
+        a.Ye = b.Ye;
+        a.Ge = b.Ge;
+        a.Lf = b.Lf;
+        a.pf = b.pf;
+        a.J = b.J.map((o2, idx)=>{ // o1.ja(o2);
+          var o1 = new B();
+          o1.a.x = o2.a.x;
+          o1.a.y = o2.a.y;
+          o1.m = o2.m;
+          o1.h = o2.h;
+          o1.v = o2.v;
+          o1.ud = idx;
+          return o1;
+        });
+        a.U = b.U.map((o2)=>{ // o1.ja(o2);
+          var o1 = new E();
+          var p0 = o2.W, p1 = o2.ca, v0 = -1, v1 = -1;
+          b.J.forEach((x, idx)=>{
+            if (x==p0)
+              v0 = idx;
+            else if (x==p1)
+              v1 = idx;
+          });
+          o1.W = a.J[v0];
+          o1.ca = a.J[v1];
+          o1.Cc = o2.Cc;
+          o1.vb = o2.vb;
+          o1.R = o2.R;
+          o1.Za = o2.Za;
+          o1.m = o2.m;
+          o1.h = o2.h;
+          o1.v = o2.v;
+          return o1;
+        });
+        a.qa = b.qa.map((o2)=>{ // o1.ja(o2);
+          var o1 = new L();
+          o1.wa.x = o2.wa.x;
+          o1.wa.y = o2.wa.y;
+          o1.Ua = o2.Ua;
+          o1.m = o2.m;
+          o1.h = o2.h;
+          o1.v = o2.v;
+          return o1;
+        });
+        a.tc = b.tc.map((o2)=>{ // o1.ja(o2);
+          var o1 = new sb();
+          o1.W.x = o2.W.x;
+          o1.W.y = o2.W.y;
+          o1.ca.x = o2.ca.x;
+          o1.ca.y = o2.ca.y;
+          o1.qe = o2.qe;
+          return o1;
+        });
+        a.F = b.F.map((o2)=>{ // o1.ja(o2);
+          var o1 = new ua();
+          o1.a.x = o2.a.x;
+          o1.a.y = o2.a.y;
+          o1.D.x = o2.D.x;
+          o1.D.y = o2.D.y;
+          o1.oa.x = o2.oa.x;
+          o1.oa.y = o2.oa.y;
+          o1.Z = o2.Z;
+          o1.m = o2.m;
+          o1.aa = o2.aa;
+          o1.Ca = o2.Ca;
+          o1.R = o2.R;
+          o1.h = o2.h;
+          o1.v = o2.v;
+          return o1;
+        });
+        a.pb = b.pb.map((o2)=>{ // o1.ja(o2);
+          var o1 = new nb();
+          o1.Yd = o2.Yd;
+          o1.Zd = o2.Zd;
+          o1.Hb = o2.Hb;
+          o1.ec = o2.ec;
+          o1.ne = o2.ne;
+          o1.R = o2.R;
+          return o1;
+        });
+        a.Dd = b.Dd.map((o)=>(new H(o.x, o.y)));
+        a.md = b.md.map((o)=>(new H(o.x, o.y)));
+        a.he();
+        return a;
+      }
+      function copyState(b, fa){
+        if (!b)
+          return null;
+        var a = new O();
+        a.ta.F = b.ta.F.map((o2)=>{ // o1.ja(o2);
+          var o1 = new ca();
+          o1.a.x = o2.a.x;
+          o1.a.y = o2.a.y;
+          o1.D.x = o2.D.x;
+          o1.D.y = o2.D.y;
+          o1.oa.x = o2.oa.x;
+          o1.oa.y = o2.oa.y;
+          o1.Z = o2.Z;
+          o1.m = o2.m;
+          o1.aa = o2.aa;
+          o1.Ca = o2.Ca;
+          o1.R = o2.R;
+          o1.h = o2.h;
+          o1.v = o2.v;
+          o1.playerId = o2.playerId;
+          return o1;
+        });
+        a.vc = b.vc;
+        a.Bb = b.Bb;
+        a.Pb = b.Pb;
+        a.Kb = b.Kb;
+        a.Hc = b.Hc;
+        a.Oa = b.Oa;
+        a.ae = b.ae;
+        a.Ma = fa;
+        a.ib = fa.ib;
+        a.Da = fa.Da;
+        a.S = fa.S;
+        a.ta.J = a.S.J;
+        a.ta.U = a.S.U;
+        a.ta.qa = a.S.qa;
+        a.ta.pb = a.S.pb;
+        return a;
+      }
+      var b = new fa();
+      b.jc = this.jc;
+      b.Pc = this.Pc;
+      b.ib = this.ib;
+      b.Da = this.Da;
+      b.ce = this.ce;
+      b.Zc = this.Zc;
+      b.yd = this.yd;
+      b.S = copyStadium(this.S); // this.S = h.ja(a);
+      b.K = copyState(this.K, b); // b && ((this.K = new O()), this.K.ja(a, this));
+      b.I = [];
+      this.I.forEach((p, i)=>{
+        var q = new ea();
+        q.cb = p.cb;
+        q.Jb = p.Jb;
+        q.Xb = p.Xb;
+        q.Jd = p.Jd;
+        q.Ld = p.Ld;
+        q.Kd = p.Kd;
+        q.Ug = p.Ug;
+        q.w = p.w;
+        q.ob = p.ob;
+        q.V = p.V;
+        q.Wb = p.Wb;
+        q.yc = p.yc;
+        q.Sc = p.Sc;
+        q.cb = p.cb;
+        q.cb = p.cb;
+        q.ea = p.ea;
+        q.auth = p.auth;
+        q.conn = p.conn;
+        q.customClient = p.customClient;
+        if (b.K && p.H){
+          var id = p.H.playerId, idx = b.K.ta.F.findIndex(x=>x.playerId==id);
+          if (idx>-1)
+            q.H = b.K.ta.F[idx];
+        }
+        b.I[i] = q;
+      });
+      this.kb.forEach((obj1, i)=>{ // this.kb[1].ja(a); this.kb[2].ja(a);
+        if (!obj1)
+          b.kb[i] = null;
+        else{
+          var obj2 = b.kb[i];
+          obj2.hd = obj1.hd;
+          obj2.ed = obj1.ed;
+          obj2.fb = [];
+          obj1.fb.forEach((fb1)=>{
+            obj2.fb.push(fb1);
+          });
+        }
+      });
+      return b;
+    },
+    exportStadium: function(){
+      var { S, ta } = this.K, d = new E(), k = new ua(), bgObj = {};
+      var rsp = S.Dd.map((a)=>([a.x, a.y])), bsp = S.md.map((a)=>([a.x, a.y])), j = ta.pb.map(h.ap);
+      h.ka(bgObj, "type", ((S.ld==1) ? "grass" : ((S.ld==2) ? "hockey" : "none")), "none");
+      h.ka(bgObj, "width", S.Td, 0);
+      h.ka(bgObj, "height", S.Sd, 0);
+      h.ka(bgObj, "kickOffRadius", S.kd, 0);
+      h.ka(bgObj, "cornerRadius", S.Uc, 0);
+      h.qg(bgObj, S.jd, 7441498);
+      (S.ld==2) && h.ka(bgObj, "goalLine", S.Fe, 0);
+      var exp = {
+        "name": S.w,
+        "width": S.$b,
+        "height": S.qc,
+        "vertexes": ta.J.map((x, i)=>{var y = h.Tr(x);y.ud=i;return y;}),
+        "segments": ta.U.map((x)=>{return h._fr_(this, x, d);}),
+        "planes": ta.qa.map(h.gq),
+        "goals": S.tc.map(h.Jo),
+        "discs": ta.F.map((x)=>{return h.mo(x, k);}),
+        "bg": bgObj,
+        "playerPhysics": h.jq(S.ge),
+        "ballPhysics": "disc0"
+      };
+      h.ka(exp, "maxViewWidth", S.Ye, 0);
+      h.ka(exp, "cameraFollow", 1 == S.Ge ? "player" : "", "");
+      h.ka(exp, "spawnDistance", S.kc, 200);
+      (j.length>0) && (exp["joints"] = ta.pb.map(h.ap));
+      (rsp.length>0) && (exp["redSpawnPoints"] = rsp);
+      (bsp.length>0) && (exp["blueSpawnPoints"] = bsp);
+      h.ka(exp, "kickOffReset", S.pf ? "full" : "partial", "partial");
+      (!S.Lf) && (exp["canBeStored"] = false);
+      return exp;
+    },
     f: fa,
+
+
+    // ------------------ Custom functions section ------------------
+    // CAUTION: These functions should NOT be used in the original 
+    // Haxball client, otherwise they will cause desynchronization.
+    // Example usage can be found in the implementation of sandbox mode.
+
+    createVertex: function(data) { // data: { x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }
+      return h._np_(data);
+    },
+
+    createSegment: function(data) { // data: { v0: number, v1: number, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
+      var segment = h._mp_(data, this.K.ta.J);
+      segment.he();
+      return segment;
+    },
+
+    createSegmentFromObj: function(data) { // data: { v0: vertexObj, v1: vertexObj, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
+      var segment = h.__mp__(data, this.K.ta.J);
+      segment.he();
+      return segment;
+    },
+
+    createGoal: function(data) { // data: { p0: [x: number, y: number], p1: [x: number, y: number], team: ("red" || "blue") }
+      return h.ip(data);
+    },
+
+    createPlane: function(data) { // data: { normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }
+      return h._kp_(data);
+    },
+
+    createDisc: function(data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }
+      return h._Mk_(data, new ua()).rp();
+    },
+
+    createJoint: function(data) { // data: { d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }
+      return h._jp_(data, this.K.ta.F);
+    },
+
+    createJointFromObj: function(data) { // data: { d0: discObj, d1: discObj, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }
+      return h.__jp__(data, this.K.ta.F);
+    },
+
+    addVertex: function(data) { // data: { x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }
+      this.K.ta.J.push(this.createVertex(data));
+    },
+
+    addSegment: function(data) { // data: { v0: number, v1: number, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
+      this.K.ta.U.push(this.createSegment(data));
+    },
+
+    addGoal: function(data) { // data: { p0: [x: number, y: number], p1: [x: number, y: number], team: ("red" || "blue") }
+      this.K.S.tc.push(this.createGoal(data));
+    },
+
+    addPlane: function(data) { // data: { normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }
+      this.K.ta.qa.push(this.createPlane(data));
+    },
+
+    addDisc: function(data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }
+      var disc = this.createDisc(data);
+      //find the index to add this disc (it should be right before player discs start)
+      var idx = this.K.ta.F.findIndex((x)=>x.playerId!=null);
+      if (idx<0)
+        idx = this.K.ta.F.length;
+      // add the disc at that index
+      this.K.ta.F.splice(idx, 0, disc);
+      // shift the disc indices by 1 in all joints of all discs that come after the added disc
+      var joints = this.K.ta.pb;
+      for (var idx2=this.K.ta.F.length-2;idx2>=idx;idx2--){
+        joints.forEach((joint)=>{
+          if (joint.Yd==idx2)
+            joint.Yd++;
+          if (joint.Zd==idx2)
+            joint.Zd++;
+        });
+      }
+    },
+
+    addJoint: function(data) { // data: { d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }
+      this.K.ta.pb.push(this.createJoint(data));
+    },
+
+    addSpawnPoint: function(data) { // data: { x: number, y: number, team: ("red" || "blue") }
+      var arr;
+      if (data.team=="red")
+        arr = this.K.S.Dd;
+      else if (data.team=="blue")
+        arr = this.K.S.md;
+      if (!arr)
+        return;
+      arr.push(new H(data.x, data.y));
+    },
+
+    addPlayer: function(data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, bCoef: number, cMask: array of string, cGroup: array of string, id: integer, name: string, avatar: string, flag: string, team: ("spec" || "red" || "blue") }
+      var { team, /* pos, radius, speed, gravity, invMass, damping, bCoef, cMask, cGroup, */ id, name, avatar, flag } = data;
+      var teamObj = (team=="spec") ? p.Ia : (((team=="red") ? p.fa : ((team=="blue") ? p.xa : null)));
+      if (!teamObj)
+        return;
+      var b = oa.la(id, name, flag, avatar, "fakeConn", "fakeAuth");
+      b.P = 0;
+      b.apply(this);
+      if (team=="spec")
+        return;
+      b = S.la(id, teamObj);
+      b.P = 0;
+      b.apply(this);
+      this.updateDiscObj(this.na(id).H, data);
+    },
+
+    findVertexIndicesOfSegmentObj: function(segment){
+      var p0 = segment.W, p1 = segment.ca, v0 = -1, v1 = -1;
+      this.K.ta.J.forEach((x, idx)=>{
+        if (x==p0)
+          v0 = idx;
+        else if (x==p1)
+          v1 = idx;
+      });
+      return [v0, v1];
+    },
+
+    findVertexIndicesOfSegment: function(segmentIndex){
+      return this.findVertexIndicesOfSegmentObj(this.K.ta.U[segmentIndex]);
+    },
+
+    updateVertex: function(idx, data) { // data: { x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }
+      var vertex = this.K.ta.J[idx];
+      if (!vertex)
+        return;
+      var v = h._np_(data);
+      if (data.hasOwnProperty("x"))
+        vertex.a.x = v.a.x;
+      if (data.hasOwnProperty("y"))
+        vertex.a.y = v.a.y;
+      if (data.hasOwnProperty("bCoef"))
+        vertex.m = v.m;
+      if (data.hasOwnProperty("cMask"))
+        vertex.h = v.h;
+      if (data.hasOwnProperty("cGroup"))
+        vertex.v = v.v;
+      // update all segments that use this vertex
+      this.K.ta.U.forEach((segment)=>{
+        if (segment.ca==vertex || segment.W==vertex)
+          segment.he();
+      });
+    },
+
+    updateSegment: function(idx, data) { // data: { v0: number, v1: number, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
+      var segment = this.K.ta.U[idx];
+      if (!segment)
+        return;
+      var s = h._mp_(data, this.K.ta.J); // using "curve" causes s.Oc() which changes s.W, s.ca, s.Cc and s.vb.
+      if (data.hasOwnProperty("v0") || data.hasOwnProperty("curve"))
+        segment.W = s.W;
+      if (data.hasOwnProperty("v1") || data.hasOwnProperty("curve"))
+        segment.ca = s.ca;
+      if (data.hasOwnProperty("bias") || data.hasOwnProperty("curve"))
+        segment.Cc = s.Cc;
+      if (data.hasOwnProperty("curveF") || data.hasOwnProperty("curve"))
+        segment.vb = s.vb;
+      if (data.hasOwnProperty("vis"))
+        segment.Za = s.Za;
+      if (data.hasOwnProperty("color"))
+        segment.R = s.R;
+      if (data.hasOwnProperty("bCoef"))
+        segment.m = s.m;
+      if (data.hasOwnProperty("cMask"))
+        segment.h = s.h;
+      if (data.hasOwnProperty("cGroup"))
+        segment.v = s.v;
+      segment.he();
+    },
+
+    updateGoal: function(idx, data) { // data: { p0: [x: number, y: number], p1: [x: number, y: number], team: ("red" || "blue") }
+      var goal = this.K.S.tc[idx];
+      if (!goal)
+        return;
+      var g = h.ip(data);
+      if (data.hasOwnProperty("p0"))
+        goal.W = g.W;
+      if (data.hasOwnProperty("p1"))
+        goal.ca = g.ca;
+      if (data.hasOwnProperty("team"))
+        goal.qe = g.qe;
+    },
+
+    updatePlane: function(idx, data) { // data: { normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }
+      var plane = this.K.ta.qa[idx];
+      if (!plane)
+        return;
+      var p = h._kp_(data);
+      if (data.hasOwnProperty("normal"))
+        plane.wa = p.wa;
+      if (data.hasOwnProperty("dist"))
+        plane.Ua = p.Ua;
+      if (data.hasOwnProperty("bCoef"))
+        plane.m = p.m;
+      if (data.hasOwnProperty("cMask"))
+        plane.h = p.h;
+      if (data.hasOwnProperty("cGroup"))
+        plane.v = p.v;
+    },
+
+    updateDisc: function(idx, data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }
+      this.updateDiscObj(this.K.ta.F[idx], data);
+    },
+
+    updateDiscObj: function(disc, data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }
+      if (!disc)
+        return;
+      var d = h._Mk_(data, new ua());
+      if (data.hasOwnProperty("pos"))
+        disc.a = d.a;
+      if (data.hasOwnProperty("speed"))
+        disc.D = d.D;
+      if (data.hasOwnProperty("gravity"))
+        disc.oa = d.oa;
+      if (data.hasOwnProperty("radius"))
+        disc.Z = d.Z;
+      if (data.hasOwnProperty("invMass"))
+        disc.aa = d.aa;
+      if (data.hasOwnProperty("damping"))
+        disc.Ca = d.Ca;
+      if (data.hasOwnProperty("color"))
+        disc.R = d.R;
+      if (data.hasOwnProperty("bCoef"))
+        disc.m = d.m;
+      if (data.hasOwnProperty("cMask"))
+        disc.h = d.h;
+      if (data.hasOwnProperty("cGroup"))
+        disc.v = d.v;
+    },
+
+    updateJoint: function(idx, data) { // data: { d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }
+      var joint = this.K.ta.pb[idx];
+      if (!joint)
+        return;
+      var j = h._jp_(data, this.K.ta.F);
+      if (data.hasOwnProperty("d0"))
+        joint.Yd = j.Yd;
+      if (data.hasOwnProperty("d1"))
+        joint.Zd = j.Zd;
+      if (data.hasOwnProperty("color"))
+        joint.R = j.R;
+      if (data.hasOwnProperty("strength"))
+        joint.ne = j.ne;
+      if (data.hasOwnProperty("length")){
+        joint.ec = j.ec;
+        joint.Hb = j.Hb;
+      }
+    },
+
+    updateSpawnPoint: function(idx, team, data) { // data: { x: number, y: number, team: ("red" || "blue") }
+      var arr1, arr2;
+      if (team=="red")
+        arr1 = this.K.S.Dd;
+      else if (team=="blue")
+        arr1 = this.K.S.md;
+      if (data.team=="red")
+        arr2 = this.K.S.Dd;
+      else if (data.team=="blue")
+        arr2 = this.K.S.md;
+      if (!arr1 || !arr2)
+        return;
+      var obj;
+      if (arr1==arr2)
+        obj = arr1[idx];
+      else
+        obj = arr1.splice(idx, 1)[0];
+      if (!obj)
+        return;
+      if (data.hasOwnProperty("x"))
+        obj.x = data.x;
+      if (data.hasOwnProperty("y"))
+        obj.y = data.y;
+      if (arr1!=arr2)
+        arr2.push(obj);
+    },
+
+    updatePlayer: function(playerId, data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, bCoef: number, cMask: array of string, cGroup: array of string, name: string, avatar: string, flag: string, team: ("spec" || "red" || "blue") }
+      var playerObj = this.na(playerId);
+      if (!playerObj)
+        return;
+      var teamObj = null;
+      if (data.hasOwnProperty("team"))
+        teamObj = (data.team=="spec") ? p.Ia : (((data.team=="red") ? p.fa : ((data.team=="blue") ? p.xa : null)));
+      if (data.hasOwnProperty("name"))
+        playerObj.w = data.name;
+      if (data.hasOwnProperty("flag"))
+        playerObj.Kd = data.flag;
+      if (data.hasOwnProperty("avatar"))
+        playerObj.Xb = data.avatar;
+      if (teamObj!=null){
+        var b = S.la(playerId, teamObj);
+        b.P = 0;
+        b.apply(this);
+      }
+      if (playerObj.H!=null)
+        this.updateDiscObj(playerObj.H, data);
+    },
+
+    removeVertex: function(idx) {
+      // remove the vertex
+      var vertex = this.K.ta.J.splice(idx, 1)[0];
+      if (!vertex)
+        return;
+      // find all segment indices that use this vertex
+      var segments = this.K.ta.U, indices = [];
+      segments.forEach((segment, idx)=>{
+        if (segment.ca==vertex || segment.W==vertex)
+          indices.unshift(idx); // adds in reverse order
+      });
+      // remove all segments that use this vertex
+      indices.forEach((idx)=>segments.splice(idx, 1));
+    },
+
+    removeSegment: function(idx) {
+      this.K.ta.U.splice(idx, 1);
+    },
+
+    removeGoal: function(idx) {
+      this.K.S.tc.splice(idx, 1);
+    },
+
+    removePlane: function(idx) {
+      this.K.ta.qa.splice(idx, 1);
+    },
+
+    removeDisc: function(idx) {
+      // remove the disc
+      this.K.ta.F.splice(idx, 1);
+      // find all joint indices that use this disc
+      var joints = this.K.ta.pb, indices = [];
+      joints.forEach((joint, idx2)=>{
+        if (joint.Yd==idx || joint.Zd==idx)
+          indices.unshift(idx2); // adds in reverse order
+      });
+      // remove all joints that use this disc
+      indices.forEach((idx2)=>joints.splice(idx2, 1));
+      // shift the disc indices by 1 in all joints of all discs that come after the removed disc
+      for (var idx2=idx+1;idx2<=this.K.ta.F.length;idx2++){
+        joints.forEach((joint)=>{
+          if (joint.Yd==idx2)
+            joint.Yd--;
+          if (joint.Zd==idx2)
+            joint.Zd--;
+        });
+      }
+    },
+
+    removeJoint: function(idx) {
+      this.K.ta.pb.splice(idx, 1);
+    },
+
+    removeSpawnPoint: function(idx, team) {
+      var arr;
+      if (team=="red")
+        arr = this.K.S.Dd;
+      else if (team=="blue")
+        arr = this.K.S.md;
+      if (!arr)
+        return;
+      arr.splice(idx, 1);
+    },
+
+    removePlayer: function(playerId) {
+      var b = Y.la(playerId, null, true);
+      b.P = 0;
+      b.apply(this);
+    },
+
+    updateStadiumPlayerPhysics: function(data) { // data: { radius: number, gravity: [x: number, y: number], invMass: number, bCoef: number, cGroup: array of string, damping: number, kickingDamping: number, acceleration: number, kickingAcceleration: number, kickStrength: number, kickback: number }
+      var obj = this.K?.S.ge;
+      if (!obj)
+        return;
+      var d = h._Mk_(data, new ua());
+      if (data.hasOwnProperty("radius"))
+        obj.Z = d.Z;
+      if (data.hasOwnProperty("gravity"))
+        obj.oa = d.oa;
+      if (data.hasOwnProperty("invMass"))
+        obj.aa = d.aa;
+      if (data.hasOwnProperty("bCoef"))
+        obj.m = d.m;
+      if (data.hasOwnProperty("cGroup"))
+        obj.v = d.v;
+      if (data.hasOwnProperty("damping"))
+        obj.Ca = d.Ca;
+      if (data.hasOwnProperty("kickingDamping"))
+        obj.Ua = r.G(data.kickingDamping, z);
+      if (data.hasOwnProperty("acceleration"))
+        obj.Ce = r.G(data.acceleration, z);
+      if (data.hasOwnProperty("kickingAcceleration"))
+        obj.Te = r.G(data.kickingAcceleration, z);
+      if (data.hasOwnProperty("kickStrength"))
+        obj.Re = r.G(data.kickStrength, z);
+      if (data.hasOwnProperty("kickback"))
+        obj.Se = r.G(data.kickback, z);
+    },
+
+    updateStadiumBg: function(data) { // data: { type: 0("none") || 1("grass") || 2("hockey"), width: number, height: number, kickOffRadius: number, cornerRadius: number, color: ("transparent" || string || [r: number, g: number, b: number]), goalLine: number }
+      var obj = this.K?.S;
+      if (!obj)
+        return;
+      if (data.hasOwnProperty("type"))
+        obj.ld = r.G(data.type, Pb);
+      if (data.hasOwnProperty("width"))
+        obj.Td = r.G(data.width, z);
+      if (data.hasOwnProperty("height"))
+        obj.Sd = r.G(data.height, z);
+      if (data.hasOwnProperty("kickOffRadius"))
+        obj.kd = r.G(data.kickOffRadius, z);
+      if (data.hasOwnProperty("cornerRadius"))
+        obj.Uc = r.G(data.cornerRadius, z);
+      if (data.hasOwnProperty("color"))
+        obj.jd = r.G(data.color, Pb);
+      if (data.hasOwnProperty("goalLine"))
+        obj.Fe = r.G(data.goalLine, z);
+    },
+
+    updateStadiumGeneral: function(data) { // data: { name: string, width: number, height: number, maxViewWidth: number, cameraFollow: 0("") || 1("player"), spawnDistance: number, kickOffReset: true("full") || false("partial"), canBeStored: boolean }
+      var obj = this.K?.S;
+      if (!obj)
+        return;
+      if (data.hasOwnProperty("name"))
+        obj.w = r.G(data.name, String);
+      if (data.hasOwnProperty("width"))
+        obj.$b = r.G(data.width, z);
+      if (data.hasOwnProperty("height"))
+        obj.qc = r.G(data.height, z);
+      if (data.hasOwnProperty("maxViewWidth"))
+        obj.Ye = r.G(data.maxViewWidth, z);
+      if (data.hasOwnProperty("cameraFollow"))
+        obj.Ge = r.G(data.cameraFollow, Pb);
+      if (data.hasOwnProperty("spawnDistance"))
+        obj.kc = r.G(data.spawnDistance, z);
+      if (data.hasOwnProperty("kickOffReset"))
+        obj.pf = r.G(data.kickOffReset, oc);
+      if (data.hasOwnProperty("canBeStored"))
+        obj.Lf = r.G(data.canBeStored, oc);
+    },
+
   };
 
   ///////////////////////////////////////////////////////////////
@@ -6905,13 +7755,419 @@ function abcHaxballAPI(window, config){
     };
   }
 
+  // sandbox mode section:
+
+  function SandboxRoom(roomState) {
+    V.call(this, roomState);
+    this.events = [];
+    this.speed = 1;
+    this.Li = performance.now();
+    this.frozen = false;
+  }
+  SandboxRoom.prototype = C(V.prototype, {
+    ra: function () {},
+    Sf: function () {
+      return this.T;
+    },
+    C: function () {
+      var arr = this.events;
+      this.events = [];
+      var a = (((performance.now() - this.Li) * this.Ac * this.speed) | 0) - this.Y;
+      for (var i=0;i<a;i++){
+        this.Y+=1;
+        if (!this.frozen){
+          this.T.C(1);
+          // events should normally run inside this loop,
+          // but since we are not dealing with network and
+          // synchronization, we can do whatever we want here.
+        }
+      }
+      arr.forEach((event)=>{
+        event.apply(this.T);
+      });
+    },
+    receiveEvent: function(event){
+      this.events.push(event);
+    },
+    setSpeed: function(speedCoeff){
+      if (speedCoeff<0)
+        return;
+      if (speedCoeff==0){
+        this.frozen = true;
+        return;
+      }
+      this.Y = (this.Y * speedCoeff / this.speed) | 0;
+      this.speed = speedCoeff;
+      this.frozen = false;
+    },
+    runSteps: function(count){
+      if (!this.frozen)
+        return;
+      this.T.C(count);
+    }
+  });
+
+  function Sandbox(ya, callbacks, options) {
+    var $c = performance.now();
+    var De = 0;
+    var raf = options?.requestAnimationFrame || requestAnimationFrame;
+    var caf = options?.cancelAnimationFrame || cancelAnimationFrame;
+    var fps_limit = options?.fps_limit;
+    var render = callbacks?.render;
+    var Kc = render && function () {
+      var a = performance.now();
+      null != fps_limit && fps_limit > a - $c || (
+        $c = a, 
+        render(ya.Sf())
+      )
+    };
+    var bf = function () {
+      De = raf(bf);
+      ya.C();
+      render && Kc();
+    };
+    function initialize(){
+      raf(bf);
+      ya.T.iq = (b)=>{
+        callbacks.onPlayerInputChange && callbacks.onPlayerInputChange(b.V, b.ob);
+      };
+      ya.T.tl = (b)=>{ // +
+        callbacks.onPlayerJoin && callbacks.onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+      };
+      ya.T.ji = (d)=>{ // +
+        callbacks.onPlayerBallKick && callbacks.onPlayerBallKick(d?.V);
+      };
+      ya.T.Ni = (team)=>{ // +
+        callbacks.onTeamGoal && callbacks.onTeamGoal(team?.$);
+      };
+      ya.T.Oi = (team)=>{ // +
+        callbacks.onGameEnd && callbacks.onGameEnd(team.$); // winningTeamId
+      };
+      ya.T.ml = (c, Bf, e)=>{ // +
+        (!e) && callbacks.onGamePauseChange && callbacks.onGamePauseChange(Bf, c?.V) // paused, byId
+      };
+      ya.T.Ki = function(a){ // +
+        callbacks.onGameStart && callbacks.onGameStart(a?.V); // byId
+      }
+      ya.T.Os = ()=>{
+        callbacks.onGameTick && callbacks.onGameTick();
+      };
+      ya.T._KO_ = ()=>{
+        callbacks.onKickOff && callbacks.onKickOff();
+      };
+      ya.T._LF_ = (a)=>{
+        callbacks.onLocalFrame && callbacks.onLocalFrame(a);
+      }
+      ya.T._CDD_ = (a, b, c, d)=>{
+        callbacks.onCollisionDiscVsDisc && callbacks.onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+      };
+      ya.T._CDP_ = (a, b, c)=>{
+        callbacks.onCollisionDiscVsPlane && callbacks.onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+      };
+      ya.T._CDS_ = (a, b, c)=>{
+        callbacks.onCollisionDiscVsSegment && callbacks.onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+      };
+      ya.T._AT_ = (a, b, c, d, e) => {
+        callbacks.onAutoTeams && callbacks.onAutoTeams(a, b, c, d, e);
+      };
+      ya.T._TLC_ = (a, b) => {
+        callbacks.onTimeLimitChange && callbacks.onTimeLimitChange(a, b);
+      };
+      ya.T._SLC_ = (a, b) => {
+        callbacks.onScoreLimitChange && callbacks.onScoreLimitChange(a, b);
+      };
+      ya.T._PAC_ = (a, b) => {
+        callbacks.onPlayerAvatarChange && callbacks.onPlayerAvatarChange(a, b);
+      };
+      ya.T._PTC_ = (a, b, c) => { // + (xl)
+        callbacks.onPlayerTeamChange && callbacks.onPlayerTeamChange(a, b, c);
+      };
+      ya.T._TCC_ = (a, b, c) => {
+        callbacks.onTeamColorsChange && callbacks.onTeamColorsChange(a, b, c);
+      };
+      ya.T._TLC2_ = (a, b) => {
+        callbacks.onTeamsLockChange && callbacks.onTeamsLockChange(a, b);
+      };
+      ya.T._CE_ = (a, b, c)=>{
+        callbacks.onCustomEvent && callbacks.onCustomEvent(a, b, c); // type, data, byUser
+      };
+      ya.T._SDP_ = (a, b, c, d)=>{
+        callbacks.onSetDiscProperties && callbacks.onSetDiscProperties(a, b, c, d); // id, type, data1, data2
+      };
+      ya.T._PD_ = (a)=>{
+        callbacks.onPingData && callbacks.onPingData(a); // ping array
+      };
+      ya.T._HC_ = (a)=>{
+        callbacks.onHandicapChange && callbacks.onHandicapChange(a);
+      };
+      ya.T._EC_ = (a)=>{
+        callbacks.onExtrapolationChange && callbacks.onExtrapolationChange(a);
+      };
+      ya.T.Pi = ()=>{ // +
+        callbacks.onTimeIsUp && callbacks.onTimeIsUp();
+      };
+      ya.T.lq = ()=>{
+        callbacks.onPositionsReset && callbacks.onPositionsReset();
+      };
+      ya.T.rl = function(b, Tc){ // +
+        callbacks.onPlayerChat && callbacks.onPlayerChat(b.V, Tc); // id, message
+      };
+      ya.T.Vl = function(msg, color, style, sound){ // +
+        callbacks.onAnnouncement && callbacks.onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+      };
+      ya.T.vf = function(b){ // +
+        callbacks.onGameStop && callbacks.onGameStop(b?.V);  //byId
+      };
+      ya.T.Ii = function(a, e){ // +
+        callbacks.onStadiumChange && callbacks.onStadiumChange(e, a?.V); // map, byId
+      };
+      ya.T.sl = function(b){ // +
+        callbacks.onPlayerSyncChange && callbacks.onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+      };
+      ya.T.ii = function(b, c){ // +
+        callbacks.onPlayerAdminChange && callbacks.onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+      };
+      ya.T.Hk = function(a, b, c, d){ // +
+        callbacks.onKickRateLimitChange && callbacks.onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+      };
+      ya.T.ul = function (d, e, f, g) { // +
+        callbacks.onPlayerLeave && callbacks.onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
+      };
+      ya.T.wl = function(a, b){ // +
+        callbacks.onPlayerChatIndicatorChange && callbacks.onPlayerChatIndicatorChange(a?.V, !b); // id, value
+      };
+    };
+    function finalize(){
+      caf(De);
+      ya.T.iq = null;
+      ya.T.tl = null;
+      ya.T.ji = null;
+      ya.T.Ni = null;
+      ya.T.Oi = null;
+      ya.T.ml = null;
+      ya.T.Ki = null;
+      ya.T.Os = null;
+      ya.T._KO_ = null;
+      ya.T._LF_ = null;
+      ya.T._CDD_ = null;
+      ya.T._CDP_ = null;
+      ya.T._CDS_ = null;
+      ya.T._AT_ = null;
+      ya.T._TLC_ = null;
+      ya.T._SLC_ = null;
+      ya.T._PAC_ = null;
+      ya.T._PTC_ = null;
+      ya.T._TCC_ = null;
+      ya.T._TLC2_ = null;
+      ya.T._CE_ = null;
+      ya.T._SDP_ = null;
+      ya.T._PD_ = null;
+      ya.T._HC_ = null;
+      ya.T._EC_ = null;
+      ya.T.Pi = null;
+      ya.T.lq = null;
+      ya.T.rl = null;
+      ya.T.Vl = null;
+      ya.T.vf = null;
+      ya.T.Ii = null;
+      ya.T.sl = null;
+      ya.T.ii = null;
+      ya.T.Hk = null;
+      ya.T.ul = null;
+      ya.T.wl = null;
+    }
+
+    initialize();
+
+    this.ia = function () {
+      finalize();
+    };
+
+    this.setRoomStateObj = function(roomState){
+      finalize();
+      ya.T = roomState;
+      initialize();
+    };
+  }
+
+  function createSandbox(callbacks, options){
+    var roomState = new fa(), room = new SandboxRoom(roomState), sandbox = new Sandbox(room, callbacks, options);
+    var obj;
+    obj = {
+      roomData: roomState,
+      takeSnapshot: function(){
+        return roomState.copy();
+      },
+      useSnapshot: function(newRoomState){
+        var state = newRoomState.copy();
+        sandbox.setRoomStateObj(state);
+        roomState = state;
+        obj.roomData = state;
+      },
+      playerJoin: function(id, name, flag, avatar, conn, auth){
+        var b = oa.la(id, name, flag, avatar, conn, auth);
+        b.P = 0;
+        room.receiveEvent(b);
+      },
+      playerLeave: function(playerId){
+        var playerObj = room.T.na(playerId);
+        if (!playerObj)
+          return;
+        var b = Y.la(playerId, null, true);
+        b.P = 0;
+        room.receiveEvent(b);
+      },
+      playerInput: function(input, byId){
+        var b = new Ga();
+        b.input = input;
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      playerChat: function(msg, byId){
+        var b = new Na();
+        b.Tc = msg;
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setKeyState: function(keyState){
+        obj.playerInput(keyState, options?.controlledPlayerId || 0);
+      },
+      setPlayerChatIndicator: function(value, byId){
+        var b = na.la(value);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setPlayerAvatar: function(value, byId){
+        var b = ra.la(value);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setCurrentStadium: function(value, byId, onError){
+        try {
+          var b = qa.la(value);
+          b.P = byId;
+          room.receiveEvent(b);
+        } catch (k) {
+          b = k instanceof q ? k.Ta : k,
+          b instanceof SyntaxError ? onError("SyntaxError in line: " + r.Be(b.lineNumber, "")) : 
+          b instanceof Bb ? onError(b.xp) : onError("Error loading stadium file.");
+        }
+      },
+      sendAnnouncement: function(msg, color=-1, style=0, sound=1, targetId, byId){
+        var b = rb.la(msg, color, style, sound);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      startGame: function(byId){
+        var b = new Ma();
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      stopGame: function(byId){
+        var b = new La();
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setGamePaused: function(value, byId){
+        var b = new Oa();
+        b.Bf = value;
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setScoreLimit: function(value, byId){
+        var b = da.la(0, value);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setTimeLimit: function(value, byId){
+        var b = da.la(1, value);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setTeamsLock: function(value, byId){
+        var b = pa.la(value);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      autoTeams: function(byId){
+        var b = new Qa();
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setPlayerTeam: function(playerId, teamId, byId){
+        var team = p.byId[teamId];
+        if (!team)
+          return;
+        var b = S.la(playerId, team);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setKickRateLimit: function(min, rate, burst, byId){
+        var b = ma.la(min, rate, burst);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setTeamColors: function(teamId, angle, colors, byId){
+        var b = ub.__cq__(teamId, angle, ...colors);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setPlayerAdmin: function(playerId, value, byId){
+        var b = sa.la(playerId, value);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      kickPlayer: function(playerId, reason, ban, byId){
+        var b = Y.la(playerId, reason, ban);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setPlayerSync: function(value, byId){
+        var b = ta.la(value);
+        b.P = byId;
+        room.receiveEvent(b);
+      }, 
+      sendPingData: function(valueFunc, byId){
+        var b = new la(), d = [];
+        for (var e=0; e<room.T.I.length; e++)
+          d.push(valueFunc(room.T.I[e]));
+        b.we = d;
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setDiscProperties: function(discId, type, data, byId){
+        var b = ob._Kf_(discId, type, data);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      sendCustomEvent: function(type, data, byId){
+        var b = CustomEvent.la(type, data);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setSimulationSpeed: function(speedCoeff){
+        room.setSpeed(speedCoeff);
+      },
+      runSteps: function(count){
+        room.runSteps(count);
+      },
+      getRoomDataOriginal: ()=>{
+        return {
+          q: {
+            ya: obj
+          }
+        }
+      },
+      destroy: sandbox.ia
+    };
+    return obj;
+  }
   
 
+
+
+
   // -- end of global Haxball classes --
-
-
-
-
 
 
 
@@ -7432,6 +8688,16 @@ function abcHaxballAPI(window, config){
     return "rgba("+[(number&16711680)>>>16, (number&65280)>>>8, number&255].join()+",255)";
   };
 
+  function colorToNumber(color){
+    var arr = color.match(/rgba?[ \t]*\([ \t]*(\d+),[ \t]*(\d+),[ \t]*(\d+)[ \t]*\)/);
+    if (arr.length<4)
+      return;
+    var r = parseInt(arr[1]), g = parseInt(arr[2]), b = parseInt(arr[3]);
+    if (r>255 || g>255 || b>255)
+      return;
+    return (r<<16)|(g<<8)|b;
+  };
+
   function keyState(dirX, dirY, kick){ // dirX = oneof[-1:left, 0:still, 1:right], dirY = oneof[-1:up, 0:still, 1:down], kick = true/false
     return (kick?16:0) | (dirX>0?8:(dirX<0?4:0)) | (dirY>0?2:(dirY<0?1:0));
   };
@@ -7465,15 +8731,15 @@ function abcHaxballAPI(window, config){
     return stadium.se();
   };
 
-  function getVertexAtMapCoord(roomState, {x, y}, threshold){
-    return roomState.K?.ta.J.find((vertex)=>{
+  function getVertexIndexAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.K?.ta.J.findIndex((vertex)=>{
       var deltaX = vertex.a.x-x, deltaY = vertex.a.y-y;
       return (deltaX*deltaX+deltaY*deltaY<=threshold*threshold);
     });
   }
 
-  function getSegmentAtMapCoord(roomState, {x, y}, threshold){
-    return roomState.K?.ta.U.find((segment)=>{
+  function getSegmentIndexAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.K?.ta.U.findIndex((segment)=>{
       var d;
       if (0*segment.vb==0){
         var dx = x-segment.Xd.x, dy = y-segment.Xd.y;
@@ -7491,8 +8757,8 @@ function abcHaxballAPI(window, config){
     });
   }
 
-  function getGoalAtMapCoord(roomState, {x, y}, threshold){
-    return roomState.S.tc.find((goal)=>{
+  function getGoalIndexAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.S.tc.findIndex((goal)=>{
       var p0 = goal.W, p1 = goal.ca, dx = p1.x-p0.x, dy = p1.y-p0.y, _dx = x-p1.x, _dy = y-p1.y;
       if ((x-p0.x)*dx+(y-p0.y)*dy<=0 || _dx*dx+_dy*dy>=0)
         return false;
@@ -7501,18 +8767,18 @@ function abcHaxballAPI(window, config){
     });
   }
 
-  function getPlaneAtMapCoord(roomState, {x, y}, threshold){
-    return roomState.K?.ta.qa.find((plane)=>{
+  function getPlaneIndexAtMapCoord(roomState, {x, y}, threshold){
+    return roomState.K?.ta.qa.findIndex((plane)=>{
       return (Math.abs(plane.Ua-(plane.wa.x*x+plane.wa.y*y))<threshold);
     });
   }
 
-  function getJointAtMapCoord(roomState, {x, y}, threshold){
+  function getJointIndexAtMapCoord(roomState, {x, y}, threshold){
     var mapObjects = roomState.K?.ta;
     if (!mapObjects)
-      return false;
+      return -1;
     var discs = mapObjects.F;
-    return mapObjects.pb.find((joint)=>{
+    return mapObjects.pb.findIndex((joint)=>{
       var disc1 = discs[joint.Zd]; // a
       if (!disc1)
         return false;
@@ -7527,11 +8793,54 @@ function abcHaxballAPI(window, config){
     });
   }
 
-  function getDiscAtMapCoord(roomState, {x, y}){
-    return roomState.K?.ta.F.find((disc)=>{
+  function getDiscIndexAtMapCoord(roomState, {x, y}){
+    return roomState.K?.ta.F.findIndex((disc)=>{
       var deltaX = disc.a.x-x, deltaY = disc.a.y-y;
       return (deltaX*deltaX+deltaY*deltaY<=disc.Z*disc.Z);
     });
+  }
+
+  function getSpawnPointIndexAtMapCoord(roomState, {x, y}, threshold){
+    if (!threshold)
+      threshold = roomState.K?.S.ge.Z;
+    var sqrThreshold = threshold*threshold;
+    var idx = roomState.K?.S.Dd.findIndex((p)=>{
+      var deltaX = p.x-x, deltaY = p.y-y;
+      return (deltaX*deltaX+deltaY*deltaY<=sqrThreshold);
+    });
+    if (idx>=0)
+      return [idx, 1];
+    idx = roomState.K?.S.md.findIndex((p)=>{
+      var deltaX = p.x-x, deltaY = p.y-y;
+      return (deltaX*deltaX+deltaY*deltaY<=sqrThreshold);
+    });
+    if (idx>=0)
+      return [idx, 2];
+    return [-1, -1];
+  }
+
+  function getVertexAtMapCoord(roomState, p, threshold){
+    return roomState.K?.ta.J[getVertexIndexAtMapCoord(roomState, p, threshold)];
+  }
+
+  function getSegmentAtMapCoord(roomState, p, threshold){
+    return roomState.K?.ta.U[getSegmentIndexAtMapCoord(roomState, p, threshold)];
+  }
+
+  function getGoalAtMapCoord(roomState, p, threshold){
+    return roomState.S.tc[getGoalIndexAtMapCoord(roomState, p, threshold)];
+  }
+
+  function getPlaneAtMapCoord(roomState, p, threshold){
+    return roomState.K?.ta.qa[getPlaneIndexAtMapCoord(roomState, p, threshold)];
+  }
+
+  function getJointAtMapCoord(roomState, p, threshold){
+    return roomState.K?.ta.pb[getJointIndexAtMapCoord(roomState, p, threshold)];
+  }
+
+  function getDiscAtMapCoord(roomState, p){
+    return roomState.K?.ta.F[getDiscIndexAtMapCoord(roomState, p)];
   }
 
   var eventCallbacks = [];
@@ -7545,6 +8854,7 @@ function abcHaxballAPI(window, config){
     this.currentPlayerId = internalData.roomObj.ya.uc;
     this.currentPlayer = internalData.roomObj.ya.T.I.filter((x)=>(x.V==this.currentPlayerId))[0];
     this.kickTimeout = 20;
+    this.renderer = renderer;
     if (internalData.pluginMechanismActive){
       this.plugins = plugins || [];
       this.pluginsMap = this.plugins.reduce((acc, x)=>{
@@ -7605,6 +8915,7 @@ function abcHaxballAPI(window, config){
         A.i(renderer?.finalize);
         y.i(newRenderer?.initialize, that);
         var oldRenderer = renderer;
+        that.renderer = newRenderer;
         that.client.renderer = newRenderer;
         internalData.renderer = newRenderer;
         renderer = newRenderer;
@@ -8349,7 +9660,7 @@ function abcHaxballAPI(window, config){
         redSpawnPoints: o.S.Dd.map((a)=>([a.x, a.y])),
         blueSpawnPoints: o.S.md.map((a)=>([a.x, a.y])),
         bg: {
-          type: 1 == o.S.ld ? "grass" : (2 == o.S.ld ? "hockey" : "none"),
+          type: (1 == o.S.ld) ? "grass" : ((2 == o.S.ld) ? "hockey" : "none"),
           width: o.S.Td,
           height: o.S.Sd,
           kickOffRadius: o.S.kd,
@@ -8370,7 +9681,7 @@ function abcHaxballAPI(window, config){
           radius: o.S.ge.Z,
           kickback: o.S.ge.Se
         },
-        vertices: p.ta.J.map(h.Tr),
+        vertexes: p.ta.J.map(h.Tr),
         segments: p.ta.U.map(h.fr),
         goals: o.S.tc.map(h.Jo),
         planes: p.ta.qa.map(h.gq),
@@ -8531,6 +9842,7 @@ function abcHaxballAPI(window, config){
       authFromKey,
       getRoomList, 
       numberToColor,
+      colorToNumber,
       keyState,
       getGeo,
       parseStadium,
@@ -8539,19 +9851,27 @@ function abcHaxballAPI(window, config){
     },
     Room: {
       join: joinRoom,
-      create: createRoom
+      create: createRoom,
+      sandbox: createSandbox
     },
     Replay: {
       read: readReplay
       //Recorder: ac
     },
     Query: {
+      getVertexIndexAtMapCoord: getVertexIndexAtMapCoord,
       getVertexAtMapCoord: getVertexAtMapCoord,
+      getSegmentIndexAtMapCoord: getSegmentIndexAtMapCoord,
       getSegmentAtMapCoord: getSegmentAtMapCoord,
+      getGoalIndexAtMapCoord: getGoalIndexAtMapCoord,
       getGoalAtMapCoord: getGoalAtMapCoord,
+      getPlaneIndexAtMapCoord: getPlaneIndexAtMapCoord,
       getPlaneAtMapCoord: getPlaneAtMapCoord,
+      getJointIndexAtMapCoord: getJointIndexAtMapCoord,
       getJointAtMapCoord: getJointAtMapCoord,
-      getDiscAtMapCoord: getDiscAtMapCoord
+      getDiscIndexAtMapCoord: getDiscIndexAtMapCoord,
+      getDiscAtMapCoord: getDiscAtMapCoord,
+      getSpawnPointIndexAtMapCoord: getSpawnPointIndexAtMapCoord
     },
     RoomConfig,
     Plugin,

@@ -188,6 +188,7 @@ Room.create({
   - `authFromKey(authKey)`: recreates the auth object for given `authKey`. the object is used in `Room.join`. returns `Promise(authObj)`
   - `getRoomList()`: returns the current room list. returns `Promise(roomListArray)`
   - `numberToColor(number)`: returns the html color string (rgba representation) of the given `number`. (0 <= `number` <= 16777215)
+  - `colorToNumber(color)`: returns the number representation of the given html color string (rgba representation).
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. `dirX` = oneof\[`-1`:left, `0`:still, `1`:right\], `dirY` = oneof\[`-1`:up, `0`:still, `1`:down\], `kick` = `true`/`false`.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
   - `getDefaultStadiums()`: get default stadium array.
@@ -195,12 +196,19 @@ Room.create({
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
 
 - `Query`: Static functions to query map features. For now, `roomState` has to come from either `Room.getRoomDataOriginal` or the extrapolated parameter in `Renderer.render`.
+  - `getVertexIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
   - `getVertexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getSegmentIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first segment that has a distance to `mapCoordinate` lower than `threshold`.
   - `getSegmentAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first segment that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getGoalIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first goal that has a distance to `mapCoordinate` lower than `threshold`.
   - `getGoalAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first goal that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getPlaneIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first plane that has a distance to `mapCoordinate` lower than `threshold`.
   - `getPlaneAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first plane that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getJointIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first joint that has a distance to `mapCoordinate` lower than `threshold`.
   - `getJointAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first joint that has a distance to `mapCoordinate` lower than `threshold`.
-  - `getDiscAtMapCoord(roomState, mapCoordinate)`: Finds the first disc that has a distance to `mapCoordinate` lower than `threshold`.
+  - `getDiscIndexAtMapCoord(roomState, mapCoordinate)`: Finds the index of the first disc that includes `mapCoordinate`.
+  - `getDiscAtMapCoord(roomState, mapCoordinate)`: Finds the first disc that includes `mapCoordinate`.
+  - `getSpawnPointIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first spawn point that has a distance to `mapCoordinate` lower than `threshold`. Returns `[spawnPointIndex, teamId]`. \[`teamId`: 1: red team, 2: blue team.\]
 
 - `Room`: The class that currently hosts all room operations. Should only be initialized by either `Room.join` or `Room.create`.
   - `static functions`: These functions are used to create/join a room.
@@ -256,6 +264,47 @@ Room.create({
         --- event triggers section ---
         - `cancel()`: should be used to cancel the process of joining a room.
         - `useRecaptchaToken(token)`: should be used to send the recaptcha token after `onRequestRecaptcha` event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use `Room.join` with the new token.
+    
+    - `sandbox(callbacks, options)`: creates a sandbox room. the returning object has the following properties and functions: 
+      - Returning replay reader object:
+        - properties:
+          - `roomData`: An object containing all information about the current room state.
+        - functions:
+          - `setSimulationSpeed(coefficient)`: Changes the speed of the simulation. `coefficient` must be a real number >=0.
+            - `coefficient` = 0 : stop simulation.
+            - 0 < `coefficient` < 1 : slow-motion simulation.
+            - `coefficient` = 1 : normal speed simulation.
+            - `coefficient` > 1 : fast-motion simulation.
+          - `runSteps(count)`: runs the simulation `count` steps. simulation must be stopped for this function to work.
+          - `takeSnapshot()`: returns a complete snapshot of the current room state.
+          - `useSnapshot(newRoomState)`: sets the current room state reference to `newRoomState`. `newRoomState` should be created by `takeSnapshot()` first.
+          - `getRoomDataOriginal()`: get the most important original objects that has the current room data. (added for compatibility with normal rooms.)
+          - `playerJoin(id, name, flag, avatar, conn, auth)`: adds a new player with properties(`id`, `name`, `flag`, `avatar`, `conn`, `auth`) to the room.
+          - `playerLeave(playerId)`: removes player(`playerId`) from the room.
+          - `playerInput(input, byId)`: sets the input of player(`byId`) to `input`.
+          - `playerChat(msg, byId)`: writes chat message(`msg`) as player(`byId`).
+          - `setKeyState(state)`: set current key state to `state`. (added for compatibility with normal rooms.)
+          - `setPlayerChatIndicator(value, byId)`: sets the chat indicator status of player(`byId`) to `value`.
+          - `setPlayerAvatar(value, byId)`: sets the avatar of player(`byId`) to `value`.
+          - `setCurrentStadium(value, byId, onError)`: creates and applies a fake event by player(`byId`) to set the current stadium to `stadium`.
+          - `sendAnnouncement(msg, color=-1, style=0, sound=1, targetId, byId)`: send announcement message(`msg`) to player(`targetId`) with properties(`color`, `style`, `sound`). `targetId` is `null` -> send to everyone. `byId` must be `0`.
+          - `startGame(byId)`: creates and applies a fake event by player(`byId`) to start the game.
+          - `stopGame(byId)`: creates and applies a fake event by player(`byId`) to stop the game.
+          - `setGamePaused(value, byId)`: creates and applies a fake event by player(`byId`) to set the game's paused state to `value`.
+          - `setScoreLimit(value, byId)`: creates and applies a fake event by player(`byId`) to set the game's score limit to `value`.
+          - `setTimeLimit(value, byId)`: creates and applies a fake event by player(`byId`) to set the game's time limit to `value`.
+          - `setTeamsLock(value, byId)`: creates and applies a fake event by player(`byId`) to set the game's teams lock state to `value`.
+          - `autoTeams(byId)`: creates and applies a fake event by player(`byId`) to remove last 2 players from spectators and add them to teams.
+          - `setPlayerTeam(playerId, teamId, byId)`: creates and applies a fake event by player(`byId`) to set player(`playerId`)'s team to team(`teamId`).
+          - `setKickRateLimit(min, rate, burst, byId)`: creates and applies a fake event by player(`byId`) to set the room's kick rate limit.
+          - `setTeamColors(teamId, angle, colors, byId)`: creates and applies a fake event by player(`byId`) to set the team colors for team(`teamId`). `teamId`: `1`(red) | `2`(blue), `angle`: `integer`, `colors`: maximum 4 parseable(hex-rgb) color parameters.
+          - `setPlayerAdmin(playerId, value, byId)`: creates and applies a fake event by player(`byId`) to set player(`playerId`)'s admin status to `isAdmin`.
+          - `kickPlayer(playerId, reason, ban, byId)`: creates and applies a fake event by player(`byId`) to kick/ban a player(`playerId`) with reason(`reason`).
+          - `setPlayerSync(value, byId)`: set the sync of player(`byId`) to `value`.
+          - `sendPingData(valueFunc, byId)`: creates and applies a fake event by player(`byId`) to change all ping values with `valueFunc`. `byId` must be `0`.
+          - `setDiscProperties(discId, type, data, byId)`: creates and applies a fake event by player(`byId`) to set disc(`discId`) properties to `data`. `byId` must be `0`.
+          - `sendCustomEvent(type, data, byId)`: creates and applies a fake custom event with properties(`type`, `data`) by player(`byId`).
+          - `destroy()`: Frees the resources that are used by this object.
 
   - `properties`:
     - `isHost`: `true` for hosts, `false` for clients
@@ -264,6 +313,7 @@ Room.create({
     - `currentPlayer`: the original current player object
     - `sdp`: current room's sdp value (only for client rooms)
     - `kickTimeout`: time between releasing and re-pressing the kick key (in milliseconds, defaults to `20`)
+    - `renderer`: room's current renderer object
     - `plugins`: array of all available plugins. this is used internally to restore the order of plugins while plugin activation/deactivation.
     - `activePlugins`: array of currently active plugins. this is used internally for callbacks.
     - `pluginsMap`: all available plugins mapped as `pluginsMap[plugin.name] = plugin`, for optimized use to communicate between plugins.
@@ -710,9 +760,10 @@ Room.create({
 <div> - Initial testing environment by <a href="https://github.com/mertushka">mertushka <img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
 <div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
 <div> - Room.modifyFrameNo by <a href="https://github.com/hxgd1">Punisher <img width="20" src="https://avatars.githubusercontent.com/u/114198188?v=4"/></a></div>
+<div> - Autoplay bot examples improved by <a href="https://github.com/K0nfy">K0nfy <img width="20" src="https://avatars.githubusercontent.com/u/27099419?v=4"/></a></div>
 <div> - Rest of the features by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
 <div> - Docs formatted by <a href="https://github.com/uzayyli">uzaylı <img width="20" src="https://avatars.githubusercontent.com/u/87779551?v=4"/></a></div>
-<div/>
+<div></div>
 <div>We will continue to add all contributors to this list.</div>
 
 </p>

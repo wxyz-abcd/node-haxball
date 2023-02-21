@@ -5,6 +5,8 @@ var makeFlagSelector = function(countries, flagSelector, onFlagSelect){
     },
     set: (v)=>{
       flagSelector.setAttribute("value", v);
+      flagSelectorPopup.style.visibility = "hidden";
+      updateFlagSelectorContents();
     }
   });
   var flagSelectorPopup = document.createElement("div");
@@ -19,8 +21,6 @@ var makeFlagSelector = function(countries, flagSelector, onFlagSelect){
     o.onclick = (e)=>{
       e.stopPropagation();
       flagSelector.value = e.currentTarget.children[0].getAttribute("data-id").toLowerCase();
-      flagSelectorPopup.style.visibility = "hidden";
-      updateFlagSelectorContents();
       onFlagSelect && onFlagSelect();
     };
   }
@@ -50,4 +50,7 @@ var makeFlagSelector = function(countries, flagSelector, onFlagSelect){
     flagSelectorPopup.style.visibility = "visible";
   };
   updateFlagSelectorContents();
+  flagSelector.setPopupVisibility = function(vis){
+    flagSelectorPopup.style.visibility = vis ? "visible" : "hidden";
+  };
 }

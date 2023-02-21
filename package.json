@@ -1,7 +1,7 @@
 {
   "name": "node-haxball",
-  "version": "1.0.0-beta.3",
-  "description": "A powerful API library for interacting with the Haxball Client",
+  "version": "1.0.0-beta.4",
+  "description": "A powerful API for interacting with the Haxball backend",
   "main": "src/index.js",
   "private": false,
   "scripts": {

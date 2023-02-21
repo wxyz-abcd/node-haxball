@@ -111,3 +111,4 @@ test/
 backup/
 src_2/
 package_git.json
+examples_web/src/sandbox.*

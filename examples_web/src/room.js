@@ -22,7 +22,7 @@ var eStartGame = eControls.children.item(0);
 var eStopGame = eControls.children.item(1);
 var ePauseGame = eControls.children.item(2);
 var ePauseGame = eControls.children.item(2);
-var ctxMenu = document.getElementById("ctxmenu");
+var ctxMenu = document.getElementsByClassName("ctxmenu").item(0);
 var inputPopup = document.getElementById("inputpopup");
 
 function onKeyDown(event){
@@ -90,28 +90,6 @@ function getInput(label, inputDefaultValue, cancelable, yesNo){
   });
 }
 
-function showContextMenu(x, y, headerText, reverse){
-  ctxMenu.style = "visibility:visible;left:"+x+"px;"+(reverse?"bottom":"top")+":"+(reverse?(window.innerHeight-y):y)+"px;";
-  ctxMenu.onmouseleave = function(){
-    ctxMenu.style = "visibility:hidden";
-    ctxMenu.innerHTML = "";
-  };
-  ctxMenu.innerHTML = "";
-  var e = document.createElement("h1");
-  e.innerText = headerText;
-  ctxMenu.appendChild(e);
-  ctxMenu.appendChild(document.createElement("div"));
-}
-
-function addContextMenuItem(text, enabled, onClick){
-  e = document.createElement("p");
-  e.innerText = text;
-  if (!enabled)
-    e.classList.toggle("disabled");
-  e.onclick = onClick;
-  ctxMenu.children.item(1).appendChild(e);
-}
-
 function makePlayerContainer(elem, player){
   elem.classList.add("player-list-item");
   if (player.cb)
@@ -122,20 +100,20 @@ function makePlayerContainer(elem, player){
   };
   elem.oncontextmenu = (event)=>{
     event.preventDefault();
-    showContextMenu(event.pageX-3, event.pageY-3, player.w);
-    addContextMenuItem(player.cb ? "Remove Admin" : "Give Admin", isAdmin(), ()=>{
+    showContextMenu(ctxMenu, event.pageX-3, event.pageY-3, player.w);
+    addContextMenuItem(ctxMenu, player.cb ? "Remove Admin" : "Give Admin", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       room.setPlayerAdmin(player.V, !player.cb);
     });
-    addContextMenuItem("Kick", isAdmin(), ()=>{
+    addContextMenuItem(ctxMenu, "Kick", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       getInput("Reason:", "", true, false).then((reason)=>{
         room.kickPlayer(player.V, reason, false);
       },()=>{});
     });
-    addContextMenuItem("Ban", isAdmin(), ()=>{
+    addContextMenuItem(ctxMenu, "Ban", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       getInput("Reason:", "", true, false).then((reason)=>{
@@ -241,15 +219,15 @@ eScoreLimit.onchange = function(event){
   room.setScoreLimit(event.target.value);//scoreLimitRef.current.selectedIndex
 };
 ePickStadium.onclick = function(event){
-  showContextMenu(event.pageX-3, event.pageY+3, "Pick Stadium", true);
+  showContextMenu(ctxMenu, event.pageX-3, event.pageY+3, "Pick Stadium", true);
   API.Utils.getDefaultStadiums().forEach((stadium)=>{
-    addContextMenuItem(stadium.w, isAdmin(), ()=>{
+    addContextMenuItem(ctxMenu, stadium.w, isAdmin(), ()=>{
       if (!isAdmin())
         return;
       room.setCurrentStadium(stadium);
     });
   });
-  addContextMenuItem("Load from file...", isAdmin(), ()=>{
+  addContextMenuItem(ctxMenu, "Load from file...", isAdmin(), ()=>{
     if (!isAdmin())
       return;
     var inp = document.createElement("input");
