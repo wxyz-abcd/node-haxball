@@ -5,7 +5,7 @@ module.exports = function(API, params){
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.11",
+    version: "1.25",
     author: "basro & abc",
     description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features. Use +, - keys for zoom in-out.`
   });
@@ -25,6 +25,13 @@ module.exports = function(API, params){
     value: true
   });
 
+  this.showPlayerIds = this.defineVariable({
+    name: "showPlayerIds",
+    description: "Show player ids?", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
   this.zoomCoeff = this.defineVariable({
     name: "zoomCoeff",
     description: "Zoom Coefficient", 
@@ -33,6 +40,18 @@ module.exports = function(API, params){
     range: {
       min: 0,
       max: Infinity,
+      step: 0.01
+    }
+  });
+
+  this.wheelZoomCoeff = this.defineVariable({
+    name: "wheelZoomCoeff",
+    description: "Defines how fast you zoom in/out with mouse wheel", 
+    type: VariableType.Number,
+    value: 1.2,
+    range: {
+      min: 1,
+      max: 10,
       step: 0.01
     }
   });
@@ -52,6 +71,20 @@ module.exports = function(API, params){
   this.showChatIndicators = this.defineVariable({ // show_indicators
     name: "showChatIndicators",
     description: "Show Chat Indicators?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.restrictCameraOrigin = this.defineVariable({
+    name: "restrictCameraOrigin",
+    description: "Restrict camera origin to view bounds?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.followMode = this.defineVariable({
+    name: "followMode",
+    description: "Follow camera enabled?", 
     type: VariableType.Boolean,
     value: true
   });
@@ -82,6 +115,13 @@ module.exports = function(API, params){
     description: "Hide current player's name and draw halo around current player?", 
     type: VariableType.Boolean,
     value: true
+  });
+  
+  this.showInvisibleSegments = this.defineVariable({
+    name: "showInvisibleSegments",
+    description: "Show invisible segments?", 
+    type: VariableType.Boolean,
+    value: false
   });
 
   var thisRenderer = this, { H: Point, p: Team, ka: TeamColors } = Impl.Core;
@@ -267,8 +307,9 @@ module.exports = function(API, params){
         }
       }
       this.strokeStyle = (roomState.K.Oa>0 || !playerObj.Wb) ? "black" : ((playerObj.Wb && playerObj.Sc<=0 && playerObj.yc>=0) ? "white" : "black");
-      if (playerObj.w!=this.name){
-        this.name = playerObj.w;
+      var name = thisRenderer.showPlayerIds?("["+playerObj.V+"] "+playerObj.w):playerObj.w;
+      if (name!=this.name){
+        this.name = name;
         this.repaintPlayerName();
       }
     },
@@ -354,12 +395,6 @@ module.exports = function(API, params){
     transformMapDistanceToPixelDistance: function(dist){
       return dist*this.actualZoomCoeff;
     },
-    transformMapCoordToPixelCoord: function(x, y){
-      return {
-        x: this.actualZoomCoeff*(x-this.origin.x)+this.canvas.width/2, 
-        y: this.actualZoomCoeff*(y-this.origin.y)+this.canvas.height/2
-      };
-    },
     render: function(roomState){ // Kc
       var time = window.performance.now(), deltaTime = (time-this.lastRenderTime)/1000;
       this.lastRenderTime = time;
@@ -442,58 +477,63 @@ module.exports = function(API, params){
       }
     },
     updateCameraOrigin: function(gameState, followDisc, viewWidth, viewHeight, deltaTime){
-      var x, y, stadium = gameState.S;
-      if (followDisc && stadium.Ge==1){
-        var pos = followDisc.a; // player's position
-        x = pos.x;
-        y = pos.y;
-      }
-      else{
-        var pos = gameState.ta.F[0].a; // ball's position
-        x = pos.x;
-        y = pos.y;
-        if (followDisc){
-          var playerPos = followDisc.a;
-          x = 0.5*(x+playerPos.x);
-          y = 0.5*(y+playerPos.y);
-          var w = 0.5*viewWidth;
-          var h = 0.5*viewHeight;
-          var minX = playerPos.x-w+50;
-          var minY = playerPos.y-h+50;
-          var maxX = playerPos.x+w-50;
-          var maxY = playerPos.y+h-50;
-          x = (x>maxX) ? maxX : ((x<minX) ? minX : x);
-          y = (y>maxY) ? maxY : ((y<minY) ? minY : y);
+      var stadium = gameState.S;
+      if (thisRenderer.followMode){
+        var x, y;
+        if (followDisc && stadium.Ge==1){
+          var pos = followDisc.a; // player's position
+          x = pos.x;
+          y = pos.y;
         }
+        else{
+          var pos = gameState.ta.F[0].a; // ball's position
+          x = pos.x;
+          y = pos.y;
+          if (followDisc){
+            var playerPos = followDisc.a;
+            x = 0.5*(x+playerPos.x);
+            y = 0.5*(y+playerPos.y);
+            var w = 0.5*viewWidth;
+            var h = 0.5*viewHeight;
+            var minX = playerPos.x-w+50;
+            var minY = playerPos.y-h+50;
+            var maxX = playerPos.x+w-50;
+            var maxY = playerPos.y+h-50;
+            x = (x>maxX) ? maxX : ((x<minX) ? minX : x);
+            y = (y>maxY) ? maxY : ((y<minY) ? minY : y);
+          }
+        }
+        var t = 60*deltaTime;
+        if (t>1)
+          t = 1;
+        t *= 0.04;
+        var origin = this.origin;
+        var x0 = origin.x;
+        var y0 = origin.y;
+        origin.x = x0+(x-x0)*t;
+        origin.y = y0+(y-y0)*t;
       }
-      var t = 60*deltaTime;
-      if (t>1)
-        t = 1;
-      t *= 0.04;
-      var origin = this.origin;
-      var x0 = origin.x;
-      var y0 = origin.y;
-      origin.x = x0+(x-x0)*t;
-      origin.y = y0+(y-y0)*t;
-      
-      // restrictCameraOrigin
-      
-      if (viewWidth>2*stadium.$b)
-        this.origin.x = 0;
-      else if (this.origin.x+0.5*viewWidth>stadium.$b)
-        this.origin.x = stadium.$b-0.5*viewWidth;
-      else if (this.origin.x-0.5*viewWidth<-stadium.$b)
-        this.origin.x = -stadium.$b+0.5*viewWidth;
-      else if (this.origin.x*0 != 0) // fix all possible camera bugs
-        this.origin.x = 0;
 
-      if (viewHeight>2*stadium.qc)
-        this.origin.y = 0;
-      else if (this.origin.y+0.5*viewHeight>stadium.qc)
-        this.origin.y = stadium.qc-0.5*viewHeight;
-      else if (this.origin.y-0.5*viewHeight<-stadium.qc)
-        this.origin.y = -stadium.qc+0.5*viewHeight;
-      else if (this.origin.y*0 != 0) // fix all possible camera bugs
+      if (thisRenderer.restrictCameraOrigin){
+        if (viewWidth>2*stadium.$b)
+          this.origin.x = 0;
+        else if (this.origin.x+0.5*viewWidth>stadium.$b)
+          this.origin.x = stadium.$b-0.5*viewWidth;
+        else if (this.origin.x-0.5*viewWidth<-stadium.$b)
+          this.origin.x = -stadium.$b+0.5*viewWidth;
+        
+        if (viewHeight>2*stadium.qc)
+          this.origin.y = 0;
+        else if (this.origin.y+0.5*viewHeight>stadium.qc)
+          this.origin.y = stadium.qc-0.5*viewHeight;
+        else if (this.origin.y-0.5*viewHeight<-stadium.qc)
+          this.origin.y = -stadium.qc+0.5*viewHeight;
+      }
+
+      // fix all possible camera bugs
+      if (this.origin.x*0 != 0)
+        this.origin.x = 0;
+      if (this.origin.y*0 != 0)
         this.origin.y = 0;
     },
     drawHalo: function(pos){ // Pq
@@ -666,10 +706,10 @@ module.exports = function(API, params){
         this.drawSegment(segments[i]);
     },
     drawJoint: function(joint, discs){ // Mq
-      if (joint.R<0)
+      if (!thisRenderer.showInvisibleJoints && joint.R<0)
         return;
       this.ctx.beginPath();
-      this.ctx.strokeStyle = Utils.numberToColor(joint.R);
+      this.ctx.strokeStyle = joint.R<0 ? "#006060" : Utils.numberToColor(joint.R);
       var disc1 = discs[joint.Yd], disc2 = discs[joint.Zd];
       if (!disc1 || !disc2)
         return;
@@ -680,7 +720,7 @@ module.exports = function(API, params){
       this.ctx.stroke();
     },
     drawSegment: function(segment){ // Qq
-      if (!segment.Za)
+      if (!thisRenderer.showInvisibleSegments && !segment.Za)
         return;
       this.ctx.beginPath();
       this.ctx.strokeStyle = Utils.numberToColor(segment.R);
@@ -753,7 +793,6 @@ module.exports = function(API, params){
   // end of basro's renderer logic
 
   var rendererObj = null; // Eb
-  var latestRoomState = null;
 
   this.initialize = function(room){
     thisRenderer.followPlayerId = room.getRoomDataOriginal().q.ya.uc;
@@ -762,15 +801,13 @@ module.exports = function(API, params){
 
   this.finalize = function(){
     rendererObj = null;
-    latestRoomState = null;
   };
 
-  this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
-    if (!params.paintGame || !extrapolatedRoomPhysicsObj.K)
+  this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
+    if (!params.paintGame || !extrapolatedRoomState.K)
       return;
-    latestRoomState = extrapolatedRoomPhysicsObj;
-    rendererObj.render(extrapolatedRoomPhysicsObj);
-    params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomPhysicsObj);
+    rendererObj.render(extrapolatedRoomState);
+    params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:
@@ -806,7 +843,7 @@ module.exports = function(API, params){
       }
       case 109:{ // Numpad '-' key
         thisRenderer.zoomCoeff -= 0.1;
-        if (thisRenderer.zoomCoeff<0)
+        if (thisRenderer.zoomCoeff<=0)
           thisRenderer.zoomCoeff = 0.01;
         break;
       }
@@ -828,17 +865,66 @@ module.exports = function(API, params){
   this.transformMapDistanceToPixelDistance = function(dist){
     return rendererObj.transformMapDistanceToPixelDistance(dist);
   };
-  
-  /*
-  this.onMouseDown = function(event){
-    var pos = thisRenderer.transformPixelCoordToMapCoord(event.pageX, event.pageY);
-    var threshold = thisRenderer.transformPixelDistanceToMapDistance(15);
-    console.log(Query.getVertexAtMapCoord(latestRoomState, pos, threshold));
-    console.log(Query.getSegmentAtMapCoord(latestRoomState, pos, threshold));
-    console.log(Query.getGoalAtMapCoord(latestRoomState, pos, threshold));
-    console.log(Query.getPlaneAtMapCoord(latestRoomState, pos, threshold));
-    console.log(Query.getJointAtMapCoord(latestRoomState, pos, threshold));
-    console.log(Query.getDiscAtMapCoord(latestRoomState, pos));
+
+  this.getOrigin = function(){
+    return rendererObj.origin;
   };
+
+  this.getActualZoomCoefficient = function(){
+    return rendererObj.actualZoomCoeff;
+  };
+
+  this.setOrigin = function(origin){
+    rendererObj.origin.x = origin.x;
+    rendererObj.origin.y = origin.y;
+  };
+
+  /*
+    w = this.canvas.width, 
+    h = this.canvas.height,
+    z = this.actualZoomCoeff,
+    zc = zoomCoeff,
+    Ox = this.origin.x,
+    Oy = this.origin.y,
+    p_to_m(x, y): [(x-w/2)/z+Ox, (y-h/2)/z+Oy],
+    m_to_p(x, y): [z*(x-Ox)+w/2, z*(y-Oy)+h/2],
+
+    e_x_p = pixelCoordX, 
+    e_y_p = pixelCoordY, 
+
+    Origin Calculation:
+    -------------------
+
+    old map coords of event point: [(e_x_p-w/2)/z+Ox, (e_y_p-h/2)/z+Oy]
+    new map coords of event point: [(e_x_p-w/2)/z_new+Ox_new, (e_y_p-h/2)/z_new+Oy_new]
+    
+    we want them to be equal, so;
+
+    (e_x_p-w/2)/z_new+Ox_new = (e_x_p-w/2)/z+Ox
+    (e_y_p-h/2)/z_new+Oy_new = (e_y_p-h/2)/z+Oy
+    
+    Ox_new = (e_x_p-w/2)*(1/z-1/z_new)+Ox
+    Oy_new = (e_y_p-h/2)*(1/z-1/z_new)+Oy
   */
+  this.zoomIn = function(pixelCoordX, pixelCoordY, zoomCoeff){
+    var { origin, canvas } = rendererObj, k = (1-1/zoomCoeff)/thisRenderer.zoomCoeff;
+    origin.x += k*(pixelCoordX-canvas.width/2);
+    origin.y += k*(pixelCoordY-canvas.height/2);
+    thisRenderer.zoomCoeff *= zoomCoeff;
+  };
+
+  this.zoomOut = function(pixelCoordX, pixelCoordY, zoomCoeff){
+    var { origin, canvas } = rendererObj, k = (1-zoomCoeff)/thisRenderer.zoomCoeff;
+    origin.x += k*(pixelCoordX-canvas.width/2);
+    origin.y += k*(pixelCoordY-canvas.height/2);
+    thisRenderer.zoomCoeff /= zoomCoeff;
+  };
+
+  this.onWheel = function(event){
+    if (event.deltaY<0)
+      thisRenderer.zoomIn(event.offsetX, event.offsetY, thisRenderer.wheelZoomCoeff);
+    else
+      thisRenderer.zoomOut(event.offsetX, event.offsetY, thisRenderer.wheelZoomCoeff);
+  };
+
 };

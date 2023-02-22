@@ -30,9 +30,10 @@ function abcHaxballAPI(window, config){
   };
 
   const OperationType = {
-    SetAvatar: 1,
-    SendChat: 2,
-    SendChatIndicator: 3,
+    SetAvatar: 0,
+    SendChat: 1,
+    SendChatIndicator: 2,
+    SendAnnouncement: 3,
     SendInput: 4,
     SetStadium: 5,
     StartGame: 6,
@@ -46,8 +47,11 @@ function abcHaxballAPI(window, config){
     SetTeamColors: 14,
     SetPlayerAdmin: 15,
     KickBanPlayer: 16,
-    SetSync: 17,
-    CustomEvent: 18
+    SetPlayerSync: 17,
+    Ping: 18,
+    SetDiscProperties: 19,
+    JoinRoom: 20,
+    CustomEvent: 21
   };
 
   const VariableType = {
@@ -106,20 +110,19 @@ function abcHaxballAPI(window, config){
     new HaxballEvent(OperationType.SetPlayerSync, "ta", {value: "Yg", ...allEventsCommon}),
     new HaxballEvent(OperationType.Ping, "la", {values: "we", ...allEventsCommon}),
     new HaxballEvent(OperationType.SetDiscProperties, "ob", {id: "ze", type: "Sm", data1: "Ka", data2: "Rc", ...allEventsCommon}), // type(0: disc -> id: discId, 1: player -> id: playerId), data1: [x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping], data2: [color, cMask, cGroup]
-    //new HaxballEvent(OperationType.JoinRoom, "oa", {id: "V", name: "name", flag: "cj", avatar: "Xb", conn: "conn", auth: "auth", ...allEventsCommon}),
+    new HaxballEvent(OperationType.JoinRoom, "oa", {id: "V", name: "name", flag: "cj", avatar: "Xb", conn: "conn", auth: "auth", ...allEventsCommon}),
     new HaxballEvent(OperationType.CustomEvent, "CustomEvent", {type: "type", data: "data", ...allEventsCommon}),
-
   ].reduce((acc, x)=>{
-    if (acc[x.fName])
-      acc[x.fName].push(x);
-    else
-      acc[x.fName] = [x];
+    acc.set(x.type, x);
     return acc;
-  }, {});
+  }, new Map());
 
   function recognizeEvent(obj){
-    var eventType = obj.__proto__ ? obj.__proto__.f.on : obj.eventType; // <-- this will be O(1), instead of Array.filter: O(n)
-    return allEvents[obj.__proto__.f.name]?.filter((x)=>(!x.extraCondition || obj[x.extraCondition[0]]==x.extraCondition[1]))[0];
+    var eventType = obj.__proto__ ? obj.__proto__.f.on : obj.eventType;
+    var otId = m.Qm.get(eventType)?.otId;
+    if (otId==-1)
+      otId = (obj.rj==1) ? OperationType.SetTimeLimit : OperationType.SetScoreLimit;
+    return allEvents.get(otId);
   }
 
   (()=>{
@@ -5240,6 +5243,32 @@ function abcHaxballAPI(window, config){
   la.za = m.Fa({ Ba: !1, Aa: !1 });
   CustomEvent.za = m.Fa({ Ba: !1, Aa: !1 });
 
+  rb.otId = OperationType.SendAnnouncement;
+  na.otId = OperationType.SendChatIndicator;
+  Ua.otId = null;
+  Ga.otId = OperationType.SendInput;
+  Na.otId = OperationType.SendChat;
+  oa.otId = OperationType.JoinRoom;
+  Y.otId = OperationType.KickBanPlayer;
+  Ma.otId = OperationType.StartGame;
+  La.otId = OperationType.StopGame;
+  Oa.otId = OperationType.PauseResumeGame;
+  da.otId = -1;
+  qa.otId = OperationType.SetStadium;
+  S.otId = OperationType.SetPlayerTeam;
+  pa.otId = OperationType.SetTeamsLock;
+  sa.otId = OperationType.SetPlayerAdmin;
+  Qa.otId = OperationType.AutoTeams;
+  ta.otId = OperationType.SetPlayerSync;
+  la.otId = OperationType.Ping;
+  ra.otId = OperationType.SetAvatar;
+  Pa.otId = OperationType.SetTeamColors;
+  pb.otId = null;
+  ma.otId = OperationType.SetKickRateLimit;
+  qb.otId = null;
+  ob.otId = OperationType.SetDiscProperties;
+  CustomEvent.otId = OperationType.CustomEvent;
+
   m.Ha(rb);
   m.Ha(na);
   m.Ha(Ua);
@@ -7062,11 +7091,11 @@ function abcHaxballAPI(window, config){
       e.P = b.$;
       if (!this.haxball.__internalData.onOperationReceived(e, this.Y, c))
         return;
-      if (e.__proto__.f.name=="CustomEvent"){
+      if (e.__proto__.f==CustomEvent){
         this.haxball.__internalData.roomObj?.ya.ra_custom(e, e.P, true);
         return;
       }
-      else if (e.__proto__.f.name=="qa" && e.Pd.F.length==0)
+      else if (e.__proto__.f==qa && e.Pd.F.length==0)
         return;
       f = this.Y;
       g = this.Y + 120;
@@ -9910,4 +9939,3 @@ if (typeof exports !== 'undefined') {
   root['abcHaxballAPI'] = abcHaxballAPI;
 else
   window['abcHaxballAPI'] = abcHaxballAPI;
-
