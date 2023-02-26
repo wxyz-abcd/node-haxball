@@ -19,6 +19,12 @@ function abcHaxballAPI(window, config){
   var RTCIceCandidate = window.webkitRTCIceCandidate || window.mozRTCIceCandidate || window.RTCIceCandidate;
   var RTCSessionDescription = window.webkitRTCSessionDescription || window.mozRTCSessionDescription || window.RTCSessionDescription;
 
+  (!config) && (config = {});
+  (!config.backend) && (config.backend = {});
+  (!config.backend.hostname) && (config.backend.hostname = "www.haxball.com");
+  (!config.backend.hostnameWs) && (config.backend.hostnameWs = "p2p.haxball.com");
+  (config.backend.secure==null) && (config.backend.secure = true);
+
   const defaultVersion = 9;
 
   const ConnectionState = {
@@ -1399,8 +1405,8 @@ function abcHaxballAPI(window, config){
   };
 
   n.b = !0;
-  n.Vr = "wss://p2p.haxball.com/";
-  n.Ee = (config?.HttpProxyUrl ? config.HttpProxyUrl : "https://www.haxball.com/rs/");
+  n.Vr = (config.backend.secure?"wss":"ws")+"://"+config.backend.hostnameWs+"/";
+  n.Ee = (config.HttpProxyUrl ? config.HttpProxyUrl : ((config.backend.secure?"https":"http")+"://"+config.backend.hostname+"/rs/"));
   n.Vf = [{ urls: "stun:stun.l.google.com:19302" }];
   //n.A = new Yb();
 
@@ -5869,12 +5875,12 @@ function abcHaxballAPI(window, config){
     };
     this.pa.di = function (b) {
       g.jr = b;
-      config?.WebSocketProxyUrl && (a = config?.WebSocketProxyUrl);
-      (!a.endsWith("client")) && (a += "client");
+      config.WebSocketProxyUrl && (a = config.WebSocketProxyUrl);
+      (!a.endsWith("client")) && (((!a.endsWith("/")) && (a += "/")), a += "client");
       if (config?.WebSocketChangeOriginAllowed) // custom environment
         g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f),{
           headers: {
-            Origin: "https://www.haxball.com",
+            Origin: (config.backend.secure?"https":"http")+"://"+config.backend.hostname
           }
         });
       else // browser
@@ -6394,12 +6400,12 @@ function abcHaxballAPI(window, config){
         if (null == b) throw new q(null);
         a = a.token;
         if (null == a) throw new q(null);
-        config?.WebSocketProxyUrl && (b = config?.WebSocketProxyUrl);
-        (!b.endsWith("host")) && (b += "host");
+        config.WebSocketProxyUrl && (b = config.WebSocketProxyUrl);
+        (!b.endsWith("host")) && (((!b.endsWith("/")) && (b += "/")), b += "host");
         if (config?.WebSocketChangeOriginAllowed) // custom environment
           d.X = new WebSocket(b + "?token=" + a, {
             headers: {
-              Origin: "https://www.haxball.com",
+              Origin: (config.backend.secure?"https":"http")+"://"+config.backend.hostname
             }
           });
         else{ // browser
@@ -7433,7 +7439,7 @@ function abcHaxballAPI(window, config){
   };
   
   function roomLink(a, b) { // u.$h
-    return "https://www.haxball.com/play?c=" + a + (b ? "&p=1" : "");
+    return (config.backend.secure?"https":"http")+"://"+config.backend.hostname+"/play?c=" + a + (b ? "&p=1" : "");
   };
 
   // replay section :

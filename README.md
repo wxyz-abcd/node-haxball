@@ -139,10 +139,14 @@ Room.create({
     - `console`, `performance`, `crypto`, (browser's window object should have these objects as well.)
     - `RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `WebSocket`, `XMLHttpRequest`, (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
     - `JSON5`, `pako`. (These are two external libraries required by Haxball.)
-  - `config`: Custom configuration. You may pass `null` here if you want to use other methods of applying origin change such as using our browser extension(look at `haxballOriginModifier` folder of this repo). Valid object keys are;
+  - `config`: Custom configuration for backend/proxy server. Valid object keys are;
     - `WebSocketChangeOriginAllowed`: browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If `true`, we do not need a proxy server. (we can do that in NW.js, for example)
-    - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `wss://p2p.haxball.com/` for host and `wss://p2p2.haxball.com/` for client.
-    - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `https://www.haxball.com/rs/`.
+    - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Overwrites backend config. Defaults to: `wss://p2p.haxball.com/` for host and `wss://p2p2.haxball.com/` for client.
+    - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Overwrites backend config. Defaults to: `https://www.haxball.com/rs/`.
+    - `backend`: Custom backend configuration. Valid object keys are:
+      - `hostname`: backend's main domain url address. Defaults to: `www.haxball.com`.
+      - `hostnameWs`: backend's url address for websocket connections. Defaults to: `p2p.haxball.com`.
+      - `secure`: determines whether the url is using secure protocol(`true`) or not(`false`). Defaults to: `true`.
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
@@ -265,8 +269,17 @@ Room.create({
         - `cancel()`: should be used to cancel the process of joining a room.
         - `useRecaptchaToken(token)`: should be used to send the recaptcha token after `onRequestRecaptcha` event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use `Room.join` with the new token.
     
-    - `sandbox(callbacks, options)`: creates a sandbox room. the returning object has the following properties and functions: 
-      - Returning replay reader object:
+    - `sandbox(callbacks, options)`: creates a sandbox room.
+    
+      - Parameters: 
+        - `callbacks`: An object that has the same callbacks as the renderer template.
+        - `options`: An object that may contain the following keys:
+          - `controlledPlayerId`: Id of the player to be controlled.
+          - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (`null` = use library's default `requestAnimationFrame`.)
+          - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (`null` = use library's default `cancelAnimationFrame`.)
+          - `fps_limit`: Any positive number that will be used as the fps limit. (`null` = no limit)
+      
+      - Returning sandbox room object:
         - properties:
           - `roomData`: An object containing all information about the current room state.
         - functions:
