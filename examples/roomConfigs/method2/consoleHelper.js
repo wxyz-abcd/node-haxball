@@ -1,6 +1,7 @@
 const vm = require("vm"); // you need to install this package manually in order to use it. (npm install vm)
 
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
@@ -29,5 +30,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     room = null;
     stdin = null;
   };
-
 };

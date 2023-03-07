@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "collisions", true, { // "collisions" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -19,5 +20,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onCollisionDiscVsPlane = function(discId, discPlayerId, planeId, customData){
     console.log("Disc vs plane collision : ", discPlayerId, discId, planeId);
   };
-
 };

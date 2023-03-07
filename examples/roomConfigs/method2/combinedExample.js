@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
@@ -119,19 +120,19 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     return 100000 + ping*ping*ping; // if host, set everybody(except host)'s ping to 100000 + its original value cubed; otherwise, only set your own ping to that value.
   };
 
-  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
 
-    var playerId = operation.getValue(msg, "byPlayerId"); // find out who sent this message
+    var playerId = msg.byId; // find out who sent this message
     if (connectionShouldBreak[playerId]) // if player is marked
       throw ""; // connection is broken here. playerId will leave by himself without triggering a kick/ban event.
     var cs = controlSwitch[playerId];
     if (cs != null && !controlSwitchBlocked[playerId]) // if the player is marked to be controlled by someone else, and the player has not protected himself being controlled,
-      operation.setValue(msg, "byPlayerId", cs); // this is where the magic happens: modify event's player id so that it will look like it has come from someone else.
+      msg.byId = cs; // this is where the magic happens: modify event's player id so that it will look like it has come from someone else.
     
-    switch (operation.type){
+    switch (type){
       case OperationType.SendChat:{ // if someone sent a chat message
         /*
-        var m = operation.getValue(msg, "text");
+        var m = msg.text;
         if (m.startsWith("!")){  // custom chat logic for extra commands
         */
         if (customData.isCommand){ // same as above 2 lines.
@@ -161,7 +162,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
         break;
       }
       case OperationType.KickBanPlayer: { // if someone is leaving or being kicked/banned by someone else
-        var reason = operation.getValue(msg, "reason"); // get the reason. this is null if the player is leaving by himself/herself.
+        var reason = msg.reason; // get the reason. this is null if the player is leaving by himself/herself.
         if (reason!=null && playerId!=0) // if any player sends a kick/ban event message other than room host
           return false; // block the event message
         break;
@@ -224,5 +225,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     // balance teams
     balanceTeams();
   };
-
 };

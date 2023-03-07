@@ -8,11 +8,6 @@
 
 <h4 align="center">node-haxball is the most powerful and lightweight bot API written by abc as a javascript library that supports both node.js and browser environments and will include every possible hack and functionality that you can imagine as a Haxball(www.haxball.com) host AND client. </h4>
 
-<p align="center">
-<a href="https://abc-haxball-proxy.up.railway.app" target="_blank"> 🔗 Join and create rooms using GUI
-<a href="https://abc-haxball-proxy.up.railway.app/headless" target="_blank"> ⚙️ Create rooms using modified Headless UI
-</p>
-
 ### 🔖 Table Of Contents
 
 - 🤔 [How To Use](#how-to-use)
@@ -31,7 +26,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = require("node-haxball");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("node-haxball")();
 // Use example code here.
 ```
 
@@ -40,6 +35,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
   - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>. (Will expire at the end of each month and not work for several days.)
   - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at haxballOriginModifier project.)
   - <a href="https://abc-haxball-proxy.infinityfreeapp.com/?no_proxy_server=true">Alternate URL</a> (No proxy server yet.)
+  - Moreover; if you have a custom backend server for Haxball, you can use it with this API too.
 
   #### 💻 Usage on Browser (via Proxy Server)
 
@@ -52,9 +48,11 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window, {
-          WebSocketProxyUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
-          HttpProxyUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
+          proxy: {
+            WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
+            HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+          }
         });
         // Use example code here.
       </script>
@@ -73,7 +71,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -133,29 +131,50 @@ Room.create({
 
 <h2 id="docs">📰 Mini-Documentation</h2>
 
-- `Library constructor(object, config)`: Initializes the library with given parameters. This constructor is only for browsers & custom environments.
+- `Library constructor(object, config)`: Initializes the library with given parameters.
   - `object`: These are objects/functions that directly affect the core functionalities. You should usually pass "window" here, because most of these objects reside there.
     - `setTimeout`, `clearTimeout`, `setInterval`, `clearInterval`, `requestAnimationFrame`, `cancelAnimationFrame`, (if you are on a custom environment such as NW.js or Electron, these functions should be binded to browser's window object before being passed on.)
     - `console`, `performance`, `crypto`, (browser's window object should have these objects as well.)
     - `RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `WebSocket`, `XMLHttpRequest`, (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
     - `JSON5`, `pako`. (These are two external libraries required by Haxball.)
   - `config`: Custom configuration for backend/proxy server. Valid object keys are;
-    - `WebSocketChangeOriginAllowed`: browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If `true`, we do not need a proxy server. (we can do that in NW.js, for example)
-    - `WebSocketProxyUrl`: proxy websocket url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Overwrites backend config. Defaults to: `wss://p2p.haxball.com/` for host and `wss://p2p2.haxball.com/` for client.
-    - `HttpProxyUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Overwrites backend config. Defaults to: `https://www.haxball.com/rs/`.
     - `backend`: Custom backend configuration. Valid object keys are:
       - `hostname`: backend's main domain url address. Defaults to: `www.haxball.com`.
       - `hostnameWs`: backend's url address for websocket connections. Defaults to: `p2p.haxball.com`.
       - `secure`: determines whether the url is using secure protocol(`true`) or not(`false`). Defaults to: `true`.
+    - `proxy`: Proxy server configuration. Valid object keys are:
+      - `WebSocketChangeOriginAllowed`: browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If `true`, we do not need a proxy server. (we can do that in NW.js, for example)
+      - `WebSocketUrl`: proxy websocket url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `wss://p2p.haxball.com/` for host and `wss://p2p2.haxball.com/` for client.
+      - `HttpUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `https://www.haxball.com/rs/`.
+    - `fixNames`: fix some important variable names or not. Defaults to: `true`.
+    - `version`: Haxball's expected version number. Defaults to: `9`.
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
 - `ConnectionState`: Different connection state values. Should be used while joining a room using `Room.join`.
 - `AllowFlags`: These flags allow us to understand whether a plugin or a roomConfig is able to work correctly while joining or creating a room. Especially useful in a GUI environment.
 
+- `Language`: Methods for global language handling. (Look inside `src/defaultLanguage.js` for usage example.)
+  - `add(abbr, errorsMap, rendererTextMap)`: Adds a new language with given properties. `abbr` is auto-transformed into upper-case. `errorsMap` must be an `object` that has a description function for each error code where each function returns a string. `rendererTextMap` must be an `object` that maps each `rendererTextIndex` to a `string` value. throws error while trying to add an already-existing language.
+  - `remove(abbr)`: Removes the language with given abbreviation(`abbr`). `abbr` is auto-transformed into upper-case. throws error while trying to remove a non-existent or current language.
+  - `current`: This is the abbreviation of the current language. Defaults to `'GB'`. It is possible to change the language of the whole API by changing this value directly; throws error if language does not exist.
+  - `currentData`: read-only. Returns all name mappings for the current language, namely `errorsMap` and `rendererTextMap` that are already described in `Language.add` above.
+  - `indices`: read-only. Returns the global name-to-integer mappings that shortly describe the language string.
+    - `ErrorCodes`: Name-to-integer mapping that shortly describes the error codes used in `HBError` class. Note that this is the same object as `Error.ErrorCodes`.
+    - `RendererTextIndices`: Name-to-integer mapping that shortly describes the default renderer's language text indices used inside the current default renderers.
+
+- `Errors`: Global error handling objects.
+  - `ErrorCodes`: Name to integer mapping that shortly describes the error codes used in `HBError` class.
+  - `HBError`: This is the class that is instantiated while any error is thrown from this API.
+    - `properties`:
+      - `code`: The error code that has been thrown. (`integer`)
+      - `params`: Parameters for the error. (`array`)
+    - `functions`:
+      - `toString()`: Returns the full description of the current error object by executing `currentLanguage.errorsMap[this.code](...this.params)`.
+
 - `Callback`: Global functions to add/remove callbacks.
-    - `add(eventName, metadata)`: creates all callbacks about a new event called `eventName` which should start with a capital letter. `metadata` is not used, but this is the library's current metadata structure: `{ params: array of string }`. should be used (and maybe overridden for usage of `metadata`) in a gui application to define custom event callbacks related to gui events such as keyboard, mouse, touch, timer etc. the main event callback defined in this room object to trigger all callbacks is `"_on" + eventName`.
-    - `remove(eventName)`: destroys the callbacks created by `Callback.add`.
+  - `add(eventName, metadata)`: creates all callbacks about a new event called `eventName` which should start with a capital letter. `metadata` is not used, but this is the library's current metadata structure: `{ params: array of string }`. should be used (and maybe overridden for usage of `metadata`) in a gui application to define custom event callbacks related to gui events such as keyboard, mouse, touch, timer etc. the main event callback defined in this room object to trigger all callbacks is `"_on" + eventName`.
+  - `remove(eventName)`: destroys the callbacks created by `Callback.add`.
 
 - `Replay`: Functions/classes related to replays.
 
@@ -163,7 +182,7 @@ Room.create({
 
     - Parameters: 
       - `uint8Array`: Must be an Uint8Array containing the contents of a .hbr file. (Currently, only version 3 is supported.)
-      - `callbacks`: An object that has the same callbacks as the renderer template. (maybe except the `onCustomEvent` callback that the replay files do not contain its corresponding event.)
+      - `callbacks`: An object that has the same callbacks as the renderer template. (except callbacks that are related to customEvents, roomConfigs, plugins, renderers, language; due to replay files not containing its corresponding event.) (Look at examples/api_structure/replayReader.js for all supported callbacks and example usage.)
       - `options`: An object that may contain the following keys:
         - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (`null` = use library's default `requestAnimationFrame`.)
         - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (`null` = use library's default `cancelAnimationFrame`.)
@@ -228,6 +247,7 @@ Room.create({
         - `unlimitedPlayerCount`: if set to `true`, bypasses the player count controller.
         - `fakePassword`: if set to `true`, the room will show that it is password-protected while in fact it is not.
         - `showInRoomList`: set to `true` if you want this room to show up in the room list.
+        - `onError(error, clientConnectionObj)`: called when an exception is thrown from the room. clientConnectionObj is the connection object of the client that caused the exception. the connection will be closed just after this callback is executed.
       - `commonParams`: explained below in `Room.join`.
 
     - `join(joinParams, commonParams)`: try to join the room(`roomId`) with given `password`(or `null`=no password). returns `Promise(room)` which is rejected if failed.
@@ -281,7 +301,7 @@ Room.create({
       
       - Returning sandbox room object:
         - properties:
-          - `roomData`: An object containing all information about the current room state.
+          - `roomData`: An object containing all information about the current room state. Note that this object also has all of the functions explained below in section: `sandbox mode functions`. (it only has `copy()` instead of `takeSnapshot()`)
         - functions:
           - `setSimulationSpeed(coefficient)`: Changes the speed of the simulation. `coefficient` must be a real number >=0.
             - `coefficient` = 0 : stop simulation.
@@ -339,7 +359,8 @@ Room.create({
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
     - `setExtrapolation(extrapolation)`: sets the client's `extrapolation` value in msecs.
     - `clearBans()`: clears all bans. host-only.
-    - `setAvatar(avatar)`: sets the current player's `avatar`.
+    - `setAvatar(avatar)`: sets the current player's client `avatar`.
+    - `setPlayerAvatar(id, value, headless)`: sets the avatar of player(`id`) to `avatar`. `headless` is a boolean to determine whether the headless or client avatar is being set. host-only.
     - `setChatIndicatorActive(active)`: sets the current player's chat indicator status. `active`: `true`/`false`.
     - `setTeamColors(teamId, angle, ...colors)`: sets the team colors for team(`teamId`). `teamId`: `1`(red) | `2`(blue), `angle`: `integer`, `colors`: maximum 4 parseable(hex-rgb) color parameters.
     - `setUnlimitedPlayerCount(on)`: adds or removes player limit control. host-only. `on`: `true`/`false`.
@@ -348,6 +369,7 @@ Room.create({
     - `sendAnnouncement(msg, targetId, color, style, sound)`: send announcement message(`msg`) to player(`targetId`) with properties(`color`, `style`, `sound`). `targetId` is `null` -> send to everyone. host-only.
     - `setDiscProperties(discId, properties)`: set disc(`discId`) `properties`. host-only.
     - `setPlayerDiscProperties(playerId, properties)`: set player(`playerId`)'s disc `properties`. host-only.
+    - `reorderPlayers(playerIdList, moveToTop)`: remove all players with ids in `playerIdList` and re-add them in the given order to the (top or bottom)(`moveToTop`) of the player list. host-only.
     - `sendCustomEvent(type, data)`: sends a `CustomEvent(type, data)` that can only be received by the users of this modified client.
     - `getKeyState()`: get current key state.
     - `setKeyState(state)`: set current key state to `state`.
@@ -395,6 +417,48 @@ Room.create({
     - `updatePlugin(pluginIndex, newPluginObj)`: sets the `Plugin` at the specified `pluginIndex` to the `newPluginObj` object, initialization and activation are automatic. plugin names must be the same. the plugin object should be derived from the provided `Plugin` class.
     - `setRenderer(renderer)`: sets the `Renderer` object that will render the game. the `renderer` object should be derived from the provided `Renderer` class.
 
+  - `sandbox mode functions`: these functions are not supported by the original Haxball client. you would need to create `CustomEvent`s to use them within a synchronized(network) environment. the game must NOT be stopped for these functions to work.
+    - `takeSnapshot()` : returns a snapshot of the current game state. you can load this object directly into sandbox using its `useSnapshot(newRoomState)` function.
+    - `exportStadium()` : returns all current game objects in hbs format.
+    - `createVertex(data)` : creates a vertex object in memory. `data`: `{ x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `createSegment(data)` : creates a segment object in memory using vertex indices. `data`: `{ v0: number, v1: number, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `createSegmentFromObj(data)` : creates a segment object in memory using vertex objects. `data`: `{ v0: vertexObj, v1: vertexObj, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `createGoal(data)` : creates a goal object in memory. `data`: `{ p0: [x: number, y: number], p1: [x: number, y: number], team: ("red" || "blue") }`
+    - `createPlane(data)` : creates a plane object in memory. `data`: `{ normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `createDisc(data)` : creates a disc object in memory. `data`: `{ pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `createJoint(data)` : creates a joint object in memory using disc indices. `data`: `{ d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }`
+    - `createJointFromObj(data)` : creates a joint object in memory using disc objects. `data`: `{ d0: discObj, d1: discObj, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }`
+    - `addVertex(data)` : creates a vertex object and adds it to the current stadium. `data`: `{ x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `addSegment(data)` : creates a segment object and adds it to the current stadium. `data`: `{ v0: number, v1: number, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `addGoal(data)` : creates a goal object and adds it to the current stadium. `data`: `{ p0: [x: number, y: number], p1: [x: number, y: number], team: ("red" || "blue") }`
+    - `addPlane(data)` : creates a plane object and adds it to the current stadium. `data`: `{ normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `addDisc(data)` : creates a disc object and adds it to the current stadium. `data`: `{ pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `addJoint(data)` : creates a joint object and adds it to the current stadium. `data`: `{ d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }`
+    - `addSpawnPoint(data)` : adds a spawn point with given properties to the current stadium. `data`: `{ x: number, y: number, team: ("red" || "blue") }`
+    - `addPlayer(data)` : adds a player with given properties to the current stadium. `data`: `{ pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, bCoef: number, cMask: array of string, cGroup: array of string, id: integer, name: string, avatar: string, flag: string, team: ("spec" || "red" || "blue") }`. these keys must exist: `team`, `id`, `name`, `avatar`, `flag`.
+    - `findVertexIndicesOfSegmentObj(segmentObj)` : finds the indices of vertices that form the given segment object(`segmentObj`). return format: `[index1, index2]`.
+    - `findVertexIndicesOfSegment(segmentIndex)` : finds the indices of vertices that form the `segmentIndex`th segment object. return format `[index1, index2]`.
+    - `updateVertex(idx, data)` : updates the `idx`th vertex's only the given values. `data`: `{ x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `updateSegment(idx, data)` : updates the `idx`th segment's only the given values. `data`: `{ v0: number, v1: number, color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `updateGoal(idx, data)` : updates the `idx`th goal's only the given values. `data`: `{ p0: [x: number, y: number], p1: [x: number, y: number], team: ("red" || "blue") }`
+    - `updatePlane(idx, data)` : updates the `idx`th plane's only the given values. `data`: `{ normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `updateDisc(idx, data)` : updates the `idx`th disc's only the given values. `data`: `{ pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `updateDiscObj(discObj, data)` : updates the given disc object(`discObj`)'s only the given values. `data`: `{ pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }`
+    - `updateJoint(idx, data)` : updates the `idx`th joint's only the given values. `data`: `{ d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }`
+    - `updateSpawnPoint(idx, team, data)` : updates the `idx`th spawn point in team(`team`) using only the given values. `data`: `{ x: number, y: number, team: ("red" || "blue") }`
+    - `updatePlayer(playerId, data)` : updates the player(`playerId`)'s only the given values. `data`: `{ pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, bCoef: number, cMask: array of string, cGroup: array of string, name: string, avatar: string, flag: string, team: ("spec" || "red" || "blue") }`
+    - `removeVertex(idx)` : removes the `idx`th vertex from the current stadium.
+    - `removeSegment(idx)` : removes the `idx`th segment from the current stadium.
+    - `removeGoal(idx)` : removes the `idx`th goal from the current stadium.
+    - `removePlane(idx)` : removes the `idx`th plane from the current stadium.
+    - `removeDisc(idx)` : removes the `idx`th disc from the current stadium.
+    - `removeJoint(idx)` : removes the `idx`th joint from the current stadium.
+    - `removeSpawnPoint(idx, team)` : removes the `idx`th spawn point of team(`team`) from the current stadium. `team`: `"red" || "blue"`
+    - `removePlayer(playerId)` : removes the player(`playerId`) from the current stadium.
+    - `updateStadiumPlayerPhysics(data)` : updates the current stadium's only the given player physics values. `data`: `{ radius: number, gravity: [x: number, y: number], invMass: number, bCoef: number, cGroup: array of string, damping: number, kickingDamping: number, acceleration: number, kickingAcceleration: number, kickStrength: number, kickback: number }`
+    - `updateStadiumBg(data)` : updates the current stadium's only the given background values. `data`: `{ type: 0("none") || 1("grass") || 2("hockey"), width: number, height: number, kickOffRadius: number, cornerRadius: number, color: ("transparent" || string || [r: number, g: number, b: number]), goalLine: number }`
+    - `updateStadiumGeneral(data)` : updates the current stadium's only the given general values. `data`: `{ name: string, width: number, height: number, maxViewWidth: number, cameraFollow: 0("") || 1("player"), spawnDistance: number, kickOffReset: true("full") || false("partial"), canBeStored: boolean }`
+  
   - `fake event triggers`: these functions are intended to be used in host mode to create/control in-memory bot players that will run much more efficiently than standard networking bot players. they also work for normal player objects, and can be used to create some events belonging to a player that did not originate from that player. most of these fake events also trigger an `onOperationReceived` call before being sent to clients.
     - `fakePlayerJoin(id, name, flag, avatar, conn, auth)`: triggers a fake join room event; which in turn creates a new in-memory player object. If there was a player before with this id, old resources are automatically reassigned to this new player object, and that player will wake up. 0 <= `id` <= 65535, all the other parameters must be a string. 
     - `fakePlayerLeave(id)`: triggers a fake leave room event. returns the player's properties so that you may pass them to `fakePlayerJoin` at a later time to wake that player. passing `id` = 0 causes desync on clients (because there's a special check for the case `id` = 0 in original clients). the player, although seemingly leaving the room, still watches the room, waiting for a fake player join event. all parameters except `id` may be different in the new `fakePlayerJoin` call, which allows player's `name`, `flag`, `avatar`, `conn` and `auth` to change without the player entirely leaving the room.
@@ -438,9 +502,9 @@ Room.create({
     - `[newFrameNo, customData] = modifyFrameNoBefore(frameNo)`: prepares a custom data object to send to all plugins while setting current player's `frameNo`. `customData=false` means "don't call callbacks". causes your player to look laggy to your opponents, especially on extrapolated clients. client-only.
     - `newFrameNo = modifyFrameNo(frameNo)`: set current player's `frameNo`. causes your player to look laggy to your opponents, especially on extrapolated clients. client-only.
     - `newFrameNo = modifyFrameNoAfter(frameNo, customData)`: set current player's `frameNo`. causes your player to look laggy to your opponents, especially on extrapolated clients. client-only.
-    - `customData = onBeforeOperationReceived(obj, msg, globalFrameNo, clientFrameNo)`: the host callback that is called only once for each message received from clients, and its return value is passed as customData to onOperationReceived callback. this callback is useful for parsing chat messages and other stuff that you would like to do only once, before the room callback or any plugin callbacks are called. The default callback value is a function that parses a chat message and returns `{ isCommand: boolean, data: string array }` where `isCommand = text.startsWith("!")` and `data = text.trimEnd().split(" ")`. 
-    - `acceptEvent = onOperationReceived(obj, msg, globalFrameNo, clientFrameNo, customData)`: runs for each message received from clients. `obj` is the operation type object, `msg` is the original message, `customData` is the return value of callback `onBeforeOperationReceived(obj, msg, globalFrameNo, clientFrameNo)`. `onOperationReceived` is called only once for each message, before all `onOperationReceived` callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
-    - `acceptEvent = onAfterOperationReceived(obj, msg, globalFrameNo, clientFrameNo, customData)`: runs for each message received from clients. `obj` is the operation type object, `msg` is the original message, `customData` is the return value of callback `onOperationReceived(obj, globalFrameNo, clientFrameNo, msg)`. `onAfterOperationReceived` is called only once for each message, after all `onOperationReceived` callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
+    - `customData = onBeforeOperationReceived(type, msg, globalFrameNo, clientFrameNo)`: the host callback that is called only once for each message received from clients, and its return value is passed as customData to onOperationReceived callback. this callback is useful for parsing chat messages and other stuff that you would like to do only once, before the room callback or any plugin callbacks are called. The default callback value is a function that parses a chat message and returns `{ isCommand: boolean, data: string array }` where `isCommand = text.startsWith("!")` and `data = text.trimEnd().split(" ")`. 
+    - `acceptEvent = onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)`: runs for each message received from clients. `type` is the type of the operation, `msg` is the original message, `customData` is the return value of callback `onBeforeOperationReceived(type, msg, globalFrameNo, clientFrameNo)`. `onOperationReceived` is called only once for each message, before all `onOperationReceived` callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
+    - `acceptEvent = onAfterOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)`: runs for each message received from clients. `type` is the type of the operation, `msg` is the original message, `customData` is the return value of callback `onOperationReceived(type, globalFrameNo, clientFrameNo, msg)`. `onAfterOperationReceived` is called only once for each message, after all `onOperationReceived` callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
 
   - `callbacks`:
     - `initialize(room)`: only called once while creating or joining a room, or during a call to `Room.setConfig`.
@@ -484,6 +548,12 @@ Room.create({
       - `customData = onBeforePlayerAvatarChange(id, value)`: player(`id`) changed its avatar to (`value`).
       - `onPlayerAvatarChange(id, value, customData)`: player(`id`) changed its avatar to (`value`).
       - `onAfterPlayerAvatarChange(id, value, customData)`: player(`id`) changed its avatar to (`value`).
+      - `customData = onBeforePlayerHeadlessAvatarChange(id, value)`: player(`id`) changed its headless avatar to (`value`). may only be triggered by host.
+      - `onPlayerHeadlessAvatarChange(id, value, customData)`: player(`id`) changed its headless avatar to (`value`). may only be triggered by host.
+      - `onAfterPlayerHeadlessAvatarChange(id, value, customData)`: player(`id`) changed its headless avatar to (`value`). may only be triggered by host.
+      - `customData = onBeforePlayersOrderChange(idList, moveToTop)`: players(`idList`) were removed, reordered to match the order in `idList` and added back to the (top or bottom)(`moveToTop`) of the player list. may only be triggered by host.
+      - `onPlayersOrderChange(idList, moveToTop, customData)`: players(`idList`) were removed, reordered to match the order in `idList` and added back to the (top or bottom)(`moveToTop`) of the player list. may only be triggered by host.
+      - `onAfterPlayersOrderChange(idList, moveToTop, customData)`: players(`idList`) were removed, reordered to match the order in `idList` and added back to the (top or bottom)(`moveToTop`) of the player list. may only be triggered by host.
       - `customData = onBeforePlayerTeamChange(id, teamId, byId)`: player(`id`) was moved to team(`teamId`) by player(`byId`).
       - `onPlayerTeamChange(id, teamId, byId, customData)`: player(`id`) was moved to team(`teamId`) by player(`byId`).
       - `onAfterPlayerTeamChange(id, teamId, byId, customData)`: player(`id`) was moved to team(`teamId`) by player(`byId`).
@@ -586,6 +656,9 @@ Room.create({
       - `customData = onBeforePluginUpdate(oldPluginObj, newPluginObj)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
       - `onAfterPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+      - `customData = onBeforeLanguageChange(abbr)`: API's language abbreviation was changed to `abbr`.
+      - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
+      - `onAfterLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
 
 - `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 
@@ -604,7 +677,7 @@ Room.create({
     - `newPing = modifyPlayerPing(playerId, ping, customData)`: set player's `ping`. `customData` is an optional data object returned from `room.modifyPlayerPingBefore`. host-only.
     - `newPing = modifyClientPing(ping, customData)`: set current player's `ping`. `customData` is an optional data object returned from `room.modifyClientPingBefore`. client-only.
     - `newFrameNo = modifyFrameNo(frameNo, customData)`: set current player's `frameNo`. causes your player to look laggy to your opponents, especially on extrapolated clients. `customData` is an optional data object returned from `room.modifyFrameNoBefore`. client-only.
-    - `acceptEvent = onOperationReceived(obj, msg, globalFrameNo, clientFrameNo, customData)`:  runs for each message received from clients. `obj` is the operation type object, `msg` is the original message. you may modify `msg`'s contents here as you wish. `customData` is an optional data object returned from `room.onBeforeOperationReceived`. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
+    - `acceptEvent = onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)`:  runs for each message received from clients. `type` is the type of the operation, `msg` is the original message. you may modify `msg`'s contents here as you wish. `customData` is an optional data object returned from `room.onBeforeOperationReceived`. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
 
   - `callbacks`:
     - `initialize(room)`: only called once while creating or joining a room, or during a call to `Room.updatePlugin`.
@@ -622,6 +695,8 @@ Room.create({
       - `onTimeLimitChange(value, byId, customData)`: time limit was changed to (`value`) by player(`byId`).
       - `onPlayerAdminChange(id, isAdmin, byId, customData)`: player(`id`)'s admin status was changed to (`isAdmin`) by player(`byId`).
       - `onPlayerAvatarChange(id, value, customData)`: player(`id`) changed its avatar to (`value`).
+      - `onPlayerHeadlessAvatarChange(id, value, customData)`: player(`id`) changed its headless avatar to (`value`). may only be triggered by host.
+      - `onPlayersOrderChange(idList, moveToTop, customData)`: players(`idList`) were removed, reordered to match the order in `idList` and added back to the (top or bottom)(`moveToTop`) of the player list. may only be triggered by host.
       - `onPlayerTeamChange(id, teamId, byId, customData)`: player(`id`) was moved to team(`teamId`) by player(`byId`).
       - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (`stadium`) by player(`byId`).
       - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (`value`) by player(`byId`).
@@ -656,6 +731,7 @@ Room.create({
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+      - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
 
 - `Renderer`: A class that defines a renderer. Any renderer should be based on this class.
 
@@ -668,7 +744,7 @@ Room.create({
   - `callbacks`:
     - `initialize(room)`: only called once while creating or joining a room, or during a call to `Room.setRenderer`.
     - `finalize()`: only called once while leaving a room, or during a call to `Room.setRenderer`.
-    - `render(extrapolatedRoomPhysicsObj)`: called inside `requestAnimationFrame` callback. rendering logic should be here. 
+    - `render(extrapolatedRoomState)`: called inside `requestAnimationFrame` callback. rendering logic should be here. 
     - `onXXXXXXX(..., customData)`: (where `XXXXXXX` is the name of the event) called after the respective plugin callbacks `plugin.onXXXXXXX(...)` and `room.onXXXXXXX(..., customData)`. `customData` is the object that might be returned from the last call of `plugin.onXXXXXXX(...)` or `room.onXXXXXXX(...)`.
       - `onRoomLink(link, customData)`: room link was received. host-only.
       - `onPlayerBallKick(playerId, customData)`: ball was kicked by player(`playerId`). triggered individually.
@@ -682,6 +758,8 @@ Room.create({
       - `onTimeLimitChange(value, byId, customData)`: time limit was changed to (`value`) by player(`byId`).
       - `onPlayerAdminChange(id, isAdmin, byId, customData)`: player(`id`)'s admin status was changed to (`isAdmin`) by player(`byId`).
       - `onPlayerAvatarChange(id, value, customData)`: player(`id`) changed its avatar to (`value`).
+      - `onPlayerHeadlessAvatarChange(id, value, customData)`: player(`id`) changed its headless avatar to (`value`). may only be triggered by host.
+      - `onPlayersOrderChange(idList, moveToTop, customData)`: players(`idList`) were removed, reordered to match the order in `idList` and added back to the (top or bottom)(`moveToTop`) of the player list. may only be triggered by host.
       - `onPlayerTeamChange(id, teamId, byId, customData)`: player(`id`) was moved to team(`teamId`) by player(`byId`).
       - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (`stadium`) by player(`byId`).
       - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (`value`) by player(`byId`).
@@ -716,6 +794,7 @@ Room.create({
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+      - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
 
 - `Impl`: Implementation of Haxball's inner classes. All important classes are exported and more detailed explanations will hopefully be available soon. Names might be fixed later. These classes are enough to run your own Haxball website.
 

@@ -1,4 +1,7 @@
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+
 function roomCallback(room){ // examples start from here.
+
   room.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){ // this is host-only.
     if (name=="abc")
       return null;  // block anyone trying to join the room with name "abc", before he can join the room.
@@ -8,4 +11,5 @@ function roomCallback(room){ // examples start from here.
       avatar // do not change avatars
     ];
   };
+
 }

@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "modifyPlayerInput", true, { // "modifyPlayerInput" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -31,12 +32,12 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     room = null;
   };
 
-  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){
-    var playerId = operation.getValue(msg, "byPlayerId");
-    switch (operation.type){
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
+    var playerId = msg.byId;
+    switch (type){
       case OperationType.SendChat: {
         /*
-        var m = operation.getValue(msg, "text");
+        var m = msg.text;
         if (m.startsWith("!")){  // custom chat logic for extra commands
         */
         if (customData.isCommand){ // same as above 2 lines.
@@ -67,5 +68,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     // free extra memory allocated
     delete staticInputs[id];
   };
-
 };

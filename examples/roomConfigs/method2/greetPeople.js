@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
@@ -33,5 +34,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
     room.sendChat("Goodbye, " + name); // say farewell to everybody
   };
-
 };

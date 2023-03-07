@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
@@ -17,9 +18,6 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     console.log("finalize...");
   };
   
-  this.onPluginActiveChange = function(plugin, customData){
-    console.log("onPluginActiveChange...", plugin, customData);
-  };
   /*
   // this is not technically an event.
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){
@@ -32,8 +30,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   };
   */
 
-  this.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){
-    console.log("onOperationReceived...", obj, msg, globalFrameNo, clientFrameNo, customData);
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
+    console.log("onOperationReceived...", msg.byId, type, msg, globalFrameNo, clientFrameNo, customData);
     return true;
   };
 
@@ -88,6 +86,14 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
 
   this.onPlayerTeamChange = function(id, teamId, byId, customData){
     console.log("onPlayerTeamChange...", id, teamId, byId, customData);
+  };
+
+  this.onPlayerHeadlessAvatarChange = function(id, value, customData){
+    console.log("onPlayerHeadlessAvatarChange...", id, value, customData);
+  };
+
+  this.onPlayersOrderChange = function(idList, moveToTop, customData){
+    console.log("onPlayersOrderChange...", idList, moveToTop, customData);
   };
 
   this.onStadiumChange = function(stadium, byId, customData){
@@ -176,6 +182,26 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     console.log("onRoomPropertiesChange...", props, customData);
   };
 
+  this.onTeamColorsChange = function(teamId, value, byId, customData){
+    console.log("onTeamColorsChange...", teamId, value, byId, customData);
+  };
+
+  this.onTimeIsUp = function(customData){
+    console.log("onTimeIsUp...", customData);
+  };
+
+  this.onPositionsReset = function(customData){
+    console.log("onPositionsReset...", customData);
+  };
+
+  this.onRoomRecordingChange = function(value, customData){
+    console.log("onRoomRecordingChange...", value, customData);
+  };
+
+  this.onPluginActiveChange = function(plugin, customData){
+    console.log("onPluginActiveChange...", plugin, customData);
+  };
+
   this.onCollisionDiscVsDisc = function(discId1, discPlayerId1, discId2, discPlayerId2, customData){
     console.log("onCollisionDiscVsDisc...", discId1, discPlayerId1, discId2, discPlayerId2, customData);
   };
@@ -192,4 +218,19 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     console.log("onCustomEvent...", type, data, byId, customData);
   };
 
+  this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){
+    console.log("onConfigUpdate...", oldRoomConfigObj, newRoomConfigObj, customData);
+  };
+
+  this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){
+    console.log("onRendererUpdate...", oldRendererObj, newRendererObj, customData);
+  };
+
+  this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){
+    console.log("onPluginUpdate...", oldPluginObj, newPluginObj, customData);
+  };
+
+  this.onLanguageChange = function(abbr, customData){
+    console.log("onLanguageChange...", abbr, customData);
+  };
 };

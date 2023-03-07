@@ -1,13 +1,13 @@
 module.exports = function(API, params){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { RendererTextIndices: TextIndices } = Language.indices;
   
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = API;
-
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.25",
+    version: "1.3",
     author: "basro & abc",
-    description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features. Use +, - keys for zoom in-out.`
+    description: `This is an improved version of the default renderer currently used in Haxball with bug-fixes and new features. Use +, - keys for zoom in-out. Disable followMode to zoom using mouse wheel.`
   });
 
   // parameters are exported so that they can be edited outside this class.
@@ -201,14 +201,15 @@ module.exports = function(API, params){
   };
 
   function CanvasTextRenderer(){ // Sb
+    const { rendererTextMap: TextMap } = Language.currentData;
     this.time = 0; // xc
     this.textQueue = []; // ab
-    this.timeUp = new CanvasText(["Time is", "Up!"], 16777215); // Ar
-    this.redVictory = new CanvasText(["Red is", "Victorious!"], 15035990); // Gq
-    this.redScore = new CanvasText(["Red", "Scores!"], 15035990); // Fq
-    this.blueVictory = new CanvasText(["Blue is", "Victorious!"], 625603); // Cn
-    this.blueScore = new CanvasText(["Blue", "Scores!"], 625603); // Bn
-    this.gamePause = new CanvasText(["Game", "Paused"], 16777215); // eq
+    this.timeUp = new CanvasText([TextMap[TextIndices.timeIsUp1], TextMap[TextIndices.timeIsUp2]], 16777215); // Ar // ["Time is", "Up!"]
+    this.redVictory = new CanvasText([TextMap[TextIndices.redIsVictorious1], TextMap[TextIndices.redIsVictorious2]], 15035990); // Gq // ["Red is", "Victorious!"]
+    this.redScore = new CanvasText([TextMap[TextIndices.redScores1], TextMap[TextIndices.redScores2]], 15035990); // Fq // ["Red", "Scores!"]
+    this.blueVictory = new CanvasText([TextMap[TextIndices.blueIsVictorious1], TextMap[TextIndices.blueIsVictorious2]], 625603); // Cn // ["Blue is", "Victorious!"]
+    this.blueScore = new CanvasText([TextMap[TextIndices.blueScores1], TextMap[TextIndices.blueScores2]], 625603); // Bn // ["Blue", "Scores!"]
+    this.gamePause = new CanvasText([TextMap[TextIndices.gamePaused1], TextMap[TextIndices.gamePaused2]], 16777215); // eq // ["Game", "Paused"]
   }
   CanvasTextRenderer.prototype = {
     addText: function(textObj){ // Pa
@@ -835,6 +836,10 @@ module.exports = function(API, params){
     tr.addText(tr.timeUp);
   };
 
+  this.onLanguageChange = function(abbr, customData){
+    rendererObj.textRenderer = new CanvasTextRenderer(); // td
+  };
+
   this.onKeyDown = function(e){
     switch(e.keyCode){
       case 107:{ // Numpad '+' key
@@ -926,5 +931,4 @@ module.exports = function(API, params){
     else
       thisRenderer.zoomOut(event.offsetX, event.offsetY, thisRenderer.wheelZoomCoeff);
   };
-
 };

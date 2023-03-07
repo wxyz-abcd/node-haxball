@@ -15,10 +15,12 @@ const API = abcHaxballAPI({
   performance: window.performance,
   JSON5: window.JSON5,
   pako: window.pako
-}/*, {
-  WebSocketChangeOriginAllowed: false,
-  WebSocketProxyUrl: "ws://localhost:3000/",
-  HttpProxyUrl: "http://localhost:3000/rs/"
+}/*,{
+  proxy: {
+    WebSocketChangeOriginAllowed: false,
+    WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
+    HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+  }
 }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
 const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
@@ -75,13 +77,13 @@ function Bot(id, pass, name, avatar, lat, lon, flag, autoPlay){
         if (alerted)
           return;
         alerted = true;
-        console.log(x);
+        console.log(x.toString());
       },
       onLeave: (x)=>{
         if (alerted)
           return;
         alerted = true;
-        console.log(x);
+        console.log(x.toString());
       }
     });
   }).catch((ex)=>{

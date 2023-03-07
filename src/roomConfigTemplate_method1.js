@@ -17,9 +17,9 @@ function defineRoomCallbacks(room){
   room.modifyFrameNo = function(frameNo, customData){return newFrameNo;};
   room.modifyFrameNoAfter = function(frameNo, customData){return newFrameNo;};
 
-  room.onBeforeOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo){/*return customData;*/};
-  room.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
-  room.onAfterOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  room.onBeforeOperationReceived = function(type, msg, globalFrameNo, clientFrameNo){/*return customData;*/};
+  room.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  room.onAfterOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){return true;};
 
   // callbacks:
   room.onBeforeRoomLink = function(link){/*return customData;*/};
@@ -73,6 +73,14 @@ function defineRoomCallbacks(room){
   room.onBeforePlayerTeamChange = function(id, teamId, byId){/*return customData;*/};
   room.onPlayerTeamChange = function(id, teamId, byId, customData){};
   room.onAfterPlayerTeamChange = function(id, teamId, byId, customData){};
+
+  room.onBeforePlayerHeadlessAvatarChange = function(id, value){/*return customData*/};
+  room.onPlayerHeadlessAvatarChange = function(id, value, customData){};
+  room.onAfterPlayerHeadlessAvatarChange = function(id, value, customData){};
+
+  room.onBeforePlayersOrderChange = function(idList, moveToTop){/*return customData*/};
+  room.onPlayersOrderChange = function(idList, moveToTop, customData){};
+  room.onAfterPlayersOrderChange = function(idList, moveToTop, customData){};
 
   room.onBeforeStadiumChange = function(stadium, byId){/*return customData;*/};
   room.onStadiumChange = function(stadium, byId, customData){};
@@ -205,5 +213,9 @@ function defineRoomCallbacks(room){
   room.onBeforePluginUpdate = function(oldPluginObj, newPluginObj){/*return customData;*/};
   room.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
   room.onAfterPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
+
+  room.onBeforeLanguageChange = function(abbr){/*return customData;*/};
+  room.onLanguageChange = function(abbr, customData){};
+  room.onAfterLanguageChange = function(abbr, customData){};
 
 };

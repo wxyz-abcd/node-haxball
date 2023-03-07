@@ -1,6 +1,6 @@
 module.exports = function(API, params){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
-  var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = API;
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default.min",
@@ -692,12 +692,12 @@ module.exports = function(API, params){
     that.roomObj = null;
   };
   
-  this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
-    if (!params.paintGame || !extrapolatedRoomPhysicsObj.K)
+  this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
+    if (!params.paintGame || !extrapolatedRoomState.K)
       return;
     that.Eb.uf();
-    that.Eb.Kc(extrapolatedRoomPhysicsObj, that.roomObj.ya.uc);
-    params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomPhysicsObj);
+    that.Eb.Kc(extrapolatedRoomState, that.roomObj.ya.uc);
+    params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:
@@ -749,5 +749,4 @@ module.exports = function(API, params){
       }
     }
   }
-
 };

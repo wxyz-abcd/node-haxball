@@ -1,4 +1,4 @@
-var { Utils } = require("../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
 
 const minCoordAlignDelta = 0.5, minKickDistance = 2;
 
@@ -77,4 +77,5 @@ function roomCallback(room){ // examples start from here.
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
+  
 };

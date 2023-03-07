@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  var { AllowFlags, RoomConfig } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
@@ -29,9 +30,9 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.modifyFrameNo = function(frameNo, customData){return newFrameNo;};
   this.modifyFrameNoAfter = function(frameNo, customData){return newFrameNo;};
 
-  this.onBeforeOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo){/*return customData;*/};
-  this.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
-  this.onAfterOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  this.onBeforeOperationReceived = function(type, msg, globalFrameNo, clientFrameNo){/*return customData;*/};
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  this.onAfterOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){return true;};
 
   // callbacks:
   this.onBeforeRoomLink = function(link){/*return customData;*/};
@@ -85,6 +86,14 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onBeforePlayerTeamChange = function(id, teamId, byId){/*return customData;*/};
   this.onPlayerTeamChange = function(id, teamId, byId, customData){};
   this.onAfterPlayerTeamChange = function(id, teamId, byId, customData){};
+
+  this.onBeforePlayerHeadlessAvatarChange = function(id, value){/*return customData*/};
+  this.onPlayerHeadlessAvatarChange = function(id, value, customData){};
+  this.onAfterPlayerHeadlessAvatarChange = function(id, value, customData){};
+
+  this.onBeforePlayersOrderChange = function(idList, moveToTop){/*return customData*/};
+  this.onPlayersOrderChange = function(idList, moveToTop, customData){};
+  this.onAfterPlayersOrderChange = function(idList, moveToTop, customData){};
 
   this.onBeforeStadiumChange = function(stadium, byId){/*return customData;*/};
   this.onStadiumChange = function(stadium, byId, customData){};
@@ -217,5 +226,9 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onBeforePluginUpdate = function(oldPluginObj, newPluginObj){/*return customData;*/};
   this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
   this.onAfterPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
+
+  this.onBeforeLanguageChange = function(abbr){/*return customData;*/};
+  this.onLanguageChange = function(abbr, customData){};
+  this.onAfterLanguageChange = function(abbr, customData){};
 
 };

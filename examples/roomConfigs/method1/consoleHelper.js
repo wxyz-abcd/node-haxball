@@ -1,3 +1,5 @@
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+
 const vm = require("vm");
 
 function roomCallback(room){ // examples start from here.

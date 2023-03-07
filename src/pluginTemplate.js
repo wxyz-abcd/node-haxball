@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  var { Plugin } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "template", true, { // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -15,7 +16,7 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.modifyPlayerPing = function(playerId, ping, customData){return newPing;};
   this.modifyClientPing = function(ping, customData){return newPing;};
   this.modifyFrameNo = function(frameNo){return newFrameNo;};
-  this.onOperationReceived = function(obj, msg, globalFrameNo, clientFrameNo, customData){return true;};
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){return true;};
 
   this.onRoomLink = function(link, customData){};
   this.onPlayerBallKick = function(playerId, customData){};
@@ -30,6 +31,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onPlayerAdminChange = function(id, isAdmin, byId, customData){};
   this.onPlayerAvatarChange = function(id, value, customData){};
   this.onPlayerTeamChange = function(id, teamId, byId, customData){};
+  this.onPlayerHeadlessAvatarChange = function(id, value, customData){};
+  this.onPlayersOrderChange = function(idList, moveToTop, customData){};
   this.onStadiumChange = function(stadium, byId, customData){};
   this.onTeamsLockChange = function(value, byId, customData){};
   this.onPlayerObjectCreated = function(playerObj, customData){};
@@ -63,5 +66,6 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){};
   this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){};
   this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
+  this.onLanguageChange = function(abbr, customData){};
 
 };

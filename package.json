@@ -1,7 +1,7 @@
 {
   "name": "node-haxball",
-  "version": "1.0.0-beta.4",
-  "description": "A powerful API for interacting with the Haxball backend",
+  "version": "1.0.0",
+  "description": "The most powerful Haxball API that runs on both node.js and browser environments",
   "main": "src/index.js",
   "private": false,
   "scripts": {
@@ -18,7 +18,9 @@
     "bot",
     "client",
     "node",
-    "headless"
+    "headless",
+    "browser",
+    "renderer"
   ],
   "repository": {
     "type": "git",

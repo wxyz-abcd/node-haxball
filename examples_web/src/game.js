@@ -2,10 +2,6 @@ const chatHistoryLimit = 500, gameStateGUIUpdateFrameInterval = 30;
 var roomFrame, canvasContainer, roomData, chatApi, room, API, keyHandler, sound, rendererParams, renderer;
 var gameTime, redScore, blueScore, gameTime_ot, gameTime_m1, gameTime_m2, gameTime_s1, gameTime_s2;
 
-function numberToColor(a){
-  return "rgba(" + [(a & 16711680) >>> 16, (a & 65280) >>> 8, a & 255].join() + ",255)";
-}
-
 function loadImage(path){
   return new Promise((resolve, reject)=>{
     var img = document.createElement("img");
@@ -383,7 +379,7 @@ window.onload = ()=>{
     else if (type==1){
       e.className = "announcement";
       if (color>=0)
-        e.style.color = numberToColor(color);
+        e.style.color = API.Utils.numberToColor(color);
       switch (font){
         case 1:
           e.style.fontWeight = "bold";

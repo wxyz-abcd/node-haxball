@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "breakConnection", true, { // "breakConnection" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -22,16 +23,16 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     connectionShouldBreak[playerId] = true; // mark player
   };
 
-  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){ // this is host-only
 
-    var playerId = operation.getValue(msg, "byPlayerId"); // find out who sent this message
+    var playerId = msg.byId // find out who sent this message
     if (connectionShouldBreak[playerId]) // if player is marked
       throw ""; // connection is broken here. playerId will leave by himself without triggering a kick/ban event.
     
-    switch (operation.type){
+    switch (type){
       case OperationType.SendChat:{ // if someone sent a chat message
         /*
-        var m = operation.getValue(msg, "text");
+        var m = msg.text;
         if (m.startsWith("!")){  // custom chat logic for extra commands
         */
         if (customData.isCommand){ // same as above 2 lines.
@@ -56,5 +57,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     // free extra memory allocated
     delete connectionShouldBreak[id];
   };
-  
 };

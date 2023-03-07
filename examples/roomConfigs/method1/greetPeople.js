@@ -1,3 +1,5 @@
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+
 function roomCallback(room){ // examples start from here.
 
   room.onPlayerJoin = (playerObj, customData) => {

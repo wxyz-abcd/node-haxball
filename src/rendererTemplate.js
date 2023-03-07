@@ -9,7 +9,8 @@ var client = Room.join({ // or Room.create
 });
 */
 
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }, canvas){
+module.exports = function(API, canvas){
+  var { Renderer } = API;
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, {
@@ -22,8 +23,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.initialize = function(room){};
   this.finalize = function(){};
   
-  this.render = function(extrapolatedRoomPhysicsObj){ // render logic here. called inside requestAnimationFrame callback
-    // use "extrapolatedRoomPhysicsObj" contents to get all information about the current extrapolated game state and draw whatever you want into the "canvas" object.
+  this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
+    // use "extrapolatedRoomState" contents to get all information about the current extrapolated game state and draw whatever you want into the "canvas" object.
   };
   
   // you can keep track of changes using these callbacks, and apply them in your render logic.
@@ -41,6 +42,8 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onPlayerAdminChange = function(id, isAdmin, byId, customData){};
   this.onPlayerAvatarChange = function(id, value, customData){};
   this.onPlayerTeamChange = function(id, teamId, byId, customData){};
+  this.onPlayerHeadlessAvatarChange = function(id, value, customData){};
+  this.onPlayersOrderChange = function(idList, moveToTop, customData){};
   this.onStadiumChange = function(stadium, byId, customData){};
   this.onTeamsLockChange = function(value, byId, customData){};
   this.onPlayerObjectCreated = function(playerObj, customData){};
@@ -74,5 +77,6 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
   this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){};
   this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){};
   this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
+  this.onLanguageChange = function(abbr, customData){};
 
 };

@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -137,11 +138,11 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     }
   };
 
-  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){
-    switch (operation.type){
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
+    switch (type){
       case OperationType.SendChat:{
         if (customData.isCommand){
-          var byPlayer = originalRoomData.na(msg.P);
+          var byPlayer = originalRoomData.na(msg.byId);
           if (!byPlayer.cb) // cb: isAdmin
             return true;
           var arr = customData.data;
@@ -304,5 +305,4 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
-
 };

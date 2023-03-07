@@ -16,13 +16,15 @@ function init(headless, roomCallback){
     performance: window.performance,
     JSON5: window.JSON5,
     pako: window.pako
-  }/*, {
-    WebSocketChangeOriginAllowed: false,
-    WebSocketProxyUrl: "ws://localhost:3000/",
-    HttpProxyUrl: "http://localhost:3000/rs/"
+  }/*,{
+    proxy: {
+      WebSocketChangeOriginAllowed: false,
+      WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
+      HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+    }
   }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   if (!headless){
     Callback.add("KeyDown"); // this defines room._onKeyDown(). We will use this callback when keyDown event happens. It will trigger all roomConfig, plugin and renderer callbacks.
@@ -114,14 +116,14 @@ function init(headless, roomCallback){
             if (alerted)
               return;
             alerted = true;
-            alert(x);
+            alert(x.toString());
             window.close();
           },
           onLeave: (x)=>{
             if (alerted)
               return;
             alerted = true;
-            alert(x);
+            alert(x.toString());
             window.close();
           }
         });

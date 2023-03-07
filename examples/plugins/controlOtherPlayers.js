@@ -1,4 +1,5 @@
-module.exports = function({ OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl }){
+module.exports = function(API){
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "controlOtherPlayers", true, { // "controlOtherPlayers" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -47,15 +48,15 @@ module.exports = function({ OperationType, VariableType, ConnectionState, AllowF
     controlSwitchBlocked[playerId] = (value == 1);
   };
 
-  this.onOperationReceived = function(operation, msg, globalFrameNo, clientFrameNo, customData){
-    var playerId = operation.getValue(msg, "byPlayerId");
+  this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
+    var playerId = msg.byId;
     var cs = controlSwitch[playerId];
     if (cs != null && !controlSwitchBlocked[playerId]) // if the player is marked to be controlled by someone else, and the player has not protected himself being controlled,
-      operation.setValue(msg, "byPlayerId", cs); // this is where the magic happens: modify event's player id so that it will look like it has come from someone else.
-    switch (operation.type){
+      msg.byId = cs; // this is where the magic happens: modify event's player id so that it will look like it has come from someone else.
+    switch (type){
       case OperationType.SendChat:{
         /*
-        var m = operation.getValue(msg, "text");
+        var m = msg.text;
         if (m.startsWith("!")){  // custom chat logic for extra commands
         */
         if (customData.isCommand){ // same as above 2 lines.

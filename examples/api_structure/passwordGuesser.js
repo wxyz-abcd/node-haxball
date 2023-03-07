@@ -1,18 +1,16 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Impl } = API = require("../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../src/index");
 
 function PasswordGuesser(){
   const guessDictionary = ["password", "111", "222", "333", "123", "12345"]; // write as many guesses as you wish here.
   var idx = -1;
-
   this.currentGuess = function(){
     return guessDictionary[idx];
-  }
-
+  };
   this.nextGuess = function(){
     if (idx>=guessDictionary.length-1)
       return null;
     return guessDictionary[++idx];
-  }
+  };
 }
 
 var pg = new PasswordGuesser();
@@ -23,7 +21,6 @@ Utils.generateAuth().then(([authKey, authObj])=>{
     avatar: "👽",
     player_auth_key: authKey
   };
-
   function joinRoom(id){
     var guess = pg.nextGuess();
     if (!guess){
@@ -37,6 +34,7 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       authObj: authObj,
       storage: storage, 
       config: null, // example roomConfig usage: new autoPlay_followBall(API) // look at examples/roomConfigs/method2 folder for related examples.
+      renderer: null, // example renderer usage: new defaultRenderer(API, {canvas: ..., images: {grass: ..., concrete: ..., concrete2: ..., typing: ...}, paintGame: true}) // look at examples_web folder for usage with room.setRenderer instead.
       plugins: [], // example plugin usage: [new autoPlay_followBall(API)] // look at examples/plugins folder for related examples.
       onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
       onFailure: () => {
@@ -44,7 +42,6 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       }
     });
   }
-  
   joinRoom("8Q059ls-QTQ"); // room id here.
 });
 
