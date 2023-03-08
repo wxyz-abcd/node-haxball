@@ -9710,7 +9710,9 @@ function abcHaxballAPI(window, config){
     };
 
     this.setKeyState = function(state){
-      if ((state&16) > 0 && (internalData.keyState&16) > 0 && !that.currentPlayer?.Wb){
+      if (that.kickTimeout<0)
+        internalData.keyState = state;
+      else if ((state&16) > 0 && (internalData.keyState&16) > 0 && !that.currentPlayer?.Wb){
         internalData.keyState = state&-17;
         setTimeout(()=>{
           internalData.keyState = state;

@@ -231,7 +231,7 @@ Room.create({
   - `getJointAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first joint that has a distance to `mapCoordinate` lower than `threshold`.
   - `getDiscIndexAtMapCoord(roomState, mapCoordinate)`: Finds the index of the first disc that includes `mapCoordinate`.
   - `getDiscAtMapCoord(roomState, mapCoordinate)`: Finds the first disc that includes `mapCoordinate`.
-  - `getSpawnPointIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first spawn point that has a distance to `mapCoordinate` lower than `threshold`. Returns `[spawnPointIndex, teamId]`. \[`teamId`: 1: red team, 2: blue team.\]
+  - `getSpawnPointIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first spawn point that has a distance to `mapCoordinate` lower than `threshold`. Returns `[spawnPointIndex, teamId]`. `teamId`: \[`1`: red team, `2`: blue team.\]
 
 - `Room`: The class that currently hosts all room operations. Should only be initialized by either `Room.join` or `Room.create`.
   - `static functions`: These functions are used to create/join a room.
@@ -269,13 +269,13 @@ Room.create({
             - `lon`: longitude value (number, default value is `40`).
             - `flag`: 2 letter country code (string, default value is `"tr"`).
           - `onValueSet(key, value)`: a callback function that is called just after the value of a key of this object has been changed by this library. default value is `null`.
-        - `noPluginMechanism`: if `true`, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define Room._onXXXXXX callbacks by yourself.
+        - `noPluginMechanism`: if `true`, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define `Room._onXXXXXX` callbacks by yourself.
         - `useDefaultChatCommandMechanism`: if `false`, you will have to write `onBeforeOperationReceived` and `onAfterOperationReceived` callbacks by yourself. By default, `onBeforeOperationReceived` is a function that determines whether a chat message is a command or not by looking at the chat message's first character(should be '!'); and `onAfterOperationReceived` is a function that blocks these command messages from being sent to the clients. All plugins can run their own `onOperationReceived` after this `onBeforeOperationReceived` function call, and all of them can block/modify all messages before the messages reach to `onAfterOperationReceived`.
-        - `config`: the `RoomConfig` object that contains all the main callbacks of this room. the object should be derived from the provided `RoomConfig` class. default value is `null`.
-        - `renderer`: the `Renderer` object that can render the game. the object should be derived from the provided `Renderer` class. default value is `null`.
-        - `plugins`: array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. default value is `[]`.
+        - `config`: the `RoomConfig` object that contains all the main callbacks of this room. the object should be derived from the provided `RoomConfig` class. default value is `null`. (Look at examples/roomConfigs/method2 folder for example RoomConfigs to use here, or src/roomConfigTemplate_method2.js for a template RoomConfig that contains all callbacks.)
+        - `renderer`: the `Renderer` object that can render the game. the object should be derived from the provided `Renderer` class. default value is `null`. (Look at examples/renderers folder for example RoomConfigs to use here, or src/rendererTemplate.js for a template Renderer that contains all callbacks.)
+        - `plugins`: array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. default value is `[]`. (Look at examples/plugins folder for example Plugins to use here, or src/pluginTemplate.js for a template Plugin that contains all callbacks.)
         - `version`: Haxball's version number. other clients cannot join this room if their version number is different than this number. default value is `9`.
-        - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. default value is `20`(msec).
+        - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. you may assign a negative value to disable this feature. default value is `20`(msec).
 
         --- event callbacks section ---
         - `onSuccess(room)`: joined/created `room`.
