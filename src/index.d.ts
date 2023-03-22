@@ -188,8 +188,6 @@ export enum GamePlayState {
 
 declare type Auth = {};
 
-declare type ClientConnection = {}; // new $b()
-
 declare type Point = {
   x: number;
   y: number;
@@ -658,7 +656,7 @@ declare type CreateRoomParams = {
   unlimitedPlayerCount?: boolean;
   fakePassword?: boolean;
   showInRoomList: boolean;
-  onError?: (error: Errors.HBError, clientConnectionObj: ClientConnection)=>void
+  onError?: (error: Errors.HBError, playerId: int)=>void
 };
 
 declare type JoinRoomParams = {

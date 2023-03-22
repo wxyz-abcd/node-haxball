@@ -7551,7 +7551,7 @@ function abcHaxballAPI(window, config){
       }
     },
     xk: function (a, b) {
-      ia.i(this.haxball.onHostError, b, a);
+      ia.i(this.haxball.onHostError, b, a.$);
       //window.console.log(b);
       this.Ie["delete"](a.$);
       D.remove(this.ac, a);
