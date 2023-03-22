@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../src/index");
 
 Room.create({
   name: "bot test", 
@@ -16,11 +16,11 @@ Room.create({
   plugins: [], // example plugin usage: [new autoPlay_followBall(API)] // look at examples/plugins folder for related examples.
   onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
   onFailure: (error)=>{
-    console.log("Unable to join room...", error);
+    console.log("Unable to join room...", error.toString());
     process.exit(0);
   },
   onLeave: (msg)=>{
-    console.log("Bot has left the room:", msg);
+    console.log("Bot has left the room:", msg.toString());
     process.exit(0);
   }
 });

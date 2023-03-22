@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
 
 function roomCallback(room){ // examples start from here.
 
@@ -39,7 +39,7 @@ function roomCallback(room){ // examples start from here.
 
   room.onPlayerJoin = (playerObj, customData) => {
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
     
     // add the new player to spectators
     teams[0].push(id);
@@ -53,7 +53,7 @@ function roomCallback(room){ // examples start from here.
 
   room.onPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
     
     // remove player from his/her team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));

@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -83,6 +83,7 @@ module.exports = function(API){
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
   // it also fixes a bug when the bot doesn't move after positions resets
+  // BUT instead, it creates a new bug... This is not the solution... Must change...
   var moveInRandomY = function(bot){
     if (bot){
       if (!bot.active)
@@ -103,7 +104,7 @@ module.exports = function(API){
 
   this.initialize = function(_room){
     room = _room;
-    originalRoomData = room.getRoomDataOriginal().o; // this object pointer never changes while inside a room, so we can store it here.
+    originalRoomData = room.state; // this object pointer never changes while inside a room, so we can store it here.
   };
 
   this.finalize = function(){
@@ -143,7 +144,7 @@ module.exports = function(API){
       case OperationType.SendChat:{
         if (customData.isCommand){
           var byPlayer = originalRoomData.na(msg.byId);
-          if (!byPlayer.cb) // cb: isAdmin
+          if (!byPlayer.isAdmin)
             return true;
           var arr = customData.data;
           switch (arr[0]){
@@ -196,39 +197,38 @@ module.exports = function(API){
     return true;
   };
 
-  var update = function(_originalRoomData, bot){
-    var { o, p, ep } = _originalRoomData;
-    if (ep)
-      p = ep;
-    var cp = o.na(bot.id);
-    var playerDisc = cp?.H;
+  var update = function(bot){
+    var { state, gameState, gameStateExt } = room;
+    gameState = gameStateExt || gameState;
+    var cp = state.na(bot.id);
+    var playerDisc = cp?.disc;
     if (!playerDisc)
       return;
-    var teamId = cp.ea.$, opponentTeamId = 3 - teamId;
-    var goals = o.S.tc, ball = p.ta.F[0];
+    var teamId = cp.team.id, opponentTeamId = 3 - teamId;
+    var goals = state.stadium.goals, ball = gameState.physicsState.discs[0];
 
-    var targetX, targetY, sqrDistBetweenBallAndPlayer = (ball.a.x-playerDisc.a.x) * (ball.a.x-playerDisc.a.x) + (ball.a.y-playerDisc.a.y) * (ball.a.y-playerDisc.a.y);
+    var targetX, targetY, sqrDistBetweenBallAndPlayer = (ball.pos.x-playerDisc.pos.x) * (ball.pos.x-playerDisc.pos.x) + (ball.pos.y-playerDisc.pos.y) * (ball.pos.y-playerDisc.pos.y);
     switch (bot.type){
       case 0:{ // always follow ball
-        targetX = ball.a.x;
-        targetY = ball.a.y;
+        targetX = ball.pos.x;
+        targetY = ball.pos.y;
         break;
       }
       case 1:{ // wait at defense + follow ball when near it
-        var maxDistanceToFollowBall = that.maxDistanceToFollowBallCoeff * o.S.$b;
+        var maxDistanceToFollowBall = that.maxDistanceToFollowBallCoeff * state.stadium.width;
         //var b = false;
     
-        if (sqrDistBetweenBallAndPlayer > ((playerDisc.Z + ball.Z + maxDistanceToFollowBall) * (playerDisc.Z + ball.Z + maxDistanceToFollowBall))){
-          var myGoal = goals.filter((g)=>(g.qe.$==teamId))[0]; //, opponentGoal = goals[oppositeTeamId - 1];
+        if (sqrDistBetweenBallAndPlayer > ((playerDisc.radius + ball.radius + maxDistanceToFollowBall) * (playerDisc.radius + ball.radius + maxDistanceToFollowBall))){
+          var myGoal = goals.filter((g)=>(g.team.id==teamId))[0]; //, opponentGoal = goals[oppositeTeamId - 1];
           if (!myGoal)
             return;
-          var MPofMyGoalX = (myGoal.ca.x + myGoal.W.x) / 2, MPofMyGoalY = (myGoal.ca.y + myGoal.W.y) / 2;
-          targetX = (ball.a.x + MPofMyGoalX) / 2;
-          targetY = (ball.a.y + MPofMyGoalY) / 2;
+          var MPofMyGoalX = (myGoal.p0.x + myGoal.p1.x) / 2, MPofMyGoalY = (myGoal.p0.y + myGoal.p1.y) / 2;
+          targetX = (ball.pos.x + MPofMyGoalX) / 2;
+          targetY = (ball.pos.y + MPofMyGoalY) / 2;
         }
         else{
-          targetX = ball.a.x;
-          targetY = ball.a.y;
+          targetX = ball.pos.x;
+          targetY = ball.pos.y;
           //b = true;
         }
         break;
@@ -237,7 +237,7 @@ module.exports = function(API){
         return;
     }
     
-    var deltaX = targetX - playerDisc.a.x, deltaY = targetY - playerDisc.a.y, dirX, dirY, kick;
+    var deltaX = targetX - playerDisc.pos.x, deltaY = targetY - playerDisc.pos.y, dirX, dirY, kick;
     if (Math.abs(deltaX) < that.minCoordAlignDelta)
       dirX = 0;
     else 
@@ -247,13 +247,13 @@ module.exports = function(API){
     else
       dirY = Math.sign(deltaY);
 
-    //f(ball.a.x, ball.a.y, playerDisc.a.x, playerDisc.a.y, myGoal.ca.x, myGoal.ca.y, myGoal.W.x, myGoal.W.y)
+    //f(ball.pos.x, ball.pos.y, playerDisc.pos.x, playerDisc.pos.y, myGoal.p0.x, myGoal.p0.y, myGoal.p1.x, myGoal.p1.y)
 
-    //var angle_PlayerToBall = Math.atan2(ball.a.y-playerDisc.a.y, ball.a.x-playerDisc.a.x);
-    //var angle_BallToGoalDisc1 = Math.atan2(myGoal.ca.y-ball.a.y, myGoal.ca.x-ball.a.x);
-    //var angle_BallToGoalDisc2 = Math.atan2(myGoal.W.y-ball.a.y, myGoal.W.x-ball.a.x);
+    //var angle_PlayerToBall = Math.atan2(ball.pos.y-playerDisc.pos.y, ball.pos.x-playerDisc.pos.x);
+    //var angle_BallToGoalDisc1 = Math.atan2(myGoal.p0.y-ball.pos.y, myGoal.p0.x-ball.pos.x);
+    //var angle_BallToGoalDisc2 = Math.atan2(myGoal.p1.y-ball.pos.y, myGoal.p1.x-ball.pos.x);
 
-    var maxSqrDist = (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance);
+    var maxSqrDist = (playerDisc.radius + ball.radius + that.minKickDistance) * (playerDisc.radius + ball.radius + that.minKickDistance);
     kick = (sqrDistBetweenBallAndPlayer < maxSqrDist);
     //console.log(bot.id, sqrDistBetweenBallAndPlayer, maxSqrDist, kick);
 
@@ -263,8 +263,8 @@ module.exports = function(API){
       // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
       // this happens because requestAnimationFrame is being used. 
       // therefore, we are trying to limit consequent sending.
-      if (keyState!=bot.keyState || kick!=cp.Wb){ // Wb: whether x key is active in-game (the circle around players is painted white if Wb is true)
-        if ((keyState==bot.keyState) && kick && !cp.Wb) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
+      if (keyState!=bot.keyState || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
+        if ((keyState==bot.keyState) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
           room.fakeSendPlayerInput(keyState & -17, bot.id); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
         room.fakeSendPlayerInput(keyState, bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
         bot.keyState = keyState;
@@ -285,11 +285,10 @@ module.exports = function(API){
     // is needed for moveInRandomY() to work
     if (Date.now() - lastPositionsReset < 150) return;
 
-    var _originalRoomData = room.getRoomDataOriginal();
     bots.forEach((bot)=>{
       if (!bot.active)
         return;
-      update(_originalRoomData, bot);
+      update(bot);
     });
   };
 

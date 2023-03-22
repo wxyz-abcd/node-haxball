@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
 
 function roomCallback(room){ // examples start from here.
 
@@ -11,7 +11,7 @@ function roomCallback(room){ // examples start from here.
     if (!controlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayerOriginal(playerIdToBeControlled))
+    if (!room.getPlayer(playerIdToBeControlled))
       playerIdToBeControlled = byPlayerId;
     controlSwitch[byPlayerId] = playerIdToBeControlled;
   };
@@ -23,7 +23,7 @@ function roomCallback(room){ // examples start from here.
     if (!blockControlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayerOriginal(playerId))
+    if (!room.getPlayer(playerId))
       return;
     controlSwitchBlocked[playerId] = (value == 1);
   };
@@ -62,7 +62,7 @@ function roomCallback(room){ // examples start from here.
 
   room.onPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
     
     // free extra memory allocated
     delete controlSwitch[id];

@@ -30,8 +30,8 @@ module.exports = function(window, config){
     {
       proxy: {
         WebSocketChangeOriginAllowed: (config?.proxy?.WebSocketChangeOriginAllowed!=null) ? config.proxy.WebSocketChangeOriginAllowed : true,
-        WebSocketProxyUrl: config?.proxy?.WebSocketUrl,
-        HttpProxyUrl: config?.proxy?.HttpUrl
+        WebSocketUrl: config?.proxy?.WebSocketUrl,
+        HttpUrl: config?.proxy?.HttpUrl
       },
       backend: config?.backend,
       fixNames: config?.fixNames,

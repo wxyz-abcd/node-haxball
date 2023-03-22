@@ -1,0 +1,168 @@
+* {
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+
+.marginRight {
+  margin-right: 3px;
+}
+
+.toolbarbtn {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  opacity: 0.5;
+  z-index: 100000;
+}
+
+.toolbar2 {
+  width: calc(100% - 10px);
+  height: 34px;
+  background-color: cadetblue;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 5px;
+}
+
+.fixedTb2ButtonHeight {
+  height: 25px;
+}
+
+.gameMenu {
+  display: none;
+}
+.playerElement {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 20px;
+}
+.playerFlag {
+  position: absolute;
+  left: 2px;
+}
+.playerElement.spec:hover {
+  background: #888;
+}
+.playerElement.red:hover {
+  background: #855;
+}
+.playerElement.blue:hover {
+  background: #558;
+}
+.playerElement.selected {
+  background: #595;
+}
+.playerElement.spec.selected:hover {
+  background: #8cc;
+}
+.playerElement.red.selected:hover {
+  background: #895;
+}
+.playerElement.blue.selected:hover {
+  background: #598;
+}
+
+.canvasContainer {
+  position: relative;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.canvasSubContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.gameStateContainer {
+  position: absolute;
+  top: 0px;
+  left: calc(50% - 225px);
+  width: 450px;
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #1A2125;
+  padding: 5px;
+  border-radius: 0 0 5px 5px;
+  font: 900 20px Arial Black,Arial Bold,Gadget,sans-serif;
+}
+
+.teamIcon {
+  width: 23px;
+  height: 23px;
+  border-radius: 5px;
+}
+
+.teamIcon.red{
+  background-color: #E56E56;
+}
+
+.teamIcon.blue{
+  background-color: #5689E5;
+}
+
+.score{
+  width: 35px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.scoreBoard {
+  display: flex;
+  align-items: center;
+}
+
+.gameTime {
+  display: flex;
+  align-items: center;
+}
+
+.gameTime > .overtime {
+  margin-right: 20px;
+  visibility: hidden;
+}
+
+.gameTime > .overtime.on {
+  visibility: visible;
+  animation: 0.4s linear overtime-appear;
+}
+
+@keyframes overtime-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+}
+
+.gameTime.time-warn {
+  animation: 0.3s infinite alternate linear time-warn;
+}
+
+@keyframes time-warn {
+  from { 
+    color: white 
+  } 
+  to { 
+    color:#ff8080
+  }
+}
+
+.gameTime > .digit {
+  width: 15px;
+  text-align: center;
+}

@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
@@ -56,7 +56,7 @@ module.exports = function(API){
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
 
     // free extra memory allocated
     delete connectionShouldBreak[id];

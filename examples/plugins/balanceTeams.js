@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "balanceTeams", true, { // "balanceTeams" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -56,7 +56,7 @@ module.exports = function(API){
 
   this.onPlayerJoin = function(playerObj, customData){
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
     
     // add the new player to spectators
     teams[0].push(id);
@@ -77,7 +77,7 @@ module.exports = function(API){
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
 
     // remove player from his/her team
     var currentTeam = teams[playerTeams[id]], idx = currentTeam?.findIndex((x)=>(x==id));

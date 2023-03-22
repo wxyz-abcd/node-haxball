@@ -1,5 +1,5 @@
 const chatHistoryLimit = 500, gameStateGUIUpdateFrameInterval = 30;
-var roomFrame, canvasContainer, roomData, chatApi, room, API, keyHandler, sound, rendererParams, renderer;
+var roomFrame, canvasContainer, roomState, chatApi, room, API, keyHandler, sound, rendererParams, renderer;
 var gameTime, redScore, blueScore, gameTime_ot, gameTime_m1, gameTime_m2, gameTime_s1, gameTime_s2;
 
 function loadImage(path){
@@ -98,13 +98,13 @@ function updateGUI(){
   roomFrame.style.display = rendererParams.paintGame ? "none" : "block";
   canvasContainer.style.display = rendererParams.paintGame ? "block" : "none";
   if (!rendererParams.paintGame)
-    roomFrame.contentWindow.update(API, room, roomData);
+    roomFrame.contentWindow.update(API, room, roomState);
 }
 
 var oldGUIValues = {};
 
 function updateGameStateGUI(gameState){
-  var _redScore = gameState.Pb, _blueScore = gameState.Kb;
+  var _redScore = gameState.redScore, _blueScore = gameState.blueScore;
   if (oldGUIValues.redScore!=_redScore){
     redScore.innerText = ""+_redScore;
     oldGUIValues.redScore = _redScore;
@@ -113,7 +113,7 @@ function updateGameStateGUI(gameState){
     blueScore.innerText = ""+_blueScore;
     oldGUIValues.blueScore = _blueScore;
   }
-  var totalGameTime = 60*gameState.Da, elapsedGameTime = gameState.Hc|0;
+  var totalGameTime = 60*gameState.timeLimit, elapsedGameTime = gameState.timeElapsed|0;
   var s = elapsedGameTime%60, m = (elapsedGameTime/60)|0;
   if (elapsedGameTime<totalGameTime && elapsedGameTime>totalGameTime-30){
     if (!oldGUIValues.timeWarningActive){
@@ -170,14 +170,11 @@ function analyzeChatCommand(msg){
       }
       break;
     case "checksum":
-      var d = room.getRoomDataOriginal().o.S;
-      msg = d.w;
-      if (d.Pe())
-        chatApi.receiveNotice('Current stadium is original: "' + msg + '"')
-      else{
-        d = J.Vg(d.Sj(), 8); // calculate checksum
-        chatApi.receiveNotice('Stadium: "' + msg + '" (checksum: ' + d + ")")
-      }
+      var cs = API.Utils.stadiumChecksum(room.stadium);
+      if (!cs)
+        chatApi.receiveNotice('Current stadium is original: "' + room.stadium.name + '"')
+      else
+        chatApi.receiveNotice('Stadium: "' + room.stadium.name + '" (checksum: ' + cs + ")")
       break;
     case "clear_avatar":
       room.setAvatar(null);
@@ -288,12 +285,12 @@ function analyzeChatCommand(msg){
         }
       break;
     case "store":
-      var f = room.getRoomDataOriginal().o.S;
+      var f = room.stadium;
       if (f.Pe())
         chatApi.receiveNotice("Can't store default stadium.");
       else {
         chatApi.receiveNotice("Not implemented to keep the web examples simple.");
-        //insertStadium({name: f.w, contents: API.Utils.exportStadium(f)}).then(()=>{
+        //insertStadium({name: f.name, contents: API.Utils.exportStadium(f)}).then(()=>{
           //chatApi.receiveNotice("Stadium stored");
         //}, ()=>{
           //chatApi.receiveNotice("Couldn't store stadium");
@@ -316,7 +313,7 @@ window.onKeyDown = function(event){
       break;
     }
     case 27:{
-      rendererParams.paintGame = (!!roomData.o.K) && (!rendererParams.paintGame);
+      rendererParams.paintGame = (!!roomState.gameState) && (!rendererParams.paintGame);
       updateGUI();
       event.preventDefault();
       break;
@@ -469,7 +466,7 @@ window.onload = ()=>{
   };
   var roomCallback = function(_room){
     room = _room;
-    roomData = room.getRoomDataOriginal();
+    roomState = room.state;
     keyHandler = new GameKeysHandler();
     sound = new Sound();
     var {p: Team} = API.Impl.Core;
@@ -485,29 +482,29 @@ window.onload = ()=>{
       return "Are you sure you want to leave the room?";
     };
     function by(playerObj){
-      return (null == playerObj ? "" : " by [" + playerObj.V + "]" + playerObj.w);
+      return (null == playerObj ? "" : " by [" + playerObj.id + "]" + playerObj.name);
     }
     room.onAfterRoomLink = (roomLink, customData)=>{
       window.roomLink = roomLink;
     };
     room.onAfterPlayerChat = function(id, message, customData){
-      var playerObj = roomData.o.I.find((x)=>x.V==id);
+      var playerObj = roomState.players.find((x)=>x.id==id);
       if (!playerObj)
         return;
-      chatApi.receiveChatMessage("[" + playerObj.V + "]" + playerObj.w, message); // d ? "highlight" : null
+      chatApi.receiveChatMessage("[" + playerObj.id + "]" + playerObj.name, message); // d ? "highlight" : null
       sound.playSound(sound.chat);//sound.highlight
     };
     room.onAfterPlayerJoin = function(playerObj, customData){
-      chatApi.receiveNotice("[" + playerObj.V + "]" + playerObj.w + " has joined");
+      chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " has joined");
       sound.playSound(sound.join);
       updateGUI();
     };
     room.onAfterPlayerLeave = function (playerObj, reason, isBanned, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       if (reason != null)
-        chatApi.receiveNotice("[" + playerObj.V + "]" + playerObj.w + " was " + (isBanned ? "banned" : "kicked") + by(byPlayerObj) + ("" != reason ? " (" + reason + ")" : ""));
+        chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " was " + (isBanned ? "banned" : "kicked") + by(byPlayerObj) + ("" != reason ? " (" + reason + ")" : ""));
       else
-        chatApi.receiveNotice("[" + playerObj.V + "]" + playerObj.w + " has left");
+        chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " has left");
       sound.playSound(sound.leave);
       updateGUI();
     };
@@ -529,43 +526,42 @@ window.onload = ()=>{
       sound.playSound(sound.goal);
     };
     room.onAfterGameEnd = function (winningTeamId, customData) {
-      chatApi.receiveNotice("" + Team.byId[winningTeamId].w + " team won the match");
+      chatApi.receiveNotice("" + Team.byId[winningTeamId].name + " team won the match");
     };
     room.onAfterGamePauseChange = function (paused, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       if (paused)
         chatApi.receiveNotice("Game paused" + by(byPlayerObj));
       updateGUI();
     };
     room.onAfterGameStart = function (byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       chatApi.receiveNotice("Game started" + by(byPlayerObj));
       rendererParams.paintGame = true;
       updateGUI();
     };
     room.onAfterGameStop = function (byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       if (byPlayerObj!=null)
         chatApi.receiveNotice("Game stopped" + by(byPlayerObj));
       rendererParams.paintGame = false;
       updateGUI();
     };
     room.onAfterStadiumChange = function (stadium, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
-      if (!stadium.Pe()) {
-        var checksum = API.Impl.Utils.J.Vg(stadium.Sj(), 8);
-        chatApi.receiveNotice('Stadium "' + stadium.w + '" (' + checksum + ") loaded" + by(byPlayerObj));
-      }
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
+      var checksum = API.Utils.stadiumChecksum(stadium);
+      if (checksum)
+        chatApi.receiveNotice('Stadium "' + stadium.name + '" (' + checksum + ") loaded" + by(byPlayerObj));
       updateGUI();
     };
     room.onAfterPlayerSyncChange = function (playerId, value, customData) {
-      var playerObj = roomData.o.I.find((x)=>x.V==playerId);
-      chatApi.receiveNotice("[" + playerObj.V + "]" + playerObj.w + " " + (playerObj.Ld ? "has desynchronized" : "is back in sync"));
+      var playerObj = roomState.players.find((x)=>x.id==playerId);
+      chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " " + (playerObj.sync ? "has desynchronized" : "is back in sync"));
     };
     room.onAfterPlayerTeamChange = function (id, teamId, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId), playerObj = roomData.o.I.find((x)=>x.V==id), teamObj = Team.byId[teamId];
-      if (roomData.o.K!=null)
-        chatApi.receiveNotice("[" + playerObj.V + "]" + playerObj.w + " was moved to " + teamObj.w + by(byPlayerObj));
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId), playerObj = roomState.players.find((x)=>x.id==id), teamObj = Team.byId[teamId];
+      if (roomState.gameState!=null)
+        chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " was moved to " + teamObj.name + by(byPlayerObj));
       updateGUI();
     };
     room.onAfterAutoTeams = function (playerId1, teamId1, playerId2, teamId2, byId, customData) {
@@ -574,16 +570,16 @@ window.onload = ()=>{
         room.onAfterPlayerTeamChange(playerId2, teamId2, byId, customData);
     };
     room.onAfterPlayerAdminChange = function (id, isAdmin, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId), playerObj = roomData.o.I.find((x)=>x.V==id);
-      chatApi.receiveNotice((playerObj.cb ? ("[" + playerObj.V + "]" + playerObj.w + " was given admin rights") : ("[" + playerObj.V + "]" + playerObj.w + "'s admin rights were taken away")) + by(byPlayerObj));
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId), playerObj = roomState.players.find((x)=>x.id==id);
+      chatApi.receiveNotice((playerObj.isAdmin ? ("[" + playerObj.id + "]" + playerObj.name + " was given admin rights") : ("[" + playerObj.id + "]" + playerObj.name + "'s admin rights were taken away")) + by(byPlayerObj));
       updateGUI();
     };
     room.onAfterKickRateLimitChange = function (min, rate, burst, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       chatApi.receiveNotice("Kick Rate Limit set to (min: " + min + ", rate: " + rate + ", burst: " + burst + ")" + by(byPlayerObj));
     };
     room.onAfterCustomEvent = function (type, data, byId, customData) {
-      var byPlayerObj = roomData.o.I.find((x)=>x.V==byId);
+      var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       chatApi.receiveNotice("Custom Event triggered (type: " + type + ", data: [" + JSON.stringify(data) + "])" + by(byPlayerObj));
     };
     room.onAfterScoreLimitChange = function (value, byId, customData) {
@@ -620,14 +616,14 @@ window.onload = ()=>{
           concrete2: images[2],
           typing: images[3]
         },
-        paintGame: !!roomData.o.K,
+        paintGame: !!roomState.gameState,
         onRequestAnimationFrame: ()=>{
-          if (!roomData.o.K)
+          if (!roomState.gameState)
             return;
           counter++;
           if (counter>gameStateGUIUpdateFrameInterval){
             counter=0;
-            updateGameStateGUI(roomData.o.K);
+            updateGameStateGUI(roomState.gameState);
           }
         }
       };

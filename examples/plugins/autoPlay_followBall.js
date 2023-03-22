@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall", true, { // "autoPlay_followBall" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -43,6 +43,7 @@ module.exports = function(API){
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
   // it also fixes a bug when the bot doesn't move after positions resets
+  // BUT instead, it creates a new bug... This is not the solution... Must change...
   var moveInRandomY = function(){
     room && room.setKeyState(
       Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false)
@@ -68,24 +69,24 @@ module.exports = function(API){
     if (Date.now() - lastPositionsReset < 150) return;
     
     // get the original data object of the current player
-    var playerDisc = room.getPlayerDiscOriginal(room.currentPlayerId);
+    var playerDisc = room.getPlayerDisc(room.currentPlayerId);
 
-    // coordinates: playerDisc.a.x, playerDisc.a.y
-    // speed: playerDisc.D.x, playerDisc.D.y
-    // radius: playerDisc.Z
+    // coordinates: playerDisc.pos.x, playerDisc.pos.y
+    // speed: playerDisc.speed.x, playerDisc.speed.y
+    // radius: playerDisc.radius
 
     if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
       return;
 
     // get the original data object of the ball
-    var ball = room.getBallOriginal();
+    var ball = room.getBall();
 
-    // coordinates: ball.a.x, ball.a.y
-    // speed: ball.D.x, ball.D.y
-    // radius: ball.Z
+    // coordinates: ball.pos.x, ball.pos.y
+    // speed: ball.speed.x, ball.speed.y
+    // radius: ball.radius
 
     // calculate delta difference for both x and y axis.
-    var deltaX = ball.a.x - playerDisc.a.x, deltaY = ball.a.y - playerDisc.a.y, dirX, dirY, kick;
+    var deltaX = ball.pos.x - playerDisc.pos.x, deltaY = ball.pos.y - playerDisc.pos.y, dirX, dirY, kick;
 
     // x direction:
     if (Math.abs(deltaX) < that.minCoordAlignDelta) // we can omit small delta.
@@ -100,7 +101,7 @@ module.exports = function(API){
       dirY = Math.sign(deltaY); // direction is +1 or -1, depending on the delta difference
 
     // kick is true if the distance between ball and player is less than minKickDistance
-    kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
+    kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.radius + ball.radius + that.minKickDistance) * (playerDisc.radius + ball.radius + that.minKickDistance));
 
     // apply current keys
     room.setKeyState(Utils.keyState(dirX, dirY, kick));

@@ -30,11 +30,11 @@ function abcHaxballAPI(window, config){
   const defaultVersion = config.version || 9;
 
   const ConnectionState = {
-    0: "Connecting to master",
-    1: "Connecting to peer",
-    2: "Awaiting state",
-    3: "Active",
-    4: "Connection Failed",
+    ConnectingToMaster: 0,
+    ConnectingToPeer: 1,
+    AwaitingState: 2,
+    Active: 3,
+    ConnectionFailed: 4
   };
 
   const OperationType = {
@@ -65,11 +65,79 @@ function abcHaxballAPI(window, config){
     CustomEvent: 24
   };
 
+  const CollisionFlags = {
+    ball: 0,
+    red: 1,
+    blue: 2,
+    redKO: 3,
+    blueKO: 4,
+    wall: 5,
+    kick: 6,
+    score: 7,
+    free1: 8,
+    free2: 9,
+    free3: 10,
+    free4: 11,
+    free5: 12,
+    free6: 13,
+    free7: 14,
+    free8: 15,
+    free9: 16,
+    free10: 17,
+    free11: 18,
+    free12: 19,
+    free13: 20,
+    free14: 21,
+    free15: 22,
+    free16: 23,
+    free17: 24,
+    free18: 25,
+    free19: 26,
+    free20: 27,
+    c0: 28,
+    c1: 29,
+    c2: 30,
+    c3: 31
+  };
+
+  const Direction = {
+    Backward: -1,
+    Still: 0,
+    Forward: 1
+  };
+  
+  const CameraFollow = {
+    None: 0,
+    Player: 1
+  };
+  
+  const BackgroundType = {
+    None: 0,
+    Grass: 1,
+    Hockey: 2
+  };
+  
+  const GamePlayState = {
+    BeforeKickOff: 0,
+    Playing: 1,
+    AfterGoal: 2,
+    Ending: 3
+  };
+  
   const VariableType = {
     Boolean: 0,
     Integer: 1,
     Number: 2,
-    String: 3
+    String: 3,
+    Color: 4,
+    CollisionFlags: 5,
+    Coordinate: 6,
+    Team: 7,
+    TeamWihSpec: 8,
+    BgType: 9,
+    CameraFollow: 10,
+    KickOffReset: 11,
+    Flag: 12
   };
 
   const ErrorCodes = {
@@ -124,7 +192,8 @@ function abcHaxballAPI(window, config){
     AuthFromKeyInvalidIdFormatError: 48,
     LanguageAlreadyExistsError: 49,
     CurrentLanguageRemovalError: 50,
-    LanguageDoesNotExistError: 51
+    LanguageDoesNotExistError: 51,
+    BadActorError: 52
   };
 
   const RendererTextIndices = {
@@ -142,9 +211,9 @@ function abcHaxballAPI(window, config){
     gamePaused2: 11
   };
   
-  const EnglishErrorsMap = {
+  const EnglishErrorsTextMap = {
     [ErrorCodes.Empty]: ()=>"",
-    [ErrorCodes.ConnectionClosed]: (reason)=>"Connection closed"+((reason!=null)?" ("+reason+")":""),
+    [ErrorCodes.ConnectionClosed]: (reason)=>"Connection closed" + ((reason != null) ? " ("+reason+")" : ""),
     [ErrorCodes.GameStateTimeout]: ()=>"Game state timeout",
     [ErrorCodes.RoomClosed]: ()=>"The room was closed.",
     [ErrorCodes.RoomFull]: ()=>"The room is full.",
@@ -155,7 +224,7 @@ function abcHaxballAPI(window, config){
     [ErrorCodes.Unknown]: ()=>"An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console.",
     [ErrorCodes.Cancelled]: ()=>"Cancelled",
     [ErrorCodes.FailedPeer]: ()=>"Failed to connect to peer.",
-    [ErrorCodes.KickedNow]: (reason, ban, byName)=>"You were "+(ban?"banned":"kicked")+(byName?.length>0?(" by "+byName):"")+(reason?.length>0?(" ("+reason+")"):""),
+    [ErrorCodes.KickedNow]: (reason, ban, byName)=>"You were " + (ban ? "banned" : "kicked") + (byName?.length > 0 ? (" by " + byName) : "") + (reason?.length > 0 ? (" ("+reason+")") : ""),
     [ErrorCodes.Failed]: ()=>"Failed",
     [ErrorCodes.MasterConnectionError]: ()=>"Master connection error",
     [ErrorCodes.StadiumParseError]: (section, index)=>"Error in \"" + section + "\" index: " + index,
@@ -193,9 +262,18 @@ function abcHaxballAPI(window, config){
     [ErrorCodes.PluginNotFoundError]: (pluginIndex)=>"Plugin not found at index " + pluginIndex,
     [ErrorCodes.PluginNameChangeNotAllowedError]: ()=>"Plugin name should not change",
     [ErrorCodes.AuthFromKeyInvalidIdFormatError]: ()=>"Invalid id format",
-    [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: "+abbr,
+    [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: " + abbr,
     [ErrorCodes.CurrentLanguageRemovalError]: ()=>"Current language cannot be removed. Change to a different language first.",
-    [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Language does not exist: "+abbr
+    [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Language does not exist: " + abbr,
+    [ErrorCodes.BadActorError]: ()=>"Bad Actor"
+  };
+
+  const EnglishConnectionStateTextMap = {
+    [ConnectionState.ConnectingToMaster]: "Connecting to master",
+    [ConnectionState.ConnectingToPeer]: "Connecting to peer",
+    [ConnectionState.AwaitingState]: "Awaiting state",
+    [ConnectionState.Active]: "Active",
+    [ConnectionState.ConnectionFailed]: "Connection Failed",
   };
 
   const EnglishRendererTextMap = {
@@ -208,7 +286,7 @@ function abcHaxballAPI(window, config){
     [RendererTextIndices.blueIsVictorious1]: "Blue is", 
     [RendererTextIndices.blueIsVictorious2]: "Victorious!", 
     [RendererTextIndices.blueScores1]: "Blue", 
-    [RendererTextIndices.blueScores1]: "Scores!", 
+    [RendererTextIndices.blueScores2]: "Scores!", 
     [RendererTextIndices.gamePaused1]: "Game", 
     [RendererTextIndices.gamePaused2]: "Paused" 
   };
@@ -256,17 +334,19 @@ function abcHaxballAPI(window, config){
   }
 
   function LanguageData(){
-    this.errorsMap = null;
+    this.errorsTextMap = null;
+    this.connectionStateTextMap = null;
     this.rendererTextMap = null;
   }
 
   const Language = {
-    add: function(abbr, errorsMap, rendererTextMap){
+    add: function(abbr, errorsTextMap, connectionStateTextMap, rendererTextMap){
       abbr = (abbr || "").toUpperCase();
       if (allLanguages[abbr]!=null)
         throw createError(ErrorCodes.LanguageAlreadyExistsError, abbr); // "Language already exists: "+abbr
       var langData = new LanguageData();
-      langData.errorsMap = errorsMap;
+      langData.errorsTextMap = errorsTextMap;
+      langData.connectionStateTextMap = connectionStateTextMap;
       langData.rendererTextMap = rendererTextMap;
       allLanguages[abbr] = langData;
     },
@@ -308,12 +388,13 @@ function abcHaxballAPI(window, config){
     get: function(){
       return {
         ErrorCodes,
+        ConnectionState,
         RendererTextIndices
       };
     }
   });
 
-  Language.add("GB", EnglishErrorsMap, EnglishRendererTextMap);
+  Language.add("GB", EnglishErrorsTextMap, EnglishConnectionStateTextMap, EnglishRendererTextMap);
   // one may add all languages here.
 
   currentLanguage = allLanguages[currentLanguageAbbr];
@@ -325,7 +406,7 @@ function abcHaxballAPI(window, config){
 
   HBError.prototype = {
     toString: function(){
-      var f = currentLanguage.errorsMap[this.code];
+      var f = currentLanguage.errorsTextMap[this.code];
       if (!f)
         return null;
       if (!this.params)
@@ -477,8 +558,21 @@ function abcHaxballAPI(window, config){
   function K() {}
   function M() {}
   function U() {}
-  function Fb() {}
-  function Wb() {}
+  function Fb() {
+    this.Id = 0;
+    this.w = "";
+    this.ub = "";
+    this.Ec = 0;
+    this.Gc = 0;
+    this.Ib = false;
+    this.Xe = 0;
+    this.I = 0;
+  }
+  function Wb() {
+    this.vd = null;
+    this.$ = "";
+    this.Le = Infinity;
+  }
   function va() {}
   function n() {}
   function F(a, b) {
@@ -8071,22 +8165,22 @@ function abcHaxballAPI(window, config){
       ya.T.iq = (b)=>{
         callbacks.onPlayerInputChange && callbacks.onPlayerInputChange(b.V, b.ob);
       };
-      ya.T.tl = (b)=>{ // +
+      ya.T.tl = (b)=>{
         callbacks.onPlayerJoin && callbacks.onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
       };
-      ya.T.ji = (d)=>{ // +
+      ya.T.ji = (d)=>{
         callbacks.onPlayerBallKick && callbacks.onPlayerBallKick(d?.V);
       };
-      ya.T.Ni = (team)=>{ // +
+      ya.T.Ni = (team)=>{
         callbacks.onTeamGoal && callbacks.onTeamGoal(team?.$);
       };
-      ya.T.Oi = (team)=>{ // +
+      ya.T.Oi = (team)=>{
         callbacks.onGameEnd && callbacks.onGameEnd(team.$); // winningTeamId
       };
-      ya.T.ml = (c, Bf, e)=>{ // +
+      ya.T.ml = (c, Bf, e)=>{
         (!e) && callbacks.onGamePauseChange && callbacks.onGamePauseChange(Bf, c?.V) // paused, byId
       };
-      ya.T.Ki = function(a){ // +
+      ya.T.Ki = function(a){
         callbacks.onGameStart && callbacks.onGameStart(a?.V); // byId
       }
       ya.T.Os = ()=>{
@@ -8125,7 +8219,7 @@ function abcHaxballAPI(window, config){
       ya.T._RP_ = (a, b) => {
         haxball.room._onPlayersOrderChange && haxball.room._onPlayersOrderChange(a, b);
       };
-      ya.T._PTC_ = (a, b, c) => { // + (xl)
+      ya.T._PTC_ = (a, b, c) => {
         callbacks.onPlayerTeamChange && callbacks.onPlayerTeamChange(a, b, c);
       };
       ya.T._TCC_ = (a, b, c) => {
@@ -8149,37 +8243,37 @@ function abcHaxballAPI(window, config){
       ya.T._EC_ = (a)=>{
         callbacks.onExtrapolationChange && callbacks.onExtrapolationChange(a);
       };
-      ya.T.Pi = ()=>{ // +
+      ya.T.Pi = ()=>{
         callbacks.onTimeIsUp && callbacks.onTimeIsUp();
       };
       ya.T.lq = ()=>{
         callbacks.onPositionsReset && callbacks.onPositionsReset();
       };
-      ya.T.rl = function(b, Tc){ // +
+      ya.T.rl = function(b, Tc){
         callbacks.onPlayerChat && callbacks.onPlayerChat(b.V, Tc); // id, message
       };
-      ya.T.Vl = function(msg, color, style, sound){ // +
+      ya.T.Vl = function(msg, color, style, sound){
         callbacks.onAnnouncement && callbacks.onAnnouncement(msg, color, style, sound); // msg, color, style, sound
       };
-      ya.T.vf = function(b){ // +
+      ya.T.vf = function(b){
         callbacks.onGameStop && callbacks.onGameStop(b?.V);  //byId
       };
-      ya.T.Ii = function(a, e){ // +
+      ya.T.Ii = function(a, e){
         callbacks.onStadiumChange && callbacks.onStadiumChange(e, a?.V); // map, byId
       };
-      ya.T.sl = function(b){ // +
+      ya.T.sl = function(b){
         callbacks.onPlayerSyncChange && callbacks.onPlayerSyncChange(b?.V, b?.Ld);// id, sync
       };
-      ya.T.ii = function(b, c){ // +
+      ya.T.ii = function(b, c){
         callbacks.onPlayerAdminChange && callbacks.onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
       };
-      ya.T.Hk = function(a, b, c, d){ // +
+      ya.T.Hk = function(a, b, c, d){
         callbacks.onKickRateLimitChange && callbacks.onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
       };
-      ya.T.ul = function (d, e, f, g) { // +
+      ya.T.ul = function (d, e, f, g) {
         callbacks.onPlayerLeave && callbacks.onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
       };
-      ya.T.wl = function(a, b){ // +
+      ya.T.wl = function(a, b){
         callbacks.onPlayerChatIndicatorChange && callbacks.onPlayerChatIndicatorChange(a?.V, !b); // id, value
       };
     };
@@ -8438,10 +8532,9 @@ function abcHaxballAPI(window, config){
   }
 
   function createSandbox(callbacks, options){
-    var roomState = new fa(), room = new SandboxRoom(roomState), sandbox = new Sandbox(room, callbacks, options);
-    var obj;
+    var roomState = new fa(), room = new SandboxRoom(roomState), sandbox = new Sandbox(room, callbacks, options), obj;
     obj = {
-      roomData: roomState,
+      state: roomState,
       takeSnapshot: function(){
         return roomState.copy();
       },
@@ -8449,7 +8542,7 @@ function abcHaxballAPI(window, config){
         var state = newRoomState.copy();
         sandbox.setRoomStateObj(state);
         roomState = state;
-        obj.roomData = state;
+        obj.state = state;
       },
       playerJoin: function(id, name, flag, avatar, conn, auth){
         var b = oa.la(id, name, flag, avatar, conn, auth);
@@ -8604,15 +8697,18 @@ function abcHaxballAPI(window, config){
       runSteps: function(count){
         room.runSteps(count);
       },
-      getRoomDataOriginal: ()=>{
-        return {
-          q: {
-            ya: obj
-          }
-        }
-      },
       destroy: sandbox.ia
     };
+    Object.defineProperty(obj, "gameState", {
+      get(){
+        return obj.state.K;
+      }
+    });
+    Object.defineProperty(obj, "currentPlayerId", {
+      get(){
+        return 0;
+      }
+    });
     return obj;
   }
   
@@ -8640,7 +8736,10 @@ function abcHaxballAPI(window, config){
         throw createError(ErrorCodes.ReplayFileReadError); // "Couldn't load replay data."
     }
     var obj = {
-      roomData: roomState,
+      state: roomState,
+      getSpeed: ()=>{
+        return jb.pl;
+      },
       setSpeed: (coefficient)=>{ // fastmo: coefficient>1, normal: coefficient=1, slowmo: 0<coefficient<1, stop: coefficient=0
         b.assignCallbacks();
         jb.pl = coefficient;
@@ -8659,6 +8758,16 @@ function abcHaxballAPI(window, config){
         b.ia();
       }
     };
+    Object.defineProperty(obj, "gameState", {
+      get(){
+        return obj.state.K;
+      }
+    });
+    Object.defineProperty(obj, "currentPlayerId", {
+      get(){
+        return jb.uc;
+      }
+    });
     jb.obj = obj;
     return obj;
   }
@@ -8774,7 +8883,7 @@ function abcHaxballAPI(window, config){
       haxball.room = new Room(internalData, haxball.config, haxball.plugins);
       allRooms.push(haxball.room);
       haxball.room.client = haxball;
-      haxball.room.kickTimeout = haxball.kickTimeout || 20;
+      haxball.room.kickTimeout = haxball.kickTimeout || -1;
       //haxball.emit("roomJoin", haxball.room);
       y.i(haxball.onSuccess, haxball.room);
       haxball.room._onPlayerObjectCreated && (
@@ -8906,7 +9015,7 @@ function abcHaxballAPI(window, config){
       removeRoomFromList(haxball.room);
       haxball.cancel = null;
       y.i(haxball.onFailure, createError(ErrorCodes.Unknown, ic instanceof q ? ic.Ta : ic)/*ic*//* instanceof q ? ic.Ta : ic*/);
-      //window.console.log(ic instanceof q ? ic.Ta : ic),
+      //console.log(ic instanceof q ? ic.Ta : ic),
         //(c = new P("Unexpected Error", "", [])),
         //(c.Vd.innerHTML =
           //"An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."),
@@ -8949,7 +9058,7 @@ function abcHaxballAPI(window, config){
       haxball.room = new Room(internalData, haxball.config, haxball.plugins);
       allRooms.push(haxball.room);
       haxball.room.client = haxball;
-      haxball.room.kickTimeout = haxball.kickTimeout || 20;
+      haxball.room.kickTimeout = haxball.kickTimeout || -1;
       haxball.room.hostPing = 0;
       y.i(haxball.onSuccess, haxball.room);
       haxball.room._onPlayerObjectCreated && (
@@ -9029,7 +9138,7 @@ function abcHaxballAPI(window, config){
       internalData.execOperationReceivedOnHost(a)!=false && l.ra(a);
     }, 3e3);
     l.$k = function (a) {
-      null != g.na(a) && ((a = Y.la(a, "Bad actor", !1)), (internalData.execOperationReceivedOnHost(a)!=false && l.ra(a)));
+      null != g.na(a) && ((a = Y.la(a, createError(ErrorCodes.BadActorError).toString(), !1)), (internalData.execOperationReceivedOnHost(a)!=false && l.ra(a))); // "Bad actor"
     };
     l.Hp = function (a, b, conn, auth) { // receive conn & auth data
       var d = b.ic();
@@ -9131,7 +9240,7 @@ function abcHaxballAPI(window, config){
     } catch (a) {
       return Promise.reject(a);
     }
-  };
+  }
 
   function authFromKey(key){ // returns Promise(authObj)
     try {
@@ -9139,11 +9248,11 @@ function abcHaxballAPI(window, config){
     } catch (a) {
       return Promise.reject(a);
     }
-  };
+  }
 
   function numberToColor(number){ // lc
     return "rgba("+[(number&16711680)>>>16, (number&65280)>>>8, number&255].join()+",255)";
-  };
+  }
 
   function colorToNumber(color){
     var arr = color.match(/rgba?[ \t]*\([ \t]*(\d+),[ \t]*(\d+),[ \t]*(\d+)[ \t]*\)/);
@@ -9153,23 +9262,35 @@ function abcHaxballAPI(window, config){
     if (r>255 || g>255 || b>255)
       return;
     return (r<<16)|(g<<8)|b;
-  };
+  }
+
+  function stadiumChecksum(stadium) { // returns null for original maps, checksum value for custom maps
+    return stadium.Pe() ? null : J.Vg(stadium.Sj(), 8);
+  }
 
   function keyState(dirX, dirY, kick){ // dirX = oneof[-1:left, 0:still, 1:right], dirY = oneof[-1:up, 0:still, 1:down], kick = true/false
     return (kick?16:0) | (dirX>0?8:(dirX<0?4:0)) | (dirY>0?2:(dirY<0?1:0));
-  };
+  }
 
   function getRoomList() {
     return va.get();
-  };
+  }
 
   function getGeo() {
     return T.Fo();
-  };
+  }
+
+  function geoFromJSON(json) {
+    return T.Rf(json);
+  }
+
+  function geoFromString(string) {
+    return T.Hh(string);
+  }
 
   function getDefaultStadiums(){
     return h.Kh();
-  };
+  }
 
   function parseStadium(textDataFromHbsFile, onError){
     try {
@@ -9181,11 +9302,11 @@ function abcHaxballAPI(window, config){
       b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
       b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError)); // "Error loading stadium file."
     }
-  };
+  }
 
   function exportStadium(stadium){
     return stadium.se();
-  };
+  }
 
   function getVertexIndexAtMapCoord(roomState, {x, y}, threshold){
     return roomState.K?.ta.J.findIndex((vertex)=>{
@@ -9303,13 +9424,48 @@ function abcHaxballAPI(window, config){
 
   function Room(internalData, config, plugins){
     var renderer = internalData.renderer, cfg = config;
-    if (!internalData.isHost)
-      this.sdp = internalData.roomObj.ya.pa.Ra.remoteDescription.sdp; // usage: require("sdp-transform").parse(sdp);
-
-    this.isHost = internalData.isHost;
-    this.currentPlayerId = internalData.roomObj.ya.uc;
-    this.currentPlayer = internalData.roomObj.ya.T.I.filter((x)=>(x.V==this.currentPlayerId))[0];
-    this.kickTimeout = 20;
+    Object.defineProperty(this, "sdp", { // usage: require("sdp-transform").parse(sdp);
+      get(){
+        return internalData.isHost ? null : internalData.roomObj.ya.pa.Ra.remoteDescription.sdp;
+      }
+    });
+    Object.defineProperty(this, "isHost", {
+      get(){
+        return internalData.isHost;
+      }
+    });
+    Object.defineProperty(this, "currentPlayerId", {
+      get(){
+        return internalData.roomObj.ya.uc;
+      }
+    });
+    Object.defineProperty(this, "currentPlayer", {
+      get(){
+        var id = internalData.roomObj.ya.uc;
+        return internalData.roomObj.ya.T.I.filter((x)=>(x.V==id))[0];
+      }
+    });
+    Object.defineProperty(this, "state", {
+      get(){
+        return internalData.roomObj?.ya?.T;
+      }
+    });
+    Object.defineProperty(this, "stateExt", {
+      get(){
+        return internalData.extrapolatedRoomState;
+      }
+    });
+    Object.defineProperty(this, "gameState", {
+      get(){
+        return internalData.roomState?.K;
+      }
+    });
+    Object.defineProperty(this, "gameStateExt", {
+      get(){
+        return internalData.extrapolatedRoomState?.K;
+      }
+    });
+    this.kickTimeout = -1;
     this.renderer = renderer;
     if (internalData.pluginMechanismActive){
       this.plugins = plugins || [];
@@ -9608,14 +9764,6 @@ function abcHaxballAPI(window, config){
     this.setChatIndicatorActive = function(active) {
       var msg = na.la(active ? 1 : 0);
       internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
-    };
-
-    this.getCurrentMap = function() {
-      return internalData.roomObj?.ya?.T?.S;
-    };
-
-    this.mapChecksum = function(map) { // returns null for original maps, checksum value for custom maps
-      return map.Pe() ? null : J.Vg(map.Sj(), 8);
     };
 
     this.setTeamColors = function(teamId, angle, ...colors) { // teamId: one of (1=red, 2=blue), colors: maximum 4 parseable color parameters 
@@ -9981,82 +10129,26 @@ function abcHaxballAPI(window, config){
     };
     */
 
-
-
-    this.getPlayerOriginal = function(id){
-      return internalData.roomObj?.ya?.T?.I?.filter((x)=>x.V==id)[0];
-    };
-
     this.getPlayer = function(id){
-      var x = internalData.roomObj?.ya?.T?.I?.filter((x)=>x.V==id)[0];
-      if (!x)
-        return null;
-      return {
-        id: x.V,
-        nick: x.w,
-        flag: x.Kd,
-        avatar: x.Xb,
-        ping: x.yb,
-        input: x.ob,
-        isAdmin: x.cb,
-        isDesync: x.Ld,
-        isKicking: x.Wb,
-        teamId: x.ea.$
-      };
-    };
-
-    this.getPlayersOriginal = function(){
-      return internalData.roomObj?.ya?.T?.I;
-    };
-
-    this.getPlayers = function(){
-      return internalData.roomObj?.ya?.T?.I?.map((x)=>{
-        return {
-          id: x.V,
-          nick: x.w,
-          flag: x.Kd,
-          avatar: x.Xb,
-          ping: x.yb,
-          input: x.ob,
-          isAdmin: x.cb,
-          isDesync: x.Ld,
-          isKicking: x.Wb,
-          teamId: x.ea.$
-        };
-      });
-    };
-
-    this.getBallOriginal = function(extrapolated = true){
-      var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      return p?.ta.F[0];
+      return internalData.roomObj.ya.T.I.filter((x)=>x.V==id)[0];
     };
 
     this.getBall = function(extrapolated = true){
       var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      return h.mo(p?.ta.F[0], {a:{},D:{},oa:{}});
-    };
-
-    this.getDiscsOriginal = function(extrapolated = true){
-      var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      return p?.ta.F;
+      return p?.ta.F[0];
     };
 
     this.getDiscs = function(extrapolated = true){
       var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      return p?.ta.F.map((x)=>h.mo(x, {a:{},D:{},oa:{}}));
-    };
-
-    this.getDiscOriginal = function(discId, extrapolated = true){
-      var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      return p?.ta.F[discId];
+      return p?.ta.F;
     };
 
     this.getDisc = function(discId, extrapolated = true){
       var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      return h.mo(p?.ta.F[discId], {a:{},D:{},oa:{}});
+      return p?.ta.F[discId];
     };
 
-    this.getPlayerDiscOriginal = function(playerId, extrapolated = true){
+    this.getPlayerDisc = function(playerId, extrapolated = true){
       var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
       var a1 = p?.ta.F, a2 = internalData.roomObj?.ya?.T?.S.F;
       if (!a1 || !a2)
@@ -10066,108 +10158,64 @@ function abcHaxballAPI(window, config){
           return a1[i];
     };
 
-    this.getPlayerDisc = function(playerId, extrapolated = true){
-      var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      var a1 = p?.ta.F, a2 = internalData.roomObj?.ya?.T?.S.F, i;
-      if (!a1 || !a2)
-        return;
-      for (i=a2.length;i<a1.length;i++)
-        if (a1[i].playerId==playerId)
-          break;
-      if (i>=a1.length)
-        return;
-      return h.mo(a1[i], {a:{},D:{},oa:{}});
-    };
-
-    this.getPlayerDiscOriginal_exp = function(playerId){
+    this.getPlayerDisc_exp = function(playerId){
       return internalData.roomObj?.ya?.T?.I.filter((x)=>x.V==playerId)[0]?.H;
     };
 
-    this.getPlayerDisc_exp = function(playerId){
-      var v = internalData.roomObj?.ya?.T?.I.filter((x)=>x.V==playerId)[0]?.H;
-      if (!v)
-        return;
-      return h.mo(v, {a:{},D:{},oa:{}});
-    };
+    Object.defineProperty(this, "name", {
+      get: function () {
+        return internalData.roomObj.ya.T.jc;
+      }
+    });
 
-    this.getRoomDataOriginal = function(){
-      var o = internalData.roomObj?.ya?.T; 
-      if (!o)
-        return {};
-      return {
-        o: o,
-        p: internalData.roomState?.K,
-        ep: internalData.extrapolatedRoomState?.K,
-        q: internalData.roomObj
-      };
-    };
+    Object.defineProperty(this, "link", {
+      get: function () {
+        return internalData.roomObj.Bg;
+      }
+    });
 
-    this.getRoomData = function(extrapolated = true){
-      var o = internalData.roomObj?.ya?.T, ret = {}; 
-      if (!o)
-        return ret;
-      var p = extrapolated ? internalData.extrapolatedRoomState?.K : internalData.roomState?.K;
-      var gameData = {
-        active: !!p
-      };
-      Object.assign(ret, {
-        name: o.jc,
-        link: internalData.roomObj.Bg,
-        timeLimit: o.Da,
-        scoreLimit: o.ib,
-        game: gameData
-      });
-      if (!p)
-        return ret;
-      Object.assign(gameData, {
-        redScore: p.Pb,
-        blueScore: p.Kb,
-        timeElapsed: p.Hc
-      });
-      var mapData = {
-        name: o.S.w,
-        width: o.S.$b,
-        height: o.S.qc,
-        maxViewWidth: o.S.Ye,
-        cameraFollow: 1 == o.S.Ge ? "player" : "",
-        spawnDistance: o.S.kc,
-        kickOffReset: o.S.pf ? "full" : "partial",
-        redSpawnPoints: o.S.Dd.map((a)=>([a.x, a.y])),
-        blueSpawnPoints: o.S.md.map((a)=>([a.x, a.y])),
-        bg: {
-          type: (1 == o.S.ld) ? "grass" : ((2 == o.S.ld) ? "hockey" : "none"),
-          width: o.S.Td,
-          height: o.S.Sd,
-          kickOffRadius: o.S.kd,
-          cornerRadius: o.S.Uc,
-          color: o.S.jd,
-          goalLine: o.S.Fe
-        },
-        playerPhysics: {
-          bCoef: o.S.ge.m,
-          invMass: o.S.ge.aa,
-          damping: o.S.ge.Ca,
-          acceleration: o.S.ge.Ce,
-          kickingAcceleration: o.S.ge.Te,
-          kickingDamping: o.S.ge.Ue,
-          kickStrength: o.S.ge.Re,
-          cGroup: o.S.ge.v,
-          gravity: [o.S.ge.oa.x, o.S.ge.oa.y],
-          radius: o.S.ge.Z,
-          kickback: o.S.ge.Se
-        },
-        vertexes: p.ta.J.map(h.Tr),
-        segments: p.ta.U.map(h.fr),
-        goals: o.S.tc.map(h.Jo),
-        planes: p.ta.qa.map(h.gq),
-        discs: p.ta.F.map((x)=>{return h.mo(x, {a:{},D:{},oa:{}});}),
-        joints: p.ta.pb.map(h.ap),
-      };
-      Object.assign(ret, {
-        map: mapData
-      });
-      return ret;
-    };
+    Object.defineProperty(this, "timeLimit", {
+      get: function () {
+        return internalData.roomObj.ya.T.Da;
+      }
+    });
+
+    Object.defineProperty(this, "scoreLimit", {
+      get: function () {
+        return internalData.roomObj.ya.T.ib;
+      }
+    });
+
+    Object.defineProperty(this, "redScore", {
+      get: function () {
+        return internalData.extrapolatedRoomState?.K.Pb;
+      }
+    });
+
+    Object.defineProperty(this, "blueScore", {
+      get: function () {
+        return internalData.extrapolatedRoomState?.K.Kb;
+      }
+    });
+
+    Object.defineProperty(this, "timeElapsed", {
+      get: function () {
+        return internalData.extrapolatedRoomState?.K.Hc;
+      }
+    });
+
+    Object.defineProperty(this, "stadium", {
+      get: function () {
+        return internalData.roomObj.ya.T.S;
+      }
+    });
+
+    Object.defineProperty(this, "players", {
+      get: function () {
+        return internalData.roomObj.ya.T.I;
+      }
+    });
+
 
     // -------------------------------------------
     // sandbox mode functions:
@@ -10501,12 +10549,6 @@ function abcHaxballAPI(window, config){
 
   function Renderer(metadata=null){
     this.defineMetadata(metadata);
-    /*
-- `Language`: Methods for global language handling.
-  - `add(abbr, errorsMap)`: Adds a new language with given properties. `errorsMap` must be an object that has a description function for each error code where each function returns a string. throws error while trying to add an already-existing language.
-  - `remove(abbr)`: Removes the language with given abbreviation(`abbr`). throws error while trying to remove a non-existent or current language.
-  - `current`: This is the abbreviation of the current language. It is possible to change the whole API's language by changing this value directly. (throws error if language does not exist.)
-    */
   }
 
    // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
@@ -10532,7 +10574,7 @@ function abcHaxballAPI(window, config){
     return x?.value; // Do not forget to return this value. It is used once inside constructor for variable "active".
   };
 
-  var AllowFlags = {
+  const AllowFlags = {
     JoinRoom: 1,
     CreateRoom: 2
   };
@@ -10637,7 +10679,7 @@ function abcHaxballAPI(window, config){
     _fixNames(Ga, [null, null, "byId"]);
     _fixNames(Na, [null, "text", "byId", "targetId"]);
     _fixNames(oa, [null, "id", null, "flag", "avatar", null, null, "byId"]);
-    _fixNames(qb, [null, "avatar2", "playerId", "byId"]);
+    _fixNames(qb, [null, "avatar", "playerId", "byId"]);
     _fixNames(Y, [null, "id", "reason", "ban", "byId"]);
     _fixNames(pb, [null, "playerIdList", "moveToTop", "ban", "byId"]);
     _fixNames(Ma, [null, "byId"]);
@@ -10656,6 +10698,8 @@ function abcHaxballAPI(window, config){
     _fixNames(ma, [null, null, "rate", "burst", "byId"]);
     _fixNames(ob, [null, "id", "type", "data1", "data2", "byId"]);
     _fixNames(CustomEvent, [null, null, null, "byId"]);
+    _fixNames(Wb, ["data", "id", "dist"]);
+    _fixNames(Fb, ["version", "name", "flag", "lat", "lon", "password", "maxPlayers", "players"]);
   }
 
   return {
@@ -10663,6 +10707,11 @@ function abcHaxballAPI(window, config){
     VariableType,
     ConnectionState,
     AllowFlags,
+    Direction, 
+    CollisionFlags,
+    CameraFollow, 
+    BackgroundType, 
+    GamePlayState,
     Callback: {
       add: createEventCallback,
       remove: destroyEventCallback
@@ -10675,6 +10724,9 @@ function abcHaxballAPI(window, config){
       colorToNumber,
       keyState,
       getGeo,
+      geoFromJSON,
+      geoFromString,
+      stadiumChecksum,
       parseStadium,
       exportStadium,
       getDefaultStadiums

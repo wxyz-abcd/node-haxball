@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory", false, { // "autoPlay_followBall_inmemory" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
@@ -43,6 +43,7 @@ module.exports = function(API){
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
   // it also fixes a bug when the bot doesn't move after positions resets
+  // BUT instead, it creates a new bug... This is not the solution... Must change...
   var moveInRandomY = function(){
     dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
       room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
@@ -77,25 +78,25 @@ module.exports = function(API){
     if (Date.now() - lastPositionsReset < 150) return;
 
     // get the original data object of the next bot
-    var cp = room.getPlayerOriginal(65535);
-    var playerDisc = cp?.H;
+    var cp = room.getPlayer(65535);
+    var playerDisc = cp?.disc;
 
-    // coordinates: playerDisc.a.x, playerDisc.a.y
-    // speed: playerDisc.D.x, playerDisc.D.y
-    // radius: playerDisc.Z
+    // coordinates: playerDisc.pos.x, playerDisc.pos.y
+    // speed: playerDisc.speed.x, playerDisc.speed.y
+    // radius: playerDisc.radius
 
     if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
       return;
 
     // get the original data object of the ball
-    var ball = room.getBallOriginal();
+    var ball = room.getBall();
 
-    // coordinates: ball.a.x, ball.a.y
-    // speed: ball.D.x, ball.D.y
-    // radius: ball.Z
+    // coordinates: ball.pos.x, ball.pos.y
+    // speed: ball.speed.x, ball.speed.y
+    // radius: ball.radius
 
     // calculate delta difference for both x and y axis.
-    var deltaX = ball.a.x - playerDisc.a.x, deltaY = ball.a.y - playerDisc.a.y, dirX, dirY, kick;
+    var deltaX = ball.pos.x - playerDisc.pos.x, deltaY = ball.pos.y - playerDisc.pos.y, dirX, dirY, kick;
 
     // x direction:
     if (Math.abs(deltaX) < that.minCoordAlignDelta) // we can omit small delta.
@@ -110,7 +111,7 @@ module.exports = function(API){
       dirY = Math.sign(deltaY); // direction is +1 or -1, depending on the delta difference
 
     // kick is true if the distance between ball and player is less than minKickDistance
-    kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
+    kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.radius + ball.radius + that.minKickDistance) * (playerDisc.radius + ball.radius + that.minKickDistance));
 
     // apply current keys
     var newKeyState = Utils.keyState(dirX, dirY, kick);
@@ -118,8 +119,8 @@ module.exports = function(API){
       // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
       // this happens because requestAnimationFrame is being used. 
       // therefore, we are trying to limit consequent sending.
-      if (newKeyState!=oldKeyState || kick!=cp.Wb){ // Wb: whether x key is active in-game (the circle around players is painted white if Wb is true)
-        if ((newKeyState==oldKeyState) && kick && !cp.Wb) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
+      if (newKeyState!=oldKeyState || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
+        if ((newKeyState==oldKeyState) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
           room.fakeSendPlayerInput(/*input:*/ newKeyState & -17, /*byId:*/ 65535); // we have to release x key before pressing it again. (newKeyState & -17) changes only the 5th(kick) bit of newKeyState to 0.
         room.fakeSendPlayerInput(/*input:*/ newKeyState, /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
         oldKeyState = newKeyState;

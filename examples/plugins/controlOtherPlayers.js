@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "controlOtherPlayers", true, { // "controlOtherPlayers" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -31,7 +31,7 @@ module.exports = function(API){
     if (!controlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayerOriginal(playerIdToBeControlled))
+    if (!room.getPlayer(playerIdToBeControlled))
       playerIdToBeControlled = byPlayerId;
     controlSwitch[byPlayerId] = playerIdToBeControlled;
   };
@@ -43,7 +43,7 @@ module.exports = function(API){
     if (!blockControlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayerOriginal(playerId))
+    if (!room.getPlayer(playerId))
       return;
     controlSwitchBlocked[playerId] = (value == 1);
   };
@@ -79,7 +79,7 @@ module.exports = function(API){
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
 
     // free extra memory allocated
     delete controlSwitch[id];

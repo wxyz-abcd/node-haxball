@@ -1,4 +1,4 @@
-var API = null, room = null, roomData = null, roomObj = null, Team = null, make2Digits = null;
+var API = null, room = null, roomState = null, Team = null, make2Digits = null;
 var eRoomView = document.getElementsByClassName("room-view").item(0);
 var eContainer = eRoomView.children.item(0);
 var eRoomName = eContainer.children.item(0);
@@ -57,7 +57,7 @@ function downloadFile(fileName, blobType, blobContents){
   c.remove();
 }
 
-var isAdmin = ()=>(room.currentPlayer?.cb || room.isHost);
+var isAdmin = ()=>(room.currentPlayer?.isAdmin || room.isHost);
 
 function getInput(label, inputDefaultValue, cancelable, yesNo){
   return new Promise((resolve, reject)=>{
@@ -92,32 +92,32 @@ function getInput(label, inputDefaultValue, cancelable, yesNo){
 
 function makePlayerContainer(elem, player){
   elem.classList.add("player-list-item");
-  if (player.cb)
+  if (player.isAdmin)
     elem.classList.add("admin");
-  elem.innerHTML = `<div class='flagico f-` + player.Kd + `'></div><div class='p-name'>` + player.w + `</div><div class='p-ping'>` + player.yb + `</div>`;
+  elem.innerHTML = `<div class='flagico f-` + player.flag + `'></div><div class='p-name'>` + player.name + `</div><div class='p-ping'>` + player.ping + `</div>`;
   elem.ondragstart = (event)=>{
-    event.dataTransfer.setData("player", "" + player.V);
+    event.dataTransfer.setData("player", "" + player.id);
   };
   elem.oncontextmenu = (event)=>{
     event.preventDefault();
-    showContextMenu(ctxMenu, event.pageX-3, event.pageY-3, player.w);
-    addContextMenuItem(ctxMenu, player.cb ? "Remove Admin" : "Give Admin", isAdmin(), ()=>{
+    showContextMenu(ctxMenu, event.pageX-3, event.pageY-3, player.name);
+    addContextMenuItem(ctxMenu, player.isAdmin ? "Remove Admin" : "Give Admin", isAdmin(), ()=>{
       if (!isAdmin())
         return;
-      room.setPlayerAdmin(player.V, !player.cb);
+      room.setPlayerAdmin(player.id, !player.isAdmin);
     });
     addContextMenuItem(ctxMenu, "Kick", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       getInput("Reason:", "", true, false).then((reason)=>{
-        room.kickPlayer(player.V, reason, false);
+        room.kickPlayer(player.id, reason, false);
       },()=>{});
     });
     addContextMenuItem(ctxMenu, "Ban", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       getInput("Reason:", "", true, false).then((reason)=>{
-        room.kickPlayer(player.V, reason, true);
+        room.kickPlayer(player.id, reason, true);
       },()=>{});
     });
     return false;
@@ -134,22 +134,22 @@ function makeTeamContainer(elem, team){
   elem.ondrop = (event)=>{
     event.preventDefault();
     var playerId = parseInt(event.dataTransfer.getData("player"));
-    !isNaN(playerId) && room.setPlayerTeam(playerId, team.$);
+    !isNaN(playerId) && room.setPlayerTeam(playerId, team.id);
   };
   var bDiv = document.createElement("div");
   bDiv.className = "buttons";
   var b1 = document.createElement("button"), b2;
   b1.className = "button center join-btn";
-  b1.innerText = team.w;
+  b1.innerText = team.name;
   b1.onclick = ()=>{
-    room.setPlayerTeam(room.currentPlayerId, team.$);
+    room.setPlayerTeam(room.currentPlayerId, team.id);
   };
   bDiv.appendChild(b1);
   if (team!=Team.Ia){
     b2 = document.createElement("button");
     b2.className = "button center reset-btn admin-only";
     b2.onclick = ()=>{
-      room.resetTeam(team.$);
+      room.resetTeam(team.id);
     };
     bDiv.appendChild(b2);
   }
@@ -159,16 +159,16 @@ function makeTeamContainer(elem, team){
   elem.appendChild(list);
   var oldList = "";
   elem.update = function(){
-    var gameActive = (roomObj.K!=null);
-    b1.disabled = roomObj.Pc || gameActive;
+    var gameActive = (roomState.gameState!=null);
+    b1.disabled = roomState.Pc || gameActive;
     if (b2)
       b2.disabled = gameActive;
-    var isAdmin = room.currentPlayer?.cb || room.isHost;
-    var arr = roomObj.I.filter(x=>(x.ea.$==team.$));
-    var newList = arr.map((x)=>(x.V+","+(x.cb?"1":"0")+","+x.yb)).join("|");
+    var isAdmin = room.currentPlayer?.isAdmin || room.isHost;
+    var arr = roomState.players.filter(x=>(x.team.id==team.id));
+    var newList = arr.map((x)=>(x.id+","+(x.isAdmin?"1":"0")+","+x.ping)).join("|");
     if (newList!=oldList){
       list.innerHTML = "";
-      roomObj.I.filter(x=>(x.ea.$ == team.$)).forEach((player)=>{
+      roomState.players.filter(x=>(x.team.id == team.id)).forEach((player)=>{
         var ePlayer = document.createElement("div");
         makePlayerContainer(ePlayer, player);
         ePlayer.draggable = isAdmin;
@@ -187,7 +187,7 @@ eRec.onclick = function(){
   }
   else
     room.startRecording();
-  update(API, room, roomData);
+  update(API, room, roomState);
 };
 eLink.onclick = function(){
   getInput("Room Link:", window.parent.roomLink, false, false).then(()=>{});
@@ -221,7 +221,7 @@ eScoreLimit.onchange = function(event){
 ePickStadium.onclick = function(event){
   showContextMenu(ctxMenu, event.pageX-3, event.pageY+3, "Pick Stadium", true);
   API.Utils.getDefaultStadiums().forEach((stadium)=>{
-    addContextMenuItem(ctxMenu, stadium.w, isAdmin(), ()=>{
+    addContextMenuItem(ctxMenu, stadium.name, isAdmin(), ()=>{
       if (!isAdmin())
         return;
       room.setCurrentStadium(stadium);
@@ -259,7 +259,7 @@ ePauseGame.onclick = function(){
   room.pauseGame();
 };
 
-window.update = function(_API, _room, _roomData){
+window.update = function(_API, _room, _roomState){
   if (API==null){ // if running for the first time
     Team = _API.Impl.Core.p;
     make2Digits = _API.Impl.Utils.J.Af;
@@ -268,22 +268,21 @@ window.update = function(_API, _room, _roomData){
     makeTeamContainer(eTeams.children.item(3), Team.xa);
     API = _API;
     room = _room;
-    roomData = _roomData;
-    roomObj = roomData.o;
+    roomState = _roomState;
   }
-  var gameActive = (roomObj.K != null);
-  var isAdmin = room.currentPlayer?.cb || room.isHost;
+  var gameActive = (roomState.gameState != null);
+  var isAdmin = room.currentPlayer?.isAdmin || room.isHost;
   var disableActions = !isAdmin || gameActive;
   if (isAdmin)
     eRoomView.classList.add("admin");
   else
     eRoomView.classList.remove("admin");
-  eRoomName.innerText = roomObj.jc;
+  eRoomName.innerText = roomState.jc;
   if (room.isRecording())
     eRec.classList.add("active");
   else
     eRec.classList.remove("active");
-  if (roomObj.Pc){
+  if (roomState.Pc){
     eLock.classList.add("locked");
     eLock.innerText = "Unlock";
   }
@@ -293,19 +292,19 @@ window.update = function(_API, _room, _roomData){
   }
   eReset.disabled = gameActive;
   eTimeLimit.disabled = disableActions;
-  eTimeLimit.value = roomObj.Da;
+  eTimeLimit.value = roomState.timeLimit;
   eScoreLimit.disabled = disableActions;
-  eScoreLimit.value = roomObj.ib;
-  if (roomObj.S.Pe())
+  eScoreLimit.value = roomState.scoreLimit;
+  if (roomState.stadium.Pe())
     eStadiumName.classList.remove("custom");
   else
     eStadiumName.classList.add("custom");
-  eStadiumName.innerText = roomObj.S.w;
+  eStadiumName.innerText = roomState.stadium.name;
   for (var i=1;i<4;i++)
     eTeams.children.item(i).update();
   ePickStadium.disabled = disableActions;
   eStartGame.style.display = gameActive ? "none" : "flex";
   eStopGame.style.display = gameActive ? "flex" : "none";
   ePauseGame.style.display = gameActive ? "flex" : "none";
-  ePauseGame.innerHTML = (gameActive && roomObj.K.Oa==120) ? "Resume (P)" : "Pause (P)";
+  ePauseGame.innerHTML = (gameActive && roomState.gameState.pauseGameTickCounter==120) ? "Resume (P)" : "Pause (P)";
 };

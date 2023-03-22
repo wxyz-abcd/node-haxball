@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
 
 function roomCallback(room){ // examples start from here.
 
@@ -59,7 +59,7 @@ function roomCallback(room){ // examples start from here.
     if (!controlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayerOriginal(playerIdToBeControlled))
+    if (!room.getPlayer(playerIdToBeControlled))
       playerIdToBeControlled = byPlayerId;
     controlSwitch[byPlayerId] = playerIdToBeControlled;
   };
@@ -71,13 +71,13 @@ function roomCallback(room){ // examples start from here.
     if (!blockControlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayerOriginal(playerId))
+    if (!room.getPlayer(playerId))
       return;
     controlSwitchBlocked[playerId] = (value == 1);
   };
 
   var setPlayerInput = function(playerId, value){
-    if (!room.getPlayerOriginal(playerId))
+    if (!room.getPlayer(playerId))
       return;
     /*
     if (!inputPermitted[byPlayerId]) // example for custom permission logic
@@ -153,7 +153,7 @@ function roomCallback(room){ // examples start from here.
 
   room.onPlayerJoin = function(playerObj, customData){
     // get player's id and name
-    var id = playerObj.V, name = playerObj.w;
+    var id = playerObj.id, name = playerObj.name;
 
     room.sendChat("Welcome, " + name); // greet everybody
     room.setPlayerAdmin(id, true); // make everybody admin
@@ -170,7 +170,7 @@ function roomCallback(room){ // examples start from here.
 
   room.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id and name
-    var id = playerObj.V, name = playerObj.w;
+    var id = playerObj.id, name = playerObj.name;
 
     room.sendChat("Goodbye, " + name); // say farewell to everybody
 

@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "modifyPlayerInput", true, { // "modifyPlayerInput" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -15,7 +15,7 @@ module.exports = function(API){
   var staticInputs = {}, room = null;
 
   var setPlayerInput = function(playerId, value){
-    if (!room.getPlayerOriginal(playerId))
+    if (!room.getPlayer(playerId))
       return;
     /*
     if (!inputPermitted[byPlayerId]) // example for custom permission logic
@@ -63,7 +63,7 @@ module.exports = function(API){
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
 
     // free extra memory allocated
     delete staticInputs[id];

@@ -37,7 +37,7 @@ var roomCallback = function(room){
   room.startGame();
   room.onPlayerJoin = (playerObj, customData) => {
     //console.log("Player joined : ", playerObj);
-    var {V:id, w:name} = playerObj;
+    var {id, name} = playerObj;
     room.setPlayerAdmin(id, true); // make everybody admin
   };
 };

@@ -8,10 +8,10 @@
       API.Language.remove("test"); 
 */
 function EnglishLanguage(API){
-  const { ErrorCodes, RendererTextIndices } = API.Language.indices;
+  const { ErrorCodes, ConnectionState, RendererTextIndices } = API.Language.indices;
   const { K } = API.Impl.Utils;
 
-  const EnglishErrorsMap = {
+  const ErrorsTextMap = {
     [ErrorCodes.Empty]: ()=>"",
     [ErrorCodes.ConnectionClosed]: (reason)=>"Connection closed"+((reason!=null)?" ("+reason+")":""),
     [ErrorCodes.GameStateTimeout]: ()=>"Game state timeout",
@@ -62,12 +62,21 @@ function EnglishLanguage(API){
     [ErrorCodes.PluginNotFoundError]: (pluginIndex)=>"Plugin not found at index " + pluginIndex,
     [ErrorCodes.PluginNameChangeNotAllowedError]: ()=>"Plugin name should not change",
     [ErrorCodes.AuthFromKeyInvalidIdFormatError]: ()=>"Invalid id format",
-    [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: "+abbr,
+    [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: " + abbr,
     [ErrorCodes.CurrentLanguageRemovalError]: ()=>"Current language cannot be removed. Change to a different language first.",
-    [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Language does not exist: "+abbr
+    [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Language does not exist: " + abbr,
+    [ErrorCodes.BadActorError]: ()=>"Bad Actor"
   };
 
-  const EnglishRendererTextMap = {
+  const ConnectionStateTextMap = {
+    [ConnectionState.ConnectingToMaster]: "Connecting to master",
+    [ConnectionState.ConnectingToPeer]: "Connecting to peer",
+    [ConnectionState.AwaitingState]: "Awaiting state",
+    [ConnectionState.Active]: "Active",
+    [ConnectionState.ConnectionFailed]: "Connection Failed",
+  };
+
+  const RendererTextMap = {
     [RendererTextIndices.timeIsUp1]: "Time is", 
     [RendererTextIndices.timeIsUp2]: "Up!", 
     [RendererTextIndices.redIsVictorious1]: "Red is", 
@@ -77,10 +86,10 @@ function EnglishLanguage(API){
     [RendererTextIndices.blueIsVictorious1]: "Blue is", 
     [RendererTextIndices.blueIsVictorious2]: "Victorious!", 
     [RendererTextIndices.blueScores1]: "Blue", 
-    [RendererTextIndices.blueScores1]: "Scores!", 
+    [RendererTextIndices.blueScores2]: "Scores!", 
     [RendererTextIndices.gamePaused1]: "Game", 
     [RendererTextIndices.gamePaused2]: "Paused" 
   };
 
-  return [EnglishErrorsMap, EnglishRendererTextMap];
+  return [ErrorsTextMap, ConnectionStateTextMap, RendererTextMap];
 };

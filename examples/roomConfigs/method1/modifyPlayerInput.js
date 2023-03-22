@@ -1,11 +1,11 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
 
 function roomCallback(room){ // examples start from here.
 
   var staticInputs = {};
 
   var setPlayerInput = function(playerId, value){
-    if (!room.getPlayerOriginal(playerId))
+    if (!room.getPlayer(playerId))
       return;
     /*
     if (!inputPermitted[byPlayerId]) // example for custom permission logic
@@ -50,7 +50,7 @@ function roomCallback(room){ // examples start from here.
 
   room.onPlayerLeave = (playerObj, reason, isBanned, byId, customData) => {
     // get player's id
-    var id = playerObj.V;
+    var id = playerObj.id;
 
     // free extra memory allocated
     delete staticInputs[id];

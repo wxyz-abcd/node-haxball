@@ -16,9 +16,11 @@ const API = abcHaxballAPI({
   JSON5: window.JSON5,
   pako: window.pako
 }/*, {
-  WebSocketChangeOriginAllowed: false,
-  WebSocketProxyUrl: "ws://localhost:3000/",
-  HttpProxyUrl: "http://localhost:3000/rs/"
+  proxy: {
+    WebSocketChangeOriginAllowed: false,
+    WebSocketUrl: "ws://localhost:3000/",
+    HttpUrl: "http://localhost:3000/rs/"
+  }
 }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
 const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
@@ -67,8 +69,8 @@ window.onload = ()=>{
   e_lon.oninput = debounce(onGeoLocationChange, 400);
   Impl.Core.T.Fo().then((value)=>{ // Get GeoLocation from basro's REST api
     geo = value;
-    e_lat.value = geo.Ec;
-    e_lon.value = geo.Gc;
+    e_lat.value = geo.lat;
+    e_lon.value = geo.lon;
     refreshList();
   });
 }
@@ -81,13 +83,13 @@ function onNameChange(){
 function onGeoLocationChange(){
   var lat = parseFloat(e_lat.value), lon = parseFloat(e_lon.value);
   if (!isFinite(lat) || isNaN(lat))
-    lat = geo.Ec;
+    lat = geo.lat;
   if (!isFinite(lon) || isNaN(lon))
-    lon = geo.Gc;
+    lon = geo.lon;
   geo = Impl.Core.T.Rf({
     lat: lat,
     lon: lon,
-    code: geo.ub
+    code: geo.flag
   });
   updateList();
 }
@@ -106,25 +108,25 @@ function setSelectedRoomId(e){
 function updateList(){
   Impl.Utils.va.Hs(geo, roomList); // Hs: calculateAllRoomDistances
   roomList.sort(function (a, b) {
-    return a.Le - b.Le; // Le: calculated distance
+    return a.dist - b.dist; // dist: calculated distance
   });
   var rows = "", anySelected = false;
-  roomList.forEach(({$, vd, Le})=>{
-    if ((hideFull && vd.I>=vd.Xe) || (hideLocked && vd.Ib) || (roomName.length>0 && !vd.w.toLowerCase().includes(roomName)))
+  roomList.forEach(({id, data, dist})=>{
+    if ((hideFull && data.players>=data.maxPlayers) || (hideLocked && data.password) || (roomName.length>0 && !data.name.toLowerCase().includes(roomName)))
       return;
-    var flagClass = "", isSelected = (selectedRoomId==$);
+    var flagClass = "", isSelected = (selectedRoomId==id);
     try {
-      flagClass = " f-" + vd.ub.toLowerCase();
+      flagClass = " f-" + data.flag.toLowerCase();
     } catch (k) {}
     anySelected = anySelected || isSelected;
     rows += `
-    <tr` + (isSelected ? " class='selected'":"") + ` data-id='` + $ + `' title='` + $ + `' onclick='setSelectedRoomId(event)'>
-      <td>` + vd.w + `</td>
-      <td>` + vd.I + '/' + vd.Xe + `</td>
-      <td>` + (vd.Ib ? 'Yes' : 'No') + `</td>
+    <tr` + (isSelected ? " class='selected'":"") + ` data-id='` + id + `' title='` + id + `' onclick='setSelectedRoomId(event)'>
+      <td>` + data.name + `</td>
+      <td>` + data.players + '/' + data.maxPlayers + `</td>
+      <td>` + (data.password ? 'Yes' : 'No') + `</td>
       <td>
         <div class='flagico` + flagClass + `'></div>
-        <span>` + (Le | 0) + 'km' + `</span>
+        <span>` + (dist | 0) + 'km' + `</span>
       </td>
     </tr>
     `;

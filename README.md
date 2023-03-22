@@ -6,7 +6,7 @@
 
 <h1 id="title" align="center">node-haxball</h1>
 
-<h4 align="center">node-haxball is the most powerful and lightweight bot API written by abc as a javascript library that supports both node.js and browser environments and will include every possible hack and functionality that you can imagine as a Haxball(www.haxball.com) host AND client. </h4>
+<h4 align="center">The most powerful and lightweight API that allows you to develop your original Haxball(www.haxball.com) host, client, and standalone applications both on node.js and browser environments and includes every possible functionality that you can imagine.</h4>
 
 ### 🔖 Table Of Contents
 
@@ -26,7 +26,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("node-haxball")();
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("node-haxball")();
 // Use example code here.
 ```
 
@@ -48,7 +48,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
           proxy: {
             WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
             HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
@@ -71,7 +71,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Util
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -95,8 +95,7 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       avatar: "👽"
     }, 
     onSuccess: (room)=>{
-      const { name } = room.getRoomData();
-      room.sendChat("Hello " + name);
+      room.sendChat("Hello " + room.name);
     }
   });
 });
@@ -118,8 +117,7 @@ Room.create({
     avatar: "👽"
   }, 
   onSuccess: (room)=>{
-    const { name } = room.getRoomData();
-    room.sendChat("Hello " + name);
+    room.sendChat("Hello " + room.name);
     room.onAfterRoomLink = (roomLink)=>{
       console.log("room link:", roomLink);
     };
@@ -151,16 +149,21 @@ Room.create({
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
-- `ConnectionState`: Different connection state values. Should be used while joining a room using `Room.join`.
+- `ConnectionState`: Different connection state values. Should be used to understand the state of connection while joining a room using `Room.join`.
 - `AllowFlags`: These flags allow us to understand whether a plugin or a roomConfig is able to work correctly while joining or creating a room. Especially useful in a GUI environment.
-
+- `Direction`: These values help understand the direction of a movement for an axis. Only designed for room.keyState function to combine seperate directions for x and y axis to generate the value of the key to press.
+- `CollisionFlags`: These flags are used internally in Haxball's physics engine to decide whether collision check should happen or not. Useful while creating a map editor GUI.
+- `CameraFollow`: These values help understand whether the camera will follow the player or not. This is only used as a variable in all stadiums.
+- `BackgroundType`: This is the type of the variable in a stadium that defines its background texture type.
+- `GamePlayState`: This type lets us understand the actual state of the game. This type only exists in a GameState object.
 - `Language`: Methods for global language handling. (Look inside `src/defaultLanguage.js` for usage example.)
-  - `add(abbr, errorsMap, rendererTextMap)`: Adds a new language with given properties. `abbr` is auto-transformed into upper-case. `errorsMap` must be an `object` that has a description function for each error code where each function returns a string. `rendererTextMap` must be an `object` that maps each `rendererTextIndex` to a `string` value. throws error while trying to add an already-existing language.
+  - `add(abbr, errorsTextMap, connectionStateTextMap, rendererTextMap)`: Adds a new language with given properties. `abbr` is auto-transformed into upper-case. `errorsTextMap` must be an `object` that has a description function for each error code where each function returns a string. `connectionStateTextMap` must be an `object` that maps each `connectionState` to a `string` value. `rendererTextMap` must be an `object` that maps each `rendererTextIndex` to a `string` value. throws error while trying to add an already-existing language.
   - `remove(abbr)`: Removes the language with given abbreviation(`abbr`). `abbr` is auto-transformed into upper-case. throws error while trying to remove a non-existent or current language.
   - `current`: This is the abbreviation of the current language. Defaults to `'GB'`. It is possible to change the language of the whole API by changing this value directly; throws error if language does not exist.
-  - `currentData`: read-only. Returns all name mappings for the current language, namely `errorsMap` and `rendererTextMap` that are already described in `Language.add` above.
+  - `currentData`: read-only. Returns all name mappings for the current language, namely `errorsTextMap` and `rendererTextMap` that are already described in `Language.add` above.
   - `indices`: read-only. Returns the global name-to-integer mappings that shortly describe the language string.
-    - `ErrorCodes`: Name-to-integer mapping that shortly describes the error codes used in `HBError` class. Note that this is the same object as `Error.ErrorCodes`.
+    - `ConnectionState`: Name-to-integer mapping that shortly describes the connection state codes that occur while trying to join a room. Note that this is the same object as the global `ConnectionState` object.
+    - `ErrorCodes`: Name-to-integer mapping that shortly describes the error codes used in `HBError` class. Note that this is the same object as `Errors.ErrorCodes`.
     - `RendererTextIndices`: Name-to-integer mapping that shortly describes the default renderer's language text indices used inside the current default renderers.
 
 - `Errors`: Global error handling objects.
@@ -170,7 +173,7 @@ Room.create({
       - `code`: The error code that has been thrown. (`integer`)
       - `params`: Parameters for the error. (`array`)
     - `functions`:
-      - `toString()`: Returns the full description of the current error object by executing `currentLanguage.errorsMap[this.code](...this.params)`.
+      - `toString()`: Returns the full description of the current error object by executing `currentLanguage.errorsTextMap[this.code](...this.params)`.
 
 - `Callback`: Global functions to add/remove callbacks.
   - `add(eventName, metadata)`: creates all callbacks about a new event called `eventName` which should start with a capital letter. `metadata` is not used, but this is the library's current metadata structure: `{ params: array of string }`. should be used (and maybe overridden for usage of `metadata`) in a gui application to define custom event callbacks related to gui events such as keyboard, mouse, touch, timer etc. the main event callback defined in this room object to trigger all callbacks is `"_on" + eventName`.
@@ -190,17 +193,20 @@ Room.create({
 
     - Returning replay reader object:
       - properties:
-        - `roomData`: An object containing all information about the current room state.
+        - `state`: An object containing all information about the current room state.
+        - `gameState`: room's game state information. returns null if game is not active. read-only.
+        - `currentPlayerId`: Always returns -1. It is only added for compatibility with renderers. (And it is only used in the initialization code of renderers.)
       - functions:
         - `length()`: Returns the length of replay content in milliseconds.
         - `getTime()`: Returns the current time in milliseconds.
         - `setTime(destinationTime)`: Plays the replay until the `destinationTime`(in milliseconds) or end of replay is reached. Note that it may take some time to reach the destination time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
+        - `getSpeed()`: Returns the current speed of playing the replay.
         - `setSpeed(coefficient)`: Changes the speed of playing the replay. `coefficient` must be a real number >=0. 
           - `coefficient` = 0 : stop replay.
           - 0 < `coefficient` < 1 : slow-motion replay.
           - `coefficient` = 1 : normal speed replay.
           - `coefficient` > 1 : fast-motion replay.
-        - `destroy()`: Frees the resources that are used by this object.
+        - `destroy()`: Releases the resources that are used by this object.
       - callbacks:
         - `onDestinationTimeReached()`: Destination time has been reached. Runs after a call to `setTime(destinationTime)`.
         - `onEnd()`: The end of replay data has been reached.
@@ -214,11 +220,14 @@ Room.create({
   - `colorToNumber(color)`: returns the number representation of the given html color string (rgba representation).
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. `dirX` = oneof\[`-1`:left, `0`:still, `1`:right\], `dirY` = oneof\[`-1`:up, `0`:still, `1`:down\], `kick` = `true`/`false`.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
+  - `geoFromJSON(json)`: creates and returns a GeoLocation object from a json object that should have `lat`, `lon` and `flag` keys.
+  - `geoFromString(jsonStr)`: creates and returns a GeoLocation object from a stringified json object that should have `lat`, `lon` and `flag` keys.
   - `getDefaultStadiums()`: get default stadium array.
   - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
+  - `stadiumChecksum(stadium)`: calculate checksum for given `stadium`. returns `null` for original maps.
 
-- `Query`: Static functions to query map features. For now, `roomState` has to come from either `Room.getRoomDataOriginal` or the extrapolated parameter in `Renderer.render`.
+- `Query`: Static functions to query map features. `roomState` should be either `room.state` or `room.stateExt`.
   - `getVertexIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
   - `getVertexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
   - `getSegmentIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first segment that has a distance to `mapCoordinate` lower than `threshold`.
@@ -235,7 +244,7 @@ Room.create({
 
 - `Room`: The class that currently hosts all room operations. Should only be initialized by either `Room.join` or `Room.create`.
   - `static functions`: These functions are used to create/join a room.
-    - `create(createParams, commonParams)`: create a room with given parameters.
+    - `create(createParams, commonParams)`: create a room with given parameters. Returns a custom object.
       - `createParams`:
         - `name`: name of the room.
         - `password`: password to protect the room. can be set `null`/`undefined` for no password.
@@ -250,7 +259,7 @@ Room.create({
         - `onError(error, clientConnectionObj)`: called when an exception is thrown from the room. clientConnectionObj is the connection object of the client that caused the exception. the connection will be closed just after this callback is executed.
       - `commonParams`: explained below in `Room.join`.
 
-    - `join(joinParams, commonParams)`: try to join the room(`roomId`) with given `password`(or `null`=no password). returns `Promise(room)` which is rejected if failed.
+    - `join(joinParams, commonParams)`: try to join the room(`roomId`) with given `password`(or `null`=no password). Returns a custom object.
       - `joinParams`:
         - `id`: the id of the room to join. for example, if the room link is `https://www.haxball.com/play?c=31IBNI3w4F0`, this room's id is `31IBNI3w4F0`.
         - `password`: a password value to join the room if the room is password-protected.
@@ -275,7 +284,7 @@ Room.create({
         - `renderer`: the `Renderer` object that can render the game. the object should be derived from the provided `Renderer` class. default value is `null`. (Look at examples/renderers folder for example RoomConfigs to use here, or src/rendererTemplate.js for a template Renderer that contains all callbacks.)
         - `plugins`: array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. default value is `[]`. (Look at examples/plugins folder for example Plugins to use here, or src/pluginTemplate.js for a template Plugin that contains all callbacks.)
         - `version`: Haxball's version number. other clients cannot join this room if their version number is different than this number. default value is `9`.
-        - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. you may assign a negative value to disable this feature. default value is `20`(msec).
+        - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. you may assign a negative value to disable this feature. default value is `-1`(msec).
 
         --- event callbacks section ---
         - `onSuccess(room)`: joined/created `room`.
@@ -285,7 +294,7 @@ Room.create({
         - `onReverseConnection()`: trying reverse connection while joining a room.
         - `onRequestRecaptcha()`: recaptcha is required while joining or creating a room.
 
-        --- event triggers section ---
+      - Returning custom object has the following triggers:
         - `cancel()`: should be used to cancel the process of joining a room.
         - `useRecaptchaToken(token)`: should be used to send the recaptcha token after `onRequestRecaptcha` event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use `Room.join` with the new token.
     
@@ -301,7 +310,9 @@ Room.create({
       
       - Returning sandbox room object:
         - properties:
-          - `roomData`: An object containing all information about the current room state. Note that this object also has all of the functions explained below in section: `sandbox mode functions`. (it only has `copy()` instead of `takeSnapshot()`)
+          - `state`: An object containing all information about the current room state. Note that this object also has all of the functions explained below in section: `sandbox mode functions`. (it only has `copy()` instead of `takeSnapshot()`)
+          - `gameState`: room's game state information. returns null if game is not active. read-only.
+          - `currentPlayerId`: Always returns 0. It is only added for compatibility with renderers. (And it is only used in the initialization code of renderers.)
         - functions:
           - `setSimulationSpeed(coefficient)`: Changes the speed of the simulation. `coefficient` must be a real number >=0.
             - `coefficient` = 0 : stop simulation.
@@ -311,7 +322,6 @@ Room.create({
           - `runSteps(count)`: runs the simulation `count` steps. simulation must be stopped for this function to work.
           - `takeSnapshot()`: returns a complete snapshot of the current room state.
           - `useSnapshot(newRoomState)`: sets the current room state reference to `newRoomState`. `newRoomState` should be created by `takeSnapshot()` first.
-          - `getRoomDataOriginal()`: get the most important original objects that has the current room data. (added for compatibility with normal rooms.)
           - `playerJoin(id, name, flag, avatar, conn, auth)`: adds a new player with properties(`id`, `name`, `flag`, `avatar`, `conn`, `auth`) to the room.
           - `playerLeave(playerId)`: removes player(`playerId`) from the room.
           - `playerInput(input, byId)`: sets the input of player(`byId`) to `input`.
@@ -340,16 +350,28 @@ Room.create({
           - `destroy()`: Frees the resources that are used by this object.
 
   - `properties`:
-    - `isHost`: `true` for hosts, `false` for clients
+    - `isHost`: `true` for hosts, `false` for clients. read-only.
     - `client`: a reference to an inner client object that the event callbacks before room was created are attached to.
-    - `currentPlayerId`: current player's id
-    - `currentPlayer`: the original current player object
-    - `sdp`: current room's sdp value (only for client rooms)
-    - `kickTimeout`: time between releasing and re-pressing the kick key (in milliseconds, defaults to `20`)
-    - `renderer`: room's current renderer object
-    - `plugins`: array of all available plugins. this is used internally to restore the order of plugins while plugin activation/deactivation.
-    - `activePlugins`: array of currently active plugins. this is used internally for callbacks.
-    - `pluginsMap`: all available plugins mapped as `pluginsMap[plugin.name] = plugin`, for optimized use to communicate between plugins.
+    - `currentPlayerId`: current player's id. read-only.
+    - `currentPlayer`: the original current player object. read-only.
+    - `state`: the object that holds the whole room state. read-only.
+    - `gameState`: room's game state information. returns null if game is not active. read-only.
+    - `gameStateExt`: room's extrapolated game state. returns null if game is not active. read-only.
+    - `sdp`: current room's sdp value (only for client rooms). read-only.
+    - `kickTimeout`: time between releasing and re-pressing the kick key (in milliseconds, defaults to `-1`). read-only.
+    - `renderer`: room's current renderer object. read-only.
+    - `plugins`: array of all available plugins. this is used internally to restore the order of plugins while plugin activation/deactivation. read-only.
+    - `activePlugins`: array of currently active plugins. this is used internally for callbacks. read-only.
+    - `pluginsMap`: all available plugins mapped as `pluginsMap[plugin.name] = plugin`, for optimized use to communicate between plugins. read-only.
+    - `name`: current name of the room. read-only.
+    - `link`: current url of the room. read-only.
+    - `timeLimit`: the game's current time limit. read-only.
+    - `scoreLimit`: the game's current score limit. read-only.
+    - `stadium`: current stadium object of the room. read-only.
+    - `players`: the list of players in the current room. read-only.
+    - `redScore`: red team's current score. `null` if game is not active. read-only.
+    - `blueScore`: blue team's current score. `null` if game is not active. read-only.
+    - `timeElapsed`: elapsed time in current game. `null` if game is not active. read-only.
 
   - `functions`:
     - `leave()`: leaves the room.
@@ -390,24 +412,12 @@ Room.create({
     - `setPlayerTeam(playerId, teamId)`: set player(`playerId`)'s team to team(`teamId`).
     - `setPlayerAdmin(playerId, isAdmin)`: set player(`playerId`)'s admin status to `isAdmin`.
     - `kickPlayer(playerId, reason, isBanning)`: kick/ban a player(`playerId`) with reason(`reason`).
-    - `getPlayerOriginal(id)`: get original player data object for player(`id`).
-    - `getPlayer(id)`: get a new and structured player data object for player(`id`).
-    - `getPlayersOriginal()`: get the original players array.
-    - `getPlayers()`: get a new and structured players array.
-    - `getBallOriginal(extrapolated = true)`: get the original ball object.
-    - `getBall(extrapolated = true)`: get a new and structured ball object.
-    - `getDiscsOriginal(extrapolated = true)`: get the original disc object for disc(`discId`).
-    - `getDiscs(extrapolated = true)`: get a new and structured disc object for disc(`discId`).
-    - `getDiscOriginal(discId, extrapolated = true)`: get the original disc object for disc(`discId`).
-    - `getDisc(discId, extrapolated = true)`: get a new and structured disc object for disc(`discId`).
-    - `getPlayerDiscOriginal(playerId, extrapolated = true)`: get the original disc object for player(`playerId`).
-    - `getPlayerDisc(playerId, extrapolated = true)`: get a new and structured disc object for player(`playerId`).
-    - `getPlayerDiscOriginal_exp(playerId)`: get the original disc object for player(`playerId`). faster than `getPlayerDiscOriginal`, but experimental. use at your own risk.
-    - `getPlayerDisc_exp(playerId)`: get a new and structured disc object for player(`playerId`). faster than `getPlayerDisc`, but experimental. use at your own risk.
-    - `getRoomDataOriginal()`: get the most important original objects that has the current room data.
-    - `getRoomData(extrapolated = true)`: get a new and structured room data object that has some of the current room data.
-    - `getCurrentMap()`: get the original object of the current map.
-    - `mapChecksum(map)`: calculate checksum for given map object. returns `null` for original maps.
+    - `getPlayer(id)`: get the original player data object for player(`id`).
+    - `getBall(extrapolated = true)`: get the original ball object.
+    - `getDiscs(extrapolated = true)`: get the original disc object for disc(`discId`).
+    - `getDisc(discId, extrapolated = true)`: get the original disc object for disc(`discId`).
+    - `getPlayerDisc(playerId, extrapolated = true)`: get the original disc object for player(`playerId`).
+    - `getPlayerDisc_exp(playerId)`: get the original disc object for player(`playerId`). faster than `getPlayerDisc`, but experimental. use at your own risk.
     - `setPluginActive(name, active)`: activate/deactivate the plugin(`name`).
     - `startRecording()`: start recording replay data. returns `true` if succeeded, `false` otherwise. recording should not be started before calling this.
     - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.

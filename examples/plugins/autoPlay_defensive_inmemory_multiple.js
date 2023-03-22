@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive_inmemory_multiple", true, { // "autoPlay_defensive_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -71,6 +71,7 @@ module.exports = function(API){
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
   // it also fixes a bug when the bot doesn't move after positions resets
+  // BUT instead, it creates a new bug... This is not the solution... Must change...
   var moveInRandomY = function(botId){
     if (botId!=null){
       dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
@@ -146,55 +147,55 @@ module.exports = function(API){
     // is needed for moveInRandomY() to work
     if (Date.now() - lastPositionsReset < 150) return;
 
-    var { o, p, ep } = room.getRoomDataOriginal();
-    if (ep)
-      p = ep;
+    var { state, gameState, gameStateExt } = room;
+    gameState = gameStateExt || gameState;
+
     botIds.forEach((botId)=>{
 
       // get the original data object of the next bot
-      var cp = p.Ma.I.filter((p)=>(p.V==botId))[0];
-      var playerDisc = cp?.H;
+      var cp = gameState.Ma.players.filter((x)=>(x.id==botId))[0];
+      var playerDisc = cp?.disc;
 
-      // coordinates: playerDisc.a.x, playerDisc.a.y
-      // speed: playerDisc.D.x, playerDisc.D.y
-      // radius: playerDisc.Z
+      // coordinates: playerDisc.pos.x, playerDisc.pos.y
+      // speed: playerDisc.speed.x, playerDisc.speed.y
+      // radius: playerDisc.radius
 
       if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
         return;
       
-      var teamId = cp.ea.$, opponentTeamId = 3 - teamId;
-      var goals = o.S.tc, ball = p.ta.F[0];
+      var teamId = cp.team.id, opponentTeamId = 3 - teamId;
+      var goals = state.stadium.goals, ball = gameState.physicsState.discs[0];
       /*
       var minDistSqr = Infinity, minDistOpponent;
-      p.Ma.I.forEach((p)=>{
-        if (p.ea.$ == opponentTeamId){
-          var distSqr = (playerDisc.a.x-p.a.x)*(playerDisc.a.x-p.a.x)+(playerDisc.a.y-p.a.y)*(playerDisc.a.y-p.a.y);
+      gameState.Ma.players.forEach((x)=>{
+        if (x.team.id == opponentTeamId){
+          var distSqr = (playerDisc.pos.x-x.pos.x)*(playerDisc.pos.x-x.pos.x)+(playerDisc.pos.y-x.pos.y)*(playerDisc.pos.y-x.pos.y);
           if (distSqr < minDistSqr){
             minDistSqr = distSqr;
-            minDistOpponent = p;
+            minDistOpponent = x;
           }
         }
       });
       */
-      var targetX, targetY, sqrDistBetweenBallAndPlayer = (ball.a.x-playerDisc.a.x) * (ball.a.x-playerDisc.a.x) + (ball.a.y-playerDisc.a.y) * (ball.a.y-playerDisc.a.y);
-      var maxDistanceToFollowBall = that.maxDistanceToFollowBallCoeff * o.S.$b;
+      var targetX, targetY, sqrDistBetweenBallAndPlayer = (ball.pos.x-playerDisc.pos.x) * (ball.pos.x-playerDisc.pos.x) + (ball.pos.y-playerDisc.pos.y) * (ball.pos.y-playerDisc.pos.y);
+      var maxDistanceToFollowBall = that.maxDistanceToFollowBallCoeff * state.stadium.width;
       var b = false;
 
-      if (sqrDistBetweenBallAndPlayer > ((playerDisc.Z + ball.Z + maxDistanceToFollowBall) * (playerDisc.Z + ball.Z + maxDistanceToFollowBall))){
-        var myGoal = goals.filter((g)=>(g.qe.$==teamId))[0]; //, opponentGoal = goals[oppositeTeamId - 1];
+      if (sqrDistBetweenBallAndPlayer > ((playerDisc.radius + ball.radius + maxDistanceToFollowBall) * (playerDisc.radius + ball.radius + maxDistanceToFollowBall))){
+        var myGoal = goals.filter((g)=>(g.team.id==teamId))[0]; //, opponentGoal = goals[oppositeTeamId - 1];
         if (!myGoal)
           return;
-        var MPofMyGoalX = (myGoal.ca.x + myGoal.W.x) / 2, MPofMyGoalY = (myGoal.ca.y + myGoal.W.y) / 2;
-        targetX = (ball.a.x + MPofMyGoalX) / 2;
-        targetY = (ball.a.y + MPofMyGoalY) / 2;
+        var MPofMyGoalX = (myGoal.p0.x + myGoal.p1.x) / 2, MPofMyGoalY = (myGoal.p0.y + myGoal.p1.y) / 2;
+        targetX = (ball.pos.x + MPofMyGoalX) / 2;
+        targetY = (ball.pos.y + MPofMyGoalY) / 2;
       }
       else{
-        targetX = ball.a.x;
-        targetY = ball.a.y;
+        targetX = ball.pos.x;
+        targetY = ball.pos.y;
         b = true;
       }
 
-      var deltaX = targetX - playerDisc.a.x, deltaY = targetY - playerDisc.a.y, dirX, dirY, kick;
+      var deltaX = targetX - playerDisc.pos.x, deltaY = targetY - playerDisc.pos.y, dirX, dirY, kick;
       if (Math.abs(deltaX) < that.minCoordAlignDelta)
         dirX = 0;
       else 
@@ -204,13 +205,13 @@ module.exports = function(API){
       else
         dirY = Math.sign(deltaY);
 
-      //f(ball.a.x, ball.a.y, playerDisc.a.x, playerDisc.a.y, myGoal.ca.x, myGoal.ca.y, myGoal.W.x, myGoal.W.y)
+      //f(ball.pos.x, ball.pos.y, playerDisc.pos.x, playerDisc.pos.y, myGoal.p0.x, myGoal.p0.y, myGoal.p1.x, myGoal.p1.y)
 
-      //var angle_PlayerToBall = Math.atan2(ball.a.y-playerDisc.a.y, ball.a.x-playerDisc.a.x);
-      //var angle_BallToGoalDisc1 = Math.atan2(myGoal.ca.y-ball.a.y, myGoal.ca.x-ball.a.x);
-      //var angle_BallToGoalDisc2 = Math.atan2(myGoal.W.y-ball.a.y, myGoal.W.x-ball.a.x);
+      //var angle_PlayerToBall = Math.atan2(ball.pos.y-playerDisc.pos.y, ball.pos.x-playerDisc.pos.x);
+      //var angle_BallToGoalDisc1 = Math.atan2(myGoal.p0.y-ball.pos.y, myGoal.p0.x-ball.pos.x);
+      //var angle_BallToGoalDisc2 = Math.atan2(myGoal.p1.y-ball.pos.y, myGoal.p1p1.x-ball.pos.x);
 
-      kick = (sqrDistBetweenBallAndPlayer < (playerDisc.Z + ball.Z + that.minKickDistance) * (playerDisc.Z + ball.Z + that.minKickDistance));
+      kick = (sqrDistBetweenBallAndPlayer < (playerDisc.radius + ball.radius + that.minKickDistance) * (playerDisc.radius + ball.radius + that.minKickDistance));
 
       /*
       if (b && kick){  // for dribball maps, reverse the moving direction while kicking the ball
@@ -231,8 +232,8 @@ module.exports = function(API){
         // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
         // this happens because requestAnimationFrame is being used. 
         // therefore, we are trying to limit consequent sending.
-        if (keyState!=keyStates[botId] || kick!=cp.Wb){ // Wb: whether x key is active in-game (the circle around players is painted white if Wb is true)
-          if ((keyState==keyStates[botId]) && kick && !cp.Wb) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
+        if (keyState!=keyStates[botId] || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
+          if ((keyState==keyStates[botId]) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
             room.fakeSendPlayerInput(/*input:*/ keyState & -17, /*byId:*/ botId); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
           room.fakeSendPlayerInput(/*input:*/ keyState, /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
           keyStates[botId] = keyState;

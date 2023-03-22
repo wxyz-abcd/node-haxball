@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "anti-opMode", true, { // "anti-opMode" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -45,13 +45,13 @@ module.exports = function(API){
   };
 
   this.onPlayerJoin = function(playerObj, customData){
-    arrays[playerObj.V] = null;
-    badCounts[playerObj.V] = 0;
+    arrays[playerObj.id] = null;
+    badCounts[playerObj.id] = 0;
   };
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
-    delete arrays[playerObj.V];
-    delete badCounts[playerObj.V];
+    delete arrays[playerObj.id];
+    delete badCounts[playerObj.id];
   };
 
   this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){

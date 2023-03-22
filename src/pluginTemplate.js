@@ -1,12 +1,12 @@
 module.exports = function(API){
-  var { Plugin } = API;
+  var { AllowFlags, Plugin } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "template", true, { // "template" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc",
     description: `This is a template plugin`,
-    allowFlags: Plugin.AllowFlags.CreateRoom|Plugin.AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
+    allowFlags: AllowFlags.CreateRoom|AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
   this.initialize = function(room){};

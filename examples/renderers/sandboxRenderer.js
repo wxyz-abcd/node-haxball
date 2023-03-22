@@ -1,5 +1,5 @@
 module.exports = function(API, params){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
   const { RendererTextIndices: TextIndices } = Language.indices;
   
   Object.setPrototypeOf(this, Renderer.prototype);
@@ -313,9 +313,9 @@ module.exports = function(API, params){
     this.initialize();
   }
   var /*PlayerDecorator.*/compareTeamColors = function(c1, c2){
-    if (c1.hd!=c2.hd || c1.ed!=c2.ed)
+    if (c1.angle!=c2.angle || c1.text!=c2.text)
       return false;
-    var a1 = c1.fb, a2 = c2.fb;
+    var a1 = c1.inner, a2 = c2.inner;
     if (a1.length!=a2.length)
       return false;
     for (var i=0;i<a1.length;i++)
@@ -324,9 +324,9 @@ module.exports = function(API, params){
     return true;
   };
   var /*PlayerDecorator.*/copyTeamColors = function(to, from){ // ao
-    to.hd = from.hd;
-    to.ed = from.ed;
-    to.fb = from.fb.slice(0);
+    to.angle = from.angle;
+    to.text = from.text;
+    to.inner = from.inner.slice(0);
   };
   PlayerDecorator.prototype = {
     initialize: function(){
@@ -354,9 +354,9 @@ module.exports = function(API, params){
       ctx.drawImage(this.ctx2.canvas, 0, 0, 160, 34, x-40, y-34, 80, 17);
     },
     update: function(playerObj, roomState){ // C
-      if (playerObj.H) {
-        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.kb[playerObj.ea.$] : playerObj.ea.wm; // "team_colors"
-        var avatarText = (playerObj.Jd!=null) ? playerObj.Jd : playerObj.Xb;
+      if (playerObj.disc) {
+        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.kb[playerObj.team.id] : playerObj.team.colors; // "team_colors"
+        var avatarText = (playerObj.headlessAvatar!=null) ? playerObj.headlessAvatar : playerObj.avatar;
         var showAvatar = thisRenderer.showAvatars/*localStorageObj.lm.L()*/ && (avatarText!=null); // "show_avatars"
         if (!/*PlayerDecorator.*/compareTeamColors(this.teamColors, teamColors) || (!showAvatar && (playerObj.Jb!=this.avatarNumber)) || (showAvatar && (this.avatarText!=avatarText))){
           /*PlayerDecorator.*/copyTeamColors(this.teamColors, teamColors);
@@ -371,22 +371,22 @@ module.exports = function(API, params){
           this.createInnerFillPattern(/*this.avatarText*/);
         }
       }
-      this.strokeStyle = (roomState.K.Oa>0 || !playerObj.Wb) ? "black" : ((playerObj.Wb && playerObj.Sc<=0 && playerObj.yc>=0) ? "white" : "black");
-      var name = thisRenderer.showPlayerIds?("["+playerObj.V+"] "+playerObj.w):playerObj.w;
+      this.strokeStyle = (roomState.gameState.pauseGameTickCounter>0 || !playerObj.isKicking) ? "black" : ((playerObj.isKicking && playerObj.Sc<=0 && playerObj.yc>=0) ? "white" : "black");
+      var name = thisRenderer.showPlayerIds?("["+playerObj.id+"] "+playerObj.name):playerObj.name;
       if (name!=this.name){
         this.name = name;
         this.repaintPlayerName();
       }
     },
     createInnerFillPattern: function(/*avatarText*/){
-      var colorArray = this.teamColors.fb;
+      var colorArray = this.teamColors.inner;
       if (colorArray.length==0)
         return;
 
       // fill the colors
       this.ctx.save();
       this.ctx.translate(32, 32); // set midpoint of the canvas as origin
-      this.ctx.rotate((3.141592653589793*this.teamColors.hd)/128); // team colors rotation by provided angle
+      this.ctx.rotate((3.141592653589793*this.teamColors.angle)/128); // team colors rotation by provided angle
       var stepWidth = 64/colorArray.length, x=-32; // here, 64 is the width of the canvas
       for (var i=0;i<colorArray.length;i++){
         this.ctx.fillStyle = Utils.numberToColor(colorArray[i]);
@@ -396,7 +396,7 @@ module.exports = function(API, params){
       this.ctx.restore(); // origin and rotation returns back to normal
 
       // draw the avatar text
-      this.ctx.fillStyle = Utils.numberToColor(this.teamColors.ed);
+      this.ctx.fillStyle = Utils.numberToColor(this.teamColors.text);
       this.ctx.textAlign = "center";
       this.ctx.textBaseline = "alphabetic";
       this.ctx.font = "900 34px 'Arial Black','Arial Bold',Gadget,sans-serif";
@@ -467,62 +467,62 @@ module.exports = function(API, params){
       this.resizeCanvas();
       HaxballRenderer.setSmoothingEnabled(this.ctx, true);
       this.ctx.resetTransform();
-      if (!roomState.K)
+      if (!roomState.gameState)
         return;
-      var gameState = roomState.K, mapObjects = gameState.ta, followPlayer = roomState.na(thisRenderer.followPlayerId), followDisc = followPlayer?.H;
+      var gameState = roomState.gameState, mapObjects = gameState.physicsState, followPlayer = roomState.na(thisRenderer.followPlayerId), followDisc = followPlayer?.disc;
       var zoomCoeff = thisRenderer.zoomCoeff*window.devicePixelRatio*thisRenderer.resolutionScale;
-      var maxViewWidth = gameState.S.Ye, viewWidth = this.canvas.width/zoomCoeff;
+      var maxViewWidth = gameState.stadium.maxViewWidth, viewWidth = this.canvas.width/zoomCoeff;
       if (maxViewWidth>0 && maxViewWidth<viewWidth){
         viewWidth = maxViewWidth;
         zoomCoeff = this.canvas.width/maxViewWidth;
       }
       var viewHeight = this.canvas.height/zoomCoeff;
       this.updateCameraOrigin(gameState, followDisc, viewWidth, viewHeight, deltaTime);
-      var playerObjects = roomState.I;
+      var playerObjects = roomState.players;
       for (var i=0;i<playerObjects.length;i++){
         var playerObject = playerObjects[i];
-        if (!playerObject.H)
+        if (!playerObject.disc)
           continue;
-        var playerDecorator = this.decoratorsById.get(playerObject.V);
+        var playerDecorator = this.decoratorsById.get(playerObject.id);
         if (!playerDecorator){
           playerDecorator = new PlayerDecorator();
-          this.decoratorsById.set(playerObject.V, playerDecorator);
+          this.decoratorsById.set(playerObject.id, playerDecorator);
         }
         playerDecorator.update(playerObject, roomState);
-        this.decoratorsByObject.set(playerObject.H, playerDecorator);
+        this.decoratorsByObject.set(playerObject.disc, playerDecorator);
       }
       this.actualZoomCoeff = zoomCoeff;
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.ctx.scale(zoomCoeff, zoomCoeff);
       this.ctx.translate(-this.origin.x, -this.origin.y);
       this.ctx.lineWidth = 3;
-      this.drawBackground(gameState.S);
+      this.drawBackground(gameState.stadium);
       if (thisRenderer.showPlanes)
-        this.drawAllPlanes(gameState.S);
+        this.drawAllPlanes(gameState.stadium);
       if (thisRenderer.showGoals)
-        this.drawAllGoals(gameState.S);
+        this.drawAllGoals(gameState.stadium);
       if (thisRenderer.showVertices)
-        this.drawAllVertices(gameState.S);
+        this.drawAllVertices(gameState.stadium);
       if (thisRenderer.showSegments)
-        this.drawAllSegments(gameState.S);
-      var discs = mapObjects.F, joints = mapObjects.pb;
+        this.drawAllSegments(gameState.stadium);
+      var discs = mapObjects.discs, joints = mapObjects.joints;
       if (thisRenderer.showJoints){
         for (var i=0;i<joints.length;i++)
           this.drawJoint(joints[i], discs);
       }
       if (thisRenderer.showSpawnPoints)
-        this.drawAllSpawnPoints(gameState.S);
+        this.drawAllSpawnPoints(gameState.stadium);
       if (thisRenderer.showPlayers){
         this.indicateAllLocations(roomState, viewWidth, viewHeight);
         this.drawPlayerDecoratorsAndChatIndicators(roomState, followPlayer);
         if (thisRenderer.currentPlayerDistinction && followDisc)
-          this.drawHalo(followDisc.a);
+          this.drawHalo(followDisc.pos);
         this.ctx.lineWidth = 2;
         for (var i=0;i<playerObjects.length;i++){
-          var playerObject = playerObjects[i], playerDisc = playerObject.H;
+          var playerObject = playerObjects[i], playerDisc = playerObject.disc;
           if (!playerDisc)
             continue;
-          this.drawDisc(playerDisc, this.decoratorsById.get(playerObject.V));
+          this.drawDisc(playerDisc, this.decoratorsById.get(playerObject.id));
         }
       }
       else
@@ -539,7 +539,7 @@ module.exports = function(API, params){
       this.ctx.resetTransform();
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.updateGamePaused(gameState);
-      if (gameState.Oa<=0){
+      if (gameState.pauseGameTickCounter<=0){
         this.textRenderer.update(deltaTime);
         this.textRenderer.render(this.ctx);
       }
@@ -547,10 +547,10 @@ module.exports = function(API, params){
       this.cleanUpDecoratorsById(roomState);
     },
     cleanUpDecoratorsById: function(roomState){ // Kq
-      var players = roomState.I;
+      var players = roomState.players;
       var playerIds = new Set();
       for (var i=0;i<players.length;i++)
-        playerIds.add(players[i].V);
+        playerIds.add(players[i].id);
       var decoratorPlayerIds = this.decoratorsById.keys();
       for (var it=decoratorPlayerIds.next();!it.done;it=decoratorPlayerIds.next()){
         var playerId = it.value;
@@ -559,20 +559,20 @@ module.exports = function(API, params){
       }
     },
     updateCameraOrigin: function(gameState, followDisc, viewWidth, viewHeight, deltaTime){
-      var stadium = gameState.S;
+      var stadium = gameState.stadium;
       if (thisRenderer.followMode){
         var x, y;
-        if (followDisc && stadium.Ge==1){
-          var pos = followDisc.a; // player's position
+        if (followDisc && stadium.cameraFollow==1){
+          var pos = followDisc.pos; // player's position
           x = pos.x;
           y = pos.y;
         }
         else{
-          var pos = gameState.ta.F[0].a; // ball's position
+          var pos = gameState.physicsState.discs[0].pos; // ball's position
           x = pos.x;
           y = pos.y;
           if (followDisc){
-            var playerPos = followDisc.a;
+            var playerPos = followDisc.pos;
             x = 0.5*(x+playerPos.x);
             y = 0.5*(y+playerPos.y);
             var w = 0.5*viewWidth;
@@ -597,19 +597,19 @@ module.exports = function(API, params){
       }
 
       if (thisRenderer.restrictCameraOrigin){
-        if (viewWidth>2*stadium.$b)
+        if (viewWidth>2*stadium.width)
           this.origin.x = 0;
-        else if (this.origin.x+0.5*viewWidth>stadium.$b)
-          this.origin.x = stadium.$b-0.5*viewWidth;
-        else if (this.origin.x-0.5*viewWidth<-stadium.$b)
-          this.origin.x = -stadium.$b+0.5*viewWidth;
+        else if (this.origin.x+0.5*viewWidth>stadium.width)
+          this.origin.x = stadium.width-0.5*viewWidth;
+        else if (this.origin.x-0.5*viewWidth<-stadium.width)
+          this.origin.x = -stadium.width+0.5*viewWidth;
 
-        if (viewHeight>2*stadium.qc)
+        if (viewHeight>2*stadium.height)
           this.origin.y = 0;
-        else if (this.origin.y+0.5*viewHeight>stadium.qc)
-          this.origin.y = stadium.qc-0.5*viewHeight;
-        else if (this.origin.y-0.5*viewHeight<-stadium.qc)
-          this.origin.y = -stadium.qc+0.5*viewHeight;
+        else if (this.origin.y+0.5*viewHeight>stadium.height)
+          this.origin.y = stadium.height-0.5*viewHeight;
+        else if (this.origin.y-0.5*viewHeight<-stadium.height)
+          this.origin.y = -stadium.height+0.5*viewHeight;
       }
 
       // fix all possible camera bugs
@@ -630,12 +630,12 @@ module.exports = function(API, params){
       this.ctx.globalAlpha = 1;
     },
     updateGamePaused: function(gameState){ // Oq
-      var paused = (gameState.Oa>0);
+      var paused = (gameState.pauseGameTickCounter>0);
       this.setGamePaused(paused);
       if (!paused)
         return;
-      if (gameState.Oa!=120){
-        var width = (gameState.Oa/120)*200;
+      if (gameState.pauseGameTickCounter!=120){
+        var width = (gameState.pauseGameTickCounter/120)*200;
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(-0.5*width, 100, width, 20);
       }
@@ -663,17 +663,17 @@ module.exports = function(API, params){
     },
     drawBackground: function(stadium){ // Sq
       HaxballRenderer.setSmoothingEnabled(this.ctx, false);
-      var width = stadium.Td, height = stadium.Sd;
-      if (stadium.ld==1) {
+      var width = stadium.bgWidth, height = stadium.bgHeight;
+      if (stadium.bgType==1) {
         this.ctx.save();
         this.ctx.resetTransform();
-        this.ctx.fillStyle = Utils.numberToColor(stadium.jd);
+        this.ctx.fillStyle = Utils.numberToColor(stadium.bgColor);
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.restore();
         if (thisRenderer.drawBackground){
           this.ctx.strokeStyle = "#C7E6BD";
           this.ctx.fillStyle = this.grassPattern;
-          this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.Uc);
+          this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.bgCornerRadius);
           this.ctx.save();
           this.ctx.scale(2, 2);
           this.ctx.fill();
@@ -682,11 +682,11 @@ module.exports = function(API, params){
           this.ctx.lineTo(0, height);
           this.ctx.stroke();
           this.ctx.beginPath();
-          this.ctx.arc(0, 0, stadium.kd, 0, 2*Math.PI);
+          this.ctx.arc(0, 0, stadium.bgKickOffRadius, 0, 2*Math.PI);
           this.ctx.stroke();
         }
       }
-      else if (stadium.ld==2){
+      else if (stadium.bgType==2){
         this.ctx.strokeStyle = "#E9CC6E";
         this.ctx.save();
         this.ctx.beginPath();
@@ -697,7 +697,7 @@ module.exports = function(API, params){
         this.ctx.restore();
         if (thisRenderer.drawBackground){
           this.ctx.save();
-          this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.Uc);
+          this.drawRoundedRect(this.ctx, -width, -height, 2*width, 2*height, stadium.bgCornerRadius);
           this.ctx.scale(2, 2);
           this.ctx.fillStyle = this.concretePattern;
           this.ctx.fill();
@@ -709,14 +709,14 @@ module.exports = function(API, params){
           this.ctx.lineTo(0, height);
           this.ctx.stroke();
           this.ctx.setLineDash([]);
-          var goalLine = stadium.Fe, delta = width-goalLine;
-          if (goalLine<stadium.Uc)
+          var goalLine = stadium.bgGoalLine, delta = width-goalLine;
+          if (goalLine<stadium.bgCornerRadius)
             delta = 0;
           var that = this;
           var drawKickOff = function(color, x, ccw){
             that.ctx.beginPath();
             that.ctx.strokeStyle = color;
-            that.ctx.arc(0, 0, stadium.kd, -1.5707963267948966, 1.5707963267948966, ccw);
+            that.ctx.arc(0, 0, stadium.bgKickOffRadius, -1.5707963267948966, 1.5707963267948966, ccw);
             if (x!=0){
               that.ctx.moveTo(x, -height);
               that.ctx.lineTo(x, height);
@@ -730,20 +730,20 @@ module.exports = function(API, params){
       else {
         this.ctx.save();
         this.ctx.resetTransform();
-        this.ctx.fillStyle = Utils.numberToColor(stadium.jd);
+        this.ctx.fillStyle = Utils.numberToColor(stadium.bgColor);
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.restore();
       }
       HaxballRenderer.setSmoothingEnabled(this.ctx, true);
     },
     drawPlayerDecoratorsAndChatIndicators: function(roomState, followPlayer){ // Nq
-      var showIndicators = thisRenderer.showChatIndicators/*localStorageObj.Ak.L()*/, players = roomState.I; // "show_indicators"
+      var showIndicators = thisRenderer.showChatIndicators/*localStorageObj.Ak.L()*/, players = roomState.players; // "show_indicators"
       for (var i=0;i<players.length;i++){
         var player = players[i];
-        var disc = player.H;
+        var disc = player.disc;
         if (!disc)
           continue;
-        var pos = disc.a, decorator = this.decoratorsById.get(player.V);
+        var pos = disc.pos, decorator = this.decoratorsById.get(player.id);
         if (showIndicators && decorator.chatIndicatorActive && /*n.Dm*/params.images?.typing)
           this.ctx.drawImage(params.images.typing, pos.x-0.5*params.images.typing.width, pos.y-35);
         if (!thisRenderer.currentPlayerDistinction || player!=followPlayer)
@@ -757,7 +757,7 @@ module.exports = function(API, params){
         this.ctx.strokeStyle = playerDecorator.strokeStyle;
       }
       else{
-        this.ctx.fillStyle = Utils.numberToColor(disc.R);
+        this.ctx.fillStyle = Utils.numberToColor(disc.color);
         this.ctx.strokeStyle = "black";
       }
       if (selectedObj==disc){
@@ -767,31 +767,31 @@ module.exports = function(API, params){
       this.ctx.beginPath();
       if (playerDecorator){
         if (thisRenderer.squarePlayers)
-          this.ctx.rect(disc.a.x-disc.Z, disc.a.y-disc.Z, 2*disc.Z, 2*disc.Z);
+          this.ctx.rect(disc.pos.x-disc.radius, disc.pos.y-disc.radius, 2*disc.radius, 2*disc.radius);
         else
-          this.ctx.arc(disc.a.x, disc.a.y, disc.Z, 0, 2*Math.PI, false);
+          this.ctx.arc(disc.pos.x, disc.pos.y, disc.radius, 0, 2*Math.PI, false);
         this.ctx.save();
-        var c = disc.Z/32;
-        this.ctx.translate(disc.a.x, disc.a.y);
+        var c = disc.radius/32;
+        this.ctx.translate(disc.pos.x, disc.pos.y);
         this.ctx.scale(c, c);
         this.ctx.translate(-32, -32);
         this.ctx.fill();
         this.ctx.restore();
       }
-      else if ((disc.R|0)!=-1){
-        this.ctx.arc(disc.a.x, disc.a.y, disc.Z, 0, 2*Math.PI, false);
+      else if ((disc.color|0)!=-1){
+        this.ctx.arc(disc.pos.x, disc.pos.y, disc.radius, 0, 2*Math.PI, false);
         this.ctx.fill();
       }
       this.ctx.stroke();
       this.ctx.setLineDash([]);
     },
     drawAllPlanes: function(stadium){
-      var planes = stadium.qa;
+      var planes = stadium.planes;
       for (var i=0;i<planes.length;i++)
         this.drawPlane(planes[i]);
     },
     calculatePlaneY: function(plane, x) {
-      return (-plane.wa.x/plane.wa.y)*(x-(plane.Ua*plane.wa.x))+(plane.Ua*plane.wa.y);
+      return (-plane.normal.x/plane.normal.y)*(x-(plane.dist*plane.normal.x))+(plane.dist*plane.normal.y);
     },
     drawPlane: function(plane){
       this.ctx.beginPath();
@@ -804,10 +804,10 @@ module.exports = function(API, params){
         this.ctx.setLineDash([10, 3, 3, 3]);
       }
       var p1, p2;
-      if (plane.wa.y==0){
+      if (plane.normal.y==0){
         p1 = this.transformPixelCoordToMapCoord(0, 0);
         p2 = this.transformPixelCoordToMapCoord(0, this.canvas.height);
-        p1.x = p2.x = plane.Ua*plane.wa.x;
+        p1.x = p2.x = plane.dist*plane.normal.x;
         this.ctx.moveTo(p1.x, p1.y);
         this.ctx.lineTo(p2.x, p2.y);
       }
@@ -823,7 +823,7 @@ module.exports = function(API, params){
       this.ctx.setLineDash([]);
     },
     drawAllGoals: function(stadium){
-      var goals = stadium.tc;
+      var goals = stadium.goals;
       for (var i=0;i<goals.length;i++)
         this.drawGoal(goals[i]);
     },
@@ -834,18 +834,18 @@ module.exports = function(API, params){
         this.ctx.setLineDash([5, 5]);
       }
       else{
-        this.ctx.strokeStyle = goal.qe.$==2?"#85ACF3":"#E18977";
+        this.ctx.strokeStyle = goal.team.id==2?"#85ACF3":"#E18977";
         this.ctx.setLineDash([10, 3, 3, 3]);
       }
-      this.ctx.moveTo(goal.W.x, goal.W.y);
-      this.ctx.lineTo(goal.ca.x, goal.ca.y);
+      this.ctx.moveTo(goal.p1.x, goal.p1.y);
+      this.ctx.lineTo(goal.p0.x, goal.p0.y);
       this.ctx.stroke();
       this.ctx.setLineDash([]);
     },
     drawAllVertices: function(stadium){ // Rq
       if (!stadium)
         return;
-      var vertices = stadium.J;
+      var vertices = stadium.vertices;
       for (var i=0;i<vertices.length;i++)
         this.drawVertex(vertices[i]);
     },
@@ -855,13 +855,13 @@ module.exports = function(API, params){
         this.ctx.strokeStyle = "#cc0000";
       else
         this.ctx.strokeStyle = "#bb44cc";
-      this.ctx.arc(vertex.a.x, vertex.a.y, 5/this.actualZoomCoeff, 0, 2*Math.PI, false);
+      this.ctx.arc(vertex.pos.x, vertex.pos.y, 5/this.actualZoomCoeff, 0, 2*Math.PI, false);
       this.ctx.stroke();
     },
     drawAllSegments: function(stadium){ // Rq
       if (!stadium)
         return;
-      var segments = stadium.U;
+      var segments = stadium.segments;
       for (var i=0;i<segments.length;i++)
         this.drawSegment(segments[i]);
     },
@@ -885,54 +885,54 @@ module.exports = function(API, params){
     drawAllSpawnPoints: function(stadium){
       if (!stadium)
         return;
-      var radius = stadium.ge.Z;
-      var sp = stadium.Dd;
+      var radius = stadium.playerPhysics.radius;
+      var sp = stadium.redSpawnPoints;
       for (var i=0;i<sp.length;i++)
         this.drawSpawnPoint(sp[i], 1, radius, selectedObj && selectedObj.type=="spawnPoint" && selectedObj.idx==i && selectedObj.team==1);
-      sp = stadium.md;
+      sp = stadium.blueSpawnPoints;
       for (var i=0;i<sp.length;i++)
         this.drawSpawnPoint(sp[i], 2, radius, selectedObj && selectedObj.type=="spawnPoint" && selectedObj.idx==i && selectedObj.team==2);
     },
     drawJoint: function(joint, discs){ // Mq
-      if (!thisRenderer.showInvisibleJoints && joint.R<0)
+      if (!thisRenderer.showInvisibleJoints && joint.color<0)
         return;
       this.ctx.beginPath();
       if (selectedObj==joint){
         this.ctx.strokeStyle = "#cc0000";
         this.ctx.setLineDash([5, 5]);
       }
-      else if (joint.R<0){
+      else if (joint.color<0){
         this.ctx.strokeStyle = "#600060a0";
         this.ctx.setLineDash([10, 3, 3, 3]);
       }
       else
-        this.ctx.strokeStyle = Utils.numberToColor(joint.R);
-      var disc1 = joint._Yd_ || discs[joint.Yd], disc2 = joint._Zd_ || discs[joint.Zd];
+        this.ctx.strokeStyle = Utils.numberToColor(joint.color);
+      var disc1 = joint._Yd_ || discs[joint.d0], disc2 = joint._Zd_ || discs[joint.d1];
       if (!disc1 || !disc2)
         return;
-      var pos1 = disc1.a;
-      var pos2 = disc2.a;
+      var pos1 = disc1.pos;
+      var pos2 = disc2.pos;
       this.ctx.moveTo(pos1.x, pos1.y);
       this.ctx.lineTo(pos2.x, pos2.y);
       this.ctx.stroke();
       this.ctx.setLineDash([]);
     },
     drawSegment: function(segment){ // Qq
-      if (!thisRenderer.showInvisibleSegments && !segment.Za)
+      if (!thisRenderer.showInvisibleSegments && !segment.vis)
         return;
       this.ctx.beginPath();
       if (selectedObj==segment){
         this.ctx.strokeStyle = "#cc0000";
         this.ctx.setLineDash([5, 5]);
       }
-      else if (segment.Za)
-        this.ctx.strokeStyle = Utils.numberToColor(segment.R);
+      else if (segment.vis)
+        this.ctx.strokeStyle = Utils.numberToColor(segment.color);
       else{
         this.ctx.strokeStyle = "#006060a0";
         this.ctx.setLineDash([10, 3, 3, 3]);
       }
-      var pos1 = segment.W.a, pos2 = segment.ca.a;
-      if (0*segment.vb!=0){ // line
+      var pos1 = segment.v0.pos, pos2 = segment.v1.pos;
+      if (0*segment.curveF!=0){ // line
         this.ctx.moveTo(pos1.x, pos1.y);
         this.ctx.lineTo(pos2.x, pos2.y);
       }
@@ -944,17 +944,17 @@ module.exports = function(API, params){
       this.ctx.setLineDash([]);
     },
     indicateAllLocations: function(roomState, viewWidth, viewHeight){ // Lq
-      var gameState = roomState.K;
+      var gameState = roomState.gameState;
       if (!gameState)
         return;
-      var ballDisc = gameState.ta.F[0];
-      this.indicateLocation(ballDisc.a, ballDisc.R, viewWidth, viewHeight);
-      var players = roomState.I;
+      var ballDisc = gameState.physicsState.discs[0];
+      this.indicateLocation(ballDisc.pos, ballDisc.color, viewWidth, viewHeight);
+      var players = roomState.players;
       for (var i=0;i<players.length;i++){
-        var player = players[i], playerDisc = player.H;
+        var player = players[i], playerDisc = player.disc;
         if (!playerDisc)
           continue;
-        this.indicateLocation(playerDisc.a, player.ea.R, viewWidth, viewHeight);
+        this.indicateLocation(playerDisc.pos, player.team.color, viewWidth, viewHeight);
       }
     },
     indicateLocation: function(pos, color, viewWidth, viewHeight){ // nk
@@ -1003,7 +1003,7 @@ module.exports = function(API, params){
   var rendererObj = null; // Eb
 
   this.initialize = function(room){
-    thisRenderer.followPlayerId = room.getRoomDataOriginal().q.ya.uc;
+    thisRenderer.followPlayerId = room.currentPlayerId;
     rendererObj = new HaxballRenderer();
   };
 
@@ -1012,7 +1012,7 @@ module.exports = function(API, params){
   };
 
   this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
-    if (!params.paintGame || !extrapolatedRoomState.K)
+    if (!params.paintGame || !extrapolatedRoomState.gameState)
       return;
     rendererObj.render(extrapolatedRoomState);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
@@ -1026,7 +1026,7 @@ module.exports = function(API, params){
 
   this.onTeamGoal = function(teamId, customData){ // Ni (a)
     var tr = rendererObj.textRenderer; // "Red Scores!", "Blue Scores!"
-    tr.addText((teamId==Team.fa.$) ? tr.redScore : tr.blueScore);
+    tr.addText((teamId==Team.fa.id) ? tr.redScore : tr.blueScore);
   };
 
   this.onGameStart = function(byId, customData){ // Ki (a)
@@ -1035,7 +1035,7 @@ module.exports = function(API, params){
 
   this.onGameEnd = function(winningTeamId, customData){ // Oi (a)
     var tr = rendererObj.textRenderer; // "Red is Victorious!", "Blue is Victorious!"
-    tr.addText((winningTeamId==Team.fa.$) ? tr.redVictory : tr.blueVictory);
+    tr.addText((winningTeamId==Team.fa.id) ? tr.redVictory : tr.blueVictory);
   };
 
   this.onTimeIsUp = function(customData){ // Pi ()

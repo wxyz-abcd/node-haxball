@@ -1,5 +1,5 @@
 module.exports = function(API, params){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
@@ -682,7 +682,7 @@ module.exports = function(API, params){
   var that = this;
 
   this.initialize = function(room){
-    that.roomObj = room.getRoomDataOriginal().q;
+    that.roomObj = room;
     that.Eb = new N();
     that.Eb.uf();
   };
@@ -696,7 +696,7 @@ module.exports = function(API, params){
     if (!params.paintGame || !extrapolatedRoomState.K)
       return;
     that.Eb.uf();
-    that.Eb.Kc(extrapolatedRoomState, that.roomObj.ya.uc);
+    that.Eb.Kc(extrapolatedRoomState, that.roomObj.currentPlayerId);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
   };
 
