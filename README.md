@@ -18,6 +18,10 @@
 
 ---
 
+- <a href="https://github.com/wxyz-abcd/node-haxball">Here</a> is the Github repository for this project.
+- You may read the full documentation <a href="https://github.com/wxyz-abcd/node-haxball/wiki">here</a>. 
+- We also have a <a href="https://discord.gg/ngACfJHSD6">discord server</a> to help people adapt to this API. See you there!
+
 <h2 id="how-to-use">🤔 How To Use</h2>
 
 #### 💻 Installing & importing as a node.js/CommonJS module:
@@ -33,7 +37,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
 #### 💻 Usage on Browser
 
   - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>. (Will expire at the end of each month and not work for several days.)
-  - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at haxballOriginModifier project.)
+  - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at our <a href="https://github.com/wxyz-abcd/node-haxball/tree/main/haxballOriginModifier">haxballOriginModifier project</a>.)
   - <a href="https://abc-haxball-proxy.infinityfreeapp.com/?no_proxy_server=true">Alternate URL</a> (No proxy server yet.)
   - Moreover; if you have a custom backend server for Haxball, you can use it with this API too.
 
