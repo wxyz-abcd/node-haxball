@@ -8,6 +8,10 @@
 
 <h4 align="center">The most powerful and lightweight API that allows you to develop your original Haxball(www.haxball.com) host, client, and standalone applications both on node.js and browser environments and includes every possible functionality that you can imagine.</h4>
 
+- <a href="https://github.com/wxyz-abcd/node-haxball">Here</a> is the Github repository for this project.
+- You may read the full documentation <a href="https://github.com/wxyz-abcd/node-haxball/wiki">here</a>. 
+- We also have a <a href="https://discord.gg/ngACfJHSD6">discord server</a> to help people adapt to this API. See you there!
+
 ### 🔖 Table Of Contents
 
 - 🤔 [How To Use](#how-to-use)
@@ -17,10 +21,6 @@
 - 🔏 [License](#license)
 
 ---
-
-- <a href="https://github.com/wxyz-abcd/node-haxball">Here</a> is the Github repository for this project.
-- You may read the full documentation <a href="https://github.com/wxyz-abcd/node-haxball/wiki">here</a>. 
-- We also have a <a href="https://discord.gg/ngACfJHSD6">discord server</a> to help people adapt to this API. See you there!
 
 <h2 id="how-to-use">🤔 How To Use</h2>
 
