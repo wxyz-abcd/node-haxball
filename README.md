@@ -256,7 +256,7 @@ Room.create({
         - `unlimitedPlayerCount`: if set to `true`, bypasses the player count controller.
         - `fakePassword`: if set to `true`, the room will show that it is password-protected while in fact it is not.
         - `showInRoomList`: set to `true` if you want this room to show up in the room list.
-        - `onError(error, clientConnectionObj)`: called when an exception is thrown from the room. clientConnectionObj is the connection object of the client that caused the exception. the connection will be closed just after this callback is executed.
+        - `onError(error, playerId)`: called when an exception is thrown from the room. playerId is the id of the player that caused the exception. the connection will be closed just after this callback is executed.
       - `commonParams`: explained below in `Room.join`.
 
     - `join(joinParams, commonParams)`: try to join the room(`roomId`) with given `password`(or `null`=no password). Returns a custom object.
