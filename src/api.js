@@ -769,6 +769,8 @@ function abcHaxballAPI(window, config){
     this.kb = [null, new ka(), new ka()];
     this.kb[1].fb.push(p.fa.R);
     this.kb[2].fb.push(p.xa.R);
+    if (config.fixNames)
+      this.getPlayer = this.na;
   }
 
   //////////////////////////////////////////////////////////
@@ -956,9 +958,9 @@ function abcHaxballAPI(window, config){
 
   p.b = !0;
   p.prototype = { f: p };
-  p.Ia = new p(0, 16777215, 0, -1, "Spectators", "t-spec", 0, 0);
-  p.fa = new p(1, 15035990, -1, 8, "Red", "t-red", 0, 2);
-  p.xa = new p(2, 5671397, 1, 16, "Blue", "t-blue", 0, 4);
+  p.spec = p.Ia = new p(0, 16777215, 0, -1, "Spectators", "t-spec", 0, 0);
+  p.red = p.fa = new p(1, 15035990, -1, 8, "Red", "t-red", 0, 2);
+  p.blue = p.xa = new p(2, 5671397, 1, 16, "Blue", "t-blue", 0, 4);
   p.Ia.pg = p.Ia;
   p.fa.pg = p.xa;
   p.xa.pg = p.fa;
@@ -2098,12 +2100,6 @@ function abcHaxballAPI(window, config){
     for (var b = a.length, c = 0; c < b && J.ls(a, b - c - 1); ) ++c;
     return 0 < c ? D.substr(a, 0, b - c) : a;
   };
-  J.Af = function (a) { // make2Digits
-    var b,
-      c = "";
-    for (b = 2 - a.length; c.length < b; ) c += "0";
-    return c + (null == a ? "null" : "" + a);
-  };
   J.replace = function (a, b, c) {
     return a.split(b).join(c);
   };
@@ -2571,8 +2567,8 @@ function abcHaxballAPI(window, config){
       f = a.color,
       g = a.strength,
       k = a.length;
-    c._Yd_ = d;
-    c._Zd_ = e;
+    c.d0Obj = d;
+    c.d1Obj = e;
     null == k
       ? ((k = e),
         null == d || null == k
@@ -9276,6 +9272,10 @@ function abcHaxballAPI(window, config){
     return va.get();
   }
 
+  function calculateAllRoomDistances(geo, roomList) {
+    va.Hs(geo, roomList);
+  }
+
   function getGeo() {
     return T.Fo();
   }
@@ -10657,12 +10657,12 @@ function abcHaxballAPI(window, config){
         });
       });
     }
-    _fixNames(ea, [null, null, "team", "disc", null, null, "isKicking", "id", "input", "name", "ping", null, "flag", "sync", "headlessAvatar", "avatar", null, "isAdmin", null, null, null]);
-    _fixNames(p, ["rival", "id", "color", null, null, "name", null, null, "colors"]);
+    _fixNames(ea, [null, null, "team", "disc", "kickRateMinTickCounter", "kickRateMaxTickCounter", "isKicking", "id", "input", "name", "ping", null, "flag", "sync", "headlessAvatar", "avatar", "avatarNumber", "isAdmin", null, null, null]);
+    _fixNames(p, ["rival", "id", "color", null, null, "name", "className", null, "colors"]);
     _fixNames(ka, ["angle", "text", "inner"]);
     _fixNames(T, ["flag", "lon", "lat"]);
     _fixNames(B, ["id", "cGroup", "cMask", "bCoef", "pos"]);
-    _fixNames(E, ["normal", null, null, null, null, "v0", "v1", "bias", "bCoef", "cMask", "cGroup", "curveF", "vis", "color"]);
+    _fixNames(E, ["normal", null, null, null, "center", "v0", "v1", "bias", "bCoef", "cMask", "cGroup", "curveF", "vis", "color"]);
     _fixNames(L, ["cGroup", "cMask", "bCoef", "dist", "normal"]);
     _fixNames(sb, ["team", "p1", "p0"]);
     _fixNames(ua, ["cGroup", "cMask", "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
@@ -10681,7 +10681,7 @@ function abcHaxballAPI(window, config){
     _fixNames(oa, [null, "id", null, "flag", "avatar", null, null, "byId"]);
     _fixNames(qb, [null, "avatar", "playerId", "byId"]);
     _fixNames(Y, [null, "id", "reason", "ban", "byId"]);
-    _fixNames(pb, [null, "playerIdList", "moveToTop", "ban", "byId"]);
+    _fixNames(pb, [null, "playerIdList", "moveToTop", "byId"]);
     _fixNames(Ma, [null, "byId"]);
     _fixNames(La, [null, "byId"]);
     _fixNames(Oa, [null, "paused", "byId"]);
@@ -10700,6 +10700,11 @@ function abcHaxballAPI(window, config){
     _fixNames(CustomEvent, [null, null, null, "byId"]);
     _fixNames(Wb, ["data", "id", "dist"]);
     _fixNames(Fb, ["version", "name", "flag", "lat", "lon", "password", "maxPlayers", "players"]);
+    Object.defineProperty(h.prototype, "isCustom", {
+      get: function(){
+        return !this.Pe();
+      }
+    });
   }
 
   return {
@@ -10720,6 +10725,7 @@ function abcHaxballAPI(window, config){
       generateAuth, 
       authFromKey,
       getRoomList, 
+      calculateAllRoomDistances,
       numberToColor,
       colorToNumber,
       keyState,

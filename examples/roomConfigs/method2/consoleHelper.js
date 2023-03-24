@@ -26,6 +26,7 @@ module.exports = function(API){
 
   this.finalize = function(){
     stdin.removeListener("data", listener);
+    stdin.end();
     listener = null;
     room = null;
     stdin = null;

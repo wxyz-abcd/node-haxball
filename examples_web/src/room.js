@@ -1,4 +1,4 @@
-var API = null, room = null, roomState = null, Team = null, make2Digits = null;
+var API = null, room = null, roomState = null, Team = null;
 var eRoomView = document.getElementsByClassName("room-view").item(0);
 var eContainer = eRoomView.children.item(0);
 var eRoomName = eContainer.children.item(0);
@@ -125,7 +125,7 @@ function makePlayerContainer(elem, player){
 }
 
 function makeTeamContainer(elem, team){
-  elem.classList.add(team.io);
+  elem.classList.add(team.className);
   elem.ondragover = (event)=>{
     if (event.dataTransfer.types.indexOf("player")==-1)
       return;
@@ -145,7 +145,7 @@ function makeTeamContainer(elem, team){
     room.setPlayerTeam(room.currentPlayerId, team.id);
   };
   bDiv.appendChild(b1);
-  if (team!=Team.Ia){
+  if (team!=Team.spec){
     b2 = document.createElement("button");
     b2.className = "button center reset-btn admin-only";
     b2.onclick = ()=>{
@@ -160,7 +160,7 @@ function makeTeamContainer(elem, team){
   var oldList = "";
   elem.update = function(){
     var gameActive = (roomState.gameState!=null);
-    b1.disabled = roomState.Pc || gameActive;
+    b1.disabled = roomState.teamsLocked || gameActive;
     if (b2)
       b2.disabled = gameActive;
     var isAdmin = room.currentPlayer?.isAdmin || room.isHost;
@@ -259,13 +259,18 @@ ePauseGame.onclick = function(){
   room.pauseGame();
 };
 
+function make2Digits(a) {
+  var b, c = "";
+  for (b = 2 - a.length; c.length < b; ) c += "0";
+  return c + (null == a ? "null" : "" + a);
+};
+
 window.update = function(_API, _room, _roomState){
   if (API==null){ // if running for the first time
     Team = _API.Impl.Core.p;
-    make2Digits = _API.Impl.Utils.J.Af;
-    makeTeamContainer(eTeams.children.item(1), Team.fa);
-    makeTeamContainer(eTeams.children.item(2), Team.Ia);
-    makeTeamContainer(eTeams.children.item(3), Team.xa);
+    makeTeamContainer(eTeams.children.item(1), Team.red);
+    makeTeamContainer(eTeams.children.item(2), Team.spec);
+    makeTeamContainer(eTeams.children.item(3), Team.blue);
     API = _API;
     room = _room;
     roomState = _roomState;
@@ -277,12 +282,12 @@ window.update = function(_API, _room, _roomState){
     eRoomView.classList.add("admin");
   else
     eRoomView.classList.remove("admin");
-  eRoomName.innerText = roomState.jc;
+  eRoomName.innerText = roomState.name;
   if (room.isRecording())
     eRec.classList.add("active");
   else
     eRec.classList.remove("active");
-  if (roomState.Pc){
+  if (roomState.teamsLocked){
     eLock.classList.add("locked");
     eLock.innerText = "Unlock";
   }
@@ -295,7 +300,7 @@ window.update = function(_API, _room, _roomState){
   eTimeLimit.value = roomState.timeLimit;
   eScoreLimit.disabled = disableActions;
   eScoreLimit.value = roomState.scoreLimit;
-  if (roomState.stadium.Pe())
+  if (!roomState.stadium.isCustom)
     eStadiumName.classList.remove("custom");
   else
     eStadiumName.classList.add("custom");

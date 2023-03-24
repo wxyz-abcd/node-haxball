@@ -95,9 +95,10 @@ function GameKeysHandler(){
 };
 
 function updateGUI(){
-  roomFrame.style.display = rendererParams.paintGame ? "none" : "block";
-  canvasContainer.style.display = rendererParams.paintGame ? "block" : "none";
-  if (!rendererParams.paintGame)
+  var pg = rendererParams?.paintGame;
+  roomFrame.style.display = pg ? "none" : "block";
+  canvasContainer.style.display = pg ? "block" : "none";
+  if (!pg)
     roomFrame.contentWindow.update(API, room, roomState);
 }
 
@@ -219,8 +220,8 @@ function analyzeChatCommand(msg){
         room.setTeamColors(teamId, angle, ...msg);
       } catch (g) {
         msg = g instanceof q ? g.Ta : g;
-        if (typeof msg == "string")
-          chatApi.receiveNotice(msg);
+        if (msg.toString != null)
+          chatApi.receiveNotice(msg.toString());
       }
       break;
     case "extrapolation":
@@ -286,7 +287,7 @@ function analyzeChatCommand(msg){
       break;
     case "store":
       var f = room.stadium;
-      if (f.Pe())
+      if (!f.isCustom)
         chatApi.receiveNotice("Can't store default stadium.");
       else {
         chatApi.receiveNotice("Not implemented to keep the web examples simple.");
@@ -313,7 +314,8 @@ window.onKeyDown = function(event){
       break;
     }
     case 27:{
-      rendererParams.paintGame = (!!roomState.gameState) && (!rendererParams.paintGame);
+      if (rendererParams)
+        rendererParams.paintGame = (!!roomState.gameState) && (!rendererParams.paintGame);
       updateGUI();
       event.preventDefault();
       break;
@@ -470,11 +472,6 @@ window.onload = ()=>{
     keyHandler = new GameKeysHandler();
     sound = new Sound();
     var {p: Team} = API.Impl.Core;
-    Team.byId = [
-      Team.Ia,
-      Team.fa,
-      Team.xa
-    ];
     document.addEventListener("keydown", window.onKeyDown);
     document.addEventListener("keyup", window.onKeyUp);
     document.addEventListener("focusout", keyHandler.reset);
@@ -537,14 +534,16 @@ window.onload = ()=>{
     room.onAfterGameStart = function (byId, customData) {
       var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       chatApi.receiveNotice("Game started" + by(byPlayerObj));
-      rendererParams.paintGame = true;
+      if (rendererParams)
+        rendererParams.paintGame = true;
       updateGUI();
     };
     room.onAfterGameStop = function (byId, customData) {
       var byPlayerObj = roomState.players.find((x)=>x.id==byId);
       if (byPlayerObj!=null)
         chatApi.receiveNotice("Game stopped" + by(byPlayerObj));
-      rendererParams.paintGame = false;
+      if (rendererParams)
+        rendererParams.paintGame = false;
       updateGUI();
     };
     room.onAfterStadiumChange = function (stadium, byId, customData) {

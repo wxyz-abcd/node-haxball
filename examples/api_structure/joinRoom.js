@@ -1,4 +1,6 @@
+// node.js / CommonJS initialization:
 const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../src/index");
+// For initialization on browsers, read the documentation here: https://github.com/wxyz-abcd/node-haxball#-usage-on-browser
 
 Utils.generateAuth().then(([authKey, authObj])=>{
   Room.join({
@@ -17,11 +19,11 @@ Utils.generateAuth().then(([authKey, authObj])=>{
     onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
     onFailure: (error)=>{
       console.log("Unable to join room...", error.toString());
-      process.exit(0);
+      //process.exit(0); // maybe close the application? in node.js
     },
     onLeave: (msg)=>{
       console.log("Bot has left the room:", msg.toString());
-      process.exit(0);
+      //process.exit(0); // maybe close the application? in node.js
     }
   });
 });

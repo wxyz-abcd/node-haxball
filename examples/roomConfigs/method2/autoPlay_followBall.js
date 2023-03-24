@@ -37,10 +37,6 @@ module.exports = function(API){
 
   var room = null, that = this;
 
-  // is needed for ball follow logic to pause.
-  // notice that this is being updated not only onPositionsReset
-  var lastPositionsReset = 0;
-
   this.initialize = function(_room){
     room = _room;
   };
@@ -48,6 +44,11 @@ module.exports = function(API){
   this.finalize = function(){
     room = null;
   };
+
+  /*
+  // is needed for ball follow logic to pause.
+  // notice that this is being updated not only onPositionsReset
+  // var lastPositionsReset = 0;
 
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
@@ -63,11 +64,11 @@ module.exports = function(API){
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
-
+  */
   this.onGameTick = function(customData){
     // do not apply ball follow logic for maybe 150ms.
     // is needed for moveInRandomY() to work
-    if (Date.now() - lastPositionsReset < 150) return;
+    //if (Date.now() - lastPositionsReset < 150) return;
     
     // get the original data object of the current player
     var playerDisc = room.getPlayerDisc(room.currentPlayerId);
@@ -107,7 +108,7 @@ module.exports = function(API){
     // apply current keys
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
-
+  /*
   this.onPlayerTeamChange = function(id){
     if (id === room.currentPlayerId) {
       lastPositionsReset = Date.now();
@@ -119,4 +120,5 @@ module.exports = function(API){
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
+  */
 };

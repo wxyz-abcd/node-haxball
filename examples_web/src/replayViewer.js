@@ -201,15 +201,7 @@ function onload(){
     pako: window.pako
   });
   sound = new Sound();
-  var {p: Team} = API.Impl.Core;
-  Team.byId = [
-    Team.Ia,
-    Team.fa,
-    Team.xa
-  ];
-
   canvas.addEventListener("wheel", (event)=>renderer.onWheel(event));
-
   Promise.all([sound.loadSound("./sounds/chat.ogg"), sound.loadSound("./sounds/crowd.ogg"), sound.loadSound("./sounds/goal.ogg"), sound.loadSound("./sounds/highlight.wav"), sound.loadSound("./sounds/join.ogg"), sound.loadSound("./sounds/kick.ogg"), sound.loadSound("./sounds/leave.ogg")]).then((sounds)=>{
     sound.chat = sounds[0];
     sound.crowd = sounds[1];
@@ -338,7 +330,7 @@ function onload(){
         },
         onPlayerLeave: (playerObj, reason, isBanned, byId)=>{
           sound.playSound(sound.leave);
-          var byPlayer = replayReader.state.na(byId);
+          var byPlayer = replayReader.state.getPlayer(byId);
           if (reason==null)
             receiveNotice("["+playerObj.id+"]"+playerObj.name+" has left")
           else
@@ -356,12 +348,12 @@ function onload(){
           renderer.onTimeIsUp();
         },
         onGamePauseChange: (paused, byId)=>{
-          var byPlayerObj = replayReader.state.na(byId);
+          var byPlayerObj = replayReader.state.getPlayer(byId);
           paused && receiveNotice("Game paused"+by(byPlayerObj));
           updateGUI();
         },
         onGameStart: (byId)=>{
-          var byPlayerObj = replayReader.state.na(byId);
+          var byPlayerObj = replayReader.state.getPlayer(byId);
           renderer.onGameStart(byId);
           receiveNotice("Game started"+by(byPlayerObj));
           updateGUI();
@@ -371,19 +363,19 @@ function onload(){
           receiveNotice(API.Impl.p.byId[winningTeamId].name+" team won the match");
         },
         onGameStop: (byId)=>{
-          var byPlayerObj = replayReader.state.na(byId);
+          var byPlayerObj = replayReader.state.getPlayer(byId);
           null != byPlayerObj && receiveNotice("Game stopped"+by(byPlayerObj));
           updateGUI();
         },
         onPlayerTeamChange: (id, teamId, byId)=>{
-          var playerObj = replayReader.state.na(id), byPlayerObj = replayReader.state.na(byId);
+          var playerObj = replayReader.state.getPlayer(id), byPlayerObj = replayReader.state.getPlayer(byId);
           if (!playerObj)
             return;
           receiveNotice("["+playerObj.id+"]"+playerObj.name+" was moved to "+playerObj.team.name+by(byPlayerObj));
           updateGUI();
         },
         onPlayerChat: (id, message)=>{
-          var playerObj = replayReader.state.na(id);
+          var playerObj = replayReader.state.getPlayer(id);
           if (!playerObj)
             return;
           console.log("%c%s", "color:black;font-family:system-ui;font-size:1rem;-webkit-text-stroke: 1px black", "["+playerObj.id+"]"+playerObj.name+" : "+message);//font-weight:bold
@@ -395,25 +387,25 @@ function onload(){
           sound.playSound(sound.chat);
         },
         onStadiumChange: (stadium, byId)=>{
-          var byPlayerObj = replayReader.state.na(byId);
-          if (!stadium.Pe())
+          var byPlayerObj = replayReader.state.getPlayer(byId);
+          if (stadium.isCustom)
             receiveNotice("Stadium \""+stadium.name+"\" loaded"+by(byPlayerObj));
           updateGUI();
         },
         onPlayerSyncChange: (playerId, value)=>{
-          var playerObj = replayReader.state.na(playerId);
+          var playerObj = replayReader.state.getPlayer(playerId);
           receiveNotice("["+playerObj.id+"]"+playerObj.name+" "+(value?"has desynchronized":"is back in sync"));
         },
         onAutoTeams: (playerId1, teamId1, playerId2, teamId2, byId)=>{},
         onPlayerAdminChange: (id, isAdmin, byId)=>{
-          var playerObj = replayReader.state.na(id);
+          var playerObj = replayReader.state.getPlayer(id);
           if (!playerObj)
             return;
-          receiveNotice((playerObj.isAdmin?("["+playerObj.id+"]"+playerObj.name+" was given admin rights"):("["+playerObj.id+"]"+playerObj.name+"'s admin rights were taken away"))+by(replayReader.state.na(byId)));
+          receiveNotice((playerObj.isAdmin?("["+playerObj.id+"]"+playerObj.name+" was given admin rights"):("["+playerObj.id+"]"+playerObj.name+"'s admin rights were taken away"))+by(replayReader.state.getPlayer(byId)));
           updateGUI();
         },
         onKickRateLimitChange: (min, rate, burst, byId)=>{
-          receiveNotice("Kick Rate Limit set to (min: "+min+", rate: "+rate+", burst: "+burst+")"+by(replayReader.state.na(byId)));
+          receiveNotice("Kick Rate Limit set to (min: "+min+", rate: "+rate+", burst: "+burst+")"+by(replayReader.state.getPlayer(byId)));
         },
         onScoreLimitChange: (value, byId)=>{},
         onTimeLimitChange: (value, byId)=>{},

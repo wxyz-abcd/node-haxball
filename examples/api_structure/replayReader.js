@@ -1,15 +1,18 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("../src/index");
-const fs = require("fs");
+// node.js / CommonJS initialization:
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../src/index");
+// For initialization on browsers, read the documentation here: https://github.com/wxyz-abcd/node-haxball#-usage-on-browser
 
+ // On browsers, you would need a FileReader object to read the contents of the binary replay file instead of the following two lines:
+const fs = require("fs");
 var data = fs.readFileSync("test.hbr2", null);
 
 var replayReader = Replay.read(data, {
   onPlayerChat: (id, message) => {
-    console.log(replayReader.state.na(id).name + " : " + message);
+    console.log(replayReader.state.getPlayer(id).name + " : " + message);
   },
   onPlayerTeamChange: (id, teamId, byId) => {
-    var by = replayReader.state.na(byId)?.name;
-    console.log(replayReader.state.na(id).name + " was moved to " + (teamId==1?"red":(teamId==2?"blue":"spectators")) + (by ? (" by " + by) : ""));
+    var by = replayReader.state.getPlayer(byId)?.name;
+    console.log(replayReader.state.getPlayer(id).name + " was moved to " + (teamId==1?"red":(teamId==2?"blue":"spectators")) + (by ? (" by " + by) : ""));
   },
   onGameTick: ()=>{
     console.log("time:", replayReader.getTime()); // getTime() might yield the same result for successive game ticks.

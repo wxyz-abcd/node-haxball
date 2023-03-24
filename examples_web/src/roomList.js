@@ -86,7 +86,7 @@ function onGeoLocationChange(){
     lat = geo.lat;
   if (!isFinite(lon) || isNaN(lon))
     lon = geo.lon;
-  geo = Impl.Core.T.Rf({
+  geo = Utils.geoFromJSON({
     lat: lat,
     lon: lon,
     code: geo.flag
@@ -106,7 +106,7 @@ function setSelectedRoomId(e){
 }
 
 function updateList(){
-  Impl.Utils.va.Hs(geo, roomList); // Hs: calculateAllRoomDistances
+  Utils.calculateAllRoomDistances(geo, roomList);
   roomList.sort(function (a, b) {
     return a.dist - b.dist; // dist: calculated distance
   });

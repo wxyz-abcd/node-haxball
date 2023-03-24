@@ -202,81 +202,82 @@ declare type Vertex = {
 };
 
 declare type Segment = {
-  v0: Vertex,
-  v1: Vertex,
-  curveF: number,
-  color: int
-  vis: boolean,
-  bias: number,
-  bCoef: number,
-  cMask: int,
-  cGroup: int,
-  normal: Point,
+  v0: Vertex;
+  v1: Vertex;
+  curveF: number;
+  color: int;
+  vis: boolean;
+  bias: number;
+  bCoef: number;
+  cMask: int;
+  cGroup: int;
+  normal: Point;
+  center: Point;
 };
 
 declare type Plane = {
-  normal: Point
-  dist: number,
-  bCoef: int,
-  cMask: int,
-  cGroup: int,
+  normal: Point;
+  dist: number;
+  bCoef: int;
+  cMask: int;
+  cGroup: int;
 };
 
 declare type Goal = {
-  p0: Point,
-  p1: Point,
-  team: Team
+  p0: Point;
+  p1: Point;
+  team: Team;
 };
 
 declare type Disc = {
-  pos: Point,
-  radius: number,
-  speed: Point,
-  gravity: Point,
-  damping: number,
-  invMass: number,
-  bCoef: number,
-  color: int,
-  cMask: int,
-  cGroup: int
+  pos: Point;
+  radius: number;
+  speed: Point;
+  gravity: Point;
+  damping: number;
+  invMass: number;
+  bCoef: number;
+  color: int;
+  cMask: int;
+  cGroup: int;
 };
 
 declare type MovableDisc = {
-  id: int,
-  pos: Point,
-  radius: number,
-  speed: Point,
-  gravity: Point,
-  damping: number,
-  invMass: number,
-  bCoef: number,
-  color: int,
-  cMask: int,
-  cGroup: int,
-  playerId: int
+  id: int;
+  pos: Point;
+  radius: number;
+  speed: Point;
+  gravity: Point;
+  damping: number;
+  invMass: number;
+  bCoef: number;
+  color: int;
+  cMask: int;
+  cGroup: int;
+  playerId: int;
 };
 
 declare type Joint = {
-  d0: int,
-  d1: int,
-  minLength: number,
-  maxLength: number,
-  strength: number,
-  color: int
+  d0: int;
+  d1: int;
+  minLength: number;
+  maxLength: number;
+  strength: number;
+  color: int;
 };
 
 declare type PlayerPhysics = {
-  kickback: number,
-  radius: number,
-  cGroup: number,
-  gravity: Point,
-  bCoef: number,
-  invMass: number,
-  damping: number,
-  acceleration: number,
-  kickingAcceleration: number,
-  kickingDamping: number,
-  kickStrength: number
+  kickback: number;
+  radius: number;
+  cGroup: number;
+  gravity: Point;
+  bCoef: number;
+  invMass: number;
+  damping: number;
+  acceleration: number;
+  kickingAcceleration: number;
+  kickingDamping: number;
+  kickStrength: number;
 };
 
 declare type Stadium = {
@@ -305,6 +306,7 @@ declare type Stadium = {
   bgCornerRadius: number;
   spawnDistance: number;
   bgGoalLine: number;
+  readonly isCustom: boolean;
 };
 
 declare type TeamColors = {
@@ -319,7 +321,15 @@ declare type Team = {
   color: number;
   name: string;
   colors: TeamColors;
+  className: string;
 };
+
+declare namespace Team {
+  export const spec: Team;
+  export const red: Team;
+  export const blue: Team;
+  export const byId: Team[];
+}
 
 declare type GeoLocation = {
   lat: number;
@@ -335,11 +345,14 @@ declare type Player = {
   avatar: string;
   headlessAvatar: string;
   isAdmin: boolean;
+  avatarNumber: int;
   conn: string;
   auth: string;
   customClient: boolean;
   ping: int;
   input: int;
+  kickRateMinTickCounter: int;
+  kickRateMaxTickCounter: int;
   isKicking: boolean;
   sync: boolean;
   disc: MovableDisc;
@@ -378,6 +391,7 @@ declare interface RoomStateBase {
   name: string;
   teamColors: TeamColors;
   copy: ()=>RoomState;
+  getPlayer: (id)=>(Player | null);
 }
 
 declare type RoomState = (RoomStateBase & SandboxModeFunctions);
@@ -633,6 +647,7 @@ export namespace Utils {
   export function generateAuth(): Promise<[string, Auth]>;
   export function authFromKey(authKey: string): Promise<Auth>;
   export function getRoomList(): Promise<RoomData[]>;
+  export function calculateAllRoomDistances(geo: GeoLocation, list: RoomData[]): void;
   export function numberToColor(number: int): string;
   export function colorToNumber(color: string): int;
   export function keyState(dirX: Direction, dirY: Direction, kick: boolean): void;

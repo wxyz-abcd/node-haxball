@@ -1,4 +1,7 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../src/index");
+// node.js / CommonJS initialization:
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../src/index");
+// For initialization on browsers, read the documentation here: https://github.com/wxyz-abcd/node-haxball#-usage-on-browser
+
 const N = 10;
 
 Utils.generateAuth().then(([authKey, authObj])=>{
@@ -16,8 +19,12 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       renderer: null, // example renderer usage: new defaultRenderer(API, {canvas: ..., images: {grass: ..., concrete: ..., concrete2: ..., typing: ...}, paintGame: true}) // look at examples_web folder for usage with room.setRenderer instead.
       plugins: [], // example plugin usage: [new autoPlay_followBall(API)] // look at examples/plugins folder for related examples.
       onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
-      onLeave: (msg)=>{
-        console.log("Bot has left the room:", msg);
+      onFailure: (error)=>{
+        console.log("Unable to join room...", error.toString());
+        joinRoom(roomId, roomName); // try to rejoin as soon as you get an error.
+      },
+        onLeave: (msg)=>{
+        console.log("Bot has left the room:", msg.toString());
         joinRoom(roomId, roomName); // try to rejoin as soon as you left the room.
       }
     });

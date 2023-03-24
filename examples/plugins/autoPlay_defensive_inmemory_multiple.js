@@ -153,7 +153,7 @@ module.exports = function(API){
     botIds.forEach((botId)=>{
 
       // get the original data object of the next bot
-      var cp = gameState.Ma.players.filter((x)=>(x.id==botId))[0];
+      var cp = state.players.filter((x)=>(x.id==botId))[0];
       var playerDisc = cp?.disc;
 
       // coordinates: playerDisc.pos.x, playerDisc.pos.y
@@ -167,7 +167,7 @@ module.exports = function(API){
       var goals = state.stadium.goals, ball = gameState.physicsState.discs[0];
       /*
       var minDistSqr = Infinity, minDistOpponent;
-      gameState.Ma.players.forEach((x)=>{
+      state.players.forEach((x)=>{
         if (x.team.id == opponentTeamId){
           var distSqr = (playerDisc.pos.x-x.pos.x)*(playerDisc.pos.x-x.pos.x)+(playerDisc.pos.y-x.pos.y)*(playerDisc.pos.y-x.pos.y);
           if (distSqr < minDistSqr){

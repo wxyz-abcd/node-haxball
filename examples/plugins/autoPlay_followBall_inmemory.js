@@ -36,6 +36,7 @@ module.exports = function(API){
 
   var room = null, that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
 
+  /*
   // is needed for ball follow logic to pause.
   // notice that this is being updated not only onPositionsReset
   var lastPositionsReset = 0;
@@ -46,9 +47,10 @@ module.exports = function(API){
   // BUT instead, it creates a new bug... This is not the solution... Must change...
   var moveInRandomY = function(){
     dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-      room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
+      room.fakeSendPlayerInput(Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), 65535); // unlike room.setKeyState, this function directly emits a keystate message.
     });
   };
+  */
 
   this.initialize = function(_room){
     room = _room;
@@ -67,15 +69,17 @@ module.exports = function(API){
       room.fakePlayerLeave(65535);
   };
 
+  /*
   this.onGameStart = function(){
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
+  */
 
   this.onGameTick = function(customData){
     // do not apply ball follow logic for maybe 150ms.
     // is needed for moveInRandomY() to work
-    if (Date.now() - lastPositionsReset < 150) return;
+    // if (Date.now() - lastPositionsReset < 150) return;
 
     // get the original data object of the next bot
     var cp = room.getPlayer(65535);
@@ -128,6 +132,7 @@ module.exports = function(API){
     });
   };
 
+  /*
   this.onPlayerTeamChange = function(id){
     if (id === 65535) {
       lastPositionsReset = Date.now();
@@ -139,4 +144,6 @@ module.exports = function(API){
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
+  */
+  
 };

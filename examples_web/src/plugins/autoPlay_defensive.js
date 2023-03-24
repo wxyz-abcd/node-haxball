@@ -83,7 +83,7 @@ module.exports = function(API){
     var { state, gameState, gameStateExt } = room;
     gameState = gameStateExt || gameState;
 
-    var cp = gameState.Ma.players.filter((x)=>(x.id==room.currentPlayerId))[0];
+    var cp = state.players.filter((x)=>(x.id==room.currentPlayerId))[0];
     var playerDisc = cp.disc;
     if (!playerDisc)
       return;
@@ -91,7 +91,7 @@ module.exports = function(API){
     var goals = state.stadium.goals, ball = gameState.physicsState.discs[0];
     /*
     var minDistSqr = Infinity, minDistOpponent;
-    x.Ma.players.forEach((x)=>{
+    state.players.forEach((x)=>{
       if (x.team.id == opponentTeamId){
         var distSqr = (playerDisc.pos.x-x.pos.x)*(playerDisc.pos.x-x.pos.x)+(playerDisc.pos.y-x.pos.y)*(playerDisc.pos.y-x.pos.y);
         if (distSqr < minDistSqr){

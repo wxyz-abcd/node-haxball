@@ -355,23 +355,23 @@ module.exports = function(API, params){
     },
     update: function(playerObj, roomState){ // C
       if (playerObj.disc) {
-        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.kb[playerObj.team.id] : playerObj.team.colors; // "team_colors"
+        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.teamColors[playerObj.team.id] : playerObj.team.colors; // "team_colors"
         var avatarText = (playerObj.headlessAvatar!=null) ? playerObj.headlessAvatar : playerObj.avatar;
         var showAvatar = thisRenderer.showAvatars/*localStorageObj.lm.L()*/ && (avatarText!=null); // "show_avatars"
-        if (!/*PlayerDecorator.*/compareTeamColors(this.teamColors, teamColors) || (!showAvatar && (playerObj.Jb!=this.avatarNumber)) || (showAvatar && (this.avatarText!=avatarText))){
+        if (!/*PlayerDecorator.*/compareTeamColors(this.teamColors, teamColors) || (!showAvatar && (playerObj.avatarNumber!=this.avatarNumber)) || (showAvatar && (this.avatarText!=avatarText))){
           /*PlayerDecorator.*/copyTeamColors(this.teamColors, teamColors);
           if (showAvatar){
             this.avatarText = avatarText;
             this.avatarNumber = -1;
           }
           else{
-            this.avatarText = "" + playerObj.Jb;
-            this.avatarNumber = playerObj.Jb;
+            this.avatarText = "" + playerObj.avatarNumber;
+            this.avatarNumber = playerObj.avatarNumber;
           }
           this.createInnerFillPattern(/*this.avatarText*/);
         }
       }
-      this.strokeStyle = (roomState.gameState.pauseGameTickCounter>0 || !playerObj.isKicking) ? "black" : ((playerObj.isKicking && playerObj.Sc<=0 && playerObj.yc>=0) ? "white" : "black");
+      this.strokeStyle = (roomState.gameState.pauseGameTickCounter>0 || !playerObj.isKicking) ? "black" : ((playerObj.isKicking && playerObj.kickRateMinTickCounter<=0 && playerObj.kickRateMaxTickCounter>=0) ? "white" : "black");
       var name = thisRenderer.showPlayerIds?("["+playerObj.id+"] "+playerObj.name):playerObj.name;
       if (name!=this.name){
         this.name = name;
@@ -469,7 +469,7 @@ module.exports = function(API, params){
       this.ctx.resetTransform();
       if (!roomState.gameState)
         return;
-      var gameState = roomState.gameState, mapObjects = gameState.physicsState, followPlayer = roomState.na(thisRenderer.followPlayerId), followDisc = followPlayer?.disc;
+      var gameState = roomState.gameState, mapObjects = gameState.physicsState, followPlayer = roomState.getPlayer(thisRenderer.followPlayerId), followDisc = followPlayer?.disc;
       var zoomCoeff = thisRenderer.zoomCoeff*window.devicePixelRatio*thisRenderer.resolutionScale;
       var maxViewWidth = gameState.stadium.maxViewWidth, viewWidth = this.canvas.width/zoomCoeff;
       if (maxViewWidth>0 && maxViewWidth<viewWidth){
@@ -907,7 +907,7 @@ module.exports = function(API, params){
       }
       else
         this.ctx.strokeStyle = Utils.numberToColor(joint.color);
-      var disc1 = joint._Yd_ || discs[joint.d0], disc2 = joint._Zd_ || discs[joint.d1];
+      var disc1 = joint.d0Obj || discs[joint.d0], disc2 = joint.d1Obj || discs[joint.d1];
       if (!disc1 || !disc2)
         return;
       var pos1 = disc1.pos;
@@ -937,7 +937,7 @@ module.exports = function(API, params){
         this.ctx.lineTo(pos2.x, pos2.y);
       }
       else{ // arc
-        var center = segment.Xd, deltaX = pos1.x-center.x, deltaY = pos1.y-center.y;
+        var center = segment.center, deltaX = pos1.x-center.x, deltaY = pos1.y-center.y;
         this.ctx.arc(center.x, center.y, Math.sqrt(deltaX*deltaX+deltaY*deltaY), Math.atan2(deltaY, deltaX), Math.atan2(pos2.y-center.y, pos2.x-center.x));
       }
       this.ctx.stroke();
@@ -1026,7 +1026,7 @@ module.exports = function(API, params){
 
   this.onTeamGoal = function(teamId, customData){ // Ni (a)
     var tr = rendererObj.textRenderer; // "Red Scores!", "Blue Scores!"
-    tr.addText((teamId==Team.fa.id) ? tr.redScore : tr.blueScore);
+    tr.addText((teamId==Team.red.id) ? tr.redScore : tr.blueScore);
   };
 
   this.onGameStart = function(byId, customData){ // Ki (a)
@@ -1035,7 +1035,7 @@ module.exports = function(API, params){
 
   this.onGameEnd = function(winningTeamId, customData){ // Oi (a)
     var tr = rendererObj.textRenderer; // "Red is Victorious!", "Blue is Victorious!"
-    tr.addText((winningTeamId==Team.fa.id) ? tr.redVictory : tr.blueVictory);
+    tr.addText((winningTeamId==Team.red.id) ? tr.redVictory : tr.blueVictory);
   };
 
   this.onTimeIsUp = function(customData){ // Pi ()

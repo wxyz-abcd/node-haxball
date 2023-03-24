@@ -143,7 +143,7 @@ module.exports = function(API){
     switch (type){
       case OperationType.SendChat:{
         if (customData.isCommand){
-          var byPlayer = originalRoomData.na(msg.byId);
+          var byPlayer = originalRoomData.getPlayer(msg.byId);
           if (!byPlayer.isAdmin)
             return true;
           var arr = customData.data;
@@ -200,7 +200,7 @@ module.exports = function(API){
   var update = function(bot){
     var { state, gameState, gameStateExt } = room;
     gameState = gameStateExt || gameState;
-    var cp = state.na(bot.id);
+    var cp = state.getPlayer(bot.id);
     var playerDisc = cp?.disc;
     if (!playerDisc)
       return;

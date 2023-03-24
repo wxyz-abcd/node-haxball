@@ -49,9 +49,18 @@ module.exports = function(API){
 
   var room = null, that = this;
 
+  this.initialize = function(_room){
+    room = _room;
+  };
+
+  this.finalize = function(){
+    room = null;
+  };
+
+  /*
   // is needed for ball follow logic to pause.
   // notice that this is being updated not only onPositionsReset
-  var lastPositionsReset = 0;
+  // var lastPositionsReset = 0;
 
   // move bot in random Y direction
   // to prevent stucking on hitting a ball on a same spot in a same manner.
@@ -63,28 +72,21 @@ module.exports = function(API){
     );
   };
 
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
-
   this.onGameStart = function(){
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
-
+  */
+ 
   this.onGameTick = function(customData){
     // do not apply ball follow logic for maybe 150ms.
     // is needed for moveInRandomY() to work
-    if (Date.now() - lastPositionsReset < 150) return;
+    //if (Date.now() - lastPositionsReset < 150) return;
 
     var { state, gameState, gameStateExt } = room;
     gameState = gameStateExt || gameState;
 
-    var cp = gameState.Ma.players.filter((x)=>(x.id==room.currentPlayerId))[0];
+    var cp = state.players.filter((x)=>(x.id==room.currentPlayerId))[0];
     var playerDisc = cp.disc;
     if (!playerDisc)
       return;
@@ -92,7 +94,7 @@ module.exports = function(API){
     var goals = state.stadium.goals, ball = gameState.physicsState.discs[0];
     /*
     var minDistSqr = Infinity, minDistOpponent;
-    gameState.Ma.players.forEach((x)=>{
+    state.players.forEach((x)=>{
       if (x.team.id == opponentTeamId){
         var distSqr = (playerDisc.pos.x-x.pos.x)*(playerDisc.pos.x-x.pos.x)+(playerDisc.pos.y-x.pos.y)*(playerDisc.pos.y-x.pos.y);
         if (distSqr < minDistSqr){
@@ -148,7 +150,7 @@ module.exports = function(API){
     // apply current keys
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
-
+  /*
   this.onPlayerTeamChange = function(id){
     if (id === room.currentPlayerId) {
       lastPositionsReset = Date.now();
@@ -160,4 +162,5 @@ module.exports = function(API){
     lastPositionsReset = Date.now();
     moveInRandomY();
   };
+  */
 };
