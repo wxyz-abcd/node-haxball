@@ -157,43 +157,44 @@ function abcHaxballAPI(window, config){
     Failed: 13,
     MasterConnectionError: 14,
     StadiumParseError: 15,
-    StadiumSyntaxError: 16,
-    ObjectCastError: 17,
-    TeamColorsReadError: 18,
-    UTF8CharacterDecodeError: 19,
-    ReadTooMuchError: 20,
-    ReadWrongStringLengthError: 21,
-    EncodeUTF8CharNegativeError: 22,
-    EncodeUTF8CharTooLargeError: 23,
-    CalculateLengthOfUTF8CharNegativeError: 24,
-    CalculateLengthOfUTF8CharTooLargeError: 25,
-    BufferResizeParameterTooSmallError: 26,
-    BadColorError: 27,
-    BadTeamError: 28,
-    StadiumLimitsExceededError: 29,
-    MissingActionConfigError: 30,
-    UnregisteredActionError: 31,
-    MissingImplementationError: 32,
-    AnnouncementActionMessageTooLongError: 33,
-    ChatActionMessageTooLongError: 34,
-    KickBanReasonTooLongError: 35,
-    ChangeTeamColorsInvalidTeamIdError: 36,
-    MissingRecaptchaCallbackError: 37,
-    ReplayFileVersionMismatchError: 38,
-    ReplayFileReadError: 39,
-    JoinRoomNullIdAuthError: 40,
-    PlayerNameTooLongError: 41,
-    PlayerCountryTooLongError: 42,
-    PlayerAvatarTooLongError: 43,
-    PlayerJoinBlockedByMPDError: 44,
-    PlayerJoinBlockedByORError: 45,
-    PluginNotFoundError: 46,
-    PluginNameChangeNotAllowedError: 47,
-    AuthFromKeyInvalidIdFormatError: 48,
-    LanguageAlreadyExistsError: 49,
-    CurrentLanguageRemovalError: 50,
-    LanguageDoesNotExistError: 51,
-    BadActorError: 52
+    StadiumParseSyntaxError: 16,
+    StadiumParseUnknownError: 17,
+    ObjectCastError: 18,
+    TeamColorsReadError: 19,
+    UTF8CharacterDecodeError: 20,
+    ReadTooMuchError: 21,
+    ReadWrongStringLengthError: 22,
+    EncodeUTF8CharNegativeError: 23,
+    EncodeUTF8CharTooLargeError: 24,
+    CalculateLengthOfUTF8CharNegativeError: 25,
+    CalculateLengthOfUTF8CharTooLargeError: 26,
+    BufferResizeParameterTooSmallError: 27,
+    BadColorError: 28,
+    BadTeamError: 29,
+    StadiumLimitsExceededError: 30,
+    MissingActionConfigError: 31,
+    UnregisteredActionError: 32,
+    MissingImplementationError: 33,
+    AnnouncementActionMessageTooLongError: 34,
+    ChatActionMessageTooLongError: 35,
+    KickBanReasonTooLongError: 36,
+    ChangeTeamColorsInvalidTeamIdError: 37,
+    MissingRecaptchaCallbackError: 38,
+    ReplayFileVersionMismatchError: 39,
+    ReplayFileReadError: 40,
+    JoinRoomNullIdAuthError: 41,
+    PlayerNameTooLongError: 42,
+    PlayerCountryTooLongError: 43,
+    PlayerAvatarTooLongError: 44,
+    PlayerJoinBlockedByMPDError: 45,
+    PlayerJoinBlockedByORError: 46,
+    PluginNotFoundError: 47,
+    PluginNameChangeNotAllowedError: 48,
+    AuthFromKeyInvalidIdFormatError: 49,
+    LanguageAlreadyExistsError: 50,
+    CurrentLanguageRemovalError: 51,
+    LanguageDoesNotExistError: 52,
+    BadActorError: 53
   };
 
   const RendererTextIndices = {
@@ -8592,7 +8593,7 @@ function abcHaxballAPI(window, config){
         } catch (k) {
           b = k instanceof q ? k.Ta : k,
           b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
-          b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError)); // "Error loading stadium file."
+          b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError, b)); // "Error loading stadium file."
         }
       },
       sendAnnouncement: function(msg, color=-1, style=0, sound=1, targetId, byId){
@@ -9300,7 +9301,7 @@ function abcHaxballAPI(window, config){
     } catch (k) {
       b = k instanceof q ? k.Ta : k,
       b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
-      b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError)); // "Error loading stadium file."
+      b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError, b)); // "Error loading stadium file."
     }
   }
 
@@ -9929,7 +9930,7 @@ function abcHaxballAPI(window, config){
       } catch (k) {
         b = k instanceof q ? k.Ta : k,
         b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
-        b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError)); // "Error loading stadium file."
+        b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError, b)); // "Error loading stadium file."
       }
     };
 
