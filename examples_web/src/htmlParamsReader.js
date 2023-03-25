@@ -13,6 +13,7 @@ function readCreateRoomParameters(q){
   var p_flag = q["p_flag"] || "";
   var token = q["token"] || "";
   var autoPlay = q["autoPlay"] || "";
+  var aimbot = q["aimbot"] || "";
   if (r_name.length>40)
     throw "Room name cannot be more than 40 characters long. This is basro's limit on his server side. Everything still works fine but your room does not show up in room list. (r_name)";
   if (r_pass=="")
@@ -46,6 +47,10 @@ function readCreateRoomParameters(q){
   if (autoPlay!="true" && autoPlay!="false")
     throw "AutoPlay must be either true or false. (autoPlay)";
   autoPlay = (autoPlay=="true");
+  aimbot = aimbot.toLowerCase();
+  if (aimbot!="true" && aimbot!="false")
+    throw "aimbot must be either true or false. (aimbot)";
+  aimbot = (aimbot=="true");
   return {
     createRoom: true,
     r_name,
@@ -61,7 +66,8 @@ function readCreateRoomParameters(q){
     p_lon,
     p_flag,
     token,
-    autoPlay
+    autoPlay,
+    aimbot
   };
 }
 
@@ -76,6 +82,7 @@ function readJoinRoomParameters(q){
   var p_flag = q["p_flag"] || "";
   var token = q["token"] || "";
   var autoPlay = q["autoPlay"] || "";
+  var aimbot = q["aimbot"] || "";
   if (r_pass=="")
     r_pass = null;
   p_flag = p_flag.toLowerCase();
@@ -91,6 +98,10 @@ function readJoinRoomParameters(q){
   if (autoPlay!="true" && autoPlay!="false")
     throw "AutoPlay must be either true or false. (autoPlay)";
   autoPlay = (autoPlay=="true");
+  aimbot = aimbot.toLowerCase();
+  if (aimbot!="true" && aimbot!="false")
+    throw "aimbot must be either true or false. (aimbot)";
+  aimbot = (aimbot=="true");
   return {
     createRoom: false,
     r_id,
@@ -102,6 +113,7 @@ function readJoinRoomParameters(q){
     p_lon,
     p_flag,
     token,
-    autoPlay
+    autoPlay,
+    aimbot
   };
 }

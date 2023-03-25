@@ -466,7 +466,7 @@ window.onload = ()=>{
       chatInput.focus();
     }
   };
-  var roomCallback = function(_room){
+  var roomCallback = function(_room, _params){
     room = _room;
     roomState = room.state;
     keyHandler = new GameKeysHandler();
@@ -627,6 +627,7 @@ window.onload = ()=>{
         }
       };
       room.setRenderer(new renderers.defaultRenderer(API, rendererParams));
+      room.renderer.aimbotActive = !!_params.aimbot;
       updateGUI();
     }, (err)=>{
       console.log(err);

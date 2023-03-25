@@ -24,6 +24,7 @@ document.getElementById("jr").onclick = function(){
     "p_lon": document.getElementById("p_lon").value,
     "p_flag": p_flag_elem.value,
     "token": document.getElementById("token").value,
-    "autoPlay": document.getElementById("autoPlay").checked.toString()
+    "autoPlay": document.getElementById("autoPlay").checked.toString(),
+    "aimbot": document.getElementById("aimbot").checked.toString()
   }), "Custom Haxball Client"+(++i), "width=800,height=600");
 }

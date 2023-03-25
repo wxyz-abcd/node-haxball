@@ -64,7 +64,7 @@ function init(headless, roomCallback){
         }, 
         renderer: null,
         plugins: pluginsArray,
-        onSuccess: roomCallback,
+        onSuccess: (room)=>{ roomCallback(room, params); },
         onRequestRecaptcha: ()=>{
           alert("Token rejected. Get a fresh token first!");
           window.close();
@@ -107,7 +107,7 @@ function init(headless, roomCallback){
           }, 
           renderer: null,
           plugins: pluginsArray,
-          onSuccess: roomCallback,
+          onSuccess: (room)=>{ roomCallback(room, params); },
           onRequestRecaptcha: ()=>{
             alert("Token rejected. Get a fresh token first!");
             window.close();
