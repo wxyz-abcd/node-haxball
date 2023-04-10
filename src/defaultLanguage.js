@@ -61,6 +61,8 @@ function EnglishLanguage(API){
     [ErrorCodes.PlayerJoinBlockedByORError]: (playerObj)=>"Player join event blocked by OperationReceived: " + playerObj,
     [ErrorCodes.PluginNotFoundError]: (pluginIndex)=>"Plugin not found at index " + pluginIndex,
     [ErrorCodes.PluginNameChangeNotAllowedError]: ()=>"Plugin name should not change",
+    [ErrorCodes.LibraryNotFoundError]: (libraryIndex)=>"Library not found at index " + libraryIndex,
+    [ErrorCodes.LibraryNameChangeNotAllowedError]: ()=>"Library name should not change",
     [ErrorCodes.AuthFromKeyInvalidIdFormatError]: ()=>"Invalid id format",
     [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: " + abbr,
     [ErrorCodes.CurrentLanguageRemovalError]: ()=>"Current language cannot be removed. Change to a different language first.",

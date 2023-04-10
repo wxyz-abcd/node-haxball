@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive", true, { // "autoPlay_defensive" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -48,20 +48,6 @@ module.exports = function(API){
 
   var room = null, that = this;
 
-  // is needed for ball follow logic to pause.
-  // notice that this is being updated not only onPositionsReset
-  var lastPositionsReset = 0;
-
-  // move bot in random Y direction
-  // to prevent stucking on hitting a ball on a same spot in a same manner.
-  // it also fixes a bug when the bot doesn't move after positions resets
-  // BUT instead, it creates a new bug... This is not the solution... Must change...
-  var moveInRandomY = function(){
-    room && room.setKeyState(
-      Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false)
-    );
-  };
-
   this.initialize = function(_room){
     room = _room;
   };
@@ -70,16 +56,7 @@ module.exports = function(API){
     room = null;
   };
 
-  this.onGameStart = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
-  };
-
   this.onGameTick = function(customData){
-    // do not apply ball follow logic for maybe 150ms.
-    // is needed for moveInRandomY() to work
-    if (Date.now() - lastPositionsReset < 150) return;
-
     var { state, gameState, gameStateExt } = room;
     gameState = gameStateExt || gameState;
 
@@ -146,17 +123,5 @@ module.exports = function(API){
     
     // apply current keys
     room.setKeyState(Utils.keyState(dirX, dirY, kick));
-  };
-
-  this.onPlayerTeamChange = function(id){
-    if (id === room.currentPlayerId) {
-      lastPositionsReset = Date.now();
-      moveInRandomY();
-    }
-  };
-
-  this.onPositionsReset = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
   };
 };

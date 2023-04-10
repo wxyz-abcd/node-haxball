@@ -190,11 +190,13 @@ function abcHaxballAPI(window, config){
     PlayerJoinBlockedByORError: 46,
     PluginNotFoundError: 47,
     PluginNameChangeNotAllowedError: 48,
-    AuthFromKeyInvalidIdFormatError: 49,
-    LanguageAlreadyExistsError: 50,
-    CurrentLanguageRemovalError: 51,
-    LanguageDoesNotExistError: 52,
-    BadActorError: 53
+    LibraryNotFoundError: 49,
+    LibraryNameChangeNotAllowedError: 50,
+    AuthFromKeyInvalidIdFormatError: 51,
+    LanguageAlreadyExistsError: 52,
+    CurrentLanguageRemovalError: 53,
+    LanguageDoesNotExistError: 54,
+    BadActorError: 55
   };
 
   const RendererTextIndices = {
@@ -3962,7 +3964,7 @@ function abcHaxballAPI(window, config){
       var a = ya.zc,
         b = this.gc;
       this.hc != a &&
-        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this), (this._LF_ && this._LF_(a)));
+        (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this));
       return b;
     },
     copy: function () {
@@ -5995,8 +5997,7 @@ function abcHaxballAPI(window, config){
       if (0 >= a) return this.T;
       a > this.Ff && (a = this.Ff);
       ya.zc++;
-      var c = this.T.sc(/*this.haxball*/),
-        d;
+      var c = this.T.sc(/*this.haxball*/), d;
       null != b ? (this.Ri.as(this.le, b), (d = this.Ri)) : (d = this.le);
       d = d.list;
       for (
@@ -7369,6 +7370,10 @@ function abcHaxballAPI(window, config){
       );
     },
     _mf_: function(a, b, x) { // private messaging.
+      if (b==0){
+        a.apply(this.T);
+        return;
+      }
       var c = this.Ie.get(b);
       if (null != c) {
         (!x) && (a.P = 0); // clients might be able to send the message too.
@@ -7665,9 +7670,6 @@ function abcHaxballAPI(window, config){
     a.T._KO_ = ()=>{
       haxball.room._onKickOff && haxball.room._onKickOff();
     };
-    a.T._LF_ = (a)=>{
-      haxball.room._onLocalFrame && haxball.room._onLocalFrame(a);
-    }
     a.T._CDD_ = (a, b, c, d)=>{
       haxball.room._onCollisionDiscVsDisc && haxball.room._onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
     };
@@ -8125,7 +8127,6 @@ function abcHaxballAPI(window, config){
       ya.T.Ki = null;
       ya.T.Os = null;
       ya.T._KO_ = null;
-      ya.T._LF_ = null;
       ya.T._CDD_ = null;
       ya.T._CDP_ = null;
       ya.T._CDS_ = null;
@@ -8186,9 +8187,6 @@ function abcHaxballAPI(window, config){
       ya.T._KO_ = ()=>{
         callbacks.onKickOff && callbacks.onKickOff();
       };
-      ya.T._LF_ = (a)=>{
-        callbacks.onLocalFrame && callbacks.onLocalFrame(a);
-      }
       ya.T._CDD_ = (a, b, c, d)=>{
         callbacks.onCollisionDiscVsDisc && callbacks.onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
       };
@@ -8385,9 +8383,6 @@ function abcHaxballAPI(window, config){
       ya.T._KO_ = ()=>{
         callbacks.onKickOff && callbacks.onKickOff();
       };
-      ya.T._LF_ = (a)=>{
-        callbacks.onLocalFrame && callbacks.onLocalFrame(a);
-      }
       ya.T._CDD_ = (a, b, c, d)=>{
         callbacks.onCollisionDiscVsDisc && callbacks.onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
       };
@@ -8484,7 +8479,6 @@ function abcHaxballAPI(window, config){
       ya.T.Ki = null;
       ya.T.Os = null;
       ya.T._KO_ = null;
-      ya.T._LF_ = null;
       ya.T._CDD_ = null;
       ya.T._CDP_ = null;
       ya.T._CDS_ = null;
@@ -8849,6 +8843,7 @@ function abcHaxballAPI(window, config){
     if (!id || !authObj)
       throw createError(ErrorCodes.JoinRoomNullIdAuthError); // "id and authObj cannot be null. (inside 1st parameter)"
     var haxball = Object.assign({}, haxballParams);
+    haxball.libraries = haxball.libraries || [];
     haxball.config = haxball.config || {};
     fixStorage(haxball);
     (password == "") && (password = null);
@@ -8864,6 +8859,9 @@ function abcHaxballAPI(window, config){
       }));
       A.i(haxball.renderer?.finalize);
       A.i(haxball.config.finalize);
+      haxball.libraries.forEach((l)=>{
+        A.i(l.finalize);
+      });
       haxball._onRoomLeave = null;
       internalData.roomObj = null;
       internalData.roomState = null;
@@ -8877,7 +8875,7 @@ function abcHaxballAPI(window, config){
       //haxball._onRoomLeave = null;
       haxball._onConnectionStateChange = null;
       fJoinRoomSucceeded = null;
-      haxball.room = new Room(internalData, haxball.config, haxball.plugins);
+      haxball.room = new Room(internalData, haxball.libraries, haxball.config, haxball.plugins);
       allRooms.push(haxball.room);
       haxball.room.client = haxball;
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
@@ -9024,6 +9022,7 @@ function abcHaxballAPI(window, config){
   function createRoom(roomParams, haxballParams){
     var haxball = Object.assign({}, haxballParams);
     haxball.config = haxball.config || {};
+    haxball.libraries = haxball.libraries || [];
     fixStorage(haxball);
     var {name, password, token, noPlayer, geo, playerCount, maxPlayerCount, unlimitedPlayerCount, fakePassword, showInRoomList, onError} = roomParams;
     haxball.onHostError = onError;
@@ -9040,6 +9039,9 @@ function abcHaxballAPI(window, config){
       }));
       A.i(haxball.renderer?.finalize);
       A.i(haxball.config.finalize);
+      haxball.libraries.forEach((l)=>{
+        A.i(l.finalize);
+      });
       fLeaveRoom = null;
       internalData.roomObj = null;
       internalData.roomState = null;
@@ -9052,7 +9054,7 @@ function abcHaxballAPI(window, config){
       console.log("internal event: CreateRoomSucceeded");
       //fLeaveRoom = null;
       fCreateRoomSucceeded = null;
-      haxball.room = new Room(internalData, haxball.config, haxball.plugins);
+      haxball.room = new Room(internalData, haxball.libraries, haxball.config, haxball.plugins);
       allRooms.push(haxball.room);
       haxball.room.client = haxball;
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
@@ -9212,7 +9214,7 @@ function abcHaxballAPI(window, config){
       c();
       if (a.hasOwnProperty("password"))
         null != e && (t.Bg = roomLink(e, null != l.Ib));
-        haxball.room._onRoomPropertiesChange && haxball.room._onRoomPropertiesChange(props);
+      haxball.room._onRoomPropertiesChange && haxball.room._onRoomPropertiesChange(props);
     };
     t.Of.__supc__ = function (a) {
       l.upc = a;
@@ -9267,6 +9269,14 @@ function abcHaxballAPI(window, config){
 
   function keyState(dirX, dirY, kick){ // dirX = oneof[-1:left, 0:still, 1:right], dirY = oneof[-1:up, 0:still, 1:down], kick = true/false
     return (kick?16:0) | (dirX>0?8:(dirX<0?4:0)) | (dirY>0?2:(dirY<0?1:0));
+  }
+
+  function reverseKeyState(state){
+    return {
+      dirX: ((state&8)>0)-((state&4)>0),
+      dirY: ((state&2)>0)-((state&1)>0),
+      kick: (state&16)>0
+    };
   }
 
   function getRoomList() {
@@ -9423,8 +9433,13 @@ function abcHaxballAPI(window, config){
 
   var eventCallbacks = [];
 
-  function Room(internalData, config, plugins){
+  function Room(internalData, libraries, config, plugins){
     var renderer = internalData.renderer, cfg = config;
+    Object.defineProperty(this, "config", {
+      get(){
+        return cfg;
+      }
+    });
     Object.defineProperty(this, "sdp", { // usage: require("sdp-transform").parse(sdp);
       get(){
         return internalData.isHost ? null : internalData.roomObj.ya.pa.Ra.remoteDescription.sdp;
@@ -9467,6 +9482,11 @@ function abcHaxballAPI(window, config){
       }
     });
     this.kickTimeout = -1;
+    this.libraries = libraries || [];
+    this.librariesMap = this.libraries.reduce((acc, x)=>{
+      acc[x.name] = x;
+      return acc;
+    }, {});
     this.renderer = renderer;
     if (internalData.pluginMechanismActive){
       this.plugins = plugins || [];
@@ -9745,20 +9765,12 @@ function abcHaxballAPI(window, config){
     };
 
     this.setPlayerAvatar = function(id, value, headless){ // host-only
-      if (headless){
-        var msg = qb.la(id, value);
-        msg.P = 0;
-      }
-      else{
-        var msg = ra.la(value);
-        msg.P = id;
-      }
-      internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
-    },
+      var msg = headless ? qb.la(id, value) : ra.la(value);
+      internalData.execOperationReceivedOnHost(msg, undefined, headless?0:id)!=false && internalData.roomObj?.ya.ra(msg);
+    };
 
     this.reorderPlayers = function(playerIdList, moveToTop){ // host-only
       var msg = pb.la(playerIdList, moveToTop);
-      msg.P = 0;
       internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
     };
 
@@ -10039,10 +10051,23 @@ function abcHaxballAPI(window, config){
       fakeSend(byId, b);
     };
 
-    this.fakeSendPlayerChat = function(msg, byId){
+    this.fakeSendPlayerChat = function(msg,/* targetId,*/ byId){
       var b = new Na();
       b.Tc = msg;
       fakeSend(byId, b);
+      /*
+      // below code is not working due to basro not sending byId here and then using it on the client side.
+      var x = internalData.roomObj?.ya;
+      if (!x)
+        return;
+      var d = new Na();
+      d.Tc = msg;
+      (internalData.execOperationReceivedOnHost(d, targetId, byId)!=false) && (
+        null != targetId ? internalData.dummyPromise.then(function() {
+          x._mf_(d, targetId);
+        }) : x.ra(d)
+      );
+      */
     };
 
     this.fakeSetPlayerChatIndicator = function(value, byId){
@@ -10524,7 +10549,25 @@ function abcHaxballAPI(window, config){
       }
     };
 
+    this.updateLibrary = function(libraryIndex, newLibraryObj){
+      var oldLibraryObj = that.libraries[libraryIndex];
+      if (!oldLibraryObj)
+        throw createError(ErrorCodes.LibraryNotFoundError, libraryIndex); // "Library not found at index " + libraryIndex
+      var {name} = oldLibraryObj;
+      if (name != newLibraryObj.name) // library name should not change, otherwise some bugs are possible.
+        throw createError(ErrorCodes.LibraryNameChangeNotAllowedError); // "Library name should not change"
+      A.i(oldLibraryObj.finalize);
+      that.libraries[libraryIndex] = newLibraryObj;
+      that.librariesMap[name] = newLibraryObj;
+      y.i(newLibraryObj.initialize, that);
+      ia.i(that._onLibraryUpdate, oldLibraryObj, newLibraryObj);
+    };
+
     if (internalData.pluginMechanismActive){
+      this.libraries.forEach((l)=>{
+        y.i(l.initialize, that);
+      });
+      
       y.i(cfg.initialize, this);
       y.i(renderer?.initialize, this);
 
@@ -10538,11 +10581,22 @@ function abcHaxballAPI(window, config){
     }
   }
 
+  function Library(name, metadata=null){
+    this.name = name;
+    this.defineMetadata(metadata);
+  }
+
+  // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  Library.prototype.defineMetadata = function(x){},//x={name, version, author, description}
+  Library.prototype.defineVariable = function(x){//x={name, type, value, range, description}
+    return x?.value;
+  };
+
   function RoomConfig(metadata=null){
     this.defineMetadata(metadata);
   }
 
-   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  // These functions should be overridden when writing a GUI application using this API, before using this RoomConfig class.
   RoomConfig.prototype.defineMetadata = function(x){},//x={name, version, author, description, allowFlags}
   RoomConfig.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     return x?.value;
@@ -10552,7 +10606,7 @@ function abcHaxballAPI(window, config){
     this.defineMetadata(metadata);
   }
 
-   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  // These functions should be overridden when writing a GUI application using this API, before using this Renderer class.
   Renderer.prototype.defineMetadata = function(x){},//x={name, version, author, description}
   Renderer.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     return x?.value;
@@ -10569,7 +10623,7 @@ function abcHaxballAPI(window, config){
     });
   }
 
-   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
+  // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
   Plugin.prototype.defineMetadata = function(x){},//x={version, author, description, allowFlags}
   Plugin.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     return x?.value; // Do not forget to return this value. It is used once inside constructor for variable "active".
@@ -10600,7 +10654,6 @@ function abcHaxballAPI(window, config){
   createEventCallback("PlayerSyncChange", { params: ["player id", "new sync value"] });
   createEventCallback("Announcement", { params: ["announcement message", "announcement color in #rrggbb format", "announcement style (a small number)", "announcement sound type (a small number)"] });
   createEventCallback("KickOff", { params: [] });
-  createEventCallback("LocalFrame", { params: ["local frame number"] });
   createEventCallback("AutoTeams", { params: ["1st player id", "1st team id", "2nd player id (or null)", "2nd team id (or null)", "id of the player that triggered this event"] });
   createEventCallback("ScoreLimitChange", { params: ["new score limit value", "id of the player that triggered this event"] });
   createEventCallback("TimeLimitChange", { params: ["new time limit value", "id of the player that triggered this event"] });
@@ -10639,6 +10692,7 @@ function abcHaxballAPI(window, config){
   createEventCallback("ConfigUpdate", { params: ["old roomConfig object", "new roomConfig object"] });
   createEventCallback("RendererUpdate", { params: ["old renderer object", "new renderer object"] });
   createEventCallback("PluginUpdate", { params: ["old plugin object", "new plugin object"] });
+  createEventCallback("LibraryUpdate", { params: ["old library object", "new library object"] });
   createEventCallback("LanguageChange", { params: ["new language abbreviation"] });
 
   if (config.fixNames){
@@ -10730,6 +10784,7 @@ function abcHaxballAPI(window, config){
       numberToColor,
       colorToNumber,
       keyState,
+      reverseKeyState,
       getGeo,
       geoFromJSON,
       geoFromString,
@@ -10762,6 +10817,7 @@ function abcHaxballAPI(window, config){
       getDiscAtMapCoord: getDiscAtMapCoord,
       getSpawnPointIndexAtMapCoord: getSpawnPointIndexAtMapCoord
     },
+    Library,
     RoomConfig,
     Plugin,
     Renderer,

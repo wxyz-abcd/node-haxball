@@ -30,7 +30,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("node-haxball")();
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("node-haxball")();
 // Use example code here.
 ```
 
@@ -52,7 +52,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
           proxy: {
             WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
             HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
@@ -75,7 +75,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -224,6 +224,7 @@ Room.create({
   - `numberToColor(number)`: returns the html color string (rgba representation) of the given `number`. (0 <= `number` <= 16777215)
   - `colorToNumber(color)`: returns the number representation of the given html color string (rgba representation).
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. `dirX` = oneof\[`-1`:left, `0`:still, `1`:right\], `dirY` = oneof\[`-1`:up, `0`:still, `1`:down\], `kick` = `true`/`false`.
+  - `reverseKeyState(state)`: returns the `dirX`, `dirY`, `kick` parameters that were used to generate the given integer `state` with `Utils.keyState` function.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
   - `geoFromJSON(json)`: creates and returns a GeoLocation object from a json object that should have `lat`, `lon` and `flag` keys.
   - `geoFromString(jsonStr)`: creates and returns a GeoLocation object from a stringified json object that should have `lat`, `lon` and `flag` keys.
@@ -285,6 +286,7 @@ Room.create({
           - `onValueSet(key, value)`: a callback function that is called just after the value of a key of this object has been changed by this library. default value is `null`.
         - `noPluginMechanism`: if `true`, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define `Room._onXXXXXX` callbacks by yourself.
         - `useDefaultChatCommandMechanism`: if `false`, you will have to write `onBeforeOperationReceived` and `onAfterOperationReceived` callbacks by yourself. By default, `onBeforeOperationReceived` is a function that determines whether a chat message is a command or not by looking at the chat message's first character(should be '!'); and `onAfterOperationReceived` is a function that blocks these command messages from being sent to the clients. All plugins can run their own `onOperationReceived` after this `onBeforeOperationReceived` function call, and all of them can block/modify all messages before the messages reach to `onAfterOperationReceived`.
+        - `libraries`: array of `Library` objects to be used. the objects should be derived from the provided `Library` class. default value is `[]`. (Look at examples/libraries folder for example Library's to use here, or src/libraryTemplate.js for a template Library that contains all callbacks.)
         - `config`: the `RoomConfig` object that contains all the main callbacks of this room. the object should be derived from the provided `RoomConfig` class. default value is `null`. (Look at examples/roomConfigs/method2 folder for example RoomConfigs to use here, or src/roomConfigTemplate_method2.js for a template RoomConfig that contains all callbacks.)
         - `renderer`: the `Renderer` object that can render the game. the object should be derived from the provided `Renderer` class. default value is `null`. (Look at examples/renderers folder for example RoomConfigs to use here, or src/rendererTemplate.js for a template Renderer that contains all callbacks.)
         - `plugins`: array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. default value is `[]`. (Look at examples/plugins folder for example Plugins to use here, or src/pluginTemplate.js for a template Plugin that contains all callbacks.)
@@ -364,10 +366,13 @@ Room.create({
     - `gameStateExt`: room's extrapolated game state. returns null if game is not active. read-only.
     - `sdp`: current room's sdp value (only for client rooms). read-only.
     - `kickTimeout`: time between releasing and re-pressing the kick key (in milliseconds, defaults to `-1`). read-only.
+    - `config`: room's current roomConfig object. read-only.
     - `renderer`: room's current renderer object. read-only.
     - `plugins`: array of all available plugins. this is used internally to restore the order of plugins while plugin activation/deactivation. read-only.
     - `activePlugins`: array of currently active plugins. this is used internally for callbacks. read-only.
-    - `pluginsMap`: all available plugins mapped as `pluginsMap[plugin.name] = plugin`, for optimized use to communicate between plugins. read-only.
+    - `pluginsMap`: all available plugins mapped as `pluginsMap[plugin.name] = plugin`, for optimized use to communicate between all addons. read-only.
+    - `libraries`: array of all available libraries.
+    - `librariesMap`: all available libraries mapped as `librariesMap[library.name] = library`, for optimized use to communicate between all addons. read-only.
     - `name`: current name of the room. read-only.
     - `link`: current url of the room. read-only.
     - `timeLimit`: the game's current time limit. read-only.
@@ -431,6 +436,7 @@ Room.create({
     - `mixConfig(newRoomConfig)`: adds all callbacks in `newRoomConfig` into the room's current RoomConfig object. if there are callbacks with the same name, a new callback is created that calls both of them. (current callback is called first.)
     - `updatePlugin(pluginIndex, newPluginObj)`: sets the `Plugin` at the specified `pluginIndex` to the `newPluginObj` object, initialization and activation are automatic. plugin names must be the same. the plugin object should be derived from the provided `Plugin` class.
     - `setRenderer(renderer)`: sets the `Renderer` object that will render the game. the `renderer` object should be derived from the provided `Renderer` class.
+    - `updateLibrary(libraryIndex, newLibraryObj)`: sets the `Library` at the specified `libraryIndex` to the `newLibraryObj` object, initialization and activation are automatic. library names must be the same. the library object should be derived from the provided `Library` class.
 
   - `sandbox mode functions`: these functions are not supported by the original Haxball client. you would need to create `CustomEvent`s to use them within a synchronized(network) environment. the game must NOT be stopped for these functions to work.
     - `takeSnapshot()` : returns a snapshot of the current game state. you can load this object directly into sandbox using its `useSnapshot(newRoomState)` function.
@@ -478,7 +484,7 @@ Room.create({
     - `fakePlayerJoin(id, name, flag, avatar, conn, auth)`: triggers a fake join room event; which in turn creates a new in-memory player object. If there was a player before with this id, old resources are automatically reassigned to this new player object, and that player will wake up. 0 <= `id` <= 65535, all the other parameters must be a string. 
     - `fakePlayerLeave(id)`: triggers a fake leave room event. returns the player's properties so that you may pass them to `fakePlayerJoin` at a later time to wake that player. passing `id` = 0 causes desync on clients (because there's a special check for the case `id` = 0 in original clients). the player, although seemingly leaving the room, still watches the room, waiting for a fake player join event. all parameters except `id` may be different in the new `fakePlayerJoin` call, which allows player's `name`, `flag`, `avatar`, `conn` and `auth` to change without the player entirely leaving the room.
     - `fakeSendPlayerInput(input, byId)`: triggers a fake input(keys) event that apparently came from `player(byId)`. 0<=`input`<=31.
-    - `fakeSendPlayerChat(msg, byId)`: triggers a fake chat event that apparently came from `player(byId)`. `msg` must be a string.
+    - `fakeSendPlayerChat(msg, targetId, byId)`: triggers a fake chat event that apparently came from `player(byId)`. `msg` must be a string. `targetId` is the id of the player who will receive this event message. If `targetId` is `null`, sends the message to everyone.
     - `fakeSetPlayerChatIndicator(value, byId)`: triggers a fake chat indicator change event that apparently came from `player(byId)`. `value` must be `true` or `false`.
     - `fakeSetPlayerAvatar(value, byId)`: triggers a fake avatar change event that apparently came from `player(byId)`. `value` must be a string.
     - `fakeSetPlayerAdmin(playerId, value, byId)`: triggers `player(playerId)`'s admin status change fake event that apparently came from `player(byId)`. `value` must be `true` or `false`.
@@ -495,6 +501,21 @@ Room.create({
     - `fakeSetKickRateLimit(min, rate, burst, byId)`: triggers a fake kick rate limit change event that apparently came from `player(byId)`. `min`, `rate`, `burst`>=0.
     - `fakeSetTeamColors(teamId, angle, colors, byId)`: triggers `team(teamId)`'s colors change event that apparently came from `player(byId)`. 0<=`angle`<=180, `colors` must be an array of type (0 <= `integer` <= 16777215) that contains at most 4 integers.
     - `fakeKickPlayer(playerId, reason, ban, byId)`: triggers `player(playerId)`'s kick/ban fake event that apparently came from `player(byId)`. `reason` must be a string, `ban` must be `true` or `false`.
+
+- `Library`: A class that defines a library. Any library should be based on this class.
+
+  - `constructor(name, metadata)`: Creates a new Library instance with given `name`. `metadata` is the information that you would want to show/update/control inside a GUI application. `metadata` should be especially useful for version checks inside the `initialize` callback.
+
+  - `properties`:
+    - `name`: Name of the library. Must be unique. All `Library`s can be accessed with their names via `Room.librariesMap[name]`.
+
+  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Library` object. These are defined in `Library.prototype`.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Library` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the libraries in the examples folder use the following metadata structure: `{version, author, description}`.
+    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Library` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable`. This function should be used whenever a variable whose value is changeable from outside will be defined. 
+
+  - `callbacks`:
+    - `initialize(room)`: Only called once while creating or joining a room, or during a call to `Room.updateLibrary`.
+    - `finalize()`: Only called once while leaving a room, or during a call to `Room.updateLibrary`.
 
 - `RoomConfig`: A class that defines a room configuration object. Room configurations should be based on this class.
 
@@ -620,9 +641,6 @@ Room.create({
       - `customData = onBeforePositionsReset()`: positions were reset just after a goal. triggered individually.
       - `onPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
       - `onAfterPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
-      - `customData = onBeforeLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
-      - `onLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
-      - `onAfterLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
       - `customData = onBeforeGameStop(byId)`: game was stopped by player(`byId`).
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onAfterGameStop(byId, customData)`: game was stopped by player(`byId`).
@@ -671,6 +689,9 @@ Room.create({
       - `customData = onBeforePluginUpdate(oldPluginObj, newPluginObj)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
       - `onAfterPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+      - `customData = onBeforeLibraryUpdate(oldLibraryObj, newLibraryObj)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
+      - `onLibraryUpdate(oldLibraryObj, newLibraryObj, customData)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
+      - `onAfterLibraryUpdate(oldLibraryObj, newLibraryObj, customData)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
       - `customData = onBeforeLanguageChange(abbr)`: API's language abbreviation was changed to `abbr`.
       - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
       - `onAfterLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
@@ -729,7 +750,6 @@ Room.create({
       - `onKickOff(customData)`: game kicked off. triggered individually.
       - `onTimeIsUp(customData)`: time is up. triggered individually.
       - `onPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
-      - `onLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
@@ -746,6 +766,7 @@ Room.create({
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+      - `onLibraryUpdate(oldLibraryObj, newLibraryObj, customData)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
       - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
 
 - `Renderer`: A class that defines a renderer. Any renderer should be based on this class.
@@ -792,7 +813,6 @@ Room.create({
       - `onKickOff(customData)`: game kicked off. triggered individually.
       - `onTimeIsUp(customData)`: time is up. triggered individually.
       - `onPositionsReset(customData)`: positions were reset after a goal. triggered individually.
-      - `onLocalFrame(localFrameNo, customData)`: new game frame was received. triggered individually.
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
@@ -809,6 +829,7 @@ Room.create({
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
+      - `onLibraryUpdate(oldLibraryObj, newLibraryObj, customData)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
       - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
 
 - `Impl`: Implementation of Haxball's inner classes. All important classes are exported and more detailed explanations will hopefully be available soon. Names might be fixed later. These classes are enough to run your own Haxball website.

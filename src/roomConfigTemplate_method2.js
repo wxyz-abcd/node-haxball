@@ -159,10 +159,6 @@ module.exports = function(API){
   this.onPositionsReset = function(customData){};
   this.onAfterPositionsReset = function(customData){};
 
-  this.onBeforeLocalFrame = function(localFrameNo){/*return customData;*/};
-  this.onLocalFrame = function(localFrameNo, customData){};
-  this.onAfterLocalFrame = function(localFrameNo, customData){};
-
   this.onBeforeGameStop = function(byId){/*return customData;*/};
   this.onGameStop = function(byId, customData){};
   this.onAfterGameStop = function(byId, customData){};
@@ -227,8 +223,11 @@ module.exports = function(API){
   this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
   this.onAfterPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
 
+  this.onBeforeLibraryUpdate = function(oldLibraryObj, newLibraryObj){/*return customData;*/};
+  this.onLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){};
+  this.onAfterLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){};
+
   this.onBeforeLanguageChange = function(abbr){/*return customData;*/};
   this.onLanguageChange = function(abbr, customData){};
   this.onAfterLanguageChange = function(abbr, customData){};
-
 };

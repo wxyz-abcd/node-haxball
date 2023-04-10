@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive_inmemory_multiple", true, { // "autoPlay_defensive_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -64,28 +64,6 @@ module.exports = function(API){
 
   var room = null, that = this;
 
-  // is needed for ball follow logic to pause.
-  // notice that this is being updated not only onPositionsReset
-  var lastPositionsReset = 0;
-
-  // move bot in random Y direction
-  // to prevent stucking on hitting a ball on a same spot in a same manner.
-  // it also fixes a bug when the bot doesn't move after positions resets
-  // BUT instead, it creates a new bug... This is not the solution... Must change...
-  var moveInRandomY = function(botId){
-    if (botId!=null){
-      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
-      });
-      return;
-    }
-    botIds.forEach((botId)=>{
-      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
-      });
-    });
-  };
-
   this.initialize = function(_room){
     room = _room;
   };
@@ -137,16 +115,7 @@ module.exports = function(API){
     return true;
   };
 
-  this.onGameStart = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
-  };
-
   this.onGameTick = function(customData){
-    // do not apply ball follow logic for maybe 150ms.
-    // is needed for moveInRandomY() to work
-    if (Date.now() - lastPositionsReset < 150) return;
-
     var { state, gameState, gameStateExt } = room;
     gameState = gameStateExt || gameState;
 
@@ -240,17 +209,5 @@ module.exports = function(API){
         }
       });
     });
-  };
-
-  this.onPlayerTeamChange = function(id){
-    if (botIds.includes(id)) {
-      lastPositionsReset = Date.now();
-      moveInRandomY(id);
-    }
-  };
-
-  this.onPositionsReset = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
   };
 };

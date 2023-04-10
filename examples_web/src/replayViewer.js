@@ -278,7 +278,7 @@ function onload(){
     }
   };
 
-  importRenderers(["sandboxRenderer"], ()=>{
+  importRenderers(["defaultRenderer"], ()=>{
     Promise.all([loadImage("./images/grass.png"), loadImage("./images/concrete.png"), loadImage("./images/concrete2.png"), loadImage("./images/typing.png")]).then((images)=>{
       var counter = 0, ctx = canvas.getContext("2d", { alpha: false });
       rendererParams = {
@@ -298,7 +298,7 @@ function onload(){
           }
         }
       };
-      renderer = new renderers.sandboxRenderer(API, rendererParams);
+      renderer = new renderers.defaultRenderer(API, rendererParams);
       renderer.followMode = false;
       //renderer.squarePlayers = true;
       renderer.restrictCameraOrigin = false;
@@ -323,6 +323,9 @@ function onload(){
         console.log("%c%s", "color:"+color+";font-family:system-ui;font-size:"+size+";-webkit-text-stroke: 1px black"+bold+italic, msg);
       }
       var callbacks = {
+        onSetDiscProperties: function(id, type, data1, data2, customData){
+          console.log("onSetDiscProperties", id, type, data1, data2, customData);
+        },
         onPlayerJoin: (playerObj)=>{
           sound.playSound(sound.join);
           receiveNotice("["+playerObj.id+"]"+playerObj.name+" has joined");

@@ -1,5 +1,4 @@
 function defineRoomCallbacks(room){
-
   // modifier callbacks:
   room.modifyPlayerDataBefore = function(playerId, name, flag, avatar, conn, auth){return [[modifiedNick, modifiedAvatar, modifiedFlag]/*, customData*/];};
   room.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){return [modifiedNick, modifiedAvatar, modifiedFlag];};
@@ -146,10 +145,6 @@ function defineRoomCallbacks(room){
   room.onPositionsReset = function(customData){};
   room.onAfterPositionsReset = function(customData){};
 
-  room.onBeforeLocalFrame = function(localFrameNo){/*return customData;*/};
-  room.onLocalFrame = function(localFrameNo, customData){};
-  room.onAfterLocalFrame = function(localFrameNo, customData){};
-
   room.onBeforeGameStop = function(byId){/*return customData;*/};
   room.onGameStop = function(byId, customData){};
   room.onAfterGameStop = function(byId, customData){};
@@ -214,8 +209,11 @@ function defineRoomCallbacks(room){
   room.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
   room.onAfterPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
 
+  room.onBeforeLibraryUpdate = function(oldLibraryObj, newLibraryObj){/*return customData;*/};
+  room.onLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){};
+  room.onAfterLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){};
+
   room.onBeforeLanguageChange = function(abbr){/*return customData;*/};
   room.onLanguageChange = function(abbr, customData){};
   room.onAfterLanguageChange = function(abbr, customData){};
-
 };

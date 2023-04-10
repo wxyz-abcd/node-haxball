@@ -67,6 +67,7 @@ function Bot(id, pass, name, avatar, lat, lon, flag, autoPlay){
         },
         extrapolation: 0
       }, 
+      libraries: [],
       renderer: null, // Don't render anything while we are trying to join multiple rooms simultaneously. :)
       plugins: [new plugins.autoPlay_defensive(API)],
       onSuccess: roomCallback,

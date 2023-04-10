@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -14,7 +14,8 @@ module.exports = function(API){
     - !remove_bot [count]: Removes the first [count] added bots that is still not removed. 0<[count]<=100.
     - !max_bot_count [count]: Sets the maximum allowed concurrent bot count to [count].
     - !bot_active [id] [active = {0, 1}]: Changes the activity of the bot player whose playerId is [id].
-    - !bot_type [id] [type = {-1, 0, 1}]: Sets the bot type of the bot player whose playerId is [id]. [type] = {-1: standing still, 0: followBall, 1: defensive}.`,
+    - !bot_type [id] [type = {-1, 0, 1}]: Sets the bot type of the bot player whose playerId is [id]. [type] = {-1: standing still, 0: followBall, 1: defensive}.
+    - !bots_active [active = {0, 1}]: (De)activate all bots at once.`,
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
@@ -75,32 +76,6 @@ module.exports = function(API){
   });
 
   var room = null, that = this, dummyPromise = Promise.resolve(), originalRoomData;
-
-  // is needed for ball follow logic to pause.
-  // notice that this is being updated not only onPositionsReset
-  var lastPositionsReset = 0;
-
-  // move bot in random Y direction
-  // to prevent stucking on hitting a ball on a same spot in a same manner.
-  // it also fixes a bug when the bot doesn't move after positions resets
-  // BUT instead, it creates a new bug... This is not the solution... Must change...
-  var moveInRandomY = function(bot){
-    if (bot){
-      if (!bot.active)
-        return;
-      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
-      });
-      return;
-    }
-    bots.forEach((bot)=>{
-      if (!bot.active)
-        return;
-      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-        room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
-      });
-    });
-  };
 
   this.initialize = function(_room){
     room = _room;
@@ -272,36 +247,14 @@ module.exports = function(API){
     });
   };
 
-  this.onGameStart = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
-  };
-
   this.onGameTick = function(customData){
     if (!that.botsActive)
       return;
-
-    // do not apply ball follow logic for maybe 150ms.
-    // is needed for moveInRandomY() to work
-    if (Date.now() - lastPositionsReset < 150) return;
 
     bots.forEach((bot)=>{
       if (!bot.active)
         return;
       update(bot);
     });
-  };
-
-  this.onPlayerTeamChange = function(id){
-    var bot = bots.find((x)=>x.id==id);
-    if (bot) {
-      lastPositionsReset = Date.now();
-      moveInRandomY(bot);
-    }
-  };
-
-  this.onPositionsReset = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
   };
 };

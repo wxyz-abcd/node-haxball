@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive_inmemory", false, { // "autoPlay_defensive_inmemory" is plugin's name, "false" means "not activated just after initialization". Every plugin should have a unique name.
@@ -48,20 +48,6 @@ module.exports = function(API){
 
   var room = null, that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
 
-  // is needed for ball follow logic to pause.
-  // notice that this is being updated not only onPositionsReset
-  var lastPositionsReset = 0;
-
-  // move bot in random Y direction
-  // to prevent stucking on hitting a ball on a same spot in a same manner.
-  // it also fixes a bug when the bot doesn't move after positions resets
-  // BUT instead, it creates a new bug... This is not the solution... Must change...
-  var moveInRandomY = function(){
-    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
-      room.fakeSendPlayerInput(/*input:*/ Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false), /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
-    });
-  };
-
   this.initialize = function(_room){
     room = _room;
   };
@@ -77,11 +63,6 @@ module.exports = function(API){
       room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
     else
       room.fakePlayerLeave(65535);
-  };
-
-  this.onGameStart = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
   };
 
   this.onGameTick = function(customData){
@@ -166,17 +147,5 @@ module.exports = function(API){
         oldKeyState = newKeyState;
       }
     });
-  };
-
-  this.onPlayerTeamChange = function(id){
-    if (id === 65535) {
-      lastPositionsReset = Date.now();
-      moveInRandomY();
-    }
-  };
-
-  this.onPositionsReset = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
   };
 };

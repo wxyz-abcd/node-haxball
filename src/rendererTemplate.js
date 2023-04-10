@@ -60,7 +60,6 @@ module.exports = function(API, canvas){
   this.onKickOff = function(customData){};
   this.onTimeIsUp = function(customData){};
   this.onPositionsReset = function(customData){};
-  this.onLocalFrame = function(localFrameNo, customData){};
   this.onGameStop = function(byId, customData){};
   this.onPingData = function(array, customData){};
   this.onExtrapolationChange = function(value, customData){};
@@ -77,6 +76,6 @@ module.exports = function(API, canvas){
   this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){};
   this.onRendererUpdate = function(oldRendererObj, newRendererObj, customData){};
   this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){};
+  this.onLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){};
   this.onLanguageChange = function(abbr, customData){};
-
 };

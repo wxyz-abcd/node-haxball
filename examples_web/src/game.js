@@ -627,7 +627,7 @@ window.onload = ()=>{
         }
       };
       room.setRenderer(new renderers.defaultRenderer(API, rendererParams));
-      room.renderer.aimbotActive = !!_params.aimbot;
+      room.librariesMap.aimbot.active = !!_params.aimbot;
       updateGUI();
     }, (err)=>{
       console.log(err);

@@ -1,4 +1,4 @@
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API = require("../../../src/index");
 
 function roomCallback(room){ // examples start from here.
 
@@ -119,10 +119,6 @@ function roomCallback(room){ // examples start from here.
     console.log("onKickOff...", customData);
   };
 
-  room.onLocalFrame = function(localFrameNo, customData){
-    //console.log("onLocalFrame...", localFrameNo, customData);
-  };
-
   room.onGameStop = function(byId, customData){
     console.log("onGameStop...", byId, customData);
   };
@@ -197,6 +193,10 @@ function roomCallback(room){ // examples start from here.
 
   room.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){
     console.log("onPluginUpdate...", oldPluginObj, newPluginObj, customData);
+  };
+
+  room.onLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){
+    console.log("onLibraryUpdate...", oldLibraryObj, newLibraryObj, customData);
   };
 
   room.onLanguageChange = function(abbr, customData){

@@ -24,7 +24,7 @@ function init(headless, roomCallback){
     }
   }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   if (!headless){
     Callback.add("KeyDown"); // this defines room._onKeyDown(). We will use this callback when keyDown event happens. It will trigger all roomConfig, plugin and renderer callbacks.
@@ -34,9 +34,11 @@ function init(headless, roomCallback){
   }
 
   function doAction(params){
-    var pluginsArray = [];
+    var pluginsArray = [], librariesArray = [];
     if (params.autoPlay) // if we want autoPlay plugin
       pluginsArray.push(new plugins.autoPlay_defensive(API));
+    if (params.aimbot) // if we want aimbot library
+      librariesArray.push(new libraries.aimbot(API));
     if (params.createRoom)
       Room.create({
         name: params.r_name, 
@@ -62,6 +64,7 @@ function init(headless, roomCallback){
           },
           extrapolation: 0
         }, 
+        libraries: librariesArray,
         renderer: null,
         plugins: pluginsArray,
         onSuccess: (room)=>{ roomCallback(room, params); },
@@ -105,6 +108,7 @@ function init(headless, roomCallback){
             },
             extrapolation: 0
           }, 
+          libraries: librariesArray,
           renderer: null,
           plugins: pluginsArray,
           onSuccess: (room)=>{ roomCallback(room, params); },
@@ -160,15 +164,19 @@ function init(headless, roomCallback){
       if (headless)
         doAction(params);
       else
-        importRenderers(["defaultRenderer"], ()=>{
-          doAction(params);
+        importLibraries(["aimbot"], ()=>{
+          importRenderers(["defaultRenderer"], ()=>{
+            doAction(params);
+          });
         });
     });
   else if (headless)
     doAction(params);
   else
-    importRenderers(["defaultRenderer"], ()=>{
-      doAction(params);
+    importLibraries(["aimbot"], ()=>{
+      importRenderers(["defaultRenderer"], ()=>{
+        doAction(params);
+      });
     });
   return API;
 }

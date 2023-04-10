@@ -744,29 +744,39 @@ declare enum ErrorCodes {
   PluginNameChangeNotAllowedError = 48,
 
   /**
+   * (libraryIndex)=>"Library not found at index " + libraryIndex
+   */
+  LibraryNotFoundError = 49,
+
+  /**
+   * ()=>"Library name should not change"
+   */
+  LibraryNameChangeNotAllowedError = 50,
+  
+  /**
    * ()=>"Invalid id format"
    */
-  AuthFromKeyInvalidIdFormatError = 49,
+  AuthFromKeyInvalidIdFormatError = 51,
 
   /**
    * (abbr)=>"Language already exists: " + abbr
    */
-  LanguageAlreadyExistsError = 50,
+  LanguageAlreadyExistsError = 52,
 
   /**
    * ()=>"Current language cannot be removed. Change to a different language first."
    */
-  CurrentLanguageRemovalError = 51,
+  CurrentLanguageRemovalError = 53,
 
   /**
    * (abbr)=>"Language does not exist: " + abbr
    */
-  LanguageDoesNotExistError = 52,
+  LanguageDoesNotExistError = 54,
 
   /**
    * ()=>"Bad Actor"
    */
-  BadActorError = 53
+  BadActorError = 55
 }
 
 declare enum RendererTextIndices {
@@ -1829,6 +1839,7 @@ declare interface RoomStateBase {
    * Returns the Player object for the player whose id is `id`.
    * 
    * @param id The id of the player to be returned.
+   * 
    * @returns The Player object, or `null` if the player is not found.
    */
   getPlayer: (id)=>(Player | null);
@@ -1915,27 +1926,29 @@ declare interface HostOnlyCallbacks {
   /**
    * The room link was received from Haxball's backend server. Called some time after a room is created successfully. Also called when your room stops sending signal to Haxball's backend server, and starts it again after some time. This can happen if your connection gets interrupted or the room somehow becomes unstable due to bugs.
    * 
-   * @param link The room link that was just received.
-   * @param customData the custom data that was returned from the previous callback.
+   * @param {string} link The room link that was just received.
+   * @param {any} customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
-  onRoomLink?: (link: string, customData?: object)=>object|undefined,
+  onRoomLink?: (link: string, customData?: object)=>object|undefined;
 
   /**
    * Called just after all bans have been cleared using `room.clearBans()`.
    * 
    * @returns void or a custom data to pass to the next callback.
    */
-  onBansClear?: (customData?: object)=>object|undefined,
+  onBansClear?: (customData?: object)=>object|undefined;
 
   /**
    * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
    * 
    * @param on The new value; whether to request recaptcha or not while joining the room.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
-  onRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>object|undefined
+  onRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>object|undefined;
 }
 
 /**
@@ -1948,20 +1961,21 @@ declare interface HostTriggeredCallbacks {
    * 
    * @param msg The announcement message.
    * @param color The color of the announcement message. Range: -1 <= `color` < 16777216. 
-    - The color value can be converted into a rgba string via API's `Utils.numberToColor` function.
-    - The special value `-1` means `transparent` color.
+   *  - The color value can be converted into a rgba string via API's `Utils.numberToColor` function.
+   *  - The special value `-1` means `transparent` color.
    * @param style The style of the announcement message. Must be one of the following:
-    - 0: use document's default font style.
-    - 1: fontWeight = "bold".
-    - 2: fontStyle = "italic".
-    - 3: fontSize = "12px".
-    - 4: fontWeight = "bold", fontSize = "12px".
-    - 5: fontWeight = "italic", fontSize = "12px".
+   *  - 0: use document's default font style.
+   *  - 1: fontWeight = "bold".
+   *  - 2: fontStyle = "italic".
+   *  - 3: fontSize = "12px".
+   *  - 4: fontWeight = "bold", fontSize = "12px".
+   *  - 5: fontWeight = "italic", fontSize = "12px".
    * @param sound The sound of the announcement message. Must be one of the following: 
-    - 0: no sound.
-    - 1: chat sound.
-    - 2: highlight sound.
+   *  - 0: no sound.
+   *  - 1: chat sound.
+   *  - 2: highlight sound.
    * @param customData the custom data that was returned from the previous callback.
+   *
    * @returns void or a custom data to pass to the next callback.
    */
   onAnnouncement?: (msg: string, color: int, style: int, sound: int, customData?: object)=>object|undefined,
@@ -1972,6 +1986,7 @@ declare interface HostTriggeredCallbacks {
    * @param id Id of the player who triggered this event.
    * @param value The new headless avatar value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerHeadlessAvatarChange?: (id: int, value: string, customData?: object)=>object|undefined,
@@ -1983,6 +1998,7 @@ declare interface HostTriggeredCallbacks {
    * @param idList The ids of players that were removed from the room's players list, reordered to match the order in `idList` and added back to the room's players list.
    * @param moveToTop Whether to add the players to the top or bottom of the room's players list.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayersOrderChange?: (idList: int[], moveToTop: boolean, customData?: object)=>object|undefined,
@@ -1997,6 +2013,7 @@ declare interface HostTriggeredCallbacks {
    * @param data1 Must consist of the following properties of the disc in the same order: `[x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping]`.
    * @param data2 Must consist of the following properties of the disc in the same order: `[color, cMask, cGroup]`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[], customData?: object)=>object|undefined,
@@ -2006,6 +2023,7 @@ declare interface HostTriggeredCallbacks {
    * 
    * @param array The updated list of ping values for each player in the same order as the player list in the current room's RoomState object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPingData?: (array: int[], customData?: object)=>object|undefined,
@@ -2026,6 +2044,7 @@ declare interface HostTriggeredCallbacks {
     ```
     Note that only the changed keys will show up in `props`.
    * @param customData the custom data that was returned from the previous callback.
+
    * @returns void or a custom data to pass to the next callback.
    */
   onRoomPropertiesChange?: (props: object, customData?: object)=>object|undefined
@@ -2038,6 +2057,7 @@ declare interface GameCallbacks {
    * 
    * @param playerId Id of the player who kicked the ball.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerBallKick?: (playerId: int, customData?: object)=>object|undefined,
@@ -2047,6 +2067,7 @@ declare interface GameCallbacks {
    * 
    * @param teamId Id of the team who scored the goal.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onTeamGoal?: (teamId: int, customData?: object)=>object|undefined,
@@ -2056,6 +2077,7 @@ declare interface GameCallbacks {
    * 
    * @param winningTeamId Id of the team who won the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onGameEnd?: (winningTeamId: int, customData?: object)=>object|undefined,
@@ -2064,6 +2086,7 @@ declare interface GameCallbacks {
    * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onGameTick?: (customData?: object)=>object|undefined,
@@ -2079,6 +2102,7 @@ declare interface GameCallbacks {
    * Called just after the game has ended by timeout.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onTimeIsUp?: (customData?: object)=>object|undefined,
@@ -2087,18 +2111,10 @@ declare interface GameCallbacks {
    * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPositionsReset?: (customData?: object)=>object|undefined,
-
-  /**
-   * Called just after a new game frame has finished. This is just like a game tick, but with a reference frame no value. In the future, this event might be merged with the GameTick event.
-   * 
-   * @param localFrameNo An independent and always increasing frame number value.
-   * @param customData the custom data that was returned from the previous callback.
-   * @returns void or a custom data to pass to the next callback.
-   */
-  onLocalFrame?: (localFrameNo: int, customData?: object)=>object|undefined,
 
   /**
    * Called just after a collision has happened between two discs.
@@ -2108,6 +2124,7 @@ declare interface GameCallbacks {
    * @param discId2 Id of the second collided disc.
    * @param discPlayerId2 The player's id that the second disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int, customData?: object)=>object|undefined,
@@ -2119,6 +2136,7 @@ declare interface GameCallbacks {
    * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param segmentId Id of the collided segment.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int, customData?: object)=>object|undefined,
@@ -2130,6 +2148,7 @@ declare interface GameCallbacks {
    * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param planeId Id of the collided plane.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int, customData?: object)=>object|undefined
@@ -2142,6 +2161,7 @@ declare interface LocalCallbacks {
    * 
    * @param value The new extrapolation value in milliseconds. Range: `-200 <= value <= 200`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onExtrapolationChange?: (value: int, customData?: object)=>object|undefined,
@@ -2151,6 +2171,7 @@ declare interface LocalCallbacks {
    * 
    * @param value The new ping handicap value in milliseconds. Range: `0 <= value <= 300`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onHandicapChange?: (value: int, customData?: object)=>object|undefined,
@@ -2162,6 +2183,7 @@ declare interface LocalCallbacks {
    * - If `true`, recording has just been started,
    * - Else, the recording has just stopped and the recorded data is returned in `value` as an `ArrayBuffer`. You might want to write the contents to a version-3 replay file.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onRoomRecordingChange?: (value: true | ArrayBuffer, customData?: object)=>object|undefined
@@ -2174,6 +2196,7 @@ declare interface APICallbacks {
    * 
    * @param plugin The plugin which was activated or deactivated. This property stores the current activation status of the plugin: `plugin.active`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPluginActiveChange?: (plugin: Plugin, customData?: object)=>object|undefined,
@@ -2184,6 +2207,7 @@ declare interface APICallbacks {
    * @param oldRoomConfigObj The old RoomConfig object.
    * @param newRoomConfigObj The new RoomConfig object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig, customData?: object)=>object|undefined,
@@ -2194,6 +2218,7 @@ declare interface APICallbacks {
    * @param oldRendererObj The old Renderer object.
    * @param newRendererObj The new Renderer object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer, customData?: object)=>object|undefined,
@@ -2204,15 +2229,28 @@ declare interface APICallbacks {
    * @param oldPluginObj The old Plugin object.
    * @param newPluginObj The new Plugin object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin, customData?: object)=>object|undefined,
+
+  /**
+   * Called just after an old library object has been replaced by a new one.
+   * 
+   * @param oldLibraryObj The old Library object.
+   * @param newLibraryObj The new Library object.
+   * @param customData the custom data that was returned from the previous callback.
+   * 
+   * @returns void or a custom data to pass to the next callback.
+   */
+  onLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library, customData?: object)=>object|undefined,
 
   /**
    * Called just after the API's language has been changed.
    * 
    * @param abbr The new language's abbreviation value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onLanguageChange?: (abbr: string, customData?: object)=>object|undefined
@@ -2228,6 +2266,7 @@ declare interface CommonCallbacks {
    * @param playerId Id of the player whose synchronization status has changed.
    * @param value The new synchronization status.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerSyncChange?: (playerId: int, value: boolean, customData?: object)=>object|undefined,
@@ -2241,6 +2280,7 @@ declare interface CommonCallbacks {
    * @param teamId2 Id of the team which the second player was moved into, or `null` if there was only one spectator when this event was triggered.
    * @param byId Id of the player who has triggered the event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onAutoTeams?: (playerId1: int, teamId1: int, playerId2: int | null, teamId2: int | null, byId: int, customData?: object)=>object|undefined,
@@ -2251,6 +2291,7 @@ declare interface CommonCallbacks {
    * @param value The new score limit value.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onScoreLimitChange?: (value: int, byId: int, customData?: object)=>object|undefined,
@@ -2261,6 +2302,7 @@ declare interface CommonCallbacks {
    * @param value The new time limit value.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onTimeLimitChange?: (value: int, byId: int, customData?: object)=>object|undefined,
@@ -2272,6 +2314,7 @@ declare interface CommonCallbacks {
    * @param isAdmin The new admin rights status of the player whose id is `id`.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerAdminChange?: (id: int, isAdmin: boolean, byId: int, customData?: object)=>object|undefined,
@@ -2282,6 +2325,7 @@ declare interface CommonCallbacks {
    * @param id Id of the player who has changed his/her avatar.
    * @param value The new avatar value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerAvatarChange?: (id: int, value: string, customData?: object)=>object|undefined,
@@ -2293,6 +2337,7 @@ declare interface CommonCallbacks {
    * @param teamId Id of the player's new team.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerTeamChange?: (id: int, teamId: int, byId: int, customData?: object)=>object|undefined,
@@ -2303,6 +2348,7 @@ declare interface CommonCallbacks {
    * @param stadium The room's new Stadium object.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onStadiumChange?: (stadium: Stadium, byId: int, customData?: object)=>object|undefined,
@@ -2313,6 +2359,7 @@ declare interface CommonCallbacks {
    * @param value The room's new teams lock value.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onTeamsLockChange?: (value: boolean, byId: int, customData?: object)=>object|undefined,
@@ -2322,6 +2369,7 @@ declare interface CommonCallbacks {
    * 
    * @param playerObj The new Player object that has just been created.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerObjectCreated?: (playerObj: Player, customData?: object)=>object|undefined,
@@ -2331,6 +2379,7 @@ declare interface CommonCallbacks {
    * 
    * @param playerObj The data representation of the player that has just joined the room.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerJoin?: (playerObj: Player, customData?: object)=>object|undefined,
@@ -2341,6 +2390,7 @@ declare interface CommonCallbacks {
    * @param isPaused Whether the game has been paused or not.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onGamePauseChange?: (isPaused: boolean, byId: int, customData?: object)=>object|undefined,
@@ -2351,6 +2401,7 @@ declare interface CommonCallbacks {
    * @param id Id of the player who has sent the chat message.
    * @param message The chat message.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerChat?: (id: int, message: string, customData?: object)=>object|undefined,
@@ -2361,6 +2412,7 @@ declare interface CommonCallbacks {
    * @param id Id of the player whose input has been changed.
    * @param value The new input value of the player.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerInputChange?: (id: int, value: int, customData?: object)=>object|undefined,
@@ -2371,6 +2423,7 @@ declare interface CommonCallbacks {
    * @param id Id of the player whose chat indicator has been activated/deactivated.
    * @param value Whether the chat indicator has been activated or not.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerChatIndicatorChange?: (id: int, value: boolean, customData?: object)=>object|undefined,
@@ -2383,6 +2436,7 @@ declare interface CommonCallbacks {
    * @param isBanned Whether the player has been banned or not. If `reason` is `null`, this value is ignored.
    * @param byId Id of the player who has kicked/banned the player. If `reason` is `null`, this value is ignored.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: int, customData?: object)=>object|undefined,
@@ -2394,6 +2448,7 @@ declare interface CommonCallbacks {
    * @param value The new team colors value.
    * @param byId Id of the player who has changed the team colors.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onTeamColorsChange?: (teamId: int, value: TeamColors, byId: int, customData?: object)=>object|undefined,
@@ -2406,6 +2461,7 @@ declare interface CommonCallbacks {
    * @param burst The new `burst` part of kick rate limit.
    * @param byId Id of the player who has changed the kick rate limit.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onKickRateLimitChange?: (min: int, rate: int, burst: int, byId: int, customData?: object)=>object|undefined,
@@ -2415,6 +2471,7 @@ declare interface CommonCallbacks {
    * 
    * @param byId Id of the player who has started the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onGameStart?: (byId: int, customData?: object)=>object|undefined,
@@ -2424,6 +2481,7 @@ declare interface CommonCallbacks {
    * 
    * @param byId Id of the player who has stopped the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onGameStop?: (byId: int, customData?: object)=>object|undefined
@@ -2443,6 +2501,7 @@ declare interface ModifierCallbacks {
    * @param avatar Avatar of the new player who is about to join the room.
    * @param conn Connection string of the new player who is about to join the room.
    * @param auth Auth string of the new player who is about to join the room.
+   * 
    * @returns 
    *   - `null`: Blocks the player from joining the room.
    *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
@@ -2455,6 +2514,7 @@ declare interface ModifierCallbacks {
    * 
    * @param playerId Id of the current player.
    * @param ping Current ping value of the current player.
+   * 
    * @returns The new ping value of the current player.
    */
   modifyPlayerPing?: (playerId: int, ping: int, customData?: object)=>number,
@@ -2463,6 +2523,7 @@ declare interface ModifierCallbacks {
    * If defined, runs only for the current player in a client room and modifies its `ping` value.
    * 
    * @param ping Current ping value of the current player.
+   * 
    * @returns The new ping value of the current player.
    */
   modifyClientPing?: (ping: int, customData?: object)=>number,
@@ -2471,6 +2532,7 @@ declare interface ModifierCallbacks {
    * If defined, expects us to return the physics engine's new current `frameNo` value, which tells the physics engine that it is currently on a different frame than expected, which causes your player to look laggy to your opponents, especially on extrapolated clients.
    * 
    * @param frameNo Current frameNo value of the physics engine.
+   * 
    * @returns The new frameNo value of the physics engine.
    */
   modifyFrameNo?: (frameNo: int, customData?: object)=>int,
@@ -2482,6 +2544,7 @@ declare interface ModifierCallbacks {
    * @param msg The original message object. We can directly modify all contents of this object here as we wish.
    * @param globalFrameNo The global frame no that host's physics engine is at, at the time that the message is received.
    * @param clientFrameNo The frame no that this client's physics engine is at, at the time that the message is received.
+   * 
    * @returns 
    *   - `true`: accept event.
    *   - `false`: block message from being processed. 
@@ -2499,6 +2562,7 @@ declare interface CustomCallbacks {
    * @param data Any JSON object to store the properties of the custom event. This object is converted to a string and sent/received by Haxball's original event mechanism.
    * @param byId Id of the player who has triggered this custom event.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onCustomEvent?: (type: int, data: object, byId: int, customData?: object)=>object|undefined
@@ -2510,6 +2574,7 @@ declare interface HostOnlyRoomConfigCallbacks {
    * The room link was received from Haxball's backend server. Called some time after a room is created successfully. Also called when your room stops sending signal to Haxball's backend server, and starts it again after some time. This can happen if your connection gets interrupted or the room somehow becomes unstable due to bugs.
    * 
    * @param link The room link that was just received.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeRoomLink?: (link: string)=>object|undefined,
@@ -2519,6 +2584,7 @@ declare interface HostOnlyRoomConfigCallbacks {
    * 
    * @param link The room link that was just received.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterRoomLink?: (link: string, customData?: object)=>void,
@@ -2541,6 +2607,7 @@ declare interface HostOnlyRoomConfigCallbacks {
    * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
    * 
    * @param on The new value; whether to request recaptcha or not while joining the room.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeRoomRecaptchaModeChange?: (on: boolean)=>object|undefined,
@@ -2550,6 +2617,7 @@ declare interface HostOnlyRoomConfigCallbacks {
    * 
    * @param on The new value; whether to request recaptcha or not while joining the room.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>void
@@ -2576,6 +2644,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
     - 1: chat sound.
     - 2: highlight sound.
    * @param customData the custom data that was returned from the previous callback.
+
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeAnnouncement?: (msg: string, color: int, style: int, sound: int)=>object|undefined,
@@ -2599,6 +2668,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
     - 1: chat sound.
     - 2: highlight sound.
    * @param customData the custom data that was returned from the previous callback.
+
    * @returns void.
    */
   onAfterAnnouncement?: (msg: string, color: int, style: int, sound: int, customData?: object)=>void,
@@ -2609,6 +2679,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * @param id Id of the player who triggered this event.
    * @param value The new headless avatar value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerHeadlessAvatarChange?: (id: int, value: string)=>object|undefined,
@@ -2619,6 +2690,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * @param id Id of the player who triggered this event.
    * @param value The new headless avatar value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerHeadlessAvatarChange?: (id: int, value: string, customData?: object)=>void,
@@ -2630,6 +2702,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * @param idList The ids of players that were removed from the room's players list, reordered to match the order in `idList` and added back to the room's players list.
    * @param moveToTop Whether to add the players to the top or bottom of the room's players list.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayersOrderChange?: (idList: int[], moveToTop: boolean)=>object|undefined,
@@ -2641,6 +2714,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * @param idList The ids of players that were removed from the room's players list, reordered to match the order in `idList` and added back to the room's players list.
    * @param moveToTop Whether to add the players to the top or bottom of the room's players list.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayersOrderChange?: (idList: int[], moveToTop: boolean, customData?: object)=>void,
@@ -2655,6 +2729,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * @param data1 Must consist of the following properties of the disc in the same order: `[x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping]`.
    * @param data2 Must consist of the following properties of the disc in the same order: `[color, cMask, cGroup]`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[])=>object|undefined,
@@ -2669,6 +2744,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * @param data1 Must consist of the following properties of the disc in the same order: `[x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping]`.
    * @param data2 Must consist of the following properties of the disc in the same order: `[color, cMask, cGroup]`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[], customData?: object)=>void,
@@ -2678,6 +2754,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * 
    * @param array The updated list of ping values for each player in the same order as the player list in the current room's RoomState object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePingData?: (array: int[])=>object|undefined,
@@ -2687,6 +2764,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
    * 
    * @param array The updated list of ping values for each player in the same order as the player list in the current room's RoomState object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPingData?: (array: int[], customData?: object)=>void,
@@ -2707,6 +2785,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
     ```
     Note that only the changed keys will show up in `props`.
    * @param customData the custom data that was returned from the previous callback.
+   *
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeRoomPropertiesChange?: (props: object)=>object|undefined,
@@ -2727,6 +2806,7 @@ declare interface HostTriggeredRoomConfigCallbacks {
     ```
     Note that only the changed keys will show up in `props`.
     * @param customData the custom data that was returned from the previous callback.
+    *
     * @returns void.
     */
   onAfterRoomPropertiesChange?: (props: object, customData?: object)=>void
@@ -2739,6 +2819,7 @@ declare interface GameRoomConfigCallbacks {
    * 
    * @param playerId Id of the player who kicked the ball.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerBallKick?: (playerId: int)=>object|undefined,
@@ -2748,6 +2829,7 @@ declare interface GameRoomConfigCallbacks {
    * 
    * @param playerId Id of the player who kicked the ball.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerBallKick?: (playerId: int, customData?: object)=>void,
@@ -2757,6 +2839,7 @@ declare interface GameRoomConfigCallbacks {
    * 
    * @param teamId Id of the team who scored the goal.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeTeamGoal?: (teamId: int)=>object|undefined,
@@ -2766,6 +2849,7 @@ declare interface GameRoomConfigCallbacks {
    * 
    * @param teamId Id of the team who scored the goal.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterTeamGoal?: (teamId: int, customData?: object)=>void,
@@ -2775,6 +2859,7 @@ declare interface GameRoomConfigCallbacks {
    * 
    * @param winningTeamId Id of the team who won the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeGameEnd?: (winningTeamId: int)=>object|undefined,
@@ -2784,6 +2869,7 @@ declare interface GameRoomConfigCallbacks {
    * 
    * @param winningTeamId Id of the team who won the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterGameEnd?: (winningTeamId: int, customData?: object)=>void,
@@ -2792,6 +2878,7 @@ declare interface GameRoomConfigCallbacks {
    * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeGameTick?: (customData?: object)=>object|undefined,
@@ -2800,6 +2887,7 @@ declare interface GameRoomConfigCallbacks {
    * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterGameTick?: (customData?: object)=>void,
@@ -2822,6 +2910,7 @@ declare interface GameRoomConfigCallbacks {
    * Called just after the game has ended by timeout.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeTimeIsUp?: (customData?: object)=>object|undefined,
@@ -2830,6 +2919,7 @@ declare interface GameRoomConfigCallbacks {
    * Called just after the game has ended by timeout.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterTimeIsUp?: (customData?: object)=>void,
@@ -2838,6 +2928,7 @@ declare interface GameRoomConfigCallbacks {
    * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePositionsReset?: (customData?: object)=>object|undefined,
@@ -2846,27 +2937,10 @@ declare interface GameRoomConfigCallbacks {
    * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
    * 
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPositionsReset?: (customData?: object)=>void,
-
-  /**
-   * Called just after a new game frame has finished. This is just like a game tick, but with a reference frame no value. In the future, this event might be merged with the GameTick event.
-   * 
-   * @param localFrameNo An independent and always increasing frame number value.
-   * @param customData the custom data that was returned from the previous callback.
-   * @returns void or a custom data to pass to the next callback.
-   */
-  onBeforeLocalFrame?: (localFrameNo: int)=>object|undefined,
-
-  /**
-   * Called just after a new game frame has finished. This is just like a game tick, but with a reference frame no value. In the future, this event might be merged with the GameTick event.
-   * 
-   * @param localFrameNo An independent and always increasing frame number value.
-   * @param customData the custom data that was returned from the previous callback.
-   * @returns void.
-   */
-  onAfterLocalFrame?: (localFrameNo: int, customData?: object)=>void,
 
   /**
    * Called just after a collision has happened between two discs.
@@ -2876,6 +2950,7 @@ declare interface GameRoomConfigCallbacks {
    * @param discId2 Id of the second collided disc.
    * @param discPlayerId2 The player's id that the second disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int)=>object|undefined,
@@ -2888,6 +2963,7 @@ declare interface GameRoomConfigCallbacks {
    * @param discId2 Id of the second collided disc.
    * @param discPlayerId2 The player's id that the second disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int, customData?: object)=>void,
@@ -2899,6 +2975,7 @@ declare interface GameRoomConfigCallbacks {
    * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param segmentId Id of the collided segment.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int)=>object|undefined,
@@ -2910,6 +2987,7 @@ declare interface GameRoomConfigCallbacks {
    * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param segmentId Id of the collided segment.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int, customData?: object)=>void,
@@ -2921,6 +2999,7 @@ declare interface GameRoomConfigCallbacks {
    * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param planeId Id of the collided plane.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int)=>object|undefined,
@@ -2932,6 +3011,7 @@ declare interface GameRoomConfigCallbacks {
    * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
    * @param planeId Id of the collided plane.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int, customData?: object)=>void
@@ -2943,6 +3023,7 @@ declare interface LocalRoomConfigCallbacks {
    * Called just after the local extrapolation value has been changed.
    * 
    * @param value The new extrapolation value in milliseconds. Range: `-200 <= value <= 200`.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeExtrapolationChange?: (value: int, customData?: object)=>object|undefined,
@@ -2952,6 +3033,7 @@ declare interface LocalRoomConfigCallbacks {
    * 
    * @param value The new extrapolation value in milliseconds. Range: `-200 <= value <= 200`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterExtrapolationChange?: (value: int, customData?: object)=>void,
@@ -2960,6 +3042,7 @@ declare interface LocalRoomConfigCallbacks {
    * Called just after the local ping handicap value has been changed.
    * 
    * @param value The new ping handicap value in milliseconds. Range: `0 <= value <= 300`.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeHandicapChange?: (value: int, customData?: object)=>object|undefined,
@@ -2969,6 +3052,7 @@ declare interface LocalRoomConfigCallbacks {
    * 
    * @param value The new ping handicap value in milliseconds. Range: `0 <= value <= 300`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterHandicapChange?: (value: int, customData?: object)=>void,
@@ -2979,6 +3063,7 @@ declare interface LocalRoomConfigCallbacks {
    * @param value 
    * - If `true`, recording has just been started,
    * - Else, the recording has just stopped and the recorded data is returned in `value` as an `ArrayBuffer`. You might want to write the contents to a version-3 replay file.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeRoomRecordingChange?: (value: true | ArrayBuffer, customData?: object)=>object|undefined,
@@ -2990,6 +3075,7 @@ declare interface LocalRoomConfigCallbacks {
    * - If `true`, recording has just been started,
    * - Else, the recording has just stopped and the recorded data is returned in `value` as an `ArrayBuffer`. You might want to write the contents to a version-3 replay file.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterRoomRecordingChange?: (value: true | ArrayBuffer, customData?: object)=>void
@@ -3001,6 +3087,7 @@ declare interface APIRoomConfigCallbacks {
    * Called just after a plugin has been activated or deactivated.
    * 
    * @param plugin The plugin which was activated or deactivated. This property stores the current activation status of the plugin: `plugin.active`.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePluginActiveChange?: (plugin: Plugin)=>object|undefined,
@@ -3010,6 +3097,7 @@ declare interface APIRoomConfigCallbacks {
    * 
    * @param plugin The plugin which was activated or deactivated. This property stores the current activation status of the plugin: `plugin.active`.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPluginActiveChange?: (plugin: Plugin, customData?: object)=>void,
@@ -3019,6 +3107,7 @@ declare interface APIRoomConfigCallbacks {
    * 
    * @param oldRoomConfigObj The old RoomConfig object.
    * @param newRoomConfigObj The new RoomConfig object.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig)=>object|undefined,
@@ -3029,6 +3118,7 @@ declare interface APIRoomConfigCallbacks {
    * @param oldRoomConfigObj The old RoomConfig object.
    * @param newRoomConfigObj The new RoomConfig object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig, customData?: object)=>void,
@@ -3038,6 +3128,7 @@ declare interface APIRoomConfigCallbacks {
    * 
    * @param oldRendererObj The old Renderer object.
    * @param newRendererObj The new Renderer object.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer)=>object|undefined,
@@ -3048,6 +3139,7 @@ declare interface APIRoomConfigCallbacks {
    * @param oldRendererObj The old Renderer object.
    * @param newRendererObj The new Renderer object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer, customData?: object)=>void,
@@ -3057,6 +3149,7 @@ declare interface APIRoomConfigCallbacks {
    * 
    * @param oldPluginObj The old Plugin object.
    * @param newPluginObj The new Plugin object.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin)=>object|undefined,
@@ -3067,14 +3160,37 @@ declare interface APIRoomConfigCallbacks {
    * @param oldPluginObj The old Plugin object.
    * @param newPluginObj The new Plugin object.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin, customData?: object)=>void,
 
   /**
+   * Called just after an old library object has been replaced by a new one.
+   * 
+   * @param oldLibraryObj The old Library object.
+   * @param newLibraryObj The new Library object.
+   * 
+   * @returns void or a custom data to pass to the next callback.
+   */
+  onBeforeLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library)=>object|undefined,
+
+  /**
+   * Called just after an old library object has been replaced by a new one.
+   * 
+   * @param oldLibraryObj The old Library object.
+   * @param newLibraryObj The new Library object.
+   * @param customData the custom data that was returned from the previous callback.
+   * 
+   * @returns void.
+   */
+  onAfterLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library, customData?: object)=>void,
+
+  /**
    * Called just after the API's language has been changed.
    * 
    * @param abbr The new language's abbreviation value.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeLanguageChange?: (abbr: string)=>object|undefined,
@@ -3084,6 +3200,7 @@ declare interface APIRoomConfigCallbacks {
    * 
    * @param abbr The new language's abbreviation value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterLanguageChange?: (abbr: string, customData?: object)=>void
@@ -3098,6 +3215,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param playerId Id of the player whose synchronization status has changed.
    * @param value The new synchronization status.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerSyncChange?: (playerId: int, value: boolean)=>object|undefined,
@@ -3108,6 +3226,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param playerId Id of the player whose synchronization status has changed.
    * @param value The new synchronization status.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerSyncChange?: (playerId: int, value: boolean, customData?: object)=>void,
@@ -3120,6 +3239,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param playerId2 Id of the second player affected by this event, or `null` if there was only one spectator when this event was triggered.
    * @param teamId2 Id of the team which the second player was moved into, or `null` if there was only one spectator when this event was triggered.
    * @param byId Id of the player who has triggered the event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeAutoTeams?: (playerId1: int, teamId1: int, playerId2: int | null, teamId2: int | null, byId: int)=>object|undefined,
@@ -3133,6 +3253,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param teamId2 Id of the team which the second player was moved into, or `null` if there was only one spectator when this event was triggered.
    * @param byId Id of the player who has triggered the event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterAutoTeams?: (playerId1: int, teamId1: int, playerId2: int | null, teamId2: int | null, byId: int, customData?: object)=>void,
@@ -3142,6 +3263,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param value The new score limit value.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeScoreLimitChange?: (value: int, byId: int)=>object|undefined,
@@ -3152,6 +3274,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param value The new score limit value.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterScoreLimitChange?: (value: int, byId: int, customData?: object)=>void,
@@ -3161,6 +3284,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param value The new time limit value.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeTimeLimitChange?: (value: int, byId: int)=>object|undefined,
@@ -3171,6 +3295,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param value The new time limit value.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterTimeLimitChange?: (value: int, byId: int, customData?: object)=>void,
@@ -3181,6 +3306,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param id Id of the player whose admin rights have been given/taken.
    * @param isAdmin The new admin rights status of the player whose id is `id`.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerAdminChange?: (id: int, isAdmin: boolean, byId: int)=>object|undefined,
@@ -3192,6 +3318,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param isAdmin The new admin rights status of the player whose id is `id`.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerAdminChange?: (id: int, isAdmin: boolean, byId: int, customData?: object)=>void,
@@ -3201,6 +3328,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param id Id of the player who has changed his/her avatar.
    * @param value The new avatar value.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerAvatarChange?: (id: int, value: string)=>object|undefined,
@@ -3211,6 +3339,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param id Id of the player who has changed his/her avatar.
    * @param value The new avatar value.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerAvatarChange?: (id: int, value: string, customData?: object)=>void,
@@ -3221,6 +3350,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param id Id of the player who has been moved to a different team.
    * @param teamId Id of the player's new team.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerTeamChange?: (id: int, teamId: int, byId: int)=>object|undefined,
@@ -3232,6 +3362,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param teamId Id of the player's new team.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerTeamChange?: (id: int, teamId: int, byId: int, customData?: object)=>void,
@@ -3241,6 +3372,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param stadium The room's new Stadium object.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeStadiumChange?: (stadium: Stadium, byId: int)=>object|undefined,
@@ -3251,6 +3383,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param stadium The room's new Stadium object.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterStadiumChange?: (stadium: Stadium, byId: int, customData?: object)=>void,
@@ -3260,6 +3393,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param value The room's new teams lock value.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeTeamsLockChange?: (value: boolean, byId: int)=>object|undefined,
@@ -3270,6 +3404,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param value The room's new teams lock value.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterTeamsLockChange?: (value: boolean, byId: int, customData?: object)=>void,
@@ -3278,6 +3413,7 @@ declare interface CommonRoomConfigCallbacks {
    * Called just after a player object has been created. This callback can be used to define custom properties inside all player objects.
    * 
    * @param playerObj The new Player object that has just been created.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerObjectCreated?: (playerObj: Player)=>object|undefined,
@@ -3287,6 +3423,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param playerObj The new Player object that has just been created.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerObjectCreated?: (playerObj: Player, customData?: object)=>void,
@@ -3295,6 +3432,7 @@ declare interface CommonRoomConfigCallbacks {
    * Called just after a player has joined the room.
    * 
    * @param playerObj The data representation of the player that has just joined the room.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerJoin?: (playerObj: Player)=>object|undefined,
@@ -3304,6 +3442,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param playerObj The data representation of the player that has just joined the room.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerJoin?: (playerObj: Player, customData?: object)=>void,
@@ -3313,6 +3452,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param isPaused Whether the game has been paused or not.
    * @param byId Id of the player who has triggered this event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeGamePauseChange?: (isPaused: boolean, byId: int)=>object|undefined,
@@ -3323,6 +3463,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param isPaused Whether the game has been paused or not.
    * @param byId Id of the player who has triggered this event.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterGamePauseChange?: (isPaused: boolean, byId: int, customData?: object)=>void,
@@ -3332,6 +3473,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param id Id of the player who has sent the chat message.
    * @param message The chat message.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerChat?: (id: int, message: string)=>object|undefined,
@@ -3342,6 +3484,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param id Id of the player who has sent the chat message.
    * @param message The chat message.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerChat?: (id: int, message: string, customData?: object)=>void,
@@ -3351,6 +3494,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param id Id of the player whose input has been changed.
    * @param value The new input value of the player.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerInputChange?: (id: int, value: int)=>object|undefined,
@@ -3361,6 +3505,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param id Id of the player whose input has been changed.
    * @param value The new input value of the player.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerInputChange?: (id: int, value: int, customData?: object)=>void,
@@ -3370,6 +3515,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param id Id of the player whose chat indicator has been activated/deactivated.
    * @param value Whether the chat indicator has been activated or not.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerChatIndicatorChange?: (id: int, value: boolean)=>object|undefined,
@@ -3380,6 +3526,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param id Id of the player whose chat indicator has been activated/deactivated.
    * @param value Whether the chat indicator has been activated or not.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerChatIndicatorChange?: (id: int, value: boolean, customData?: object)=>void,
@@ -3391,6 +3538,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param reason The reason of leaving the room. If `null`, the player has left by himself/herself.
    * @param isBanned Whether the player has been banned or not. If `reason` is `null`, this value is ignored.
    * @param byId Id of the player who has kicked/banned the player. If `reason` is `null`, this value is ignored.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforePlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: int)=>object|undefined,
@@ -3403,6 +3551,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param isBanned Whether the player has been banned or not. If `reason` is `null`, this value is ignored.
    * @param byId Id of the player who has kicked/banned the player. If `reason` is `null`, this value is ignored.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: int, customData?: object)=>void,
@@ -3413,6 +3562,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param teamId The team whose colors have been changed.
    * @param value The new team colors value.
    * @param byId Id of the player who has changed the team colors.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeTeamColorsChange?: (teamId: int, value: TeamColors, byId: int)=>object|undefined,
@@ -3424,6 +3574,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param value The new team colors value.
    * @param byId Id of the player who has changed the team colors.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterTeamColorsChange?: (teamId: int, value: TeamColors, byId: int, customData?: object)=>void,
@@ -3435,6 +3586,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param rate The new `rate` part of kick rate limit.
    * @param burst The new `burst` part of kick rate limit.
    * @param byId Id of the player who has changed the kick rate limit.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeKickRateLimitChange?: (min: int, rate: int, burst: int, byId: int)=>object|undefined,
@@ -3447,6 +3599,7 @@ declare interface CommonRoomConfigCallbacks {
    * @param burst The new `burst` part of kick rate limit.
    * @param byId Id of the player who has changed the kick rate limit.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterKickRateLimitChange?: (min: int, rate: int, burst: int, byId: int, customData?: object)=>void,
@@ -3455,6 +3608,7 @@ declare interface CommonRoomConfigCallbacks {
    * Called just after the game has been started.
    * 
    * @param byId Id of the player who has started the game.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeGameStart?: (byId: int)=>object|undefined,
@@ -3464,6 +3618,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param byId Id of the player who has started the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterGameStart?: (byId: int, customData?: object)=>void,
@@ -3472,6 +3627,7 @@ declare interface CommonRoomConfigCallbacks {
    * Called just after the game has been stopped.
    * 
    * @param byId Id of the player who has stopped the game.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeGameStop?: (byId: int)=>object|undefined,
@@ -3481,6 +3637,7 @@ declare interface CommonRoomConfigCallbacks {
    * 
    * @param byId Id of the player who has stopped the game.
    * @param customData the custom data that was returned from the previous callback.
+   * 
    * @returns void.
    */
   onAfterGameStop?: (byId: int, customData?: object)=>void
@@ -3497,6 +3654,7 @@ declare interface ModifierRoomConfigCallbacks {
    * @param avatar Avatar of the new player who is about to join the room.
    * @param conn Connection string of the new player who is about to join the room.
    * @param auth Auth string of the new player who is about to join the room.
+   * 
    * @returns 
    *   - `null`: Blocks the player from joining the room.
    *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
@@ -3513,6 +3671,7 @@ declare interface ModifierRoomConfigCallbacks {
    * @param conn Connection string of the new player who is about to join the room.
    * @param auth Auth string of the new player who is about to join the room.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns 
    *   - `null`: Blocks the player from joining the room.
    *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
@@ -3525,6 +3684,7 @@ declare interface ModifierRoomConfigCallbacks {
    * 
    * @param playerId Id of the current player.
    * @param ping Current ping value of the current player.
+   * 
    * @returns The new ping value of the current player.
    */
   modifyPlayerPingBefore?: (playerId: int, ping: int)=>number,
@@ -3536,6 +3696,7 @@ declare interface ModifierRoomConfigCallbacks {
    * @param playerId Id of the current player.
    * @param ping Current ping value of the current player.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns The new ping value of the current player.
    */
   modifyPlayerPingAfter?: (playerId: int, ping: int, customData?: object)=>number,
@@ -3544,6 +3705,7 @@ declare interface ModifierRoomConfigCallbacks {
    * If defined, runs only for the current player in a client room and modifies its `ping` value.
    * 
    * @param ping Current ping value of the current player.
+   * 
    * @returns The new ping value of the current player.
    */
   modifyClientPingBefore?: (ping: int)=>number,
@@ -3553,6 +3715,7 @@ declare interface ModifierRoomConfigCallbacks {
    * 
    * @param ping Current ping value of the current player.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns The new ping value of the current player.
    */
   modifyClientPingAfter?: (ping: int, customData?: object)=>number,
@@ -3561,6 +3724,7 @@ declare interface ModifierRoomConfigCallbacks {
    * If defined, expects us to return the physics engine's new current `frameNo` value, which tells the physics engine that it is currently on a different frame than expected, which causes your player to look laggy to your opponents, especially on extrapolated clients.
    * 
    * @param frameNo Current frameNo value of the physics engine.
+   * 
    * @returns The new frameNo value of the physics engine.
    */
   modifyFrameNoBefore?: (frameNo: int)=>int,
@@ -3570,6 +3734,7 @@ declare interface ModifierRoomConfigCallbacks {
    * 
    * @param frameNo Current frameNo value of the physics engine.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns The new frameNo value of the physics engine.
    */
   modifyFrameNoAfter?: (frameNo: int, customData?: object)=>int,
@@ -3581,6 +3746,7 @@ declare interface ModifierRoomConfigCallbacks {
    * @param msg The original message object. We can directly modify all contents of this object here as we wish.
    * @param globalFrameNo The global frame no that host's physics engine is at, at the time that the message is received.
    * @param clientFrameNo The frame no that this client's physics engine is at, at the time that the message is received.
+   * 
    * @returns 
    *   - `true`: accept event.
    *   - `false`: block message from being processed. 
@@ -3596,6 +3762,7 @@ declare interface ModifierRoomConfigCallbacks {
    * @param globalFrameNo The global frame no that host's physics engine is at, at the time that the message is received.
    * @param clientFrameNo The frame no that this client's physics engine is at, at the time that the message is received.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns 
    *   - `true`: accept event.
    *   - `false`: block message from being processed. 
@@ -3612,6 +3779,7 @@ declare interface CustomRoomConfigCallbacks {
    * @param type Any integer value to hold the type of the custom event.
    * @param data Any JSON object to store the properties of the custom event. This object is converted to a string and sent/received by Haxball's original event mechanism.
    * @param byId Id of the player who has triggered this custom event.
+   * 
    * @returns void or a custom data to pass to the next callback.
    */
   onBeforeCustomEvent?: (type: int, data: object, byId: int)=>object|undefined,
@@ -3623,6 +3791,7 @@ declare interface CustomRoomConfigCallbacks {
    * @param data Any JSON object to store the properties of the custom event. This object is converted to a string and sent/received by Haxball's original event mechanism.
    * @param byId Id of the player who has triggered this custom event.
    * @param customData Any custom data that might be returned from the previous addon's calback.
+   * 
    * @returns void.
    */
   onAfterCustomEvent?: (type: int, data: object, byId: int, customData?: object)=>void
@@ -3640,10 +3809,10 @@ declare interface RendererCallbacks {
   render?: (extrapolatedRoomState: RoomState)=>void
 }
 
-declare type CommonlyUsedCallbacks = HostTriggeredCallbacks & GameCallbacks & CommonCallbacks & RendererCallbacks;
-declare type AllPluginCallbacks = HostOnlyCallbacks & HostTriggeredCallbacks & IndividuallyTriggeredCallbacks & CommonCallbacks & ModifierCallbacks & CustomCallbacks;
-declare type AllRendererCallbacks = HostOnlyCallbacks & HostTriggeredCallbacks & IndividuallyTriggeredCallbacks & CommonCallbacks & CustomCallbacks & RendererCallbacks;
-declare type AllRoomConfigCallbacks = HostOnlyRoomConfigCallbacks & HostTriggeredRoomConfigCallbacks & IndividuallyTriggeredRoomConfigCallbacks & CommonRoomConfigCallbacks & ModifierRoomConfigCallbacks & CustomRoomConfigCallbacks & AllPluginCallbacks;
+declare interface CommonlyUsedCallbacks extends HostTriggeredCallbacks, GameCallbacks, CommonCallbacks, RendererCallbacks {}
+declare interface AllPluginCallbacks extends HostOnlyCallbacks, HostTriggeredCallbacks, IndividuallyTriggeredCallbacks, CommonCallbacks, ModifierCallbacks, CustomCallbacks {}
+declare interface AllRendererCallbacks extends HostOnlyCallbacks, HostTriggeredCallbacks, IndividuallyTriggeredCallbacks, CommonCallbacks, CustomCallbacks, RendererCallbacks {}
+declare interface AllRoomConfigCallbacks extends HostOnlyRoomConfigCallbacks, HostTriggeredRoomConfigCallbacks, IndividuallyTriggeredRoomConfigCallbacks, CommonRoomConfigCallbacks, ModifierRoomConfigCallbacks, CustomRoomConfigCallbacks, AllPluginCallbacks {}
 
 /**
  * This object consists of functions regarding event callbacks. Here is a detailed documentation of the default event callbacks for this API: https://github.com/wxyz-abcd/node-haxball/wiki/uncategorized-commonEventCallbacks.
@@ -3657,6 +3826,7 @@ export namespace Callback {
    * @param name The name of the new event, which should start with a _capital_ letter.
    * @param metadata This value is currently not used anywhere; but just in case, the default keys for this object is as follows: 
    *   - `params: string[]`: Short explanations for each parameter of this event.
+   * 
    * @returns void.
    */
   export function add(name: string, metadata: any): void;
@@ -3665,6 +3835,7 @@ export namespace Callback {
    * Removes the callbacks created by `Callback.add`. Added for convenience. This function should not normally be needed.
    * 
    * @param name The name of the event to be removed.
+   * 
    * @returns void.
    */
   export function remove(name: string): void;
@@ -3687,6 +3858,7 @@ export namespace Utils {
    * Recreates the auth object from the given `authKey`. The returned object is only to be used as parameter to the function `Room.join`. Bad inputs or any internal error will result in a _rejected_ promise.
    * 
    * @param authKey A simplified string that represents an auth object.
+   * 
    * @returns The Auth object that was generated from the given `authKey`.
    */
   export function authFromKey(authKey: string): Promise<Auth>;
@@ -3703,6 +3875,7 @@ export namespace Utils {
    * 
    * @param geo The location to calculate the distances to.
    * @param list The room list to update.
+   * 
    * @returns void.
    */
   export function calculateAllRoomDistances(geo: GeoLocation, list: RoomData[]): void;
@@ -3711,6 +3884,7 @@ export namespace Utils {
    * Returns the html color string (rgba representation) of the given `number`. This function is mostly intended to be used in renderers and map editors. Bad inputs will return a bad string output.
    * 
    * @param number A number in the range [0, 16777215].
+   * 
    * @returns The rgba representation of the color that was generated from the given `number`.
    */
   export function numberToColor(number: int): string;
@@ -3721,6 +3895,7 @@ export namespace Utils {
    *   - Alpha value of the input color is not used. (The game engine currently assigns `255` to all alpha values by default.)
    * 
    * @param color The rgba representation of a color.
+   * 
    * @returns An integer that represents the given `color`.
    */
   export function colorToNumber(color: string): int;
@@ -3731,9 +3906,19 @@ export namespace Utils {
    * @param dirX Desired x direction. One of \[`-1`:left, `0`:still, `1`:right\].
    * @param dirY Desired y direction. One of \[`-1`:up, `0`:still, `1`:down\].
    * @param kick Desired pressed state of the kick button.
+   * 
    * @returns An integer in the range \[0, 31\].
    */
-  export function keyState(dirX: Direction, dirY: Direction, kick: boolean): void;
+  export function keyState(dirX: Direction, dirY: Direction, kick: boolean): int;
+
+  /**
+   * Returns the explanation of the given key state.
+   * 
+   * @param state A key state value in the range \[0, 31\].
+   * 
+   * @returns An object that holds values for x, y directions and kick.
+   */
+  export function reverseKeyState(state: int): {dirX: Direction, dirY: Direction, kick: boolean};
 
   /**
    * Connects to Haxball's backend server, retrieves your location based on IP address using backend's geolocation API and returns it. Might throw errors.
@@ -3857,6 +4042,7 @@ declare type CreateRoomParams = {
    * 
    * @param error The thrown error.
    * @param playerId Id of the player that caused the error.
+   * 
    * @returns void.
    */
   onError?: (error: Errors.HBError, playerId: int)=>void
@@ -3885,7 +4071,7 @@ declare type JoinRoomParams = {
   authObj: Auth;
 };
 
-declare interface HaxballClient{
+declare class HaxballClient{
 
   /**
    * An object that stores information about the current player preferences.
@@ -3913,9 +4099,14 @@ declare interface HaxballClient{
   renderer?: Renderer;
 
   /**
-   * An array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. Default value is `[]`. Look at https://github.com/wxyz-abcd/node-haxball/tree/main/examples/plugins for example Plugins to use here, or https://github.com/wxyz-abcd/node-haxball/blob/main/src/rendererTemplate.js for a template Plugin that contains all callbacks.
+   * An array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. Default value is `[]`. Look at https://github.com/wxyz-abcd/node-haxball/tree/main/examples/plugins for example Plugins to use here, or https://github.com/wxyz-abcd/node-haxball/blob/main/src/pluginTemplate.js for a template Plugin that contains all callbacks.
    */
   plugins?: Plugin[];
+
+  /**
+   * An array of `Library` objects to be used. the objects should be derived from the provided `Library` class. Default value is `[]`. Look at https://github.com/wxyz-abcd/node-haxball/tree/main/examples/libraries for example Library's to use here, or https://github.com/wxyz-abcd/node-haxball/blob/main/src/libraryTemplate.js for a template Library that contains all callbacks.
+   */
+  libraries?: Library[];
 
   /**
    * Haxball's version number. Other clients cannot join this room if their version number is different than this number. Default value is `9`.
@@ -6395,11 +6586,16 @@ declare interface RoomBase {
    * Time between releasing and re-pressing the kick key. `kickTimeout` <= `0` means that this feature is disabled. (in milliseconds, defaults to `-1`)
    */
   readonly kickTimeout: int;
-
+  
   /**
-   * The current renderer object. Might be null.
+   * The current roomConfig object.
    */
-  readonly renderer: Renderer;
+  readonly config: RoomConfig;
+  
+  /**
+   * The current renderer object.
+   */
+  readonly renderer: Renderer | null;
 
   /**
    * Array of all available plugins. This is used internally to restore the order of plugins while a plugin is being activated/deactivated.
@@ -6412,9 +6608,19 @@ declare interface RoomBase {
   readonly activePlugins: Plugin[];
 
   /**
-   * All available plugins mapped as `pluginsMap[plugin.name] = plugin`, for meaningful communication between plugins/renderers/roomConfigs inside our custom Plugin/Renderer/RoomConfig codes.
+   * All available plugins mapped as `pluginsMap[plugin.name] = plugin`, for meaningful communication between addons inside our custom addon codes.
    */
   readonly pluginsMap: object;
+
+  /**
+   * Array of all available libraries.
+   */
+  readonly libraries: Library[];
+
+  /**
+   * All available libraries mapped as `librariesMap[library.name] = library`, for meaningful communication between addons inside our custom addon codes.
+   */
+  readonly librariesMap: object;
 
   /**
    * The name of the room. read-only.
@@ -6977,6 +7183,16 @@ declare interface RoomBase {
   setRenderer(renderer: Renderer): void;
 
   /**
+   * Replaces the `Library` at the specified `libraryIndex` with the `newLibraryObj` library. The old library is finalized and the new library is initialized. The names of the libraries must be the same.
+   * 
+   * @param libraryIndex The index of the library that is about to be replaced with the new Library object.
+   * @param newLibraryObj The new Library object that will replace the old one.
+   * 
+   * @returns void.
+   */
+  updateLibrary(libraryIndex: int, newLibraryObj: Library): void;
+
+  /**
    * Returns a snapshot of the current room state. You can load this object directly into sandbox using its `useSnapshot(roomState)` function. Note that the values stored here are the currently active values, not the static and stored ones.
    * 
    * @returns The snapshot copy of the current room's state.
@@ -6987,8 +7203,8 @@ declare interface RoomBase {
 /***
  * The class/object that currently hosts all room operations. Can only be instantiated by either `Room.join` or `Room.create`.
  */
-export type Room = (RoomBase & AllRoomConfigCallbacks & SandboxModeFunctions & FakeEventTriggers);
-export namespace Room {
+export interface Room extends RoomBase, AllRoomConfigCallbacks, SandboxModeFunctions, FakeEventTriggers {}
+export class Room implements RoomBase, AllRoomConfigCallbacks, SandboxModeFunctions, FakeEventTriggers {
 
   /**
    * Creates a room with given parameters.
@@ -7009,7 +7225,7 @@ export namespace Room {
    * 
    * @returns An instance of `HaxballClient`.
    */
-  export function create(createParams: CreateRoomParams, commonParams: HaxballClient): HaxballClient;
+  static create(createParams: CreateRoomParams, commonParams: HaxballClient): HaxballClient;
 
   /**
    * Tries to join a room using the given parameters.
@@ -7023,7 +7239,7 @@ export namespace Room {
    * 
    * @returns An instance of `HaxballClient`.
    */
-  export function join(joinParams: JoinRoomParams, commonParams: HaxballClient): HaxballClient;
+  static join(joinParams: JoinRoomParams, commonParams: HaxballClient): HaxballClient;
 
   /**
    * Creates a sandbox room object.
@@ -7037,7 +7253,7 @@ export namespace Room {
    * 
    * @returns An instance of the SandboxRoom structure.
    */
-  export function sandbox(callbacks: CommonlyUsedCallbacks & CustomCallbacks, options: SandboxOptions): SandboxRoom;
+  static sandbox(callbacks: CommonlyUsedCallbacks & CustomCallbacks, options: SandboxOptions): SandboxRoom;
 }
 
 /**
@@ -7065,7 +7281,7 @@ export class AsyncReplayReader{
    * 
    * @returns The current speed coefficient of this replay reader object.
    */
-  declare getSpeed(): number;
+  declare getSpeed: ()=>number;
 
   /**
    * Changes the speed coefficient of this replay reader object.
@@ -7078,21 +7294,21 @@ export class AsyncReplayReader{
    * 
    * @returns void.
    */
-  declare setSpeed(coefficient): void;
+  declare setSpeed: (coefficient)=>void;
 
   /**
    * Returns the current time.
    * 
    * @returns The current time in milliseconds.
    */
-  declare getTime(): number;
+  declare getTime: ()=>number;
 
   /**
    * Returns the length of replay content.
    * 
    * @returns The length of replay content in milliseconds.
    */
-  declare length(): number;
+  declare length: ()=>number;
 
   /**
    * Plays the replay until the `destinationTime` or end of replay is reached. Note that it may take some time to reach the destination time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
@@ -7101,14 +7317,14 @@ export class AsyncReplayReader{
    * 
    * @returns void.
    */
-  declare setTime(destinationTime): void;
+  declare setTime: (destinationTime)=>void;
 
   /**
    * Releases the resources that are used by this object.
    * 
    * @returns void.
    */
-  declare destroy(): void;
+  declare destroy: ()=>void;
 
   /**
    * Called when the destination time has been reached, which only happens some time after a call to `setTime(destinationTime)`.
@@ -7387,7 +7603,7 @@ declare interface Variable{
   value: any
 }
 
-declare abstract class Addon{
+declare interface Addon{
 
   /**
    * This function is called internally inside the constructor of all Addons by default. 
@@ -7410,7 +7626,7 @@ declare abstract class Addon{
    * 
    * @returns void.
    */
-  public defineMetadata(metadata?: any);
+  defineMetadata: (metadata?: any)=>void;
 
   /**
    * This function defines a variable inside the Addon object that can be changed 
@@ -7439,31 +7655,30 @@ declare abstract class Addon{
    *     - `max: number`: The maximum value for this variable.
    *     - `step: number`: The step increment/decrement for this variable. (for easy increment/decrement via a spinbox)
    */
-  public defineVariable(variable?: Variable);
+  defineVariable: (variable?: Variable)=>any;
 
   /**
-   * If defined, called while creating or joining a room, or during a call to `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. You should write all custom initialization logic inside this callback function.
+   * If defined, called while creating or joining a room, or during a call to `Room.updateLibrary`, `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. You should write all custom initialization logic inside this callback function.
    * 
    * @param room The current Room object.
    * 
    * @returns void.
    */
-  abstract initialize(room: Room): void;
+  initialize: (room: Room)=>void;
 
   /**
-   * If defined, called while leaving a room, or during a call to `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. We should write all custom finalization logic inside this callback function.
+   * If defined, called while leaving a room, or during a call to `Room.updateLibrary`, `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. We should write all custom finalization logic inside this callback function.
    * 
    * @returns void.
    */
-  abstract finalize(): void;
+  finalize: ()=>void;
 }
-
-export interface RoomConfig extends AllRoomConfigCallbacks {}
 
 /**
  * This class defines a RoomConfig object to be used inside Haxball rooms. A RoomConfig is the backbone of all Haxball bots. Every room has an internal (and initially empty) RoomConfig object built inside.
  */
-export abstract class RoomConfig extends Addon implements AllRoomConfigCallbacks{
+export interface RoomConfig extends Addon, AllRoomConfigCallbacks {}
+export abstract class RoomConfig implements Addon, AllRoomConfigCallbacks {
 
   /**
    * Creates a new `RoomConfig` instance. 
@@ -7475,12 +7690,11 @@ export abstract class RoomConfig extends Addon implements AllRoomConfigCallbacks
   constructor(metadata?: any);
 }
 
-export interface Plugin extends AllPluginCallbacks {}
-
 /**
  * This class defines a Plugin object to be used inside a Haxball room. A Plugin is a piece of code that can be activated/deactivated and, when activated, enchances the current capabilities of the software or does some specific/extra tasks while still being capable of the software's original functionalities.
  */
-export abstract class Plugin extends Addon implements AllPluginCallbacks {
+export interface Plugin extends Addon, AllPluginCallbacks {}
+export abstract class Plugin implements Addon, AllPluginCallbacks {
 
   /**
    * Creates a new `Plugin` instance. 
@@ -7494,12 +7708,11 @@ export abstract class Plugin extends Addon implements AllPluginCallbacks {
   constructor(name: string, active?: boolean, metadata?: any);
 }
 
-export interface Renderer extends AllRendererCallbacks {}
-
 /**
  * This class defines a Renderer object to be used inside a Haxball room. A Renderer is a piece of code that generates graphical representations for some objects in memory.
  */
-export abstract class Renderer extends Addon implements AllRendererCallbacks{
+export interface Renderer extends Addon, AllRendererCallbacks {}
+export abstract class Renderer implements Addon, AllRendererCallbacks {
 
   /**
    * Creates a new `Renderer` instance. 
@@ -7509,6 +7722,23 @@ export abstract class Renderer extends Addon implements AllRendererCallbacks{
    * @returns void.
    */
   constructor(metadata?: any);
+}
+
+/**
+ * This class defines a Library object to be used inside a Haxball room. You may use the Library objects from inside other Addons.
+ */
+export interface Library extends Addon {}
+export abstract class Library implements Addon {
+
+  /**
+   * Creates a new `Library` instance. 
+   * 
+   * @param name Name of the Library. Every Library should have a unique name, since they can be accessed directly by their names from inside a `Room` object. 
+   * @param metadata Any information that we would want to show/update inside a GUI application about this Library. This is not used by the API by default, but we can reprogram the Library's prototype to make use of this value if we want.
+   * 
+   * @returns void.
+   */
+  constructor(name: string, metadata?: any);
 }
 
 export namespace Language {
@@ -7633,7 +7863,7 @@ export namespace Impl {
        * The y coordinate of the point.
        */
       y: number;
-    };
+    }
 
     /**
      * TeamColors class.
@@ -7654,7 +7884,7 @@ export namespace Impl {
        * The numeric colors of each stripe rendered inside a player.
        */
       inner: int[];
-    };
+    }
 
     /**
      * Team class
@@ -7680,7 +7910,7 @@ export namespace Impl {
        * A static array to get all teams using their ids. Its definition is `Team.byId = [Team.spec, Team.red, Team.blue]`.
        */
       const byId: p[];
-    };
+    }
 
     export interface p {
 
@@ -7713,7 +7943,7 @@ export namespace Impl {
        * Name of the class for HTML elements. Can be either "t-spec", "t-red", or "t-blue".
        */
       className: string;
-    };
+    }
 
     /**
      * GeoLocation class
@@ -7734,7 +7964,7 @@ export namespace Impl {
        * Latitude
        */
       lat: number;
-    };
+    }
   }
 
   /**
@@ -7746,12 +7976,12 @@ export namespace Impl {
     /**
      * StreamReader class
      */
-    export class F{};
+    export class F{}
 
     /**
      * StreamWriter class
      */
-    export class w{};
+    export class w{}
   }
 
   /**

@@ -1,16 +1,16 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, RoomConfig.prototype);
   RoomConfig.call(this, { // Every roomConfig should have a unique name.
     name: "combinedExample",
-    version: "0.1",
+    version: "0.2",
     author: "abc",
     description: `This roomConfig has all of the features (and more) of balanceTeams, breakConnection, controlOtherPlayers and modifyPlayerData plugins so you should disable them while using this.`,
     allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only.
   });
 
-  var room = null, teams = [[], [], []], playerTeams = {}, that = this;
+  var room = null, teams = [[], [], []], playerTeams = {};
   var connectionShouldBreak = {};
   var controlSwitch = {}, controlSwitchBlocked = {};
   var staticInputs = {};

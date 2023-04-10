@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "eventLogger", true, { // "eventLogger" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -147,11 +147,6 @@ module.exports = function(API){
     console.log("onKickOff event...", customData);
   };
 
-  this.onLocalFrame = function(localFrameNo, customData){
-    // commented out to avoid console message flooding
-    //console.log("onLocalFrame...", localFrameNo, customData);
-  };
-
   this.onGameStop = function(byId, customData){
     console.log("onGameStop...", byId, customData);
   };
@@ -227,6 +222,10 @@ module.exports = function(API){
 
   this.onPluginUpdate = function(oldPluginObj, newPluginObj, customData){
     console.log("onPluginUpdate...", oldPluginObj, newPluginObj, customData);
+  };
+
+  this.onLibraryUpdate = function(oldLibraryObj, newLibraryObj, customData){
+    console.log("onLibraryUpdate...", oldLibraryObj, newLibraryObj, customData);
   };
 
   this.onLanguageChange = function(abbr, customData){
