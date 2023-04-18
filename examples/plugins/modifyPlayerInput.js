@@ -12,24 +12,16 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var staticInputs = {}, room = null;
+  var staticInputs = {}, that = this;
 
   var setPlayerInput = function(playerId, value){
-    if (!room.getPlayer(playerId))
+    if (!that.room.getPlayer(playerId))
       return;
     /*
     if (!inputPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
     staticInputs[playerId] = (isNaN(value) || value<0 || value>31) ? null : value;  // store a static input value for this player
-  };
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
   };
 
   this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){

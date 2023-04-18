@@ -9,8 +9,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -22,7 +21,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -34,7 +33,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+  this.defineVariable({
     name: "maxDistanceToFollowBallCoeff",
     description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
     type: VariableType.Number,
@@ -46,23 +45,15 @@ module.exports = function(API){
     }
   });
 
-  var room = null, that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
 
   this.onPluginActiveChange = function(plugin, customData){
     if (plugin.name!=that.name)
       return;
     if (that.active)
-      room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
+      that.room.fakePlayerJoin(/*id:*/ 65535, /*name:*/ "in-memory-bot", /*flag:*/ "tr", /*avatar:*/ "XX", /*conn:*/ "fake-ip-do-not-believe-it", /*auth:*/ "fake-auth-do-not-believe-it");
     else
-      room.fakePlayerLeave(65535);
+      that.room.fakePlayerLeave(65535);
   };
 
   this.onGameTick = function(customData){
@@ -70,7 +61,7 @@ module.exports = function(API){
     // is needed for moveInRandomY() to work
     if (Date.now() - lastPositionsReset < 150) return;
 
-    var { state, gameState, gameStateExt } = room;
+    var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
       
     var cp = state.players.filter((x)=>(x.id==65535))[0];
@@ -142,8 +133,8 @@ module.exports = function(API){
       // therefore, we are trying to limit consequent sending.
       if (newKeyState!=oldKeyState || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
         if ((newKeyState==oldKeyState) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
-          room.fakeSendPlayerInput(/*input:*/ newKeyState & -17, /*byId:*/ 65535); // we have to release x key before pressing it again. (newKeyState & -17) changes only the 5th(kick) bit of newKeyState to 0.
-        room.fakeSendPlayerInput(/*input:*/ newKeyState, /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
+          that.room.fakeSendPlayerInput(/*input:*/ newKeyState & -17, /*byId:*/ 65535); // we have to release x key before pressing it again. (newKeyState & -17) changes only the 5th(kick) bit of newKeyState to 0.
+        that.room.fakeSendPlayerInput(/*input:*/ newKeyState, /*byId:*/ 65535); // unlike room.setKeyState, this function directly emits a keystate message.
         oldKeyState = newKeyState;
       }
     });

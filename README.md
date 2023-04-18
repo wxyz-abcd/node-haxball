@@ -150,6 +150,7 @@ Room.create({
       - `HttpUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `https://www.haxball.com/rs/`.
     - `fixNames`: fix some important variable names or not. Defaults to: `true`.
     - `version`: Haxball's expected version number. Defaults to: `9`.
+    - `noVariableValueChangeEvent`: if `true`, disables the mechanism that enables variable value change event which in turn improves performance while reaching a variable's value that was defined by any `Addon.defineVariable` function. (Variable will have a directly accessable, actual value; instead of a property that points to the actual variable.) Defaults to: `false`.
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
@@ -160,7 +161,7 @@ Room.create({
 - `CameraFollow`: These values help understand whether the camera will follow the player or not. This is only used as a variable in all stadiums.
 - `BackgroundType`: This is the type of the variable in a stadium that defines its background texture type.
 - `GamePlayState`: This type lets us understand the actual state of the game. This type only exists in a GameState object.
-- `Language`: Methods for global language handling. (Look inside `src/defaultLanguage.js` for usage example.)
+- `Language`: Methods for global language handling. (Look inside `examples/languages/englishLanguage.js` for usage example.)
   - `add(abbr, errorsTextMap, connectionStateTextMap, rendererTextMap)`: Adds a new language with given properties. `abbr` is auto-transformed into upper-case. `errorsTextMap` must be an `object` that has a description function for each error code where each function returns a string. `connectionStateTextMap` must be an `object` that maps each `connectionState` to a `string` value. `rendererTextMap` must be an `object` that maps each `rendererTextIndex` to a `string` value. throws error while trying to add an already-existing language.
   - `remove(abbr)`: Removes the language with given abbreviation(`abbr`). `abbr` is auto-transformed into upper-case. throws error while trying to remove a non-existent or current language.
   - `current`: This is the abbreviation of the current language. Defaults to `'GB'`. It is possible to change the language of the whole API by changing this value directly; throws error if language does not exist.
@@ -285,7 +286,6 @@ Room.create({
             - `flag`: 2 letter country code (string, default value is `"tr"`).
           - `onValueSet(key, value)`: a callback function that is called just after the value of a key of this object has been changed by this library. default value is `null`.
         - `noPluginMechanism`: if `true`, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define `Room._onXXXXXX` callbacks by yourself.
-        - `useDefaultChatCommandMechanism`: if `false`, you will have to write `onBeforeOperationReceived` and `onAfterOperationReceived` callbacks by yourself. By default, `onBeforeOperationReceived` is a function that determines whether a chat message is a command or not by looking at the chat message's first character(should be '!'); and `onAfterOperationReceived` is a function that blocks these command messages from being sent to the clients. All plugins can run their own `onOperationReceived` after this `onBeforeOperationReceived` function call, and all of them can block/modify all messages before the messages reach to `onAfterOperationReceived`.
         - `libraries`: array of `Library` objects to be used. the objects should be derived from the provided `Library` class. default value is `[]`. (Look at examples/libraries folder for example Library's to use here, or src/libraryTemplate.js for a template Library that contains all callbacks.)
         - `config`: the `RoomConfig` object that contains all the main callbacks of this room. the object should be derived from the provided `RoomConfig` class. default value is `null`. (Look at examples/roomConfigs/method2 folder for example RoomConfigs to use here, or src/roomConfigTemplate_method2.js for a template RoomConfig that contains all callbacks.)
         - `renderer`: the `Renderer` object that can render the game. the object should be derived from the provided `Renderer` class. default value is `null`. (Look at examples/renderers folder for example RoomConfigs to use here, or src/rendererTemplate.js for a template Renderer that contains all callbacks.)
@@ -508,22 +508,26 @@ Room.create({
 
   - `properties`:
     - `name`: Name of the library. Must be unique. All `Library`s can be accessed with their names via `Room.librariesMap[name]`.
+    - `room`: The room that this library is attached to.
 
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Library` object. These are defined in `Library.prototype`.
     - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Library` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the libraries in the examples folder use the following metadata structure: `{version, author, description}`.
-    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Library` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable`. This function should be used whenever a variable whose value is changeable from outside will be defined. 
+    - `defineVariable({name, value, type, range, description})`: Defines the variable with the given `name` and `value` inside this `Library` object. The rest of the properties are not used by default for optimization purposes. (We do not need these values in a non-GUI environment.) This function should be used whenever a variable whose value is changeable from outside will be defined. Fires an `onVariableValueChange` event whenever this variable's value changes, if the global `config.noVariableValueChangeEvent` is not `true`.
 
   - `callbacks`:
-    - `initialize(room)`: Only called once while creating or joining a room, or during a call to `Room.updateLibrary`.
+    - `initialize()`: Only called once while creating or joining a room, or during a call to `Room.updateLibrary`.
     - `finalize()`: Only called once while leaving a room, or during a call to `Room.updateLibrary`.
 
 - `RoomConfig`: A class that defines a room configuration object. Room configurations should be based on this class.
 
   - `constructor(metadata)`: creates a new `RoomConfig` instance. `metadata` is the information that you would want to show/update inside a GUI application.
 
+  - `properties`:
+    - `room`: The room that this roomConfig is attached to.
+
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `RoomConfig` object. These are defined in `RoomConfig.prototype`.
     - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `RoomConfig` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default roomConfig in the examples folder uses the following `metadata` structure: `{name, version, author, description, allowFlags}`.
-    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `RoomConfig` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default roomConfig in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable`, and should be used whenever a variable whose value is changeable from outside will be defined. 
+    - `defineVariable({name, value, type, range, description})`: Defines the variable with the given `name` and `value` inside this `RoomConfig` object. The rest of the properties are not used by default for optimization purposes. (We do not need these values in a non-GUI environment.) This function should be used whenever a variable whose value is changeable from outside will be defined. Fires an `onVariableValueChange` event whenever this variable's value changes, if the global `config.noVariableValueChangeEvent` is not `true`.
 
   - `modifier callbacks`:
     - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedName, modifiedFlag, modifiedAvatar]`. if `dataArray` is `null`, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
@@ -543,7 +547,7 @@ Room.create({
     - `acceptEvent = onAfterOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)`: runs for each message received from clients. `type` is the type of the operation, `msg` is the original message, `customData` is the return value of callback `onOperationReceived(type, globalFrameNo, clientFrameNo, msg)`. `onAfterOperationReceived` is called only once for each message, after all `onOperationReceived` callbacks of all plugins are called for the same message. you may modify msg's contents here as you wish. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
 
   - `callbacks`:
-    - `initialize(room)`: only called once while creating or joining a room, or during a call to `Room.setConfig`.
+    - `initialize()`: only called once while creating or joining a room, or during a call to `Room.setConfig`.
     - `finalize()`: only called once while leaving a room, or during a call to `Room.setConfig`.
     - `customData = onBeforeXXXXXXX(...)`: (where `XXXXXXX` is the name of the event) called before plugin callbacks. return a `customData` object to be used for each `plugin.onXXXXXXX(..., customData)` and then `room.onAfterXXXXXXX(..., customData)`. return `false` to stop propagation. 
     - `onXXXXXXX(..., customData)`: (where `XXXXXXX` is the name of the event) called after plugin callbacks, just before renderer callback. the last parameter, `customData`, is the data object that was returned from `room.onBeforeXXXXXXX(...)`.
@@ -695,6 +699,9 @@ Room.create({
       - `customData = onBeforeLanguageChange(abbr)`: API's language abbreviation was changed to `abbr`.
       - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
       - `onAfterLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
+      - `customData = onBeforeVariableValueChange(addonObject, variableName, oldValue, newValue)`: Value of the variable inside `addonObject` named `variableName` was changed from `oldValue` to `newValue`.
+      - `onVariableValueChange(addonObject, variableName, oldValue, newValue, customData)`: Value of the variable inside `addonObject` named `variableName` was changed from `oldValue` to `newValue`.
+      - `onAfterVariableValueChange(addonObject, variableName, oldValue, newValue, customData)`: Value of the variable inside `addonObject` named `variableName` was changed from `oldValue` to `newValue`.
 
 - `Plugin`: A class that defines a plugin. Any plugin should be based on this class.
 
@@ -703,10 +710,11 @@ Room.create({
   - `properties`:
     - `name`: name of the plugin. Must be unique, and is used internally in `Room.setPluginActive`. All Plugins can be accessed with their names via `Room.pluginsMap[name]`.
     - `active`: activation status of the plugin. You should use `Room.setPluginActive(name, active)` if you want to modify this value manually.
+    - `room`: The room that this plugin is attached to.
 
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Plugin` object. These are defined in `Plugin.prototype`.
     - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Plugin` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following metadata structure: `{version, author, description, allowFlags}`.
-    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Plugin` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the plugins in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable` since it is used once in the constructor for the plugin's `active` property. This function should be used whenever a variable whose value is changeable from outside will be defined. 
+    - `defineVariable({name, value, type, range, description})`: Defines the variable with the given `name` and `value` inside this `Plugin` object. The rest of the properties are not used by default for optimization purposes. (We do not need these values in a non-GUI environment.) This function should be used whenever a variable whose value is changeable from outside will be defined. Fires an `onVariableValueChange` event whenever this variable's value changes, if the global `config.noVariableValueChangeEvent` is not `true`.
 
   - `modifier callbacks`:
     - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. `customData` is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
@@ -716,7 +724,7 @@ Room.create({
     - `acceptEvent = onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)`:  runs for each message received from clients. `type` is the type of the operation, `msg` is the original message. you may modify `msg`'s contents here as you wish. `customData` is an optional data object returned from `room.onBeforeOperationReceived`. `return true` -> accept event, `return false` -> block message from being processed, `throw exception` -> break message sender player's connection. host-only.
 
   - `callbacks`:
-    - `initialize(room)`: only called once while creating or joining a room, or during a call to `Room.updatePlugin`.
+    - `initialize()`: only called once while creating or joining a room, or during a call to `Room.updatePlugin`.
     - `finalize()`: only called once while leaving a room, or during a call to `Room.updatePlugin`.
     - `onXXXXXXX(..., customData)`: (where `XXXXXXX` is the name of the event) called after `room.onBeforeXXXXXXX(...)` and before `room.onAfterXXXXXXX(..., customData)`. `customData` is the object that might be returned from `room.onBeforeXXXXXXX(...)`.
       - `onRoomLink(link, customData)`: room link was received. host-only.
@@ -768,17 +776,21 @@ Room.create({
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
       - `onLibraryUpdate(oldLibraryObj, newLibraryObj, customData)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
       - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
+      - `onVariableValueChange(addonObject, variableName, oldValue, newValue, customData)`: Value of the variable inside `addonObject` named `variableName` was changed from `oldValue` to `newValue`.
 
 - `Renderer`: A class that defines a renderer. Any renderer should be based on this class.
 
   - `constructor(metadata)`: creates a new `Renderer` instance. `metadata` is the information that you would want to show/update inside a GUI application.
 
+  - `properties`:
+    - `room`: The room that this renderer is attached to.
+
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Renderer` object. These are defined in `Renderer.prototype`.
     - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Renderer` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default renderer in the examples folder uses the following `metadata` structure: `{name, version, author, description}`.
-    - `defineVariable(variable)`: Does nothing, returns `variable`'s value by default. This function should define the given `variable` object inside this `Renderer` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default renderer in the examples folder use the following variable structure: `{name, type, value, range, description}`. This function should return the value of the `variable`, and should be used whenever a variable whose value is changeable from outside will be defined. 
+    - `defineVariable({name, value, type, range, description})`: Defines the variable with the given `name` and `value` inside this `Renderer` object. The rest of the properties are not used by default for optimization purposes. (We do not need these values in a non-GUI environment.) This function should be used whenever a variable whose value is changeable from outside will be defined. Fires an `onVariableValueChange` event whenever this variable's value changes, if the global `config.noVariableValueChangeEvent` is not `true`.
 
   - `callbacks`:
-    - `initialize(room)`: only called once while creating or joining a room, or during a call to `Room.setRenderer`.
+    - `initialize()`: only called once while creating or joining a room, or during a call to `Room.setRenderer`.
     - `finalize()`: only called once while leaving a room, or during a call to `Room.setRenderer`.
     - `render(extrapolatedRoomState)`: called inside `requestAnimationFrame` callback. rendering logic should be here. 
     - `onXXXXXXX(..., customData)`: (where `XXXXXXX` is the name of the event) called after the respective plugin callbacks `plugin.onXXXXXXX(...)` and `room.onXXXXXXX(..., customData)`. `customData` is the object that might be returned from the last call of `plugin.onXXXXXXX(...)` or `room.onXXXXXXX(...)`.
@@ -831,6 +843,7 @@ Room.create({
       - `onPluginUpdate(oldPluginObj, newPluginObj, customData)`: an old plugin object(`oldPluginObj`) was replaced by a new plugin object(`newPluginObj`).
       - `onLibraryUpdate(oldLibraryObj, newLibraryObj, customData)`: an old library object(`oldLibraryObj`) was replaced by a new library object(`newLibraryObj`).
       - `onLanguageChange(abbr, customData)`: API's language abbreviation was changed to `abbr`.
+      - `onVariableValueChange(addonObject, variableName, oldValue, newValue, customData)`: Value of the variable inside `addonObject` named `variableName` was changed from `oldValue` to `newValue`.
 
 - `Impl`: Implementation of Haxball's inner classes. All important classes are exported and more detailed explanations will hopefully be available soon. Names might be fixed later. These classes are enough to run your own Haxball website.
 
@@ -888,6 +901,7 @@ Room.create({
 <div> - Initial testing environment by <a href="https://github.com/mertushka">mertushka <img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
 <div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
 <div> - Room.modifyFrameNo by <a href="https://github.com/hxgd1">Punisher <img width="20" src="https://avatars.githubusercontent.com/u/114198188?v=4"/></a></div>
+<div> - Lots of testing and Porteguese language translation by <a href="https://github.com/guguxh">Juze <img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
 <div> - Autoplay bot examples improved by <a href="https://github.com/K0nfy">K0nfy <img width="20" src="https://avatars.githubusercontent.com/u/27099419?v=4"/></a></div>
 <div> - Rest of the features by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
 <div> - Docs formatted by <a href="https://github.com/uzayyli">uzaylı <img width="20" src="https://avatars.githubusercontent.com/u/87779551?v=4"/></a></div>

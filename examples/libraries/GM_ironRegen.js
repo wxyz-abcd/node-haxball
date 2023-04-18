@@ -10,7 +10,7 @@ module.exports = function(API){
     - !iron: Activate/deactivate ironman.`
   });
 
-  var room, playerData, latestTick = 0, params = {
+  var playerData, thisLibrary = this, latestTick = 0, params = {
     maxRegen: 20000,
     massiveDecrease: 2500,
     minBeforeCanUse: 7500,
@@ -27,25 +27,17 @@ module.exports = function(API){
     radius: 10,
     invMass: 0.00000000001
   };
-  
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
 
   this.initializeMode = function(){
     playerData = {};
-    room.players.forEach(({id})=>{
+    thisLibrary.room.players.forEach(({id})=>{
       playerData[id]={
         value: 0,
         lastSentState: null,
         active: false
       };
     });
-    room.librariesMap.commands?.add({
+    thisLibrary.room.librariesMap.commands?.add({
       name: "iron",
       parameters: [],
       minParameterCount: 0,
@@ -60,7 +52,7 @@ module.exports = function(API){
           data.value -= params.massiveDecrease;
           var state = Math.round(params.chatStatusMsgLength*data.value/params.maxRegen);
           if (data.lastSentState!=state){
-            room.setPlayerAvatar(byId, ""+state);
+            thisLibrary.room.setPlayerAvatar(byId, ""+state, true);
             data.lastSentState = state;
           }
         }
@@ -70,9 +62,9 @@ module.exports = function(API){
   };
 
   this.finalizeMode = function(){
-    room.librariesMap?.commands?.remove("iron");
-    room.players.forEach(({id})=>{
-      room.setPlayerAvatar(id, null);
+    thisLibrary.room.librariesMap?.commands?.remove("iron");
+    thisLibrary.room.players.forEach(({id})=>{
+      thisLibrary.room.setPlayerAvatar(id, null, true);
       setIronmanActive(id, false);
     });
     playerData = null;
@@ -94,13 +86,13 @@ module.exports = function(API){
     if (playerData[id]!=null)
       playerData[id].active = active;
     if (active)
-      room.setPlayerDiscProperties(id, playerProps);
+      thisLibrary.room.setPlayerDiscProperties(id, playerProps);
     else
-      room.setPlayerDiscProperties(id, originalPlayerProps);
+      thisLibrary.room.setPlayerDiscProperties(id, originalPlayerProps);
   }
 
   this.onModePositionsReset = function(customData){
-    room.players.forEach(({id})=>{
+    thisLibrary.room.players.forEach(({id})=>{
       setIronmanActive(id, false);
     });
   };
@@ -135,7 +127,7 @@ module.exports = function(API){
       ptr.value = val;
       var state = Math.round(p.chatStatusMsgLength*val/p.maxRegen);
       if (ptr.lastSentState!=state){
-        room.setPlayerAvatar(parseInt(id),""+state);
+        thisLibrary.room.setPlayerAvatar(parseInt(id),""+state, true);
         ptr.lastSentState = state;
       }
     });

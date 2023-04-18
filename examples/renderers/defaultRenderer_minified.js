@@ -10,21 +10,21 @@ module.exports = function(API, params){
   });
 
   // parameters are exported so that they can be edited outside this class.
-  this.showTeamColors = this.defineVariable({ // team_colors
+  this.defineVariable({ // team_colors
     name: "showTeamColors",
     description: "Show team colors?", 
     type: VariableType.Boolean,
     value: true
   });
 
-  this.showAvatars = this.defineVariable({ // show_avatars
+  this.defineVariable({ // show_avatars
     name: "showAvatars",
     description: "Show player avatars?", 
     type: VariableType.Boolean,
     value: true
   });
 
-  this.viewMode = this.defineVariable({ // view_mode
+  this.defineVariable({ // view_mode
     name: "viewMode",
     description: "View Mode", 
     type: VariableType.Integer,
@@ -36,7 +36,7 @@ module.exports = function(API, params){
     }
   });
 
-  this.resolutionScale = this.defineVariable({ // resolution_scale
+  this.defineVariable({ // resolution_scale
     name: "resolutionScale",
     description: "Resolution Scale", 
     type: VariableType.Number,
@@ -48,7 +48,7 @@ module.exports = function(API, params){
     }
   });
 
-  this.showChatIndicators = this.defineVariable({ // show_indicators
+  this.defineVariable({ // show_indicators
     name: "showChatIndicators",
     description: "Show Chat Indicators?", 
     type: VariableType.Boolean,
@@ -331,6 +331,7 @@ module.exports = function(API, params){
     Kc: function (a, b) {
       var c = window.performance.now(),
         d = (c - this.$c) / 1e3;
+      this.spf = d;
       this.$c = c;
       this.Jg.clear();
       this.Pr();
@@ -677,27 +678,28 @@ module.exports = function(API, params){
   // end of basro's renderer logic
 
   this.Eb = null;
-  this.roomObj = null;
   
   var that = this;
 
-  this.initialize = function(room){
-    that.roomObj = room;
+  this.initialize = function(){
     that.Eb = new N();
     that.Eb.uf();
   };
 
   this.finalize = function(){
     that.Eb = null;
-    that.roomObj = null;
   };
   
   this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
     if (!params.paintGame || !extrapolatedRoomState.K)
       return;
     that.Eb.uf();
-    that.Eb.Kc(extrapolatedRoomState, that.roomObj.currentPlayerId);
+    that.Eb.Kc(extrapolatedRoomState, that.room.currentPlayerId);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
+  };
+
+  this.fps = function(){
+    return 1/rendererObj.spf;
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:

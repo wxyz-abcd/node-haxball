@@ -9,8 +9,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.historyLength = this.defineVariable({
+  this.defineVariable({
     name: "historyLength",
     description: "Number of frame differences to store, per player", 
     type: VariableType.Integer,
@@ -22,7 +21,7 @@ module.exports = function(API){
     }
   });
 
-  this.allowedBadFrames = this.defineVariable({
+  this.defineVariable({
     name: "allowedBadFrames",
     description: "Number of bad frame differences allowed, per player", 
     type: VariableType.Integer,
@@ -34,15 +33,7 @@ module.exports = function(API){
     }
   });
 
-  var room, arrays = [], badCounts = [], thisPlugin = this;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var arrays = [], badCounts = [], thisPlugin = this;
 
   this.onPlayerJoin = function(playerObj, customData){
     arrays[playerObj.id] = null;
@@ -75,7 +66,7 @@ module.exports = function(API){
       badCounts[id] = 1;
     }
 	  // enable the below line if you want to debug & experiment.
-    // room.sendAnnouncement("id: " + id + " frameDiff: " + diff + " bad count: " + badCounts[id], null, 0xff8888, 0, 0);
+    // thisPlugin.room.sendAnnouncement("id: " + id + " frameDiff: " + diff + " bad count: " + badCounts[id], null, 0xff8888, 0, 0);
     return true;
   };
 };

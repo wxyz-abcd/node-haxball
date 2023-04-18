@@ -125,19 +125,20 @@ function abcHaxballAPI(window, config){
   };
   
   const VariableType = {
-    Boolean: 0,
-    Integer: 1,
-    Number: 2,
-    String: 3,
-    Color: 4,
-    CollisionFlags: 5,
-    Coordinate: 6,
-    Team: 7,
-    TeamWihSpec: 8,
-    BgType: 9,
-    CameraFollow: 10,
-    KickOffReset: 11,
-    Flag: 12
+    Void: 0,
+    Boolean: 1,
+    Integer: 2,
+    Number: 3,
+    String: 4,
+    Color: 5,
+    CollisionFlags: 6,
+    Coordinate: 7,
+    Team: 8,
+    TeamWihSpec: 9,
+    BgType: 10,
+    CameraFollow: 11,
+    KickOffReset: 12,
+    Flag: 13
   };
 
   const ErrorCodes = {
@@ -6194,7 +6195,7 @@ function abcHaxballAPI(window, config){
           return lc.Dr(d.Sh, c).then(e, e);
         })
         .then(function (a) {
-          d.di(a);
+          d.di(a); // d.di is not a function???
         })
         ["catch"](function (ex) {
           console.log(ex);
@@ -8817,7 +8818,6 @@ function abcHaxballAPI(window, config){
       renderer: haxball.renderer,
       storage: haxball.storage,
       pluginMechanismActive: !haxball.noPluginMechanism,
-      useDefaultChatCommandMechanism: haxball.useDefaultChatCommandMechanism,
       onOperationReceived: function(msg, globalFrameNo, clientFrameNo) {
         if (!haxball.room._onOperationReceived)
           return true;
@@ -8856,11 +8856,17 @@ function abcHaxballAPI(window, config){
       fLeaveRoom = null;
       haxball.plugins && (haxball.plugins.forEach((p)=>{
         A.i(p.finalize);
+        p.room = null;
       }));
-      A.i(haxball.renderer?.finalize);
+      if (haxball.renderer){
+        A.i(haxball.renderer.finalize);
+        haxball.renderer.room = null;
+      }
       A.i(haxball.config.finalize);
+      haxball.config.room = null;
       haxball.libraries.forEach((l)=>{
         A.i(l.finalize);
+        l.room = null;
       });
       haxball._onRoomLeave = null;
       internalData.roomObj = null;
@@ -9036,11 +9042,17 @@ function abcHaxballAPI(window, config){
       fCreateRoomSucceeded = null;
       haxball.plugins && (haxball.plugins.forEach((p)=>{
         A.i(p.finalize);
+        p.room = null;
       }));
-      A.i(haxball.renderer?.finalize);
+      if (haxball.renderer){
+        A.i(haxball.renderer.finalize);
+        haxball.renderer.room = null;
+      }
       A.i(haxball.config.finalize);
+      haxball.config.room = null;
       haxball.libraries.forEach((l)=>{
         A.i(l.finalize);
+        l.room = null;
       });
       fLeaveRoom = null;
       internalData.roomObj = null;
@@ -9520,8 +9532,10 @@ function abcHaxballAPI(window, config){
       this.setConfig = function(newCfg){
         var oldCfg = cfg;
         A.i(oldCfg.finalize);
+        oldCfg.room = null;
         newCfg = newCfg || {};
-        y.i(newCfg.initialize, that);
+        newCfg.room = that;
+        y.i(newCfg.initialize);
         that.client.config = newCfg;
         cfg = newCfg;
         ia.i(that._onConfigUpdate, oldCfg, newCfg);
@@ -9545,8 +9559,14 @@ function abcHaxballAPI(window, config){
       };
 
       this.setRenderer = function(newRenderer){
-        A.i(renderer?.finalize);
-        y.i(newRenderer?.initialize, that);
+        if (renderer){
+          A.i(renderer.finalize);
+          renderer.room = null;
+        }
+        if (newRenderer){
+          newRenderer.room = that;
+          y.i(newRenderer.initialize);
+        }
         var oldRenderer = renderer;
         that.renderer = newRenderer;
         that.client.renderer = newRenderer;
@@ -9648,33 +9668,6 @@ function abcHaxballAPI(window, config){
         return frameNo;
       };
       defineCfgModifierCallback("modifyFrameNo");
-
-      if (internalData.useDefaultChatCommandMechanism!==false){
-        if (!cfg.onBeforeOperationReceived){
-          cfg.onBeforeOperationReceived = function(type, msg, globalFrameNo, clientFrameNo){
-            if (type != OperationType.SendChat)
-              return;
-            var m = msg.Tc;
-            if (m.startsWith("!")){  // custom chat logic for extra commands
-              return {
-                isCommand: true, 
-                data: m.trimEnd().split(" ")
-              };
-            };
-            return {
-              isCommand: false
-            };
-          };
-        }
-        
-        if (!cfg.onAfterOperationReceived){
-          cfg.onAfterOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
-            if (type != OperationType.SendChat)
-              return true;
-            return !customData?.isCommand;
-          };
-        }
-      }
 
       this._onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo){
         var customData = cfg.onBeforeOperationReceived && cfg.onBeforeOperationReceived(type, msg, globalFrameNo, clientFrameNo), b = (customData!==false);
@@ -10539,9 +10532,11 @@ function abcHaxballAPI(window, config){
       if (active)
         that.setPluginActive(name, false);
       A.i(oldPluginObj.finalize);
+      oldPluginObj.room = null;
       that.plugins[pluginIndex] = newPluginObj;
       that.pluginsMap[name] = newPluginObj;
-      y.i(newPluginObj.initialize, that);
+      newPluginObj.room = that;
+      y.i(newPluginObj.initialize);
       ia.i(that._onPluginUpdate, oldPluginObj, newPluginObj);
       if (active){
         newPluginObj.active = false; // to force-trigger plugin activation event
@@ -10557,22 +10552,30 @@ function abcHaxballAPI(window, config){
       if (name != newLibraryObj.name) // library name should not change, otherwise some bugs are possible.
         throw createError(ErrorCodes.LibraryNameChangeNotAllowedError); // "Library name should not change"
       A.i(oldLibraryObj.finalize);
+      oldLibraryObj.room = null;
       that.libraries[libraryIndex] = newLibraryObj;
       that.librariesMap[name] = newLibraryObj;
-      y.i(newLibraryObj.initialize, that);
+      newLibraryObj.room = that;
+      y.i(newLibraryObj.initialize);
       ia.i(that._onLibraryUpdate, oldLibraryObj, newLibraryObj);
     };
 
     if (internalData.pluginMechanismActive){
       this.libraries.forEach((l)=>{
-        y.i(l.initialize, that);
+        l.room = that;
+        y.i(l.initialize);
       });
       
-      y.i(cfg.initialize, this);
-      y.i(renderer?.initialize, this);
+      cfg.room = that;
+      y.i(cfg.initialize);
+      if (renderer){
+        renderer.room = that;
+        y.i(renderer.initialize);
+      }
 
       this.plugins.forEach((p)=>{
-        y.i(p.initialize, that);
+        p.room = that;
+        y.i(p.initialize);
       });
 
       this.activePlugins.forEach((p)=>{
@@ -10589,7 +10592,22 @@ function abcHaxballAPI(window, config){
   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
   Library.prototype.defineMetadata = function(x){},//x={name, version, author, description}
   Library.prototype.defineVariable = function(x){//x={name, type, value, range, description}
-    return x?.value;
+    var { name, value } = x, that = this;
+    if (config.noVariableValueChangeEvent)
+      that[name] = value;
+    else
+      Object.defineProperty(that, name, {
+        get: ()=>{
+          return value;
+        },
+        set: (newValue)=>{
+          var oldValue = value;
+          if (newValue==oldValue)
+            return;
+          value = newValue;
+          that.room?._onVariableValueChange(that, name, oldValue, value);
+        }
+      });
   };
 
   function RoomConfig(metadata=null){
@@ -10599,7 +10617,22 @@ function abcHaxballAPI(window, config){
   // These functions should be overridden when writing a GUI application using this API, before using this RoomConfig class.
   RoomConfig.prototype.defineMetadata = function(x){},//x={name, version, author, description, allowFlags}
   RoomConfig.prototype.defineVariable = function(x){//x={name, type, value, range, description}
-    return x?.value;
+    var { name, value } = x, that = this;
+    if (config.noVariableValueChangeEvent)
+      that[name] = value;
+    else
+      Object.defineProperty(that, name, {
+        get: ()=>{
+          return value;
+        },
+        set: (newValue)=>{
+          var oldValue = value;
+          if (newValue==oldValue)
+            return;
+          value = newValue;
+          that.room?._onVariableValueChange(that, name, oldValue, value);
+        }
+      });
   };
 
   function Renderer(metadata=null){
@@ -10609,13 +10642,28 @@ function abcHaxballAPI(window, config){
   // These functions should be overridden when writing a GUI application using this API, before using this Renderer class.
   Renderer.prototype.defineMetadata = function(x){},//x={name, version, author, description}
   Renderer.prototype.defineVariable = function(x){//x={name, type, value, range, description}
-    return x?.value;
+    var { name, value } = x, that = this;
+    if (config.noVariableValueChangeEvent)
+      that[name] = value;
+    else
+      Object.defineProperty(that, name, {
+        get: ()=>{
+          return value;
+        },
+        set: (newValue)=>{
+          var oldValue = value;
+          if (newValue==oldValue)
+            return;
+          value = newValue;
+          that.room?._onVariableValueChange(that, name, oldValue, value);
+        }
+      });
   };
 
   function Plugin(name, active=false, metadata=null){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
     this.name = name;
     this.defineMetadata(metadata);
-    this.active = this.defineVariable({
+    this.defineVariable({
       name: "active",
       description: "Whether this plugin is active or not.", 
       type: VariableType.Boolean,
@@ -10626,7 +10674,22 @@ function abcHaxballAPI(window, config){
   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
   Plugin.prototype.defineMetadata = function(x){},//x={version, author, description, allowFlags}
   Plugin.prototype.defineVariable = function(x){//x={name, type, value, range, description}
-    return x?.value; // Do not forget to return this value. It is used once inside constructor for variable "active".
+    var { name, value } = x, that = this;
+    if (config.noVariableValueChangeEvent)
+      that[name] = value;
+    else
+      Object.defineProperty(that, name, {
+        get: ()=>{
+          return value;
+        },
+        set: (newValue)=>{
+          var oldValue = value;
+          if (newValue==oldValue)
+            return;
+          value = newValue;
+          that.room?._onVariableValueChange(that, name, oldValue, value);
+        }
+      });
   };
 
   const AllowFlags = {
@@ -10694,6 +10757,8 @@ function abcHaxballAPI(window, config){
   createEventCallback("PluginUpdate", { params: ["old plugin object", "new plugin object"] });
   createEventCallback("LibraryUpdate", { params: ["old library object", "new library object"] });
   createEventCallback("LanguageChange", { params: ["new language abbreviation"] });
+  if (!config.noVariableValueChangeEvent)
+    createEventCallback("VariableValueChange", { params: ["addon object", "variable name", "old value", "new value"] });
 
   if (config.fixNames){
     function _fixNames(classObj, nameArray){

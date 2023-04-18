@@ -9,8 +9,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -22,7 +21,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -34,19 +33,11 @@ module.exports = function(API){
     }
   });
 
-  var room = null, that = this;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var that = this;
   
   this.onGameTick = function(customData){
     // get the original data object of the current player
-    var playerDisc = room.getPlayerDisc(room.currentPlayerId);
+    var playerDisc = that.room.getPlayerDisc(that.room.currentPlayerId);
 
     // coordinates: playerDisc.pos.x, playerDisc.pos.y
     // speed: playerDisc.speed.x, playerDisc.speed.y
@@ -56,7 +47,7 @@ module.exports = function(API){
       return;
 
     // get the original data object of the ball
-    var ball = room.getBall();
+    var ball = that.room.getBall();
 
     // coordinates: ball.pos.x, ball.pos.y
     // speed: ball.speed.x, ball.speed.y
@@ -81,6 +72,6 @@ module.exports = function(API){
     kick = (deltaX * deltaX + deltaY * deltaY < (playerDisc.radius + ball.radius + that.minKickDistance) * (playerDisc.radius + ball.radius + that.minKickDistance));
 
     // apply current keys
-    room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    that.room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

@@ -10,7 +10,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom|AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
   });
 
-  this.initialize = function(room){};
+  this.initialize = function(){};
   this.finalize = function(){};
 
   // modifier callbacks:

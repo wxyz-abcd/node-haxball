@@ -11,7 +11,7 @@ module.exports = function(API){
   });
 
   // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -23,7 +23,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -35,7 +35,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+  this.defineVariable({
     name: "maxDistanceToFollowBallCoeff",
     description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
     type: VariableType.Number,
@@ -47,46 +47,13 @@ module.exports = function(API){
     }
   });
 
-  var room = null, that = this;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
-
-  /*
-  // is needed for ball follow logic to pause.
-  // notice that this is being updated not only onPositionsReset
-  // var lastPositionsReset = 0;
-
-  // move bot in random Y direction
-  // to prevent stucking on hitting a ball on a same spot in a same manner.
-  // it also fixes a bug when the bot doesn't move after positions resets
-  // BUT instead, it creates a new bug... This is not the solution... Must change...
-  var moveInRandomY = function(){
-    room && room.setKeyState(
-      Utils.keyState(0, [1, -1][Math.floor(Math.random() * 2)], false)
-    );
-  };
-
-  this.onGameStart = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
-  };
-  */
+  var that = this;
  
   this.onGameTick = function(customData){
-    // do not apply ball follow logic for maybe 150ms.
-    // is needed for moveInRandomY() to work
-    //if (Date.now() - lastPositionsReset < 150) return;
-
-    var { state, gameState, gameStateExt } = room;
+    var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
 
-    var cp = state.players.filter((x)=>(x.id==room.currentPlayerId))[0];
+    var cp = state.players.filter((x)=>(x.id==that.room.currentPlayerId))[0];
     var playerDisc = cp.disc;
     if (!playerDisc)
       return;
@@ -148,19 +115,6 @@ module.exports = function(API){
     */
     
     // apply current keys
-    room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    that.room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
-  /*
-  this.onPlayerTeamChange = function(id){
-    if (id === room.currentPlayerId) {
-      lastPositionsReset = Date.now();
-      moveInRandomY();
-    }
-  };
-
-  this.onPositionsReset = function(){
-    lastPositionsReset = Date.now();
-    moveInRandomY();
-  };
-  */
 };

@@ -2253,7 +2253,20 @@ declare interface APICallbacks {
    * 
    * @returns void or a custom data to pass to the next callback.
    */
-  onLanguageChange?: (abbr: string, customData?: object)=>object|undefined
+  onLanguageChange?: (abbr: string, customData?: object)=>object|undefined,
+
+  /**
+   * Called just after the value of a variable has been changed.
+   * 
+   * @param addonObject The Addon object that the variable belongs to.
+   * @param variableName The name of the variable whose value has been changeed.
+   * @param oldValue The old value of the variable.
+   * @param newValue The new value of the variable.
+   * @param customData the custom data that was returned from the previous callback.
+   * 
+   * @returns void or a custom data to pass to the next callback.
+   */
+  onVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any, customData?: object)=>object|undefined
 }
 
 declare type IndividuallyTriggeredCallbacks = GameCallbacks & LocalCallbacks & APICallbacks;
@@ -3204,6 +3217,31 @@ declare interface APIRoomConfigCallbacks {
    * @returns void.
    */
   onAfterLanguageChange?: (abbr: string, customData?: object)=>void
+
+  /**
+   * Called just after the value of a variable has been changed.
+   * 
+   * @param addonObject The Addon object that the variable belongs to.
+   * @param variableName The name of the variable whose value has been changeed.
+   * @param oldValue The old value of the variable.
+   * @param newValue The new value of the variable.
+   * 
+   * @returns void or a custom data to pass to the next callback.
+   */
+  onBeforeVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any)=>object|undefined
+
+  /**
+   * Called just after the value of a variable has been changed.
+   * 
+   * @param addonObject The Addon object that the variable belongs to.
+   * @param variableName The name of the variable whose value has been changeed.
+   * @param oldValue The old value of the variable.
+   * @param newValue The new value of the variable.
+   * @param customData the custom data that was returned from the previous callback.
+   * 
+   * @returns void.
+   */
+  onAfterVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any, customData?: object)=>void
 }
 
 declare type IndividuallyTriggeredRoomConfigCallbacks = GameRoomConfigCallbacks & LocalRoomConfigCallbacks & APIRoomConfigCallbacks;
@@ -4082,11 +4120,6 @@ declare class HaxballClient{
    * If `true`, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define `Room._onXXXXXX` callbacks by yourself.
    */
   noPluginMechanism?: boolean;
-
-  /**
-   * If `false`, you will have to write `onBeforeOperationReceived` and `onAfterOperationReceived` callbacks by yourself. By default, `onBeforeOperationReceived` is a function that determines whether a chat message is a command or not by looking at the chat message's first character(should be '!'); and `onAfterOperationReceived` is a function that blocks these command messages from being sent to the clients. All plugins can run their own `onOperationReceived` after this `onBeforeOperationReceived` function call, and all of them can block/modify all messages before the messages reach to `onAfterOperationReceived`.
-   */
-  useDefaultChatCommandMechanism?: boolean;
 
   /**
    * The `RoomConfig` object that contains all the main callbacks of this room. Default value is `null`. Note that the api will generate an empty config if you do not provide one. Look at https://github.com/wxyz-abcd/node-haxball/tree/main/examples/roomConfigs/method2 for example RoomConfigs to use here, or https://github.com/wxyz-abcd/node-haxball/blob/main/src/roomConfigTemplate_method2.js for a template RoomConfig that contains all callbacks.
@@ -7598,12 +7631,53 @@ export namespace Query {
 declare interface Variable{
 
   /**
+   * The name of this variable.
+   */
+  name: string;
+
+  /**
    * The current value of this variable.
    */
-  value: any
+  value: any;
+
+  /**
+   * Type of this variable. 
+   */
+  type?: VariableType;
+
+  /**
+   * A detailed description of this variable.
+   */
+  description?: string;
+
+  /**
+   * The possible range of this variable's value. Should only be applied to numbers(literally) and maybe strings(for min and max length of the string).
+   */
+  range?: {
+
+    /**
+     * The minimum value for this variable.
+     */
+    min?: number;
+
+    /**
+     * The maximum value for this variable.
+     */
+    max?: number;
+
+    /**
+     * The step increment/decrement for this variable. (for easy increment/decrement via a spinbox)
+     */
+    step?: number;
+  };
 }
 
 declare interface Addon{
+
+  /**
+   * The room that this Addon is currently attached to.
+   */
+  readonly room: Room;
 
   /**
    * This function is called internally inside the constructor of all Addons by default. 
@@ -7630,41 +7704,26 @@ declare interface Addon{
 
   /**
    * This function defines a variable inside the Addon object that can be changed 
-   * from outside. The default behavior of this function is as follows:
+   * from outside. If we want to make use of the metadata that we sent into this 
+   * function, we can override this function. Only name and value fields are used
+   * by the default implementation. The implementation also depends on the API's
+   * global `config.noVariableValueChangeEvent` variable, since this function will
+   * also fire an onVariableValueChange event whenever a variable's value changes
+   * if this value is not `true`.
    * 
-   * ```js
-   * function defineVariable(x){
-   *   return x?.value;
-   * };
-   * ```
-   * 
-   * If we want to make use of the metadata that we sent into this function; we can 
-   * override this function, but have to be careful to `return variableObj?.value;` 
-   * in the end.
-   * 
-   * @param variable An object that holds some metadata values along with the variable's 
-   * value. This object might depend on what you want to do with this API. The examples 
-   * in the GitHub repo are intended to be shown in a web application GUI that can be 
-   * accessed by anyone. Therefore, the following structure is used for this object:
-   *   - `name: string`: Name of the variable that will be displayed on the GUI.
-   *   - `type: int`: Type of this variable. 
-   *   - `value: object`: The default/initial value of this variable.
-   *   - `description: string`: A detailed description of this variable.
-   *   - `range: object`: The possible range of this variable's value. Should only be applied to numbers(literally) and maybe strings(for min and max length of the string).
-   *     - `min: number`: The minimum value for this variable.
-   *     - `max: number`: The maximum value for this variable.
-   *     - `step: number`: The step increment/decrement for this variable. (for easy increment/decrement via a spinbox)
+   * @param variable An object that might hold some metadata values along with the variable's 
+   * name and value. This object might depend on what you want to do with this API. The examples 
+   * in the GitHub repo are intended to be shown in a web application GUI that can be accessed by 
+   * anyone. Therefore, this metadata structure has fields such as type, description and range.
    */
-  defineVariable: (variable?: Variable)=>any;
+  defineVariable: (variable: Variable)=>any;
 
   /**
    * If defined, called while creating or joining a room, or during a call to `Room.updateLibrary`, `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. You should write all custom initialization logic inside this callback function.
    * 
-   * @param room The current Room object.
-   * 
    * @returns void.
    */
-  initialize: (room: Room)=>void;
+  initialize: ()=>void;
 
   /**
    * If defined, called while leaving a room, or during a call to `Room.updateLibrary`, `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. We should write all custom finalization logic inside this callback function.

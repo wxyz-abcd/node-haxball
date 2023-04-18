@@ -1,8 +1,8 @@
 /* 
   // Example to add/remove commands in a Plugin or a RoomConfig:
   
-  this.initialize = function(room){
-    room.librariesMap.commands.add({
+  this.initialize = function(){
+    this.room.librariesMap.commands.add({
       name: "afk",
       parameters: [{
         name: "historyLength",
@@ -20,17 +20,17 @@
     });
   };
   this.finalize = function(){
-    room.librariesMap.commands.remove("afk");
+    this.room.librariesMap.commands.remove("afk");
   };
 
   // Example chat analyzing code in a RoomConfig:
   this.onBeforeOperationReceived = function(type, msg, globalFrameNo, clientFrameNo){ // this callback is host-only
     if (type != OperationType.SendChat)
       return;
-    var {code, cmdName, pIdx, pName, params, result} = room.librariesMap.commands.analyzeText(msg.text, msg.byId);
+    var {code, cmdName, pIdx, pName, params, result} = this.room.librariesMap.commands.analyzeText(msg.text, msg.byId);
     if (code<0)
       return;
-    if (code==0){ // room.librariesMap.commands.ErrorCodes.Success
+    if (code==0){ // this.room.librariesMap.commands.ErrorCodes.Success
       // command executed successfully.
       // you can show a success message using params and result here.
       return false;
@@ -56,84 +56,84 @@ module.exports = function(API){
     description: `This is a library to generalize and standardize the process of creating new chat commands.`
   });
 
-  this.active = this.defineVariable({
+  this.defineVariable({
     name: "active",
     description: "Commands are active?",
     type: VariableType.Boolean,
     value: true
   });
 
-  this.firstCharacter = this.defineVariable({
+  this.defineVariable({
     name: "firstCharacter",
     description: "The first character of the input text in order for the text to be recognized as a command.",
     type: VariableType.String,
     value: "!"
   });
 
-  this.splitCharacter = this.defineVariable({
+  this.defineVariable({
     name: "splitCharacter",
     description: "The character of the input text that lets us seperate each parameter of the command from each other.",
     type: VariableType.String,
     value: " "
   });
 
-  this.infoColor = this.defineVariable({
+  this.defineVariable({
     name: "infoColor",
     description: "The color of info announcement messages. (in css format)",
     type: VariableType.String,
     value: "rgb(255,255,0)"
   });
 
-  this.infoStyle = this.defineVariable({
+  this.defineVariable({
     name: "infoStyle",
     description: "The style of info announcement messages. ('normal', 'bold', 'italic', 'small', 'small-bold', 'small-italic')",
     type: VariableType.String,
     value: "italic"
   });
 
-  this.infoFont = this.defineVariable({
+  this.defineVariable({
     name: "infoFont",
     description: "The font of info announcement messages.",
     type: VariableType.Integer,
     value: 1
   });
 
-  this.errorColor = this.defineVariable({
+  this.defineVariable({
     name: "errorColor",
     description: "The color of error announcement messages. (in css format)",
     type: VariableType.String,
     value: "rgb(255,50,50)"
   });
 
-  this.errorStyle = this.defineVariable({
+  this.defineVariable({
     name: "errorStyle",
     description: "The style of error announcement messages. ('normal', 'bold', 'italic', 'small', 'small-bold', 'small-italic')",
     type: VariableType.String,
     value: "bold"
   });
 
-  this.errorFont = this.defineVariable({
+  this.defineVariable({
     name: "errorFont",
     description: "The font of error announcement messages.",
     type: VariableType.Integer,
     value: 1
   });
 
-  this.actionColor = this.defineVariable({
+  this.defineVariable({
     name: "actionColor",
     description: "The color of info announcement messages. (in css format)",
     type: VariableType.String,
     value: "rgb(170,40,170)"
   });
 
-  this.actionStyle = this.defineVariable({
+  this.defineVariable({
     name: "actionStyle",
     description: "The style of info announcement messages. ('normal', 'bold', 'italic', 'small', 'small-bold', 'small-italic')",
     type: VariableType.String,
     value: "bold"
   });
 
-  this.actionFont = this.defineVariable({
+  this.defineVariable({
     name: "actionFont",
     description: "The font of info announcement messages.",
     type: VariableType.Integer,
@@ -171,18 +171,18 @@ module.exports = function(API){
     this.callback = callback;
   }
 
-  var thisLibrary = this, room, commands;
+  var thisLibrary = this, commands;
 
   this.announceError = function(msg, toId){
-    room.sendAnnouncement(msg, toId, Utils.colorToNumber(thisLibrary.errorColor), thisLibrary.errorStyle, thisLibrary.errorFont);
+    thisLibrary.room.sendAnnouncement(msg, toId, Utils.colorToNumber(thisLibrary.errorColor), thisLibrary.errorStyle, thisLibrary.errorFont);
   };
 
   this.announceInfo = function(msg, toId){
-    room.sendAnnouncement(msg, toId, Utils.colorToNumber(thisLibrary.infoColor), thisLibrary.infoStyle, thisLibrary.infoFont);
+    thisLibrary.room.sendAnnouncement(msg, toId, Utils.colorToNumber(thisLibrary.infoColor), thisLibrary.infoStyle, thisLibrary.infoFont);
   };
 
   this.announceAction = function(msg, toId){
-    room.sendAnnouncement(msg, toId, Utils.colorToNumber(thisLibrary.actionColor), thisLibrary.actionStyle, thisLibrary.actionFont);
+    thisLibrary.room.sendAnnouncement(msg, toId, Utils.colorToNumber(thisLibrary.actionColor), thisLibrary.actionStyle, thisLibrary.actionFont);
   };
 
   this.announcePermissionDenied = function(toId){
@@ -246,8 +246,7 @@ module.exports = function(API){
       }, "help("+commandName+"): "+cmd.helpText+" Usage: "+thisLibrary.firstCharacter+commandName), byId);
   }
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     commands = [];
     thisLibrary.add({
       name: "help",
@@ -263,7 +262,6 @@ module.exports = function(API){
 
   this.finalize = function(){
     commands = null;
-    room = null;
   };
 
   this.add = function({name, parameters, minParameterCount, helpText, callback}){

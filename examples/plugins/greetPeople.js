@@ -9,28 +9,20 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  var room = null;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var that = this;
 
   this.onPlayerJoin = function(playerObj, customData){
     // get player's id and name
     var id = playerObj.id, name = playerObj.name;
 
-    room.sendChat("Welcome, " + name); // greet everybody
-    room.setPlayerAdmin(id, true); // make everybody admin
+    that.room.sendChat("Welcome, " + name); // greet everybody
+    that.room.setPlayerAdmin(id, true); // make everybody admin
   };
 
   this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
     // get player's name
     var name = playerObj.name;
 
-    room.sendChat("Goodbye, " + name); // say farewell to everybody
+    that.room.sendChat("Goodbye, " + name); // say farewell to everybody
   };
 };

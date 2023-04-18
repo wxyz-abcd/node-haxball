@@ -10,8 +10,10 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this roomConfig to be activated on both CreateRoom and JoinRoom.
   });
 
-  this.initialize = function(room){
-    room.hostPing = 1987987987; // this is host-only. host ping has to be modified like this.
+  var that = this;
+
+  this.initialize = function(){
+    that.room.hostPing = 1987987987; // this is host-only. host ping has to be modified like this.
   };
 
   this.modifyPlayerPing = function(playerId, ping, customData){

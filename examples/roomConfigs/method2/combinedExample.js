@@ -10,7 +10,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only.
   });
 
-  var room = null, teams = [[], [], []], playerTeams = {};
+  var teams = [[], [], []], playerTeams = {}, that = this;
   var connectionShouldBreak = {};
   var controlSwitch = {}, controlSwitchBlocked = {};
   var staticInputs = {};
@@ -24,15 +24,15 @@ module.exports = function(API){
 
       // if red team has more players, add the player to blue team
       if (redCount>blueCount)
-        room.setPlayerTeam(teams[0][0], 2);
+        that.room.setPlayerTeam(teams[0][0], 2);
       
       // if blue team has more players, add the player to red team
       else if (blueCount>redCount)
-        room.setPlayerTeam(teams[0][0], 1);
+        that.room.setPlayerTeam(teams[0][0], 1);
       
       // if player counts are equal for both teams, add the player to a random team
       else
-        room.setPlayerTeam(teams[0][0], 1+Math.floor(Math.random()*2));
+        that.room.setPlayerTeam(teams[0][0], 1+Math.floor(Math.random()*2));
     }
 
     // if there is no spectator
@@ -40,11 +40,11 @@ module.exports = function(API){
 
       // if red team has more than 1 extra player than blue team, move the last red player to blue
       if (redCount>blueCount+1)
-        room.setPlayerTeam(teams[1][teams[1].length-1], 2);
+        that.room.setPlayerTeam(teams[1][teams[1].length-1], 2);
 
       // if blue team has more than 1 extra player than red team, move the last blue player to red
       else if (blueCount>redCount+1)
-        room.setPlayerTeam(teams[2][teams[2].length-1], 1);
+        that.room.setPlayerTeam(teams[2][teams[2].length-1], 1);
     }
   };
 
@@ -65,7 +65,7 @@ module.exports = function(API){
     if (!controlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayer(playerIdToBeControlled))
+    if (!that.room.getPlayer(playerIdToBeControlled))
       playerIdToBeControlled = byPlayerId;
     controlSwitch[byPlayerId] = playerIdToBeControlled;
   };
@@ -77,13 +77,13 @@ module.exports = function(API){
     if (!blockControlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayer(playerId))
+    if (!that.room.getPlayer(playerId))
       return;
     controlSwitchBlocked[playerId] = (value == 1);
   };
 
   var setPlayerInput = function(playerId, value){
-    if (!room.getPlayer(playerId))
+    if (!that.room.getPlayer(playerId))
       return;
     /*
     if (!inputPermitted[byPlayerId]) // example for custom permission logic
@@ -92,13 +92,11 @@ module.exports = function(API){
     staticInputs[playerId] = (isNaN(value) || value<0 || value>31) ? null : value;  // store a static input value for this player
   };
 
-  this.initialize = function(_room){
-    room = _room;
-    room.hostPing = 1987987987; // this is host-only. host ping has to be modified like this.
+  this.initialize = function(){
+    that.room.hostPing = 1987987987; // this is host-only. host ping has to be modified like this.
   };
 
   this.finalize = function(){
-    room = null;
     teams = null;
     playerTeams = null;
     connectionShouldBreak = null;
@@ -175,8 +173,8 @@ module.exports = function(API){
     // get player's id and name
     var id = playerObj.id, name = playerObj.name;
 
-    room.sendChat("Welcome, " + name); // greet everybody
-    room.setPlayerAdmin(id, true); // make everybody admin
+    that.room.sendChat("Welcome, " + name); // greet everybody
+    that.room.setPlayerAdmin(id, true); // make everybody admin
     
     // add the new player to spectators
     teams[0].push(id);
@@ -192,7 +190,7 @@ module.exports = function(API){
     // get player's id and name
     var id = playerObj.id, name = playerObj.name;
 
-    room.sendChat("Goodbye, " + name); // say farewell to everybody
+    that.room.sendChat("Goodbye, " + name); // say farewell to everybody
 
     // free extra memory allocated
     delete connectionShouldBreak[id];

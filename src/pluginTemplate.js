@@ -9,7 +9,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom|AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  this.initialize = function(room){};
+  this.initialize = function(){};
   this.finalize = function(){};
 
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){return [modifiedNick, modifiedAvatar, modifiedFlag];};

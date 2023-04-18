@@ -11,28 +11,28 @@ module.exports = function(API, params){
   });
 
   // parameters are exported so that they can be edited outside this class.
-  this.showTeamColors = this.defineVariable({ // team_colors
+  this.defineVariable({ // team_colors
     name: "showTeamColors",
     description: "Show team colors?", 
     type: VariableType.Boolean,
     value: true
   });
 
-  this.showAvatars = this.defineVariable({ // show_avatars
+  this.defineVariable({ // show_avatars
     name: "showAvatars",
     description: "Show player avatars?", 
     type: VariableType.Boolean,
     value: true
   });
 
-  this.showPlayerIds = this.defineVariable({
+  this.defineVariable({
     name: "showPlayerIds",
     description: "Show player ids?", 
     type: VariableType.Boolean,
     value: false
   });
 
-  this.zoomCoeff = this.defineVariable({
+  this.defineVariable({
     name: "zoomCoeff",
     description: "Zoom Coefficient", 
     type: VariableType.Number,
@@ -44,7 +44,7 @@ module.exports = function(API, params){
     }
   });
 
-  this.wheelZoomCoeff = this.defineVariable({
+  this.defineVariable({
     name: "wheelZoomCoeff",
     description: "Defines how fast you zoom in/out with mouse wheel", 
     type: VariableType.Number,
@@ -56,7 +56,7 @@ module.exports = function(API, params){
     }
   });
   
-  this.resolutionScale = this.defineVariable({ // resolution_scale
+  this.defineVariable({ // resolution_scale
     name: "resolutionScale",
     description: "Resolution Scale", 
     type: VariableType.Number,
@@ -68,56 +68,56 @@ module.exports = function(API, params){
     }
   });
 
-  this.showChatIndicators = this.defineVariable({ // show_indicators
+  this.defineVariable({ // show_indicators
     name: "showChatIndicators",
     description: "Show Chat Indicators?", 
     type: VariableType.Boolean,
     value: true
   });
 
-  this.restrictCameraOrigin = this.defineVariable({
+  this.defineVariable({
     name: "restrictCameraOrigin",
     description: "Restrict camera origin to view bounds?", 
     type: VariableType.Boolean,
     value: true
   });
 
-  this.followMode = this.defineVariable({
+  this.defineVariable({
     name: "followMode",
     description: "Follow camera enabled?", 
     type: VariableType.Boolean,
     value: true
   });
   
-  this.followPlayerId = this.defineVariable({
+  this.defineVariable({
     name: "followPlayerId",
     description: "Id of the player that the camera will follow", 
     type: VariableType.Integer,
     value: null
   });
 
-  this.drawBackground = this.defineVariable({
+  this.defineVariable({
     name: "drawBackground",
     description: "Draw Background?", 
     type: VariableType.Boolean,
     value: true
   });
   
-  this.squarePlayers = this.defineVariable({
+  this.defineVariable({
     name: "squarePlayers",
     description: "Draw Players as squares?", 
     type: VariableType.Boolean,
     value: false
   });
   
-  this.currentPlayerDistinction = this.defineVariable({
+  this.defineVariable({
     name: "currentPlayerDistinction",
     description: "Hide current player's name and draw halo around current player?", 
     type: VariableType.Boolean,
     value: true
   });
   
-  this.showInvisibleSegments = this.defineVariable({
+  this.defineVariable({
     name: "showInvisibleSegments",
     description: "Show invisible segments?", 
     type: VariableType.Boolean,
@@ -398,6 +398,7 @@ module.exports = function(API, params){
     },
     render: function(roomState){ // Kc
       var time = window.performance.now(), deltaTime = (time-this.lastRenderTime)/1000;
+      this.spf = deltaTime;
       this.lastRenderTime = time;
       this.decoratorsByObject.clear();
       this.resizeCanvas();
@@ -454,7 +455,7 @@ module.exports = function(API, params){
           continue;
         this.drawDisc(disc, null);
       }
-      roomLibrariesMap.aimbot?.calculateAndDraw(followDisc, mapObjects, this.ctx);
+      roomLibrariesMap?.aimbot?.calculateAndDraw(followDisc, mapObjects, this.ctx);
       this.ctx.lineWidth = 3;
       this.ctx.resetTransform();
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
@@ -796,9 +797,9 @@ module.exports = function(API, params){
 
   var rendererObj = null; // Eb
 
-  this.initialize = function(room){
-    thisRenderer.followPlayerId = room.currentPlayerId;
-    roomLibrariesMap = room.librariesMap;
+  this.initialize = function(){
+    thisRenderer.followPlayerId = thisRenderer.room.currentPlayerId;
+    roomLibrariesMap = thisRenderer.room.librariesMap;
     rendererObj = new HaxballRenderer();
   };
 
@@ -812,6 +813,10 @@ module.exports = function(API, params){
       return;
     rendererObj.render(extrapolatedRoomState);
     params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
+  };
+
+  this.fps = function(){
+    return 1/rendererObj.spf;
   };
 
   // you can keep track of changes using these callbacks, and apply them in your render logic:

@@ -20,7 +20,7 @@ module.exports = function(API, canvas){
     description: `This is a template renderer`
   });
 
-  this.initialize = function(room){};
+  this.initialize = function(){};
   this.finalize = function(){};
   
   this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback

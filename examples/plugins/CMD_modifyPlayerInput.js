@@ -12,17 +12,16 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var staticInputs, room, permissionCtx, permissionIds = {};
+  var staticInputs, permissionCtx, permissionIds = {}, that = this;
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     staticInputs = {};
-    permissionCtx = room.librariesMap.permissions?.createContext("modifyPlayerInput");
+    permissionCtx = that.room.librariesMap.permissions?.createContext("modifyPlayerInput");
     if (permissionCtx)
       permissionIds = {
         input: permissionCtx.addPermission("input")
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "input",
       parameters: [{
         name: "playerId",
@@ -41,10 +40,10 @@ module.exports = function(API){
       minParameterCount: 2,
       helpText: "Lets you change a player's input. '-1' resets to default.",
       callback: ({playerId, value}, byId) => {
-        if (!room.getPlayer(playerId))
+        if (!that.room.getPlayer(playerId))
           return;
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.input)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         staticInputs[playerId] = value<0 ? null : value;  // store a static input value for this player
@@ -53,9 +52,8 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("input");
-    room.librariesMap?.permissions?.removeContext(permissionCtx);
-    room = null;
+    that.room.librariesMap?.commands?.remove("input");
+    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
     staticInputs = null;
     permissionCtx = null;
     permissionIds = null;

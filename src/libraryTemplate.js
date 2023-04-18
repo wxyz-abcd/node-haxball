@@ -8,6 +8,6 @@ module.exports = function(API){
     description: `This is a template library`
   });
 
-  this.initialize = function(room){};
+  this.initialize = function(){};
   this.finalize = function(){};
 };

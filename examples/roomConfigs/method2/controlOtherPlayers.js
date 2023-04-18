@@ -13,14 +13,9 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only.
   });
 
-  var room, controlSwitch = {}, controlSwitchBlocked = {};
-
-  this.initialize = function(_room){
-    room = _room;
-  };
+  var controlSwitch = {}, controlSwitchBlocked = {}, that = this;
 
   this.finalize = function(){
-    room = null;
     controlSwitch = null;
     controlSwitchBlocked = null;
   };
@@ -32,7 +27,7 @@ module.exports = function(API){
     if (!controlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayer(playerIdToBeControlled))
+    if (!that.room.getPlayer(playerIdToBeControlled))
       playerIdToBeControlled = byPlayerId;
     controlSwitch[byPlayerId] = playerIdToBeControlled;
   };
@@ -44,7 +39,7 @@ module.exports = function(API){
     if (!blockControlPermitted[byPlayerId]) // example for custom permission logic
       return;
     */
-    if (!room.getPlayer(playerId))
+    if (!that.room.getPlayer(playerId))
       return;
     controlSwitchBlocked[playerId] = (value == 1);
   };

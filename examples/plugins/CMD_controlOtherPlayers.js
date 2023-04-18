@@ -12,19 +12,18 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var room, controlSwitch, controlSwitchBlocked, permissionCtx, permissionIds;
+  var controlSwitch, controlSwitchBlocked, permissionCtx, permissionIds, that = this;
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     controlSwitch = {};
     controlSwitchBlocked = {};
-    permissionCtx = room.librariesMap.permissions?.createContext("controlOtherPlayers");
+    permissionCtx = that.room.librariesMap.permissions?.createContext("controlOtherPlayers");
     if (permissionCtx)
       permissionIds = {
         control: permissionCtx.addPermission("control"),
         blockControl: permissionCtx.addPermission("blockControl")
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "control",
       parameters: [{
         name: "playerId",
@@ -39,16 +38,16 @@ module.exports = function(API){
         if (controlSwitchBlocked[playerId])
           return;
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.control)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        if (!room.getPlayer(playerId))
+        if (!that.room.getPlayer(playerId))
           playerId = byId;
         controlSwitch[byId] = playerId;
-        room.librariesMap.commands?.announceAction("You are in control of the player whose id is " + playerId + ".", byId);
+        that.room.librariesMap.commands?.announceAction("You are in control of the player whose id is " + playerId + ".", byId);
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "blockControl",
       parameters: [{
         name: "playerId",
@@ -64,22 +63,21 @@ module.exports = function(API){
       helpText: "(Un)Blocks a player's ability to take control of another player.",
       callback: ({playerId, value}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.blockControl)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        if (!room.getPlayer(playerId))
+        if (!that.room.getPlayer(playerId))
           return;
         controlSwitchBlocked[playerId] = (value == 1);
-        room.librariesMap.commands?.announceAction("The player whose id is " + playerId + " is "+((value == 1)?"":"not ")+"vulnerable to be controlled now.", byId);
+        that.room.librariesMap.commands?.announceAction("The player whose id is " + playerId + " is "+((value == 1)?"":"not ")+"vulnerable to be controlled now.", byId);
       }
     });
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("control");
-    room.librariesMap?.commands?.remove("blockControl");
-    room.librariesMap?.permissions?.removeContext(permissionCtx);
-    room = null;
+    that.room.librariesMap?.commands?.remove("control");
+    that.room.librariesMap?.commands?.remove("blockControl");
+    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
     controlSwitch = null;
     controlSwitchBlocked = null;
     permissionCtx = null;

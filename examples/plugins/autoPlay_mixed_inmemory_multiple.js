@@ -19,8 +19,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -32,7 +31,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -44,7 +43,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+  this.defineVariable({
     name: "maxDistanceToFollowBallCoeff",
     description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
     type: VariableType.Number,
@@ -56,7 +55,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxConcurrentBotCount = this.defineVariable({
+  this.defineVariable({
     name: "maxConcurrentBotCount",
     description: "Maximum number of concurrently running bots.", 
     type: VariableType.Integer,
@@ -68,22 +67,20 @@ module.exports = function(API){
     }
   });
 
-  this.botsActive = this.defineVariable({
+  this.defineVariable({
     name: "botsActive",
     description: "Whether all the bots are active or not.", 
     type: VariableType.Boolean,
     value: true
   });
 
-  var room = null, that = this, dummyPromise = Promise.resolve(), originalRoomData;
+  var that = this, dummyPromise = Promise.resolve(), originalRoomData;
 
-  this.initialize = function(_room){
-    room = _room;
-    originalRoomData = room.state; // this object pointer never changes while inside a room, so we can store it here.
+  this.initialize = function(){
+    originalRoomData = that.room.state; // this object pointer never changes while inside a room, so we can store it here.
   };
 
   this.finalize = function(){
-    room = null;
     originalRoomData = null;
   };
 
@@ -99,7 +96,7 @@ module.exports = function(API){
         type: type,
         keyState: 0
       });
-      room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
+      that.room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
     }
   };
 
@@ -107,7 +104,7 @@ module.exports = function(API){
     for (var i=0;i<count;i++){
       if (smallestBotId < largestBotId){
         bots.splice(bots.findIndex((x)=>(x.id==largestBotId)), 1);
-        room.fakePlayerLeave(largestBotId--);
+        that.room.fakePlayerLeave(largestBotId--);
       }
       else
         break;
@@ -173,7 +170,7 @@ module.exports = function(API){
   };
 
   var update = function(bot){
-    var { state, gameState, gameStateExt } = room;
+    var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
     var cp = state.getPlayer(bot.id);
     var playerDisc = cp?.disc;
@@ -240,8 +237,8 @@ module.exports = function(API){
       // therefore, we are trying to limit consequent sending.
       if (keyState!=bot.keyState || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
         if ((keyState==bot.keyState) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
-          room.fakeSendPlayerInput(keyState & -17, bot.id); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
-        room.fakeSendPlayerInput(keyState, bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
+          that.room.fakeSendPlayerInput(keyState & -17, bot.id); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
+        that.room.fakeSendPlayerInput(keyState, bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
         bot.keyState = keyState;
       }
     });

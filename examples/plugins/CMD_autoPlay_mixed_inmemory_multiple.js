@@ -19,8 +19,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -32,7 +31,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -44,7 +43,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+  this.defineVariable({
     name: "maxDistanceToFollowBallCoeff",
     description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
     type: VariableType.Number,
@@ -56,7 +55,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxConcurrentBotCount = this.defineVariable({
+  this.defineVariable({
     name: "maxConcurrentBotCount",
     description: "Maximum number of concurrently running bots.", 
     type: VariableType.Integer,
@@ -68,19 +67,18 @@ module.exports = function(API){
     }
   });
 
-  this.botsActive = this.defineVariable({
+  this.defineVariable({
     name: "botsActive",
     description: "Whether all the bots are active or not.", 
     type: VariableType.Boolean,
     value: true
   });
 
-  var room = null, that = this, dummyPromise = Promise.resolve(), originalRoomData, permissionCtx, permissionIds;
+  var that = this, dummyPromise = Promise.resolve(), originalRoomData, permissionCtx, permissionIds;
 
-  this.initialize = function(_room){
-    room = _room;
-    originalRoomData = room.state; // this object pointer never changes while inside a room, so we can store it here.
-    permissionCtx = room.librariesMap.permissions?.createContext("autoPlayMixedInMemoryMultiple");
+  this.initialize = function(){
+    originalRoomData = that.room.state; // this object pointer never changes while inside a room, so we can store it here.
+    permissionCtx = that.room.librariesMap.permissions?.createContext("autoPlayMixedInMemoryMultiple");
     if (permissionCtx)
       permissionIds = {
         addBot: permissionCtx.addPermission("addBot"),
@@ -90,7 +88,7 @@ module.exports = function(API){
         botType: permissionCtx.addPermission("botType"),
         botsActive: permissionCtx.addPermission("botsActive")
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "add_bot",
       parameters: [{
         name: "type",
@@ -141,7 +139,7 @@ module.exports = function(API){
       helpText: "Adds new bots to the room.",
       callback: ({type, active, count, name, flag, avatar, conn, auth}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.addBot)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         /*
@@ -152,7 +150,7 @@ module.exports = function(API){
         addBot(active, type, count, name, flag, avatar, conn, auth);
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "remove_bot",
       parameters: [{
         name: "count",
@@ -166,7 +164,7 @@ module.exports = function(API){
       helpText: "Removes bots from the room.",
       callback: ({count}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.removeBot)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         /*
@@ -177,7 +175,7 @@ module.exports = function(API){
         removeBot(count);
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "max_bot_count",
       parameters: [{
         name: "count",
@@ -191,7 +189,7 @@ module.exports = function(API){
       helpText: "Changes the maximum allowed number of bots",
       callback: ({count}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.maxBotCount)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         /*
@@ -202,7 +200,7 @@ module.exports = function(API){
         that.maxConcurrentBotCount = count;
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "bot_active",
       parameters: [{
         name: "id",
@@ -218,7 +216,7 @@ module.exports = function(API){
       helpText: "Activate/deactivate a bot",
       callback: ({id, active}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.botActive)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         /*
@@ -231,7 +229,7 @@ module.exports = function(API){
           bot.active = active;
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "bot_type",
       parameters: [{
         name: "id",
@@ -251,7 +249,7 @@ module.exports = function(API){
       helpText: "Changes the type of a bot.",
       callback: ({id, type}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.botType)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         /*
@@ -264,7 +262,7 @@ module.exports = function(API){
           bot.type = type;
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "bots_active",
       parameters: [{
         name: "active",
@@ -274,7 +272,7 @@ module.exports = function(API){
       helpText: "Activate/deactivate all bots.",
       callback: ({active}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.botsActive)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         /*
@@ -288,14 +286,13 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("add_bot");
-    room.librariesMap?.commands?.remove("remove_bot");
-    room.librariesMap?.commands?.remove("max_bot_count");
-    room.librariesMap?.commands?.remove("bot_active");
-    room.librariesMap?.commands?.remove("bot_type");
-    room.librariesMap?.commands?.remove("bots_active");
-    room.librariesMap?.permissions?.removeContext(permissionCtx);
-    room = null;
+    that.room.librariesMap?.commands?.remove("add_bot");
+    that.room.librariesMap?.commands?.remove("remove_bot");
+    that.room.librariesMap?.commands?.remove("max_bot_count");
+    that.room.librariesMap?.commands?.remove("bot_active");
+    that.room.librariesMap?.commands?.remove("bot_type");
+    that.room.librariesMap?.commands?.remove("bots_active");
+    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
     originalRoomData = null;
     permissionCtx = null;
     permissionIds = null;
@@ -313,7 +310,7 @@ module.exports = function(API){
         type: type,
         keyState: 0
       });
-      room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
+      that.room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
     }
   };
 
@@ -321,7 +318,7 @@ module.exports = function(API){
     for (var i=0;i<count;i++){
       if (smallestBotId < largestBotId){
         bots.splice(bots.findIndex((x)=>(x.id==largestBotId)), 1);
-        room.fakePlayerLeave(largestBotId--);
+        that.room.fakePlayerLeave(largestBotId--);
       }
       else
         break;
@@ -329,7 +326,7 @@ module.exports = function(API){
   };
 
   var update = function(bot){
-    var { state, gameState, gameStateExt } = room;
+    var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
     var cp = state.getPlayer(bot.id);
     var playerDisc = cp?.disc;
@@ -396,8 +393,8 @@ module.exports = function(API){
       // therefore, we are trying to limit consequent sending.
       if (keyState!=bot.keyState || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
         if ((keyState==bot.keyState) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
-          room.fakeSendPlayerInput(keyState & -17, bot.id); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
-        room.fakeSendPlayerInput(keyState, bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
+          that.room.fakeSendPlayerInput(keyState & -17, bot.id); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
+        that.room.fakeSendPlayerInput(keyState, bot.id); // unlike room.setKeyState, this function directly emits a keystate message.
         bot.keyState = keyState;
       }
     });

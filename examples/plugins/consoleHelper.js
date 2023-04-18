@@ -12,13 +12,12 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  var room, stdin, listener = function(d) {
-    vm.runInContext(d.toString().trim(), room); // process the string as a command in the room context.
+  var that = this, stdin, listener = function(d) {
+    vm.runInContext(d.toString().trim(), that.room); // process the string as a command in the room context.
   };
 
-  this.initialize = function(_room){
-    room = _room;
-    vm.createContext(room); // setup context for room object.
+  this.initialize = function(){
+    vm.createContext(that.room); // setup context for room object.
     stdin = process.openStdin(); // read from standard input (console, in this case)
     stdin.addListener("data", listener); // triggered when we press enter in console.
   };
@@ -26,7 +25,6 @@ module.exports = function(API){
   this.finalize = function(){
     stdin.removeListener("data", listener);
     listener = null;
-    room = null;
     stdin = null;
   };
 };

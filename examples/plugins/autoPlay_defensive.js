@@ -9,8 +9,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -22,7 +21,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -34,7 +33,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxDistanceToFollowBallCoeff = this.defineVariable({
+  this.defineVariable({
     name: "maxDistanceToFollowBallCoeff",
     description: "Coefficient of max distance between ball and player for the bot to follow ball; otherwise it goes back to defense.", 
     type: VariableType.Number,
@@ -46,21 +45,13 @@ module.exports = function(API){
     }
   });
 
-  var room = null, that = this;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var that = this;
 
   this.onGameTick = function(customData){
-    var { state, gameState, gameStateExt } = room;
+    var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
 
-    var cp = state.players.filter((x)=>(x.id==room.currentPlayerId))[0];
+    var cp = state.players.filter((x)=>(x.id==that.room.currentPlayerId))[0];
     var playerDisc = cp.disc;
     if (!playerDisc)
       return;
@@ -122,6 +113,6 @@ module.exports = function(API){
     */
     
     // apply current keys
-    room.setKeyState(Utils.keyState(dirX, dirY, kick));
+    that.room.setKeyState(Utils.keyState(dirX, dirY, kick));
   };
 };

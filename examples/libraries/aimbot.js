@@ -8,35 +8,35 @@ module.exports = function(API){
     description: `An aimbot`
   });
 
-  this.active = this.defineVariable({
+  this.defineVariable({
     name: "active",
     description: "Aimbot is active?",
     type: VariableType.Boolean,
     value: false
   });
   
-  this.minDistToBall = this.defineVariable({
+  this.defineVariable({
     name: "minDistToBall",
     description: "Minimum distance to show aimbot line",
     type: VariableType.Number,
     value: 25
   });
   
-  this.distThreshold = this.defineVariable({
+  this.defineVariable({
     name: "distThreshold",
     description: "Aimbot may trace rays until this distance is reached",
     type: VariableType.Number,
     value: 600
   });
   
-  this.maxIter = this.defineVariable({
+  this.defineVariable({
     name: "maxIter",
     description: "Aimbot may trace rays until this iteration count is reached",
     type: VariableType.Number,
     value: 1000
   });
   
-  this.color = this.defineVariable({
+  this.defineVariable({
     name: "color",
     description: "Color of aimbot's line (in css format)",
     type: VariableType.String,
@@ -45,9 +45,6 @@ module.exports = function(API){
 
   var thisLibrary = this;
   
-  this.initialize = function(room){};
-  this.finalize = function(){};
-
   function onSegment(a, b, x, y){
     var segmentLengthSqr = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
     var r = ((x - a.x) * (b.x - a.x) + (y - a.y) * (b.y - a.y)) / segmentLengthSqr;

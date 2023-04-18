@@ -12,29 +12,28 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var room, permissionCtx, permissionIds;
+  var permissionCtx, permissionIds, that = this;
 
-  this.initialize = function(_room){
-    room = _room;
-    permissionCtx = room.librariesMap.permissions?.createContext("accounts");
+  this.initialize = function(){
+    permissionCtx = that.room.librariesMap.permissions?.createContext("accounts");
     if (permissionCtx)
       permissionIds = {
         authban: permissionCtx.addPermission("authban"),
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "authregister",
       parameters: [],
       minParameterCount: 0,
       helpText: "Registers your auth to host's database.",
       callback: ({}, byId) => {
-        var {storage} = room.config;
+        var {storage} = that.room.config;
         if (!storage){
           return;
         }
         var users = storage.get("users");
         if (!users)
           users = [];
-        var auth = room.players.find((x)=>x.id==byId)?.auth;
+        var auth = that.room.players.find((x)=>x.id==byId)?.auth;
         if (!auth){
           return;
         }
@@ -46,7 +45,7 @@ module.exports = function(API){
         storage.set("users", users);
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "authban",
       parameters: [{
         name: "playerId",
@@ -62,17 +61,17 @@ module.exports = function(API){
       helpText: "Bans a player's auth in host's database from joining the room.",
       callback: ({playerId, ban}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.authban)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        var {storage} = room.config;
+        var {storage} = that.room.config;
         if (!storage){
           return;
         }
         var users = storage.get("users");
         if (!users)
           users = [];
-        var auth = room.players.find((x)=>x.id==playerId)?.auth;
+        var auth = that.room.players.find((x)=>x.id==playerId)?.auth;
         if (!auth){
           return;
         }
@@ -87,23 +86,22 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("authregister");
-    room.librariesMap?.commands?.remove("authban");
-    room.librariesMap?.permissions?.removeContext(permissionCtx);
-    room = null;
+    that.room.librariesMap?.commands?.remove("authregister");
+    that.room.librariesMap?.commands?.remove("authban");
+    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
   };
 
   this.modifyPlayerData = function(playerId, name, flag, avatar, conn, auth, customData){
-    if (room.config.storage?.get("users")?.find((x)=>x.auth==auth)?.ban)
+    if (that.room.config.storage?.get("users")?.find((x)=>x.auth==auth)?.ban)
       return null;
     return [name, flag, avatar];
   };
 
   this.onPlayerJoin = function(playerObj, customData){
     var { id, auth } = playerObj;
-    var {storage} = room.config, permissionsLib = room.librariesMap?.permissions;
+    var {storage} = that.room.config, permissionsLib = that.room.librariesMap?.permissions;
     if (!storage || !permissionsLib)
       return;
     var users = storage.get("users");

@@ -12,14 +12,14 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  this.instaStop = this.defineVariable({
+  this.defineVariable({
     name: "instaStop",
     description: "Initial value of instant stop for all players",
     type: VariableType.Boolean,
     value: true
   });
 
-  this.xCoefficient = this.defineVariable({
+  this.defineVariable({
     name: "xCoefficient",
     description: "Initial value of x coefficient for all players",
     type: VariableType.Number,
@@ -31,7 +31,7 @@ module.exports = function(API){
     }
   });
 
-  this.yCoefficient = this.defineVariable({
+  this.defineVariable({
     name: "yCoefficient",
     description: "Initial value of y coefficient for all players",
     type: VariableType.Number,
@@ -43,18 +43,17 @@ module.exports = function(API){
     }
   });
 
-  var room, playerProps, permissionCtx, permissionIds, thisPlugin = this;
+  var playerProps, permissionCtx, permissionIds, that = this;
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     playerProps = {};
-    permissionCtx = room.librariesMap.permissions?.createContext("speedHack");
+    permissionCtx = that.room.librariesMap.permissions?.createContext("speedHack");
     if (permissionCtx)
       permissionIds = {
         speedHack: permissionCtx.addPermission("speedHack"),
         speedHackProps: permissionCtx.addPermission("speedHackProps")
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "speedHack",
       parameters: [{
         name: "playerId",
@@ -70,7 +69,7 @@ module.exports = function(API){
       helpText: "Activates/deactivates speedhack for a player.",
       callback: ({playerId, value}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.speedHack)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         if (playerProps[playerId])
@@ -78,13 +77,13 @@ module.exports = function(API){
         else
           playerProps[playerId] = {
             enabled: value,
-            instaStop: thisPlugin.instaStop,
-            xCoef: thisPlugin.xCoefficient,
-            yCoef: thisPlugin.yCoefficient
+            instaStop: that.instaStop,
+            xCoef: that.xCoefficient,
+            yCoef: that.yCoefficient
           };
       }
     });
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "speedHackProps",
       parameters: [{
         name: "playerId",
@@ -107,16 +106,16 @@ module.exports = function(API){
       helpText: "Changes speedhack parameters for a player.",
       callback: ({playerId, prop, value}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.speedHackProps)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         var props = playerProps[playerId], f;
         if (!props)
           props = {
             enabled: false,
-            instaStop: thisPlugin.instaStop,
-            xCoef: thisPlugin.xCoefficient,
-            yCoef: thisPlugin.yCoefficient
+            instaStop: that.instaStop,
+            xCoef: that.xCoefficient,
+            yCoef: that.yCoefficient
           };
         switch(prop){
           case 0:
@@ -141,10 +140,9 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("speedHack");
-    room.librariesMap?.commands?.remove("speedHackProps");
-    room.librariesMap?.permissions?.removeContext(permissionCtx);
-    room = null;
+    that.room.librariesMap?.commands?.remove("speedHack");
+    that.room.librariesMap?.commands?.remove("speedHackProps");
+    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
     playerProps = null;
     permissionCtx = null;
     permissionIds = null;
@@ -161,7 +159,7 @@ module.exports = function(API){
     var d = Math.abs(dirX)+Math.abs(dirY);
     if (d>0){
       d = (d==2)?Math.SQRT1_2:1;
-			room.setPlayerDiscProperties(id, {
+			that.room.setPlayerDiscProperties(id, {
         xgravity: props.xCoef*dirX*d, 
         ygravity: props.yCoef*dirY*d
       });
@@ -175,7 +173,7 @@ module.exports = function(API){
       prop.xspeed = 0;
       prop.yspeed = 0;
     }
-    room.setPlayerDiscProperties(id, prop);
+    that.room.setPlayerDiscProperties(id, prop);
     msg.input = 0;
     return true;
   };

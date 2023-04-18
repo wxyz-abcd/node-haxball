@@ -9,14 +9,9 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
   });
 
-  var room = null, teams = [[], [], []], playerTeams = {}, that = this;
-
-  this.initialize = function(_room){
-    room = _room;
-  };
+  var teams = [[], [], []], playerTeams = {}, that = this;
 
   this.finalize = function(){
-    room = null;
     teams = null;
     playerTeams = null;
   };
@@ -30,15 +25,15 @@ module.exports = function(API){
 
       // if red team has more players, add the player to blue team
       if (redCount>blueCount)
-        room.setPlayerTeam(teams[0][0], 2);
+        that.room.setPlayerTeam(teams[0][0], 2);
       
       // if blue team has more players, add the player to red team
       else if (blueCount>redCount)
-        room.setPlayerTeam(teams[0][0], 1);
+        that.room.setPlayerTeam(teams[0][0], 1);
       
       // if player counts are equal for both teams, add the player to a random team
       else
-        room.setPlayerTeam(teams[0][0], 1+Math.floor(Math.random()*2));
+        that.room.setPlayerTeam(teams[0][0], 1+Math.floor(Math.random()*2));
     }
 
     // if there is no spectator
@@ -46,11 +41,11 @@ module.exports = function(API){
 
       // if red team has more than 1 extra player than blue team, move the last red player to blue
       if (redCount>blueCount+1)
-        room.setPlayerTeam(teams[1][teams[1].length-1], 2);
+        that.room.setPlayerTeam(teams[1][teams[1].length-1], 2);
 
       // if blue team has more than 1 extra player than red team, move the last blue player to red
       else if (blueCount>redCount+1)
-        room.setPlayerTeam(teams[2][teams[2].length-1], 1);
+        that.room.setPlayerTeam(teams[2][teams[2].length-1], 1);
     }
   };
 

@@ -10,12 +10,11 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only. (Because commands library is using host-only announcements.)
   });
 
-  var room = null, cmdLib = null;
+  var cmdLib = null, that = this;
   var Success, ParamsLessThanMinParamCount, CommandNotFound, UnknownParameterType, ParameterAlreadyDefined, BooleanParseError, NumberNaNOrInfinite, NumberOutOfBounds, StringLengthOutOfBounds;
 
-  this.initialize = function(_room){
-    room = _room;
-    cmdLib = room.librariesMap.commands;
+  this.initialize = function(){
+    cmdLib = that.room.librariesMap.commands;
     if (cmdLib){
       Success = cmdLib.ErrorCodes.Success;
       ParamsLessThanMinParamCount = cmdLib.ErrorCodes.ParamsLessThanMinParamCount;
@@ -31,7 +30,6 @@ module.exports = function(API){
 
   this.finalize = function(){
     cmdLib = null;
-    room = null;
   };
 
   this.onBeforeOperationReceived = function(type, msg, globalFrameNo, clientFrameNo){ // this callback is host-only

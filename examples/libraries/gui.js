@@ -8,23 +8,17 @@ module.exports = function(API){
     description: `This is a library that contains functions to create custom graphical user interfaces. This library would not work in node.js.`
   });
 
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var thisLibrary = this;
 
   this.newWindowFromURL = function(url, width, height){
     var w = window.open(url,"_blank",`left=${screen.availLeft + (screen.availWidth - width) / 2},top=${screen.availTop + (screen.availHeight - height) / 2},width=${width},height=${height},resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes`);
-    w.room = room;
+    w.room = thisLibrary.room;
     return w;
   };
 
   this.newWindowFromContent = function(htmlHeadContent, htmlBodyContent, width, height){
     var w = window.open("about:blank","_blank",`left=${screen.availLeft + (screen.availWidth - width) / 2},top=${screen.availTop + (screen.availHeight - height) / 2},width=${width},height=${height},resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes`);
-    w.room = room;
+    w.room = thisLibrary.room;
     w.document.head.innerHTML = htmlHeadContent;
     w.document.body.innerHTML = htmlBodyContent;
     return w;

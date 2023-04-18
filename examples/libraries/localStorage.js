@@ -8,14 +8,14 @@ module.exports = function(API){
     description: `This is a library that implements the "default storage interface"(?) using the browser's localStorage object. This library would not directly work in node.js.`
   });
 
-  this.active = this.defineVariable({
+  this.defineVariable({
     name: "active",
     description: "Storage is active?",
     type: VariableType.Boolean,
     value: true
   });
 
-  this.mainKey = this.defineVariable({
+  this.defineVariable({
     name: "mainKey",
     description: "The main key that will contain all inner keys in browser's local storage.",
     type: VariableType.String,
@@ -24,8 +24,7 @@ module.exports = function(API){
 
   var thisLibrary = this, memoryObj = null;
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     try{
       memoryObj = JSON.parse(window.localStorage.getItem(thisLibrary.mainKey)) || {};
     }catch(e){
@@ -34,7 +33,6 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    room = null;
     memoryObj = null;
   };
 

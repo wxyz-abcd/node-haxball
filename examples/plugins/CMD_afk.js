@@ -11,55 +11,53 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  this.detectNonAFKByInput = this.defineVariable({
+  this.defineVariable({
     name: "detectNonAFKByInput",
     description: "Whether to automatically mark players non-AFK whenever they press a key.",
     type: VariableType.Boolean,
     value: true
   });
 
-  var room, afks, thisPlugin = this;
+  var afks, that = this;
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     afks = {};
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "afk",
       parameters: [],
       minParameterCount: 0,
       helpText: "Toggles your afk status.",
       callback: ({}, byId) => {
-        var P = room.players.find((x)=>x.id==byId);
+        var P = that.room.players.find((x)=>x.id==byId);
         var value = afks[byId];
         if (value){
           delete afks[byId];
           if (P)
-            room.librariesMap.commands?.announceAction(P.name + " is now back to the game.");
+            that.room.librariesMap.commands?.announceAction(P.name + " is now back to the game.");
         }
         else{
           afks[byId] = true;
           if (P)
-            room.librariesMap.commands?.announceAction(P.name + " is now AFK.");
+            that.room.librariesMap.commands?.announceAction(P.name + " is now AFK.");
         }
       }
     });
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("afk");
-    room = null;
+    that.room.librariesMap?.commands?.remove("afk");
     afks = null;
   };
 
   this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
-    if (!thisPlugin.detectNonAFKByInput || type!=OperationType.SendInput)
+    if (!that.detectNonAFKByInput || type!=OperationType.SendInput)
       return true;
     var byId = msg.byId;
     if (afks[byId]){
       delete afks[byId];
-      var P = room.players.find((x)=>x.id==byId);
+      var P = that.room.players.find((x)=>x.id==byId);
       if (P)
-        room.librariesMap.commands?.announceAction(P.name + " is now back to the game.");
+        that.room.librariesMap.commands?.announceAction(P.name + " is now back to the game.");
     }
     return true;
   };

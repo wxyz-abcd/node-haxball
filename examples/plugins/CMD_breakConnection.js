@@ -11,17 +11,16 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  var room, connectionShouldBreak, permissionCtx, permissionIds;
+  var connectionShouldBreak, permissionCtx, permissionIds, that = this;
 
-  this.initialize = function(_room){
-    room = _room;
+  this.initialize = function(){
     connectionShouldBreak = {};
-    permissionCtx = room.librariesMap.permissions?.createContext("breakConnection");
+    permissionCtx = that.room.librariesMap.permissions?.createContext("breakConnection");
     if (permissionCtx)
       permissionIds = {
         breakKick: permissionCtx.addPermission("breakKick")
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "breakKick",
       parameters: [{
         name: "playerId",
@@ -34,7 +33,7 @@ module.exports = function(API){
       helpText: "Breaks the connection of a player, effectively kicking the player without actually kicking him/her.",
       callback: ({playerId}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.breakKick)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
         connectionShouldBreak[playerId] = true; // mark player
@@ -43,9 +42,8 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    room.librariesMap?.commands?.remove("breakKick");
-    room.librariesMap?.permissions?.removeContext(permissionCtx);
-    room = null;
+    that.room.librariesMap?.commands?.remove("breakKick");
+    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
     connectionShouldBreak = null;
     permissionCtx = null;
     permissionIds = null;

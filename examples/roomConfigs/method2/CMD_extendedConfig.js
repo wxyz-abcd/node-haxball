@@ -10,7 +10,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this roomConfig to be activated on CreateRoom only.
   });
 
-  this.storageType = this.defineVariable({
+  this.defineVariable({
     name: "storageType",
     description: "The type of storage to use for storing permanent data. (0: None, 1: LocalStorage)",
     type: VariableType.Integer,
@@ -22,7 +22,7 @@ module.exports = function(API){
     }
   });
 
-  this.gameMode = this.defineVariable({
+  this.defineVariable({
     name: "gameMode",
     description: "Current mode of the game. (0: Default, 1: Ironman Regeneration)",
     type: VariableType.Integer,
@@ -34,23 +34,22 @@ module.exports = function(API){
     }
   });
 
-  var room = null, cmdLib = null, thisConfig = this, modes = null, permissionCtx = null, permissionIds = null, mode = null;
+  var cmdLib = null, that = this, modes = null, permissionCtx = null, permissionIds = null, mode = null;
   var Success, ParamsLessThanMinParamCount, CommandNotFound, UnknownParameterType, ParameterAlreadyDefined, BooleanParseError, NumberNaNOrInfinite, NumberOutOfBounds, StringLengthOutOfBounds;
 
   Object.defineProperty(this, "storage", {
     get: ()=>{
-      switch(parseInt(thisConfig.storageType)){
+      switch(parseInt(that.storageType)){
         case 1:
-          return room.librariesMap.localStorage;
+          return that.room.librariesMap.localStorage;
         // TODO: map other storage types to libraries here. All storage libraries must use the same storage interface.
       }
     }
   });
 
-  this.initialize = function(_room){
+  this.initialize = function(){
     mode = null;
-    room = _room;
-    cmdLib = room.librariesMap.commands;
+    cmdLib = that.room.librariesMap.commands;
     if (cmdLib){
       Success = cmdLib.ErrorCodes.Success;
       ParamsLessThanMinParamCount = cmdLib.ErrorCodes.ParamsLessThanMinParamCount;
@@ -62,13 +61,13 @@ module.exports = function(API){
       NumberOutOfBounds = cmdLib.ErrorCodes.NumberOutOfBounds;
       StringLengthOutOfBounds = cmdLib.ErrorCodes.StringLengthOutOfBounds;
     }
-    modes = [null, room.librariesMap.GM_ironRegen];
-    permissionCtx = room.librariesMap.permissions?.createContext("extConfig");
+    modes = [null, that.room.librariesMap.GM_ironRegen];
+    permissionCtx = that.room.librariesMap.permissions?.createContext("extConfig");
     if (permissionCtx)
       permissionIds = {
         mode: permissionCtx.addPermission("mode"),
       };
-    room.librariesMap.commands?.add({
+    that.room.librariesMap.commands?.add({
       name: "mode",
       parameters: [{
         name: "modeIdx",
@@ -82,25 +81,24 @@ module.exports = function(API){
       helpText: "Changes the room's game mode.",
       callback: ({modeIdx}, byId) => {
         if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.mode)){
-          room.librariesMap.commands?.announcePermissionDenied(byId);
+          that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        var oldGameMode = thisConfig.gameMode;
-        thisConfig.gameMode = modeIdx;
-        room._onVariableValueChange(thisConfig, "gameMode", oldGameMode, thisConfig.gameMode);
+        var oldGameMode = that.gameMode;
+        that.gameMode = modeIdx;
+        that.room._onVariableValueChange(that, "gameMode", oldGameMode, that.gameMode);
       }
     });    
   };
 
   this.finalize = function(){
     cmdLib = null;
-    room = null;
     modes = null;
     mode = null;
   };
 
   this.onVariableValueChange = function(addOnObj, variableName, oldValue, value){
-    if (addOnObj==thisConfig && variableName=="gameMode"){
+    if (addOnObj==that && variableName=="gameMode"){
       mode?.finalizeMode();
       mode = modes[value];
       mode?.initializeMode();

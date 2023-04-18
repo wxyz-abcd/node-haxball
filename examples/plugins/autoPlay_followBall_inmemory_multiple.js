@@ -13,8 +13,7 @@ module.exports = function(API){
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
   });
 
-  // parameters are exported so that they can be edited outside this class.
-  this.minCoordAlignDelta = this.defineVariable({
+  this.defineVariable({
     name: "minCoordAlignDelta",
     description: "Minimum delta value for coordinate alignment", 
     type: VariableType.Number,
@@ -26,7 +25,7 @@ module.exports = function(API){
     }
   });
 
-  this.minKickDistance = this.defineVariable({
+  this.defineVariable({
     name: "minKickDistance",
     description: "Minimum distance between ball and bot player for the bot player to start kicking the ball", 
     type: VariableType.Number,
@@ -38,7 +37,7 @@ module.exports = function(API){
     }
   });
 
-  this.maxConcurrentBotCount = this.defineVariable({
+  this.defineVariable({
     name: "maxConcurrentBotCount",
     description: "Maximum number of concurrently running bots.", 
     type: VariableType.Integer,
@@ -50,15 +49,7 @@ module.exports = function(API){
     }
   });
 
-  var room = null, that = this;
-  
-  this.initialize = function(_room){
-    room = _room;
-  };
-
-  this.finalize = function(){
-    room = null;
-  };
+  var that = this;
 
   var smallestBotId = 65535, largestBotId = 65535, botIds = [], keyStates = {}, dummyPromise = Promise.resolve();
 
@@ -67,14 +58,14 @@ module.exports = function(API){
       return;
     botIds.push(smallestBotId);
     keyStates[smallestBotId] = 0;
-    room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
+    that.room.fakePlayerJoin(smallestBotId--, name || "in-memory-bot", flag || "tr", avatar || "XX", conn || "fake-ip-do-not-believe-it", auth || "fake-auth-do-not-believe-it");
   };
 
   var removeBot = function(){
     if (smallestBotId < largestBotId){
       delete keyStates[largestBotId];
       botIds.splice(botIds.indexOf(largestBotId), 1);
-      room.fakePlayerLeave(largestBotId--);
+      that.room.fakePlayerLeave(largestBotId--);
     }
   };
 
@@ -107,7 +98,7 @@ module.exports = function(API){
     botIds.forEach((botId)=>{
 
       // get the original data object of the next bot
-      var cp = room.getPlayer(botId);
+      var cp = that.room.getPlayer(botId);
       var playerDisc = cp?.disc;
 
       // coordinates: playerDisc.pos.x, playerDisc.pos.y
@@ -118,7 +109,7 @@ module.exports = function(API){
         return;
 
       // get the original data object of the ball
-      var ball = room.getBall();
+      var ball = that.room.getBall();
 
       // coordinates: ball.pos.x, ball.pos.y
       // speed: ball.speed.x, ball.speed.y
@@ -150,8 +141,8 @@ module.exports = function(API){
         // therefore, we are trying to limit consequent sending.
         if (keyState!=keyStates[botId] || kick!=cp.isKicking){ // isKicking: whether x key is active in-game (the circle around players is painted white if isKicking is true)
           if ((keyState==keyStates[botId]) && kick && !cp.isKicking) // if keyStates are the same and we are trying to kick, but the x key is not active in game,
-            room.fakeSendPlayerInput(/*input:*/ keyState & -17, /*byId:*/ botId); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
-          room.fakeSendPlayerInput(/*input:*/ keyState, /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
+            that.room.fakeSendPlayerInput(/*input:*/ keyState & -17, /*byId:*/ botId); // we have to release x key before pressing it again. (keyState & -17) changes only the 5th(kick) bit of keyState to 0.
+          that.room.fakeSendPlayerInput(/*input:*/ keyState, /*byId:*/ botId); // unlike room.setKeyState, this function directly emits a keystate message.
           keyStates[botId] = keyState;
         }
       });
