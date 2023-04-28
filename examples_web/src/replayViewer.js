@@ -199,6 +199,8 @@ function onload(){
     performance: window.performance,
     JSON5: window.JSON5,
     pako: window.pako
+  }, {
+    noVariableValueChangeEvent: true
   });
   sound = new Sound();
   canvas.addEventListener("wheel", (event)=>renderer.onWheel(event));
@@ -428,6 +430,7 @@ function onload(){
           var data = new Uint8Array(reader.result);
           replayReader = API.Replay.read(data, callbacks);
           replayReader.onDestinationTimeReached = onDestinationTimeReached;
+          renderer.room = replayReader;
           renderer.initialize(replayReader);
           //replayReader.setSpeed(1.0);
         }
