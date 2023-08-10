@@ -110,6 +110,7 @@ dist
 test/
 backup/
 src_2/
+api_fixednames.js
 package_git.json
 examples/*_halfMinified
 examples/renderers/*_halfMinified.js

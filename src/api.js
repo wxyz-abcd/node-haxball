@@ -8764,6 +8764,68 @@ function abcHaxballAPI(window, config){
     return obj;
   }
 
+  function ReplayData(){
+    this.roomData = new fa();
+    this.events = [];
+    this.totalFrames = 0;
+    this.version = 3;
+  }
+
+  function readAllReplay(uint8Array){
+    var data = new ReplayData();
+    var hg = 0;
+    var a = new F(new DataView(uint8Array.buffer), !1);
+    if (1212305970 != a.hb()) throw new q('');
+    var b = a.hb();
+    if (3 != b) throw new q(new Kb(b)); // version
+    data.totalFrames = a.hb();
+    var c = pako.inflateRaw(a.sb());
+    var Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength));
+    var gg = null;
+    for (var b = Lc.Ob(), c = 0, i = 0; i < b; i++) { // meaningless data ???
+      Lc.Ab();
+      Lc.B();
+    }
+    c = Lc.sb();
+    Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength), !1);
+    data.roomData.ja(Lc);
+    while(Lc.a < Lc.o.byteLength){
+      b = Lc.Ab();
+      hg += b;
+      b = Lc.Ob();
+      gg = m.fh(Lc, true);
+      gg.P = b;
+      gg.frameNo = hg;
+      data.events.push(gg);
+    }
+    return data;
+  }
+
+  function writeAllReplay(replayData){
+    var Df = w.ha(16384);
+    var d = 0;
+    replayData.roomData.ga(Df);
+    replayData.events.forEach((b)=>{
+      var e = b.frameNo;
+      if (e<d)
+        return;
+      Df.lb(e - d);
+      d = e;
+      Df.Ub(b.P);
+      m.lj(b, Df);
+    });
+    var Nd = w.ha(1000);
+    Nd.Ub(0);
+    Nd.o.setUint16(0, 0, Nd.Sa);
+    Nd.Vb(Df.Sb());
+    var a = pako.deflateRaw(Nd.Sb()), b = w.ha(a.byteLength + 32);
+    b.Og("HBR2");
+    b.tb(replayData.version);
+    b.tb(replayData.totalFrames);
+    b.Vb(a);
+    return b.Sb();
+  }
+
   function fixStorage(options){
     var storage = options?.storage;
     (!storage) && (storage = options.storage = {});
@@ -10864,7 +10926,10 @@ function abcHaxballAPI(window, config){
       sandbox: createSandbox
     },
     Replay: {
-      read: readReplay
+      ReplayData: ReplayData,
+      read: readReplay,
+      readAll: readAllReplay,
+      writeAll: writeAllReplay
       //Recorder: ac
     },
     Query: {

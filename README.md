@@ -215,6 +215,15 @@ Room.create({
       - callbacks:
         - `onDestinationTimeReached()`: Destination time has been reached. Runs after a call to `setTime(destinationTime)`.
         - `onEnd()`: The end of replay data has been reached.
+  
+  - `ReplayData`: The structure that holds all of the data inside a replay file.
+    - `roomData`: The initial `RoomState` of the replay, including all the information about the current stadium, game state, players, etc.
+    - `events`: All events in this replay ordered by their respective `frameNo`.
+    - `totalFrames`: Total number of frames in this replay.
+    - `version`: Version number of the replay. Must currently be equal to `3`.
+
+  - `readAll(uint8Array)`: Reads all of the given binary replay data into a new `ReplayData` structure and returns it. 
+  - `writeAll(replayData)`: Writes the contents of a `ReplayData` structure into a new `Uint8Array` and returns it. 
 
 - `Utils`: Some static utility functions.
 
