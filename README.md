@@ -1,4 +1,4 @@
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball) [![NPM Version](https://img.shields.io/npm/v/node-haxball?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/node-haxball?style=flat-square)](https://npmjs.org/package/node-haxball) [![Proxy Server Status](https://img.shields.io/endpoint?label=proxy%20server&style=flat-square&url=https%3A%2F%2Fabc-haxball-proxy.up.railway.app%2Fstatus)](https://abc-haxball-proxy.up.railway.app)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball) [![NPM Version](https://img.shields.io/npm/v/node-haxball?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/node-haxball?style=flat-square)](https://npmjs.org/package/node-haxball) [![Proxy Server Status](https://img.shields.io/endpoint?label=proxy%20server&style=flat-square&url=https%3A%2F%2Fsurf-emerald-armadillo.glitch.me%2Fstatus)](https://surf-emerald-armadillo.glitch.me)
 
 [![License](https://img.shields.io/github/license/wxyz-abcd/node-haxball?style=flat-square)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/wxyz-abcd/node-haxball?style=flat-square) ![Repository Size](https://img.shields.io/github/repo-size/wxyz-abcd/node-haxball?style=flat-square)
 
@@ -36,7 +36,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
 
 #### 💻 Usage on Browser
 
-  - NOTE: Usage on Browser currently relies on our <a href="https://abc-haxball-proxy.up.railway.app">proxy server</a>. (Will expire at the end of each month and not work for several days.)
+  - NOTE: Usage on Browser currently relies on our <a href="https://surf-emerald-armadillo.glitch.me">proxy server</a>. (Will expire at the end of each month and not work for several days.)
   - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at our <a href="https://github.com/wxyz-abcd/node-haxball/tree/main/haxballOriginModifier">haxballOriginModifier project</a>.)
   - <a href="https://abc-haxball-proxy.infinityfreeapp.com/?no_proxy_server=true">Alternate URL</a> (No proxy server yet.)
   - Moreover; if you have a custom backend server for Haxball, you can use it with this API too.
@@ -46,16 +46,16 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
   ```html
   <html>
     <head>
-      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
-      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
+      <script src="https://www.haxball.com/PwfmUfRI/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
+      <script src="https://www.haxball.com/PwfmUfRI/__cache_static__/g/vendor/pako-jszip.min.js"></script> <!-- pako library -->
       <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
     </head>
     <body>
       <script>
         var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
           proxy: {
-            WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
-            HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+            WebSocketUrl: "wss://surf-emerald-armadillo.glitch.me/",
+            HttpUrl: "https://surf-emerald-armadillo.glitch.me/rs/"
           }
         });
         // Use example code here.
@@ -69,8 +69,8 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
   ```html
   <html>
     <head>
-      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
-      <script src="https://www.haxball.com/PFj3geCw/__cache_static__/g/vendor/pako.min.js"></script> <!-- pako library -->
+      <script src="https://www.haxball.com/PwfmUfRI/__cache_static__/g/vendor/json5.min.js"></script> <!-- json5 library -->
+      <script src="https://www.haxball.com/PwfmUfRI/__cache_static__/g/vendor/pako-jszip.min.js"></script> <!-- pako library -->
       <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script> <!-- this file comes from this repo -->
     </head>
     <body>
@@ -148,6 +148,7 @@ Room.create({
       - `WebSocketChangeOriginAllowed`: browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If `true`, we do not need a proxy server. (we can do that in NW.js, for example)
       - `WebSocketUrl`: proxy websocket url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `wss://p2p.haxball.com/` for host and `wss://p2p2.haxball.com/` for client.
       - `HttpUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `https://www.haxball.com/rs/`.
+    - `proxyAgent`: a global custom proxy agent for this api object. This method does not work in browsers. Defaults to `null`.
     - `fixNames`: fix some important variable names or not. Defaults to: `true`.
     - `version`: Haxball's expected version number. Defaults to: `9`.
     - `noVariableValueChangeEvent`: if `true`, disables the mechanism that enables variable value change event which in turn improves performance while reaching a variable's value that was defined by any `Addon.defineVariable` function. (Variable will have a directly accessable, actual value; instead of a property that points to the actual variable.) Defaults to: `false`.
@@ -301,6 +302,7 @@ Room.create({
         - `plugins`: array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. default value is `[]`. (Look at examples/plugins folder for example Plugins to use here, or src/pluginTemplate.js for a template Plugin that contains all callbacks.)
         - `version`: Haxball's version number. other clients cannot join this room if their version number is different than this number. default value is `9`.
         - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. you may assign a negative value to disable this feature. default value is `-1`(msec).
+        - `proxyAgent`: a custom proxy agent for the room's connection. This method does not work in browsers. Defaults to `null`.
 
         --- event callbacks section ---
         - `onSuccess(room)`: joined/created `room`.

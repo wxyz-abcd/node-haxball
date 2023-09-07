@@ -19,8 +19,8 @@ function init(headless, roomCallback){
   }/*,{
     proxy: {
       WebSocketChangeOriginAllowed: false,
-      WebSocketUrl: "wss://abc-haxball-proxy.up.railway.app/", // These urls will (probably) work between 10th and 30th day of each month.
-      HttpUrl: "https://abc-haxball-proxy.up.railway.app/rs/"
+      WebSocketUrl: "wss://surf-emerald-armadillo.glitch.me/",
+      HttpUrl: "https://surf-emerald-armadillo.glitch.me/rs/"
     }
   }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 

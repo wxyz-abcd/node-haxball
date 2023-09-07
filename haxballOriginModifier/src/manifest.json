@@ -8,8 +8,8 @@
   "host_permissions": [
     "https://*.haxball.com/*",
     "wss://*.haxball.com/*",
-    "https://*.railway.app/*",
-    "wss://*.railway.app/*",
+    "https://*.glitch.me/*",
+    "wss://*.glitch.me/*",
     "https://*.infinityfreeapp.com/*",
     "wss://*.infinityfreeapp.com/*",
     "http://*.localhost:*/*",

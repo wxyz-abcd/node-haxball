@@ -2161,6 +2161,8 @@ function abcHaxballAPI(window, config){
   M.Pl = function (a, b, c, d, e) {
     return new Promise(function (f, g) {
       var k = new XMLHttpRequest();
+      //if (config.nodeProxy)
+      //  k.proxy = config.nodeProxy.host+":"+config.nodeProxy.port;
       k.open(b, a);
       k.responseType = c;
       k.onload = function () {
@@ -6340,8 +6342,9 @@ function abcHaxballAPI(window, config){
     },
   };
   
-  function wb(a, b, c, d, e, f) {
+  function wb(a, b, c, d, e, f, proxyAgent) {
     this.rh = this.yh = !1;
+    this.proxyAgent = proxyAgent;
     var g = this;
     this.pa = new Va(0, b, d);
     this.pa.bd = function () {
@@ -6356,12 +6359,16 @@ function abcHaxballAPI(window, config){
       g.jr = b;
       config.proxy?.WebSocketUrl && (a = config.proxy.WebSocketUrl);
       (!a.endsWith("client")) && (((!a.endsWith("/")) && (a += "/")), a += "client");
-      if (config.proxy?.WebSocketChangeOriginAllowed) // custom environment
-        g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f),{
-          headers: {
+      if (g.proxyAgent || config.proxy?.WebSocketChangeOriginAllowed){ // custom environment
+        var propsObj = {};
+        if (g.proxyAgent)
+          propsObj.agent = g.proxyAgent;
+        if (config.proxy.WebSocketChangeOriginAllowed)
+          propsObj.headers = {
             Origin: (config.backend.secure?"https":"http")+"://"+config.backend.hostname
-          }
-        });
+          };
+        g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f), propsObj);
+      }
       else // browser
         g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f));
       g.X.binaryType = "arraybuffer";
@@ -6495,7 +6502,7 @@ function abcHaxballAPI(window, config){
         var f = w.ha();
         f.Ub(b.version);
         f.Db(b.password);
-        c.pc = new wb(b.ij, b.iceServers, a, Zb.Km, f, b.gn);
+        c.pc = new wb(b.ij, b.iceServers, a, Zb.Km, f, b.gn, c.haxball.proxyAgent || config.proxyAgent);
         c.pc.rh = e;
         c.pc.zd = function (a) {
           c.pc = null;
@@ -6886,15 +6893,18 @@ function abcHaxballAPI(window, config){
         if (null == a) throw new q(null);
         config.proxy?.WebSocketUrl && (b = config.proxy?.WebSocketUrl);
         (!b.endsWith("host")) && (((!b.endsWith("/")) && (b += "/")), b += "host");
-        if (config.proxy?.WebSocketChangeOriginAllowed) // custom environment
-          d.X = new WebSocket(b + "?token=" + a, {
-            headers: {
+        if (d.haxball.proxyAgent || config.proxyAgent || config.proxy?.WebSocketChangeOriginAllowed){ // custom environment
+          var propsObj = {};
+          if (d.haxball.proxyAgent || config.proxyAgent)
+            propsObj.agent = d.haxball.proxyAgent || config.proxyAgent;
+          if (config.proxy.WebSocketChangeOriginAllowed)
+            propsObj.headers = {
               Origin: (config.backend.secure?"https":"http")+"://"+config.backend.hostname
-            }
-          });
-        else{ // browser
-          d.X = new WebSocket(b + "?token=" + a);
+            };
+          d.X = new WebSocket(b + "?token=" + a, propsObj);
         }
+        else // browser
+          d.X = new WebSocket(b + "?token=" + a);
         d.X.binaryType = "arraybuffer";
         d.X.onopen = function () {
           d.So();
@@ -6923,6 +6933,9 @@ function abcHaxballAPI(window, config){
         ["catch"](function (ex) {
           console.log(ex instanceof q ? ex.Ta : ex);
           d.haxball.useRecaptchaToken = null;
+          //if (typeof ex=="string" && ex.startsWith("status:")) // TODO: catch proxy server errors properly.
+            //d.ia();
+          //else
           d.Mh(!0);
         });
     },
