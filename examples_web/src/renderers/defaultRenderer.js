@@ -5,7 +5,7 @@ module.exports = function(API, params){
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default",
-    version: "1.4",
+    version: "1.5",
     author: "basro & abc",
     description: `This is a much more improved version of the default renderer currently used in Haxball with bug-fixes, aimbot and new features. Use +, - keys for zoom in-out. Disable followMode to zoom using mouse wheel.`
   });
@@ -122,6 +122,13 @@ module.exports = function(API, params){
     description: "Show invisible segments?", 
     type: VariableType.Boolean,
     value: false
+  });
+
+  this.defineVariable({
+    name: "transparentDiscBugFix",
+    description: "Hide transparent discs?", 
+    type: VariableType.Boolean,
+    value: true
   });
 
   var thisRenderer = this, { H: Point, p: Team, ka: TeamColors } = Impl.Core, roomLibrariesMap = null;
@@ -672,13 +679,16 @@ module.exports = function(API, params){
       }
     },
     drawDisc: function(disc, playerDecorator){ // Ll
+      var transparent;
       this.ctx.beginPath();
       if (playerDecorator){
         this.ctx.fillStyle = playerDecorator.pattern;
         this.ctx.strokeStyle = playerDecorator.strokeStyle;
       }
       else{
-        this.ctx.fillStyle = Utils.numberToColor(disc.color);
+        transparent = (disc.color|0)==-1;
+        if (thisRenderer.transparentDiscBugFix || !transparent)
+          this.ctx.fillStyle = Utils.numberToColor(disc.color);
         this.ctx.strokeStyle = "black";
       }
       this.ctx.beginPath();
@@ -695,9 +705,10 @@ module.exports = function(API, params){
         this.ctx.fill();
         this.ctx.restore();
       }
-      else if ((disc.color|0)!=-1){
+      else{
         this.ctx.arc(disc.pos.x, disc.pos.y, disc.radius, 0, 2*Math.PI, false);
-        this.ctx.fill();
+        if (!thisRenderer.transparentDiscBugFix || !transparent)
+          this.ctx.fill();
       }
       this.ctx.stroke();
     },

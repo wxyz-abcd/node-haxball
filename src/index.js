@@ -36,7 +36,8 @@ module.exports = function(window, config){
       backend: config?.backend,
       proxyAgent: config?.proxyAgent,
       fixNames: config?.fixNames,
-      version: config?.version
+      version: config?.version,
+      noVariableValueChangeEvent: config?.noVariableValueChangeEvent
     }
   );
 }

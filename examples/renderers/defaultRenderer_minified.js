@@ -4,7 +4,7 @@ module.exports = function(API, params){
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default.min",
-    version: "1.02",
+    version: "1.03",
     author: "basro & abc",
     description: `This is the default renderer currently used in Haxball, with the exception that most if not all of the camera bugs have been fixed.`
   });
@@ -51,6 +51,13 @@ module.exports = function(API, params){
   this.defineVariable({ // show_indicators
     name: "showChatIndicators",
     description: "Show Chat Indicators?", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.defineVariable({
+    name: "transparentDiscBugFix",
+    description: "Hide transparent discs?", 
     type: VariableType.Boolean,
     value: true
   });
@@ -562,9 +569,10 @@ module.exports = function(API, params){
       }
     },
     Ll: function (a, b) {
+      var t;
       this.c.beginPath();
       null == b
-        ? ((this.c.fillStyle = Utils.numberToColor(a.R)), (this.c.strokeStyle = "black"))
+        ? ((t = (a.R | 0)==-1), ((thisRenderer.transparentDiscBugFix || !t) && (this.c.fillStyle = Utils.numberToColor(a.R))), (this.c.strokeStyle = "black"))
         : ((this.c.fillStyle = b.Ij), (this.c.strokeStyle = b.lo));
       this.c.beginPath();
       this.c.arc(a.a.x, a.a.y, a.Z, 0, 2 * Math.PI, !1);
@@ -576,7 +584,7 @@ module.exports = function(API, params){
         this.c.translate(-32, -32);
         this.c.fill();
         this.c.restore();
-      } else -1 != (a.R | 0) && this.c.fill();
+      } else (!thisRenderer.transparentDiscBugFix || !t) && this.c.fill();
       this.c.stroke();
     },
     Rq: function (a) {

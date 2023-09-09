@@ -5,7 +5,7 @@ module.exports = function(API, params){
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "sandbox",
-    version: "1.2",
+    version: "1.3",
     author: "basro & abc",
     description: `This is a customized renderer with aimbot designed specifically for the new sandbox mode for Haxball. Disable followMode to zoom using mouse wheel.`
   });
@@ -122,6 +122,13 @@ module.exports = function(API, params){
     description: "Show invisible segments?", 
     type: VariableType.Boolean,
     value: false
+  });
+
+  this.defineVariable({
+    name: "transparentDiscBugFix",
+    description: "Hide transparent discs?", 
+    type: VariableType.Boolean,
+    value: true
   });
 
   this.defineVariable({
@@ -753,13 +760,16 @@ module.exports = function(API, params){
       }
     },
     drawDisc: function(disc, playerDecorator){ // Ll
+      var transparent;
       this.ctx.beginPath();
       if (playerDecorator){
         this.ctx.fillStyle = playerDecorator.pattern;
         this.ctx.strokeStyle = playerDecorator.strokeStyle;
       }
       else{
-        this.ctx.fillStyle = Utils.numberToColor(disc.color);
+        transparent = (disc.color|0)==-1;
+        if (thisRenderer.transparentDiscBugFix || !transparent)
+          this.ctx.fillStyle = Utils.numberToColor(disc.color);
         this.ctx.strokeStyle = "black";
       }
       if (selectedObj==disc){
@@ -780,9 +790,10 @@ module.exports = function(API, params){
         this.ctx.fill();
         this.ctx.restore();
       }
-      else if ((disc.color|0)!=-1){
+      else{
         this.ctx.arc(disc.pos.x, disc.pos.y, disc.radius, 0, 2*Math.PI, false);
-        this.ctx.fill();
+        if (!thisRenderer.transparentDiscBugFix || !transparent)
+          this.ctx.fill();
       }
       this.ctx.stroke();
       this.ctx.setLineDash([]);
