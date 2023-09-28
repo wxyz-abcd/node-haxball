@@ -152,6 +152,7 @@ Room.create({
     - `fixNames`: fix some important variable names or not. Defaults to: `true`.
     - `version`: Haxball's expected version number. Defaults to: `9`.
     - `noVariableValueChangeEvent`: if `true`, disables the mechanism that enables variable value change event which in turn improves performance while reaching a variable's value that was defined by any `Addon.defineVariable` function. (Variable will have a directly accessable, actual value; instead of a property that points to the actual variable.) Defaults to: `false`.
+    - `noWebRTC`: If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
@@ -308,7 +309,7 @@ Room.create({
         - `onSuccess(room)`: joined/created `room`.
         - `onFailure(error)`: join room failed with error(`error`).
         - `onLeave(msg)`: triggered while leaving the room with reason(`msg`).
-        - `onConnectionStateChange(state)`: connection state has just changed to (`state`).
+        - `onConnectionStateChange(state, sdp)`: connection state has just changed to (`state`). `sdp` value can be used to get all the information about the webrtc connection when `state` is `1` or `2`. you may use this to block players before they can connect the host, etc.
         - `onReverseConnection()`: trying reverse connection while joining a room.
         - `onRequestRecaptcha()`: recaptcha is required while joining or creating a room.
 

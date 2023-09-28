@@ -37,6 +37,7 @@ module.exports = function(window, config){
       proxyAgent: config?.proxyAgent,
       fixNames: config?.fixNames,
       version: config?.version,
+      noWebRTC: config?.noWebRTC,
       noVariableValueChangeEvent: config?.noVariableValueChangeEvent
     }
   );

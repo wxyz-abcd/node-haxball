@@ -426,29 +426,30 @@ function abcHaxballAPI(window, config){
     return e;
   }
 
-  (()=>{
-    //mc.ts (init webrtc) contents:
-    var b = new RTCPeerConnection({ iceServers: [] });
-    try {
-      b.createAnswer()["catch"](function () {});
-    } catch (e) {
-      var a = a.RTCPeerConnection.prototype,
-        c = a.createOffer,
-        d = a.createAnswer;
-      a.createOffer = function (a) {
-        var b = this;
-        return new Promise(function (d, e) {
-          c.call(b, d, e, a);
-        });
-      };
-      a.createAnswer = function (a) {
-        var b = this;
-        return new Promise(function (c, e) {
-          d.call(b, c, e, a);
-        });
-      };
-    }
-  })();
+  if (!config.noWebRTC)
+    (()=>{
+      //mc.ts (init webrtc) contents:
+      var b = new RTCPeerConnection({ iceServers: [] });
+      try {
+        b.createAnswer()["catch"](function () {});
+      } catch (e) {
+        var a = a.RTCPeerConnection.prototype,
+          c = a.createOffer,
+          d = a.createAnswer;
+        a.createOffer = function (a) {
+          var b = this;
+          return new Promise(function (d, e) {
+            c.call(b, d, e, a);
+          });
+        };
+        a.createAnswer = function (a) {
+          var b = this;
+          return new Promise(function (c, e) {
+            d.call(b, c, e, a);
+          });
+        };
+      }
+    })();
 
 
 
@@ -6520,10 +6521,10 @@ function abcHaxballAPI(window, config){
             c.ia();
           }, 1e4);
           c.re = a;
-          c.tf(2);
+          c.tf(2, c.pa.Ra.remoteDescription.sdp);
         };
         c.pc.gl = function () {
-          c.tf(1);
+          c.tf(1, c.pc.jr.sdp);
         };
         var g = !1;
         c.pc.Zk = function () {
@@ -6576,8 +6577,8 @@ function abcHaxballAPI(window, config){
       this.tf(4);
       y.i(this.haxball._onRoomLeave, this.ek);
     },
-    tf: function (a) {
-      this.pd != a && ((this.pd = a), (y.i(this.haxball._onConnectionStateChange, a)), null != this.Ad && this.Ad(a));
+    tf: function (a, b) {
+      this.pd != a && ((this.pd = a), (ia.i(this.haxball._onConnectionStateChange, a, b)), null != this.Ad && this.Ad(a));
     },
     wd: function () {
       return 3 == this.pd;
@@ -8968,9 +8969,9 @@ function abcHaxballAPI(window, config){
         })
       );
     };
-    haxball._onConnectionStateChange = function(state){
+    haxball._onConnectionStateChange = function(state, param){
       console.log("internal event: ConnectionStateChange");
-      y.i(haxball.onConnectionStateChange, state);
+      ia.i(haxball.onConnectionStateChange, state, param);
       if (state==4){
         //haxball._onRoomLeave = null;
         haxball._onConnectionStateChange = null;

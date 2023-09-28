@@ -280,7 +280,7 @@ declare namespace MainReturnType {
   }
 
   /**
-   * These values are used to track the current state of connection while joining a room. (Designed for the `onConnectionStateChange(state)` callback in the `commonParams` parameter of `Room.join` function.)
+   * These values are used to track the current state of connection while joining a room. (Designed for the `onConnectionStateChange(state, sdp)` callback in the `commonParams` parameter of `Room.join` function.)
    */
   export enum ConnectionState {
 
@@ -948,6 +948,410 @@ declare namespace MainReturnType {
      */
     Ending = 3
   }
+
+  /**
+   * The base class for all Haxball events.
+   */
+  declare class HaxballEvent {
+    
+    /**
+     * Type of the event. Should not be modified.
+     */
+    public readonly eventType: OperationType;
+
+    /**
+     * Id of the player who triggered this event.
+     */
+    public byId: int;
+  };
+
+  /**
+   * The event message structure that is created when the game is started.
+   */
+  declare class StartGameEvent extends HaxballEvent {};
+
+  /**
+   * The event message structure that is created when the game is stopped.
+   */
+  declare class StopGameEvent extends HaxballEvent {};
+
+  /**
+   * The event message structure that is created when auto teams button is clicked.
+   */
+  declare class AutoTeamsEvent extends HaxballEvent {};
+
+  /**
+   * The event message structure that is created when a player's synchronization status changes.
+   */
+  declare class SetPlayerSyncEvent extends HaxballEvent {
+
+    /**
+     * The new synchronization status of the player who sent this event.
+     */
+    public value: boolean;
+  };
+
+  /**
+   * The event message structure that is created when an announcement is sent/received.
+   */
+  declare class SendAnnouncementEvent extends HaxballEvent {
+
+    /**
+     * The announcement message. ( max length = 1000 )
+     */
+    public msg: string;
+
+    /**
+     * The color of the announcement message. Range: -1 <= `color` < 16777216. 
+     *  - The color value can be converted into a rgba string via API's `Utils.numberToColor` function.
+     *  - The special value `-1` means `transparent` color.
+     */
+    public color: int;
+
+    /**
+     * The style of the announcement message. Must be one of the following:
+     *  - 0: use document's default font style.
+     *  - 1: fontWeight = "bold".
+     *  - 2: fontStyle = "italic".
+     *  - 3: fontSize = "12px".
+     *  - 4: fontWeight = "bold", fontSize = "12px".
+     *  - 5: fontWeight = "italic", fontSize = "12px".
+     */
+    public style: uint8;
+
+    /**
+     * The sound of the announcement message. Must be one of the following: 
+     *  - 0: no sound.
+     *  - 1: chat sound.
+     *  - 2: highlight sound.
+     */
+    public sound: uint8;
+
+    /**
+     * Id of the player who will receive the announcement. 
+     * If `null`, everyone receives it. Can not be modified.
+     */
+    public readonly targetId: int | null;
+  };
+
+  /**
+   * The event message structure that is created when score limit or time limit is changed.
+   */
+  declare class SetLimitEvent extends HaxballEvent {
+
+    /**
+     * Type of the event. 
+     * - If `0`, score limit is changed.
+     * - Otherwise, time limit is changed.
+     */
+    public type: uint8;
+
+    /**
+     * The new value of the limit. (0 <= value < 100)
+     */
+    public newValue: int;
+  };
+
+  /**
+   * The event message structure that is created when a player's admin status is changed.
+   */
+  declare class SetPlayerAdminEvent extends HaxballEvent {
+
+    /**
+     * Id of the player whose admin status is changed.
+     */
+    public playerId: int;
+
+    /**
+     * The new admin status value.
+     */
+    public value: boolean;
+  };
+
+  /**
+   * The event message structure that is created when a player changes its avatar.
+   */
+  declare class SetAvatarEvent extends HaxballEvent {
+
+    /**
+     * The new avatar. ( max length = 2 )
+     */
+    public value: string | null;
+  };
+
+  /**
+   * The event message structure that is created when a player is moved to a team.
+   */
+  declare class SetPlayerTeamEvent extends HaxballEvent {
+
+    /**
+     * Id of the player whose team is changed.
+     */
+    public playerId: int;
+
+    /**
+     * The new team.
+     */
+    public team: Team;
+  };
+
+  /**
+   * The event message structure that is created when the stadium is changed.
+   */
+  declare class SetStadiumEvent extends HaxballEvent {
+
+    /**
+     * The new stadium.
+     */
+    public stadium: Stadium;
+  };
+
+  /**
+   * The event message structure that is created when the team colors are changed.
+   */
+  declare class SetTeamColorsEvent extends HaxballEvent {
+
+    /**
+     * The team whose colors are changed.
+     */
+    public team: Team;
+
+    /**
+     * The new team colors.
+     */
+    public colors: TeamColors;
+  };
+
+  /**
+   * The event message structure that is created when the teams lock status is changed.
+   */
+  declare class SetTeamsLockEvent extends HaxballEvent {
+
+    /**
+     * The new teams lock status.
+     */
+    public newValue: boolean;
+  };
+
+  /**
+   * The event message structure that is created when a new player joins the room.
+   */
+  declare class JoinRoomEvent extends HaxballEvent {
+
+    /**
+     * Id of the new player.
+     */
+    public id: int;
+
+    /**
+     * Name of the new player.
+     */
+    public name: string | null;
+
+    /**
+     * Flag of the new player.
+     */
+    public flag: string | null;
+
+    /**
+     * Avatar of the new player.
+     */
+    public avatar: string | null;
+
+    /**
+     * Hex-encoded "connection string"(!) of the new player.
+     */
+    public conn: string;
+
+    /**
+     * Auth of the new player.
+     */
+    public auth: string;
+  };
+
+  /**
+   * The event message structure that is created when a player's headless avatar is changed.
+   */
+  declare class SetHeadlessAvatarEvent extends HaxballEvent {
+
+    /**
+     * Id of the player whose headless avatar is changed.
+     */
+    public playerId: int;
+
+    /**
+     * The new headless avatar value. ( max length = 2 )
+     */
+    public value: string | null;
+  };
+
+  /**
+   * The event message structure that is created when the game is paused/resumed.
+   */
+  declare class PauseResumeGameEvent extends HaxballEvent {
+
+    /**
+     * Whether the game is paused or not.
+     */
+    public paused: boolean;
+  };
+
+  /**
+   * The event message structure that is created when a chat message is sent.
+   */
+  declare class SendChatEvent extends HaxballEvent {
+
+    /**
+     * The chat text that is sent. ( max length = 140 )
+     */
+    public text: string;
+
+    /**
+     * Id of the player who will receive the chat. 
+     * If `null`, everyone receives it. Can not be modified.
+     */
+    public readonly targetId: int | null;
+  };
+
+  /**
+   * The event message structure that is created when a player's input changes.
+   */
+  declare class SendInputEvent extends HaxballEvent {
+
+    /**
+     * The new input value. ( 0 <= input < 32 )
+     */
+    public input: uint32;
+  };
+
+  /**
+   * The event message structure that is created when a player's chat indicator status changes.
+   */
+  declare class SendChatIndicatorEvent extends HaxballEvent {
+
+    /**
+     * The new value of the chat indicator status. (0: off, 1: on)
+     */
+    public value: uint8;
+  };
+
+  /**
+   * The event message structure that is created when a custom event is triggered by this API.
+   */
+  declare class CustomEvent extends HaxballEvent {
+
+    /**
+     * Type of the custom event. This value can be anything you want.
+     */
+    public type: uint8;
+
+    /**
+     * Custom data of the custom event. This value can be anything you want.
+     * It has to be any json object that can be `JSON.stringify`ed and `JSON.parse`d.
+     */
+    public data: object;
+  };
+
+  /**
+   * The event message structure that is created when a player leaves the room or is kicked/banned by the host.
+   */
+  declare class KickBanPlayerEvent extends HaxballEvent {
+
+    /**
+     * Id of the player who left the room.
+     */
+    public id: int;
+
+    /**
+     * The reason of kick/ban. ( max length = 100 )
+     * Interpreted as leaving by himself/herself if this value is `null`.
+     */
+    public reason: string | null;
+
+    /**
+     * Whether the player is banned or not.
+     */
+    public ban: boolean;
+  };
+
+  /**
+   * The event message structure that is created when the host calls room.reorderPlayers function.
+   */
+  declare class ReorderPlayersEvent extends HaxballEvent {
+
+    /**
+     * Id of the players who will be reordered in the player list.
+     */
+    public playerIdList: int[];
+
+    /**
+     * Whether the players will be moved to the top or bottom of the list.
+     */
+    public moveToTop: boolean;
+  };
+
+  /**
+   * The event message structure that is created when the host calls room.setDiscProperties or room.setPlayerDiscProperties function.
+   */
+  declare class SetDiscPropertiesEvent extends HaxballEvent {
+
+    /**
+     * Id of the disc/player whose properties are changed.
+     */
+    public id: int;
+
+    /**
+     * If `true`, this is triggered by room.setPlayerDiscProperties, and `id` is the player's id.
+     * Otherwise, this is triggered by room.setDiscProperties, and `id` is the disc's id.
+     */
+    public type: boolean;
+
+    /**
+     * Contains the floating point properties that are sent, in this order:
+     * `[x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping]`
+     * If any of these values are `null`, it means that that value is not modified.
+     */
+    public data1: (float32 | null)[];
+
+    /**
+     * Contains the integer properties that are sent, in this order:
+     * `[color, cMask, cGroup]`
+     * If any of these values are `null`, it means that that value is not modified.
+     */
+    public data2: (int | null)[];
+  };
+
+  /**
+   * The event message structure that is created when the kick rate limit is changed.
+   */
+  declare class SetKickRateLimitEvent extends HaxballEvent {
+
+    /**
+     * The `min` component of the kick rate limit.
+     */
+    public min: int;
+
+    /**
+     * The `rate` component of the kick rate limit.
+     */
+    public rate: int;
+
+    /**
+     * The `burst` component of the kick rate limit.
+     */
+    public burst: int;
+  };
+
+  /**
+   * The event message structure that is automatically created by the host to indicate current ping values of players.
+   */
+  declare class PingEvent extends HaxballEvent {
+
+    /**
+     * The ping values of all players in the same order as the players list.
+     */
+    public values: int[];
+  };
 
   /**
    * A player can be identified from the stringified instance of this class that the player carries.
@@ -1799,7 +2203,7 @@ declare namespace MainReturnType {
     timeLimit: int;
 
     /**
-     * The time limit of this current RoomState. 0 = no limit.
+     * The score limit of this current RoomState. 0 = no limit.
      */
     scoreLimit: int;
 
@@ -2565,7 +2969,7 @@ declare namespace MainReturnType {
      *   - `false`: block message from being processed. 
      *   - `throw exception`: break the connection of the sender of this message.
      */
-    onOperationReceived?: (type: int, msg: object, globalFrameNo: int, clientFrameNo: int, customData?: object)=>boolean
+    onOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int, customData?: object)=>boolean
   }
 
   declare interface CustomCallbacks {
@@ -3792,7 +4196,7 @@ declare namespace MainReturnType {
      *   - `false`: block message from being processed. 
      *   - `throw exception`: break the connection of the sender of this message.
      */
-    onBeforeOperationReceived?: (type: int, msg: object, globalFrameNo: int, clientFrameNo: int)=>boolean,
+    onBeforeOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int)=>boolean,
 
     /**
      * If defined, runs for each message received from all clients in a host room, before they are processed and sent to all clients. This is the most important callback inside a host room; all permission logic should reside here. You are also allowed to freely modify the contents of all messages here.
@@ -3808,7 +4212,7 @@ declare namespace MainReturnType {
      *   - `false`: block message from being processed. 
      *   - `throw exception`: break the connection of the sender of this message.
      */
-    onAfterOperationReceived?: (type: int, msg: object, globalFrameNo: int, clientFrameNo: int, customData?: object)=>boolean
+    onAfterOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int, customData?: object)=>boolean
   }
 
   declare interface CustomRoomConfigCallbacks {
@@ -4194,10 +4598,11 @@ declare namespace MainReturnType {
      * Triggered when the connection's state changed.
      * 
      * @param state The new connection state.
+     * @param sdp The session description value for webrtc connection. (only exists if `state` is `ConnectingToPeer` or `AwaitingState`.)
      * 
      * @returns void.
      */
-    onConnectionStateChange?: (state: ConnectionState)=>void;
+    onConnectionStateChange?: (state: ConnectionState, sdp: string|undefined)=>void;
     
     /**
      * Triggered while starting to try the reverse connection method while joining a room.
@@ -4399,10 +4804,21 @@ declare namespace MainReturnType {
     /**
      * Sends an announcement message to a player.
      * 
-     * @param msg Contents of the announcement message.
-     * @param color Color of the announcement message.
-     * @param style Style of the announcement message.
-     * @param sound Sound of the announcement message.
+     * @param msg The contents of the announcement message.
+     * @param color The color of the announcement message. Range: -1 <= `color` < 16777216. 
+     *  - The color value can be converted into a rgba string via API's `Utils.numberToColor` function.
+     *  - The special value `-1` means `transparent` color.
+     * @param style The style of the announcement message. Must be one of the following:
+     *  - 0: use document's default font style.
+     *  - 1: fontWeight = "bold".
+     *  - 2: fontStyle = "italic".
+     *  - 3: fontSize = "12px".
+     *  - 4: fontWeight = "bold", fontSize = "12px".
+     *  - 5: fontWeight = "italic", fontSize = "12px".
+     * @param sound The sound of the announcement message. Must be one of the following: 
+     *  - 0: no sound.
+     *  - 1: chat sound.
+     *  - 2: highlight sound.
      * @param targetId Id of the player who will receive this announcement. If this value is `null`, the announcement is sent to everyone.
      * @param byId This value must always be 0.
      * 
@@ -8300,6 +8716,11 @@ declare class LibConfig {
    * A custom proxy agent to use for the room's connection. This method does not work in browsers. Defaults to `null`.
    */
   proxyAgent?: ProxyAgentLike;
+
+  /**
+   * If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
+   */
+  noWebRTC?: boolean;
 };
 
 export = (object?: WindowLike, config?: LibConfig)=>MainReturnType;
