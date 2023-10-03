@@ -1579,7 +1579,7 @@ declare namespace MainReturnType {
   };
 
   /**
-   * A class that defines an active disc
+   * A class that defines an active disc.
    */
   declare type MovableDisc = {
 
@@ -1644,6 +1644,11 @@ declare namespace MainReturnType {
      * Id of the player that owns this Disc, or `null` if it is not owned by a player.
      */
     playerId: int | null;
+
+    /**
+     * The extrapolated version of this Disc, or `null` if the data is not available.
+     */
+    ext: MovableDisc | null;
   };
 
   /**
@@ -2089,6 +2094,11 @@ declare namespace MainReturnType {
      * Current disc of this Player, or null if this Player is not currently playing.
      */
     disc: MovableDisc | null;
+
+    /**
+     * The extrapolated version of this Player, or `null` if the data is not available.
+     */
+    ext: Player | null;
   };
 
   /**
@@ -2120,6 +2130,11 @@ declare namespace MainReturnType {
      * All joints of this PhysicsState.
      */
     joints: Joint[];
+
+    /**
+     * The extrapolated version of this PhysicsState, or `null` if the data is not available.
+     */
+    ext: PhysicsState | null;
   };
 
   /**
@@ -2178,6 +2193,11 @@ declare namespace MainReturnType {
      * The stadium that the game is currently being played in.
      */
     stadium: Stadium;
+  
+    /**
+     * The extrapolated version of this GameState, or `null` if the data is not available.
+     */
+    ext: GameState | null;
   };
 
   declare interface RoomStateBase {
@@ -2233,6 +2253,11 @@ declare namespace MainReturnType {
      * The custom colors for each team. The 0th index has `null` because it's the Spectators team.
      */
     teamColors: TeamColors[];
+
+    /**
+     * The extrapolated version of this RoomState, or `null` if the data is not available.
+     */
+    ext: RoomState | null;
 
     /**
      * Returns a snapshot of the current room state. You can load the returned object directly into sandbox using its `useSnapshot(roomState)` function.

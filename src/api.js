@@ -322,6 +322,11 @@ function abcHaxballAPI(window, config){
   vb.i = function (a, b, c, d, e) {
     null != a && a(b, c, d, e);
   };
+  function Zz() {}
+  Zz.b = !0;
+  Zz.i = function (a, b, c, d, e, f) {
+    null != a && a(b, c, d, e, f);
+  };
 
   /////////////////////////////////
 
@@ -3828,7 +3833,6 @@ function abcHaxballAPI(window, config){
       for (var e = 0, f = d.length; e < f; ) {
         var g = e++;
         c[g] = d[g].hs();
-        //haxball.room._onPlayerObjectCreated(c[g]);  // runs in extrapolation loop, too many times per second. disabled for now.
       }
     }
     a.K = null == b.K ? null : b.K.sc();
@@ -5132,9 +5136,8 @@ function abcHaxballAPI(window, config){
         b.conn = this.conn;
         b.auth = this.auth; // store auth
         a.I.push(b);
-        a = a.tl;
-        null != a && a(b);
-        haxball?.room?._onPlayerObjectCreated && haxball.room._onPlayerObjectCreated(b);
+        y.i(a.tl, b);
+        y.i(haxball?.room?._onPlayerObjectCreated, b);
       }
     },
     ua: function (a) {
@@ -6748,9 +6751,8 @@ function abcHaxballAPI(window, config){
       var a = performance.now();
       this.zm = a;
       this.Di.push(a);
-      var b = this.sg.$g(0.5) | 0,
-        c = w.ha();
-      this.haxball.room?._modifyClientPing && (b = this.haxball.room._modifyClientPing(b));
+      var b = this.sg.$g(0.5) | 0, c = w.ha(), q = this.haxball.room?._modifyClientPing;
+      q && (b = q(b));
       c.l(2);
       c.s(a);
       c.lb(b);
@@ -6767,9 +6769,9 @@ function abcHaxballAPI(window, config){
           c = 0;
         0 > this.bc && (this.bc = 0);
         a.zf.Aa && (c = this.Y + (this.Xc | 0) + this.bc);
-        var d = w.ha();
+        var d = w.ha(), q = this.haxball.room?._modifyFrameNo;
         d.l(1);
-        this.haxball.room?._modifyFrameNo && (c = this.haxball.room._modifyFrameNo(c));
+        q && (c = q(c));
         d.tb(c);
         d.tb(b);
         m.lj(a, d);
@@ -7094,7 +7096,7 @@ function abcHaxballAPI(window, config){
       a.l(this.nf ? 1 : 0);
       this.X.send(a.Hd());
       this.dm = this.nf;
-      this.haxball.room._onRoomRecaptchaModeChange && this.haxball.room._onRoomRecaptchaModeChange(this.nf);
+      y.i(this.haxball.room._onRoomRecaptchaModeChange, this.nf);
     },
     Bi: function (a, b, c, d) {
       var e = w.ha(32, !1);
@@ -7350,7 +7352,7 @@ function abcHaxballAPI(window, config){
     Ud: function () {
       this.Ic.Ud();
       this.Kj.clear();
-      this.haxball.room._onBansClear && this.haxball.room._onBansClear();
+      A.i(this.haxball.room._onBansClear);
     },
     Fi: function (a) {
       this.Ic.Fi(a);
@@ -7576,9 +7578,8 @@ function abcHaxballAPI(window, config){
       a.pa.ia();
     },
     sq: function (a, b) {
-      var c = a.u();
-      if (this.haxball.room._modifyPlayerPing)
-        b.yb = this.haxball.room._modifyPlayerPing(b.$, a.Ab());
+      var c = a.u(), q = this.haxball.room._modifyPlayerPing;
+      q && (b.yb = q(b.$, a.Ab()));
       var d = w.ha();
       d.l(4);
       d.s((performance.now() - this.Li) * this.Ac + this.wi);
@@ -7659,67 +7660,67 @@ function abcHaxballAPI(window, config){
     // all other engine updates run K.C(x), and not T.C(x).
     
     a.T.iq = (b)=>{
-      haxball.room._onPlayerInputChange && haxball.room._onPlayerInputChange(b.V, b.ob);
+      ia.i(haxball.room._onPlayerInputChange, b.V, b.ob);
     };
     a.T.tl = (b)=>{
-      haxball.room._onPlayerJoin && haxball.room._onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+      y.i(haxball.room._onPlayerJoin, b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
     };
     a.T.ji = (d)=>{
-      haxball.room._onPlayerBallKick && haxball.room._onPlayerBallKick(d?.V);
+      y.i(haxball.room._onPlayerBallKick, d?.V);
     };
     a.T.Ni = (team)=>{
-      haxball.room._onTeamGoal && haxball.room._onTeamGoal(team?.$);
+      y.i(haxball.room._onTeamGoal, team?.$);
     };
     a.T.Oi = (team)=>{
-      haxball.room._onGameEnd && haxball.room._onGameEnd(team.$); // winningTeamId
+      y.i(haxball.room._onGameEnd, team.$); // winningTeamId
     };
     a.T.ml = (c, Bf, e)=>{
-      (!e) && haxball.room._onGamePauseChange && haxball.room._onGamePauseChange(Bf, c?.V) // paused, byId
+      (!e) && ia.i(haxball.room._onGamePauseChange, Bf, c?.V); // paused, byId
     };
     a.T.Ki = function(a){
-      haxball.room._onGameStart && haxball.room._onGameStart(a?.V); // byId
+      y.i(haxball.room._onGameStart, a?.V); // byId
     }
     a.T.Os = ()=>{
-      haxball.room._onGameTick && haxball.room._onGameTick();
+      A.i(haxball.room._onGameTick);
     };
     a.T._KO_ = ()=>{
-      haxball.room._onKickOff && haxball.room._onKickOff();
+      A.i(haxball.room._onKickOff);
     };
     a.T._CDD_ = (a, b, c, d)=>{
-      haxball.room._onCollisionDiscVsDisc && haxball.room._onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+      vb.i(haxball.room._onCollisionDiscVsDisc, a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
     };
     a.T._CDP_ = (a, b, c)=>{
-      haxball.room._onCollisionDiscVsPlane && haxball.room._onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+      Cb.i(haxball.room._onCollisionDiscVsPlane, a, b, c); // discId, discPlayerId, planeId
     };
     a.T._CDS_ = (a, b, c)=>{
-      haxball.room._onCollisionDiscVsSegment && haxball.room._onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+      Cb.i(haxball.room._onCollisionDiscVsSegment, a, b, c); // discId, discPlayerId, segmentId
     };
     a.T._AT_ = (a, b, c, d, e) => {
-      haxball.room._onAutoTeams && haxball.room._onAutoTeams(a, b, c, d, e);
+      Zz.i(haxball.room._onAutoTeams, a, b, c, d, e);
     };
     a.T._TLC_ = (a, b) => {
-      haxball.room._onTimeLimitChange && haxball.room._onTimeLimitChange(a, b);
+      ia.i(haxball.room._onTimeLimitChange, a, b);
     };
     a.T._SLC_ = (a, b) => {
-      haxball.room._onScoreLimitChange && haxball.room._onScoreLimitChange(a, b);
+      ia.i(haxball.room._onScoreLimitChange, a, b);
     };
     a.T._PAC_ = (a, b) => {
-      haxball.room._onPlayerAvatarChange && haxball.room._onPlayerAvatarChange(a, b);
+      ia.i(haxball.room._onPlayerAvatarChange, a, b);
     };
     a.T._PHAC_ = (a, b) => {
-      haxball.room._onPlayerHeadlessAvatarChange && haxball.room._onPlayerHeadlessAvatarChange(a, b);
+      ia.i(haxball.room._onPlayerHeadlessAvatarChange, a, b);
     };
     a.T._RP_ = (a, b) => {
-      haxball.room._onPlayersOrderChange && haxball.room._onPlayersOrderChange(a, b);
+      ia.i(haxball.room._onPlayersOrderChange, a, b);
     };
     a.T._PTC_ = (a, b, c) => {
-      haxball.room._onPlayerTeamChange && haxball.room._onPlayerTeamChange(a, b, c);
+      Cb.i(haxball.room._onPlayerTeamChange, a, b, c);
     };
     a.T._TCC_ = (a, b, c) => {
-      haxball.room._onTeamColorsChange && haxball.room._onTeamColorsChange(a, b, c);
+      Cb.i(haxball.room._onTeamColorsChange, a, b, c);
     };
     a.T._TLC2_ = (a, b) => {
-      haxball.room._onTeamsLockChange && haxball.room._onTeamsLockChange(a, b);
+      ia.i(haxball.room._onTeamsLockChange, a, b);
     };
     a.T._CCI_ = (x, y, z) => {
       if (haxball.__internalData.isHost){
@@ -7739,13 +7740,13 @@ function abcHaxballAPI(window, config){
       }
     };
     a.T._CE_ = (a, b, c)=>{
-      haxball.room._onCustomEvent && haxball.room._onCustomEvent(a, b, c); // type, data, byUser
+      Cb.i(haxball.room._onCustomEvent, a, b, c); // type, data, byUser
     };
     a.T._SDP_ = (a, b, c, d)=>{
-      haxball.room._onSetDiscProperties && haxball.room._onSetDiscProperties(a, b, c, d); // id, type, data1, data2
+      vb.i(haxball.room._onSetDiscProperties, a, b, c, d); // id, type, data1, data2
     };
     a.T._PD_ = (a)=>{
-      haxball.room._onPingData && haxball.room._onPingData(a); // ping array
+      y.i(haxball.room._onPingData, a); // ping array
     };
     a.T._HP_ = ()=>{
       return haxball?.room?.hostPing || 0
@@ -7754,50 +7755,50 @@ function abcHaxballAPI(window, config){
       b.ob.al();
     };
     a.T._HC_ = (a)=>{
-      haxball.room._onHandicapChange && haxball.room._onHandicapChange(a);
+      y.i(haxball.room._onHandicapChange, a);
     };
-    a.T._EC_ = (a)=>{
-      haxball.room._onExtrapolationChange && haxball.room._onExtrapolationChange(a);
+    a.T._EC_ = (a)=>{ // FIX ME: extrapolation change events will not be triggered at the exact time that we joined a room.
+      y.i(haxball.room?._onExtrapolationChange, a);
     };
     a.T.Pi = ()=>{ 
-      haxball.room._onTimeIsUp && haxball.room._onTimeIsUp();
+      A.i(haxball.room._onTimeIsUp);
     };
     a.T.lq = ()=>{
-      haxball.room._onPositionsReset && haxball.room._onPositionsReset();
+      A.i(haxball.room._onPositionsReset);
     };
     a.T.ko = function (c) { // set sync
       b.am != c && ((b.am = c), (c = ta.la(c)), (haxball.__internalData.execOperationReceivedOnHost(c)!=false && a.ra(c)));
     };
     a.T.rl = function(b, Tc){
-      haxball.room._onPlayerChat && haxball.room._onPlayerChat(b.V, Tc); // id, message
+      ia.i(haxball.room._onPlayerChat, b.V, Tc); // id, message
     };
     a.T.Vl = function(msg, color, style, sound){
-      haxball.room._onAnnouncement && haxball.room._onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+      vb.i(haxball.room._onAnnouncement, msg, color, style, sound); // msg, color, style, sound
     };
     a.T.vf = function(b){
-      haxball.room._onGameStop && haxball.room._onGameStop(b?.V);  //byId
+      y.i(haxball.room._onGameStop, b?.V);  //byId
     };
     a.T.Ii = function(a, e){
-      haxball.room._onStadiumChange && haxball.room._onStadiumChange(e, a?.V); // map, byId
+      ia.i(haxball.room._onStadiumChange, e, a?.V); // map, byId
     };
     a.T.sl = function(b){
-      haxball.room._onPlayerSyncChange && haxball.room._onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+      ia.i(haxball.room._onPlayerSyncChange, b?.V, b?.Ld);// id, sync
     };
     a.T.ii = function(b, c){
-      haxball.room._onPlayerAdminChange && haxball.room._onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+      Cb.i(haxball.room._onPlayerAdminChange, c?.V, c?.cb, b?.V)// id, isAdmin, byId
     };
     a.T.Hk = function(a, b, c, d){
-      haxball.room._onKickRateLimitChange && haxball.room._onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+      vb.i(haxball.room._onKickRateLimitChange, b, c, d, a?.V); // min, rate, burst, byId
     };
     a.T.ul = function (d, e, f, g) {
       y.i(b.Op, d.V);
       null != e && (
         vb.i(b.Np, d.V, e, null != g ? g.w : null, f)
       );
-      haxball.room._onPlayerLeave && haxball.room._onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
+      vb.i(haxball.room._onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
     };
     a.T.wl = function(a, b){
-      haxball.room._onPlayerChatIndicatorChange && haxball.room._onPlayerChatIndicatorChange(a?.V, !b); // id, value
+      ia.i(haxball.room._onPlayerChatIndicatorChange, a?.V, !b); // id, value
     };
 
     this.ob.ng = function (b) {
@@ -7847,7 +7848,7 @@ function abcHaxballAPI(window, config){
         if (null != b.Ed)
           return false;
         b.zr();
-        haxball.room._onRoomRecordingChange && haxball.room._onRoomRecordingChange(true);
+        y.i(haxball.room._onRoomRecordingChange, true);
         return true;
       }
       else {
@@ -7855,7 +7856,7 @@ function abcHaxballAPI(window, config){
           return null;
         var a = b.Ed.stop();
         b.Ed = null;
-        haxball.room._onRoomRecordingChange && haxball.room._onRoomRecordingChange(a);
+        y.i(haxball.room._onRoomRecordingChange, a);
         return a;
       }
     };
@@ -8176,115 +8177,115 @@ function abcHaxballAPI(window, config){
       if (ya.T.iq!=null)
         return;
       ya.T.iq = (b)=>{
-        callbacks.onPlayerInputChange && callbacks.onPlayerInputChange(b.V, b.ob);
+        ia.i(callbacks.onPlayerInputChange, b.V, b.ob);
       };
       ya.T.tl = (b)=>{
-        callbacks.onPlayerJoin && callbacks.onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+        y.i(callbacks.onPlayerJoin, b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
       };
       ya.T.ji = (d)=>{
-        callbacks.onPlayerBallKick && callbacks.onPlayerBallKick(d?.V);
+        y.i(callbacks.onPlayerBallKick, d?.V);
       };
       ya.T.Ni = (team)=>{
-        callbacks.onTeamGoal && callbacks.onTeamGoal(team?.$);
+        y.i(callbacks.onTeamGoal, team?.$);
       };
       ya.T.Oi = (team)=>{
-        callbacks.onGameEnd && callbacks.onGameEnd(team.$); // winningTeamId
+        y.i(callbacks.onGameEnd, team.$); // winningTeamId
       };
       ya.T.ml = (c, Bf, e)=>{
-        (!e) && callbacks.onGamePauseChange && callbacks.onGamePauseChange(Bf, c?.V) // paused, byId
+        (!e) && ia.i(callbacks.onGamePauseChange, Bf, c?.V) // paused, byId
       };
       ya.T.Ki = function(a){
-        callbacks.onGameStart && callbacks.onGameStart(a?.V); // byId
+        y.i(callbacks.onGameStart, a?.V); // byId
       }
       ya.T.Os = ()=>{
-        callbacks.onGameTick && callbacks.onGameTick();
+        A.i(callbacks.onGameTick);
       };
       ya.T._KO_ = ()=>{
-        callbacks.onKickOff && callbacks.onKickOff();
+        A.i(callbacks.onKickOff);
       };
       ya.T._CDD_ = (a, b, c, d)=>{
-        callbacks.onCollisionDiscVsDisc && callbacks.onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+        vb.i(callbacks.onCollisionDiscVsDisc, a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
       };
       ya.T._CDP_ = (a, b, c)=>{
-        callbacks.onCollisionDiscVsPlane && callbacks.onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+        Cb.i(callbacks.onCollisionDiscVsPlane, a, b, c); // discId, discPlayerId, planeId
       };
       ya.T._CDS_ = (a, b, c)=>{
-        callbacks.onCollisionDiscVsSegment && callbacks.onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+        Cb.i(callbacks.onCollisionDiscVsSegment, a, b, c); // discId, discPlayerId, segmentId
       };
       ya.T._AT_ = (a, b, c, d, e) => {
-        callbacks.onAutoTeams && callbacks.onAutoTeams(a, b, c, d, e);
+        Zz.i(callbacks.onAutoTeams, a, b, c, d, e);
       };
       ya.T._TLC_ = (a, b) => {
-        callbacks.onTimeLimitChange && callbacks.onTimeLimitChange(a, b);
+        ia.i(callbacks.onTimeLimitChange, a, b);
       };
       ya.T._SLC_ = (a, b) => {
-        callbacks.onScoreLimitChange && callbacks.onScoreLimitChange(a, b);
+        ia.i(callbacks.onScoreLimitChange, a, b);
       };
       ya.T._PAC_ = (a, b) => {
-        callbacks.onPlayerAvatarChange && callbacks.onPlayerAvatarChange(a, b);
+        ia.i(callbacks.onPlayerAvatarChange, a, b);
       };
       ya.T._PHAC_ = (a, b) => {
-        callbacks.onPlayerHeadlessAvatarChange && callbacks.onPlayerHeadlessAvatarChange(a, b);
+        ia.i(callbacks.onPlayerHeadlessAvatarChange, a, b);
       };
       ya.T._RP_ = (a, b) => {
-        haxball.room._onPlayersOrderChange && haxball.room._onPlayersOrderChange(a, b);
+        ia.i(callbacks.onPlayersOrderChange, a, b);
       };
       ya.T._PTC_ = (a, b, c) => {
-        callbacks.onPlayerTeamChange && callbacks.onPlayerTeamChange(a, b, c);
+        Cb.i(callbacks.onPlayerTeamChange, a, b, c);
       };
       ya.T._TCC_ = (a, b, c) => {
-        callbacks.onTeamColorsChange && callbacks.onTeamColorsChange(a, b, c);
+        Cb.i(callbacks.onTeamColorsChange, a, b, c);
       };
       ya.T._TLC2_ = (a, b) => {
-        callbacks.onTeamsLockChange && callbacks.onTeamsLockChange(a, b);
+        ia.i(callbacks.onTeamsLockChange, a, b);
       };
       ya.T._CE_ = (a, b, c)=>{
-        callbacks.onCustomEvent && callbacks.onCustomEvent(a, b, c); // type, data, byUser
+        Cb.i(callbacks.onCustomEvent, a, b, c); // type, data, byUser
       };
       ya.T._SDP_ = (a, b, c, d)=>{
-        callbacks.onSetDiscProperties && callbacks.onSetDiscProperties(a, b, c, d); // id, type, data1, data2
+        vb.i(callbacks.onSetDiscProperties, a, b, c, d); // id, type, data1, data2
       };
       ya.T._PD_ = (a)=>{
-        callbacks.onPingData && callbacks.onPingData(a); // ping array
+        y.i(callbacks.onPingData, a); // ping array
       };
       ya.T._HC_ = (a)=>{
-        callbacks.onHandicapChange && callbacks.onHandicapChange(a);
+        y.i(callbacks.onHandicapChange, a);
       };
       ya.T._EC_ = (a)=>{
-        callbacks.onExtrapolationChange && callbacks.onExtrapolationChange(a);
+        y.i(callbacks.onExtrapolationChange, a);
       };
       ya.T.Pi = ()=>{
-        callbacks.onTimeIsUp && callbacks.onTimeIsUp();
+        A.i(callbacks.onTimeIsUp);
       };
       ya.T.lq = ()=>{
-        callbacks.onPositionsReset && callbacks.onPositionsReset();
+        A.i(callbacks.onPositionsReset);
       };
       ya.T.rl = function(b, Tc){
-        callbacks.onPlayerChat && callbacks.onPlayerChat(b.V, Tc); // id, message
+        ia.i(callbacks.onPlayerChat, b.V, Tc); // id, message
       };
       ya.T.Vl = function(msg, color, style, sound){
-        callbacks.onAnnouncement && callbacks.onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+        vb.i(callbacks.onAnnouncement, msg, color, style, sound); // msg, color, style, sound
       };
       ya.T.vf = function(b){
-        callbacks.onGameStop && callbacks.onGameStop(b?.V);  //byId
+        y.i(callbacks.onGameStop, b?.V);  //byId
       };
       ya.T.Ii = function(a, e){
-        callbacks.onStadiumChange && callbacks.onStadiumChange(e, a?.V); // map, byId
+        ia.i(callbacks.onStadiumChange, e, a?.V); // map, byId
       };
       ya.T.sl = function(b){
-        callbacks.onPlayerSyncChange && callbacks.onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+        ia.i(callbacks.onPlayerSyncChange, b?.V, b?.Ld);// id, sync
       };
       ya.T.ii = function(b, c){
-        callbacks.onPlayerAdminChange && callbacks.onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+        Cb.i(callbacks.onPlayerAdminChange, c?.V, c?.cb, b?.V)// id, isAdmin, byId
       };
       ya.T.Hk = function(a, b, c, d){
-        callbacks.onKickRateLimitChange && callbacks.onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+        vb.i(callbacks.onKickRateLimitChange, b, c, d, a?.V); // min, rate, burst, byId
       };
       ya.T.ul = function (d, e, f, g) {
-        callbacks.onPlayerLeave && callbacks.onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
+        vb.i(callbacks.onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
       };
       ya.T.wl = function(a, b){
-        callbacks.onPlayerChatIndicatorChange && callbacks.onPlayerChatIndicatorChange(a?.V, !b); // id, value
+        ia.i(callbacks.onPlayerChatIndicatorChange, a?.V, !b); // id, value
       };
     };
 
@@ -8372,115 +8373,115 @@ function abcHaxballAPI(window, config){
     function initialize(){
       raf(bf);
       ya.T.iq = (b)=>{
-        callbacks.onPlayerInputChange && callbacks.onPlayerInputChange(b.V, b.ob);
+        ia.i(callbacks.onPlayerInputChange, b.V, b.ob);
       };
       ya.T.tl = (b)=>{ // +
-        callbacks.onPlayerJoin && callbacks.onPlayerJoin(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+        y.i(callbacks.onPlayerJoin, b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
       };
       ya.T.ji = (d)=>{ // +
-        callbacks.onPlayerBallKick && callbacks.onPlayerBallKick(d?.V);
+        y.i(callbacks.onPlayerBallKick, d?.V);
       };
       ya.T.Ni = (team)=>{ // +
-        callbacks.onTeamGoal && callbacks.onTeamGoal(team?.$);
+        y.i(callbacks.onTeamGoal, team?.$);
       };
       ya.T.Oi = (team)=>{ // +
-        callbacks.onGameEnd && callbacks.onGameEnd(team.$); // winningTeamId
+        y.i(callbacks.onGameEnd, team.$); // winningTeamId
       };
       ya.T.ml = (c, Bf, e)=>{ // +
-        (!e) && callbacks.onGamePauseChange && callbacks.onGamePauseChange(Bf, c?.V) // paused, byId
+        (!e) && ia.i(callbacks.onGamePauseChange, Bf, c?.V) // paused, byId
       };
       ya.T.Ki = function(a){ // +
-        callbacks.onGameStart && callbacks.onGameStart(a?.V); // byId
+        y.i(callbacks.onGameStart, a?.V); // byId
       }
       ya.T.Os = ()=>{
-        callbacks.onGameTick && callbacks.onGameTick();
+        A.i(callbacks.onGameTick);
       };
       ya.T._KO_ = ()=>{
-        callbacks.onKickOff && callbacks.onKickOff();
+        A.i(callbacks.onKickOff);
       };
       ya.T._CDD_ = (a, b, c, d)=>{
-        callbacks.onCollisionDiscVsDisc && callbacks.onCollisionDiscVsDisc(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+        vb.i(callbacks.onCollisionDiscVsDisc, a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
       };
       ya.T._CDP_ = (a, b, c)=>{
-        callbacks.onCollisionDiscVsPlane && callbacks.onCollisionDiscVsPlane(a, b, c); // discId, discPlayerId, planeId
+        Cb.i(callbacks.onCollisionDiscVsPlane, a, b, c); // discId, discPlayerId, planeId
       };
       ya.T._CDS_ = (a, b, c)=>{
-        callbacks.onCollisionDiscVsSegment && callbacks.onCollisionDiscVsSegment(a, b, c); // discId, discPlayerId, segmentId
+        Cb.i(callbacks.onCollisionDiscVsSegment, a, b, c); // discId, discPlayerId, segmentId
       };
       ya.T._AT_ = (a, b, c, d, e) => {
-        callbacks.onAutoTeams && callbacks.onAutoTeams(a, b, c, d, e);
+        Zz.i(callbacks.onAutoTeams, a, b, c, d, e);
       };
       ya.T._TLC_ = (a, b) => {
-        callbacks.onTimeLimitChange && callbacks.onTimeLimitChange(a, b);
+        ia.i(callbacks.onTimeLimitChange, a, b);
       };
       ya.T._SLC_ = (a, b) => {
-        callbacks.onScoreLimitChange && callbacks.onScoreLimitChange(a, b);
+        ia.i(callbacks.onScoreLimitChange, a, b);
       };
       ya.T._PAC_ = (a, b) => {
-        callbacks.onPlayerAvatarChange && callbacks.onPlayerAvatarChange(a, b);
+        ia.i(callbacks.onPlayerAvatarChange, a, b);
       };
       ya.T._PHAC_ = (a, b) => {
-        callbacks.onPlayerHeadlessAvatarChange && callbacks.onPlayerHeadlessAvatarChange(a, b);
+        ia.i(callbacks.onPlayerHeadlessAvatarChange, a, b);
       };
       ya.T._RP_ = (a, b) => {
-        haxball.room._onPlayersOrderChange && haxball.room._onPlayersOrderChange(a, b);
+        ia.i(callbacks.onPlayersOrderChange, a, b);
       };
       ya.T._PTC_ = (a, b, c) => { // + (xl)
-        callbacks.onPlayerTeamChange && callbacks.onPlayerTeamChange(a, b, c);
+        Cb.i(callbacks.onPlayerTeamChange, a, b, c);
       };
       ya.T._TCC_ = (a, b, c) => {
-        callbacks.onTeamColorsChange && callbacks.onTeamColorsChange(a, b, c);
+        Cb.i(callbacks.onTeamColorsChange, a, b, c);
       };
       ya.T._TLC2_ = (a, b) => {
-        callbacks.onTeamsLockChange && callbacks.onTeamsLockChange(a, b);
+        ia.i(callbacks.onTeamsLockChange, a, b);
       };
       ya.T._CE_ = (a, b, c)=>{
-        callbacks.onCustomEvent && callbacks.onCustomEvent(a, b, c); // type, data, byUser
+        Cb.i(callbacks.onCustomEvent, a, b, c); // type, data, byUser
       };
       ya.T._SDP_ = (a, b, c, d)=>{
-        callbacks.onSetDiscProperties && callbacks.onSetDiscProperties(a, b, c, d); // id, type, data1, data2
+        vb.i(callbacks.onSetDiscProperties, a, b, c, d); // id, type, data1, data2
       };
       ya.T._PD_ = (a)=>{
-        callbacks.onPingData && callbacks.onPingData(a); // ping array
+        y.i(callbacks.onPingData, a); // ping array
       };
       ya.T._HC_ = (a)=>{
-        callbacks.onHandicapChange && callbacks.onHandicapChange(a);
+        y.i(callbacks.onHandicapChange, a);
       };
       ya.T._EC_ = (a)=>{
-        callbacks.onExtrapolationChange && callbacks.onExtrapolationChange(a);
+        y.i(callbacks.onExtrapolationChange, a);
       };
       ya.T.Pi = ()=>{ // +
-        callbacks.onTimeIsUp && callbacks.onTimeIsUp();
+        A.i(callbacks.onTimeIsUp);
       };
       ya.T.lq = ()=>{
-        callbacks.onPositionsReset && callbacks.onPositionsReset();
+        A.i(callbacks.onPositionsReset);
       };
       ya.T.rl = function(b, Tc){ // +
-        callbacks.onPlayerChat && callbacks.onPlayerChat(b.V, Tc); // id, message
+        ia.i(callbacks.onPlayerChat, b.V, Tc); // id, message
       };
       ya.T.Vl = function(msg, color, style, sound){ // +
-        callbacks.onAnnouncement && callbacks.onAnnouncement(msg, color, style, sound); // msg, color, style, sound
+        vb.i(callbacks.onAnnouncement, msg, color, style, sound); // msg, color, style, sound
       };
       ya.T.vf = function(b){ // +
-        callbacks.onGameStop && callbacks.onGameStop(b?.V);  //byId
+        y.i(callbacks.onGameStop, b?.V);  //byId
       };
       ya.T.Ii = function(a, e){ // +
-        callbacks.onStadiumChange && callbacks.onStadiumChange(e, a?.V); // map, byId
+        ia.i(callbacks.onStadiumChange, e, a?.V); // map, byId
       };
       ya.T.sl = function(b){ // +
-        callbacks.onPlayerSyncChange && callbacks.onPlayerSyncChange(b?.V, b?.Ld);// id, sync
+        ia.i(callbacks.onPlayerSyncChange, b?.V, b?.Ld);// id, sync
       };
       ya.T.ii = function(b, c){ // +
-        callbacks.onPlayerAdminChange && callbacks.onPlayerAdminChange(c?.V, c?.cb, b?.V)// id, isAdmin, byId
+        Cb.i(callbacks.onPlayerAdminChange, c?.V, c?.cb, b?.V)// id, isAdmin, byId
       };
       ya.T.Hk = function(a, b, c, d){ // +
-        callbacks.onKickRateLimitChange && callbacks.onKickRateLimitChange(b, c, d, a?.V); // min, rate, burst, byId
+        vb.i(callbacks.onKickRateLimitChange, b, c, d, a?.V); // min, rate, burst, byId
       };
       ya.T.ul = function (d, e, f, g) { // +
-        callbacks.onPlayerLeave && callbacks.onPlayerLeave(d, e, f, g?.V); // playerObj, reason, isBanned, byId
+        vb.i(callbacks.onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
       };
       ya.T.wl = function(a, b){ // +
-        callbacks.onPlayerChatIndicatorChange && callbacks.onPlayerChatIndicatorChange(a?.V, !b); // id, value
+        ia.i(callbacks.onPlayerChatIndicatorChange, a?.V, !b); // id, value
       };
     };
     function finalize(){
@@ -8895,12 +8896,13 @@ function abcHaxballAPI(window, config){
       storage: haxball.storage,
       pluginMechanismActive: !haxball.noPluginMechanism,
       onOperationReceived: function(msg, globalFrameNo, clientFrameNo) {
-        if (!haxball.room._onOperationReceived)
+        var oR = haxball.room._onOperationReceived;
+        if (!oR)
           return true;
         var c = msg.eventType;
         if (c==null)
           return true;
-        return haxball.room._onOperationReceived(c, msg, globalFrameNo, clientFrameNo);
+        return oR(c, msg, globalFrameNo, clientFrameNo);
       },
       execOperationReceivedOnHost: function(msg, targetId, fakeId) {
         if (!internalData.isHost)
@@ -8963,11 +8965,9 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
       //haxball.emit("roomJoin", haxball.room);
       y.i(haxball.onSuccess, haxball.room);
-      haxball.room._onPlayerObjectCreated && (
-        internalData.roomObj.ya.T.I.forEach((x)=>{
-          haxball.room._onPlayerObjectCreated(x);
-        })
-      );
+      var poc = haxball.room._onPlayerObjectCreated;
+      if (poc)
+        internalData.roomObj.ya.T.I.forEach(poc);
     };
     haxball._onConnectionStateChange = function(state, param){
       console.log("internal event: ConnectionStateChange");
@@ -9148,11 +9148,9 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
       haxball.room.hostPing = 0;
       y.i(haxball.onSuccess, haxball.room);
-      haxball.room._onPlayerObjectCreated && (
-        internalData.roomObj.ya.T.I.forEach((x)=>{
-          haxball.room._onPlayerObjectCreated(x);
-        })
-      );
+      var poc = haxball.room._onPlayerObjectCreated;
+      if (poc)
+        internalData.roomObj.ya.T.I.forEach(poc);
     };
     var b = {
       name: name, 
@@ -9234,8 +9232,9 @@ function abcHaxballAPI(window, config){
       if (3 < e.length) throw new q(createError(ErrorCodes.PlayerCountryTooLongError, conn, auth, d, e)); // "country too long"
       var f = b.zb();
       if (null != f && 2 < f.length) throw new q(createError(ErrorCodes.PlayerAvatarTooLongError, conn, auth, d, e, f)); // "avatar too long"
-      if (haxball.room._modifyPlayerData){
-        var newPlayerData = haxball.room._modifyPlayerData(a, d, e, f, conn, auth);
+      var mP = haxball.room._modifyPlayerData;
+      if (mP){
+        var newPlayerData = mP(a, d, e, f, conn, auth);
         if (!newPlayerData)
           throw new q(createError(ErrorCodes.PlayerJoinBlockedByMPDError, conn, auth, d, e, f)); // "Player join not allowed: " + d + " " + e + " " + f + " " + conn + " " + auth
         [d, e, f] = newPlayerData;
@@ -9255,7 +9254,7 @@ function abcHaxballAPI(window, config){
     l.kg = function (a) {
       e = a;
       t.Bg = roomLink(a, null != l.Ib);
-      haxball.room._onRoomLink && haxball.room._onRoomLink(t.Bg);
+      y.i(haxball.room._onRoomLink, t.Bg);
     };
     t.Np = function (a, b, c, d) {
       l.to(a, b, c, d);
@@ -9274,7 +9273,7 @@ function abcHaxballAPI(window, config){
       l.Ib = a;
       c();
       null != e && (t.Bg = roomLink(e, null != l.Ib));
-      haxball.room._onRoomPropertiesChange && haxball.room._onRoomPropertiesChange({password: a});
+      y.i(haxball.room._onRoomPropertiesChange, {password: a});
     };
     t.Of.jm = function (a) {
       l.Ei(a);
@@ -9302,7 +9301,7 @@ function abcHaxballAPI(window, config){
       c();
       if (a.hasOwnProperty("password"))
         null != e && (t.Bg = roomLink(e, null != l.Ib));
-      haxball.room._onRoomPropertiesChange && haxball.room._onRoomPropertiesChange(props);
+      y.i(haxball.room._onRoomPropertiesChange, props);
     };
     t.Of.__supc__ = function (a) {
       l.upc = a;
@@ -10853,7 +10852,7 @@ function abcHaxballAPI(window, config){
         });
       });
     }
-    _fixNames(ea, [null, null, "team", "disc", "kickRateMinTickCounter", "kickRateMaxTickCounter", "isKicking", "id", "input", "name", "ping", null, "flag", "sync", "headlessAvatar", "avatar", "avatarNumber", "isAdmin", null, null, null]);
+    _fixNames(ea, [null, "ext", "team", "disc", "kickRateMinTickCounter", "kickRateMaxTickCounter", "isKicking", "id", "input", "name", "ping", null, "flag", "sync", "headlessAvatar", "avatar", "avatarNumber", "isAdmin", null, null, null]);
     _fixNames(p, ["rival", "id", "color", null, null, "name", "className", null, "colors"]);
     _fixNames(ka, ["angle", "text", "inner"]);
     _fixNames(T, ["flag", "lon", "lat"]);
@@ -10864,11 +10863,11 @@ function abcHaxballAPI(window, config){
     _fixNames(ua, ["cGroup", "cMask", "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
     _fixNames(nb, ["color", "strength", "maxLength", "minLength", "d1", "d0"]);
     _fixNames(Eb, ["kickback", "radius", "cGroup", "gravity", "bCoef", "invMass", "damping", "acceleration", "kickingAcceleration", "kickingDamping", "kickStrength"]);
-    _fixNames(ca, [null, null, null, "id", "cGroup", "cMask", null, "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
+    _fixNames(ca, [null, null, "ext", "id", "cGroup", "cMask", null, "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
     _fixNames(h, ["vertices", "segments", "planes", "goals", "discs", "joints", "redSpawnPoints", "blueSpawnPoints", "playerPhysics", "defaultStadiumId", "maxViewWidth", "cameraFollow", "canBeStored", "fullKickOffReset", "name", "width", "height", "bgType", "bgColor", "bgWidth", "bgHeight", "bgKickOffRadius", "bgCornerRadius", "spawnDistance", "bgGoalLine"]);
-    _fixNames(Fa, [null, null, "discs", "vertices", "planes", "segments", "joints"]);
-    _fixNames(O, [null, null, "pauseGameTickCounter", "timeElapsed", "blueScore", "redScore", null, "state", "goalTickCounter", "physicsState", "timeLimit", "scoreLimit", "stadium", null]);
-    _fixNames(fa, [null, null, "stadium", "kickRate_min", "kickRate_rate", null, "timeLimit", "scoreLimit", "teamsLocked", "gameState", "players", "name", "teamColors"]);
+    _fixNames(Fa, [null, "ext", "discs", "vertices", "planes", "segments", "joints"]);
+    _fixNames(O, [null, "ext", "pauseGameTickCounter", "timeElapsed", "blueScore", "redScore", null, "state", "goalTickCounter", "physicsState", "timeLimit", "scoreLimit", "stadium", null]);
+    _fixNames(fa, [null, "ext", "stadium", "kickRate_min", "kickRate_rate", null, "timeLimit", "scoreLimit", "teamsLocked", "gameState", "players", "name", "teamColors"]);
     _fixNames(Ua, [null, "data"]);
     _fixNames(rb, [null, "msg", null, null, "sound", "byId", "targetId"]);
     _fixNames(na, [null, "value", null, null, "byId"]);
