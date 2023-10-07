@@ -3,7 +3,7 @@ module.exports = function(API){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive_inmemory", false, { // "autoPlay_defensive_inmemory" is plugin's name, "false" means "not activated just after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: `This is an auto-playing bot that follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking. This bot creates a fake player(id=65535) in host's memory and controls it using fake events.`,
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
@@ -65,7 +65,7 @@ module.exports = function(API){
     gameState = gameStateExt || gameState;
       
     var cp = state.players.filter((x)=>(x.id==65535))[0];
-    var playerDisc = cp?.disc;
+    var playerDisc = cp?.disc?.ext;
     if (!playerDisc)
       return;
     var teamId = cp.team.id, opponentTeamId = 3 - teamId;

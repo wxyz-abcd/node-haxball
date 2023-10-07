@@ -3,7 +3,7 @@ module.exports = function(API){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "CMD_autoPlay_mixed_inmemory_multiple", true, { // "CMD_autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: `This is an auto-playing bot that has 2 different modes. 
     - followBall mode always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
@@ -329,7 +329,7 @@ module.exports = function(API){
     var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
     var cp = state.getPlayer(bot.id);
-    var playerDisc = cp?.disc;
+    var playerDisc = cp?.disc?.ext;
     if (!playerDisc)
       return;
     var teamId = cp.team.id, opponentTeamId = 3 - teamId;

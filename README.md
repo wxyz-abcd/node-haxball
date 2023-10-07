@@ -206,7 +206,9 @@ Room.create({
       - functions:
         - `length()`: Returns the length of replay content in milliseconds.
         - `getTime()`: Returns the current time in milliseconds.
+        - `getCurrentFrameNo()`: Returns the current frame number.
         - `setTime(destinationTime)`: Plays the replay until the `destinationTime`(in milliseconds) or end of replay is reached. Note that it may take some time to reach the destination time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
+        - `setCurrentFrameNo(destinationFrameNo)`: Plays the replay until the `destinationFrameNo` or end of replay is reached. Note that it may take some time to reach the destination frame no(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
         - `getSpeed()`: Returns the current speed of playing the replay.
         - `setSpeed(coefficient)`: Changes the speed of playing the replay. `coefficient` must be a real number >=0. 
           - `coefficient` = 0 : stop replay.
@@ -215,7 +217,7 @@ Room.create({
           - `coefficient` > 1 : fast-motion replay.
         - `destroy()`: Releases the resources that are used by this object.
       - callbacks:
-        - `onDestinationTimeReached()`: Destination time has been reached. Runs after a call to `setTime(destinationTime)`.
+        - `onDestinationTimeReached()`: Destination time or frame number has been reached. Runs after a call to `setTime(destinationTime)` or `setCurrentFrameNo(destinationFrameNo)`.
         - `onEnd()`: The end of replay data has been reached.
   
   - `ReplayData`: The structure that holds all of the data inside a replay file.
@@ -225,13 +227,15 @@ Room.create({
     - `version`: Version number of the replay. Must currently be equal to `3`.
 
   - `readAll(uint8Array)`: Reads all of the given binary replay data into a new `ReplayData` structure and returns it. 
+  - `trim(replayData, { beginFrameNo, endFrameNo })`: Synchronously trims the given `ReplayData` between given frame numbers `beginFrameNo` and `endFrameNo`, both of which can be omitted and are inclusive. If omitted, `beginFrameNo` defaults to `0` and `endFrameNo` defaults to `replayData.totalFrames-1`.
+  - `trimAsync(replayData, { beginFrameNo, endFrameNo })`: Asynchronously trims the given `ReplayData` between given frame numbers `beginFrameNo` and `endFrameNo`, both of which can be omitted and are inclusive. If omitted, `beginFrameNo` defaults to `0` and `endFrameNo` defaults to `replayData.totalFrames-1`. returns `Promise(void)`
   - `writeAll(replayData)`: Writes the contents of a `ReplayData` structure into a new `Uint8Array` and returns it. 
 
 - `Utils`: Some static utility functions.
 
-  - `generateAuth()`: generates a new `player_auth_key` along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in `Room.join`. returns `Promise([authKey, authObj])`
-  - `authFromKey(authKey)`: recreates the auth object for given `authKey`. the object is used in `Room.join`. returns `Promise(authObj)`
-  - `getRoomList()`: returns the current room list. returns `Promise(roomListArray)`
+  - `generateAuth()`: generates a new `player_auth_key` along with its companion auth object. you should store the key and use it later if you want to be recognized in Haxball rooms. the object is used in `Room.join`. returns `Promise([authKey, authObj])`.
+  - `authFromKey(authKey)`: recreates the auth object for given `authKey`. the object is used in `Room.join`. returns `Promise(authObj)`.
+  - `getRoomList()`: returns the current room list. returns `Promise(roomListArray)`.
   - `calculateAllRoomDistances(geo, roomList)`: calculates the distances to the given geoLocation `geo` of all rooms in given `roomList` and stores them inside each room's `dist` property.
   - `numberToColor(number)`: returns the html color string (rgba representation) of the given `number`. (0 <= `number` <= 16777215)
   - `colorToNumber(color)`: returns the number representation of the given html color string (rgba representation).
@@ -339,6 +343,7 @@ Room.create({
             - `coefficient` = 1 : normal speed simulation.
             - `coefficient` > 1 : fast-motion simulation.
           - `runSteps(count)`: runs the simulation `count` steps. simulation must be stopped for this function to work.
+          - `executeEvent(eventMsg)`: applies an event to the current room state. for example; the event object may come from a `ReplayData` structure, or from a `onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)` callback.
           - `takeSnapshot()`: returns a complete snapshot of the current room state.
           - `useSnapshot(newRoomState)`: sets the current room state reference to `newRoomState`. `newRoomState` should be created by `takeSnapshot()` first.
           - `playerJoin(id, name, flag, avatar, conn, auth)`: adds a new player with properties(`id`, `name`, `flag`, `avatar`, `conn`, `auth`) to the room.

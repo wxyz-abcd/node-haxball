@@ -3,7 +3,7 @@ module.exports = function(API){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory_multiple", true, { // "autoPlay_followBall_inmemory_multiple" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
     This bot is capable of creating/removing fake bot players(id descending from 65535) in host's memory and controlling all of them at the same time using fake events.
@@ -99,7 +99,7 @@ module.exports = function(API){
 
       // get the original data object of the next bot
       var cp = that.room.getPlayer(botId);
-      var playerDisc = cp?.disc;
+      var playerDisc = cp?.disc?.ext;
 
       // coordinates: playerDisc.pos.x, playerDisc.pos.y
       // speed: playerDisc.speed.x, playerDisc.speed.y
@@ -109,7 +109,7 @@ module.exports = function(API){
         return;
 
       // get the original data object of the ball
-      var ball = that.room.getBall();
+      var ball = that.room.getBall().ext;
 
       // coordinates: ball.pos.x, ball.pos.y
       // speed: ball.speed.x, ball.speed.y

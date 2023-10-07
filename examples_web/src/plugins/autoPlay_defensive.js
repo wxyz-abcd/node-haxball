@@ -3,7 +3,7 @@ module.exports = function(API){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_defensive", true, { // "autoPlay_defensive" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: `This is an auto-playing bot that follows the ball if it is near enough, otherwise goes back and tries to be just in the midpoint of ball and his team's goal line; and kicks the ball whenever it is nearby without any direction checking. This bot uses real events and controls real players.`,
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
@@ -51,8 +51,7 @@ module.exports = function(API){
     var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
 
-    var cp = state.players.filter((x)=>(x.id==that.room.currentPlayerId))[0];
-    var playerDisc = cp.disc;
+    var cp = that.room.currentPlayer, playerDisc = cp?.disc?.ext;
     if (!playerDisc)
       return;
     var teamId = cp.team.id, opponentTeamId = 3 - teamId;

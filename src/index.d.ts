@@ -2274,6 +2274,15 @@ declare namespace MainReturnType {
      * @returns The Player object, or `null` if the player is not found.
      */
     getPlayer: (id)=>(Player | null);
+
+    /**
+     * Runs the simulation `count` steps. Use with extreme caution, especially on network rooms.
+     * 
+     * @param count Number of steps to run the simulation.
+     * 
+     * @returns void.
+     */
+    runSteps: (count: int)=>void;
   }
 
   /**
@@ -4726,6 +4735,16 @@ declare namespace MainReturnType {
      * @returns void.
      */
     runSteps(count: int): void;
+
+    /**
+     * Applies an event to the current room state. For example; the event object may come from a `ReplayData` structure, 
+     * or from a `onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)` callback.
+     * 
+     * @param eventMsg The event message to apply.
+     * 
+     * @returns void.
+     */
+    executeEvent(eventMsg: HaxballEvent): void;
 
     /**
      * Returns a complete snapshot of the current room state.
@@ -7785,6 +7804,13 @@ declare namespace MainReturnType {
     declare getTime: ()=>number;
 
     /**
+     * Returns the current frame number.
+     * 
+     * @returns The current frame number.
+     */
+    declare getCurrentFrameNo: ()=>int;
+
+    /**
      * Returns the length of replay content.
      * 
      * @returns The length of replay content in milliseconds.
@@ -7792,13 +7818,26 @@ declare namespace MainReturnType {
     declare length: ()=>number;
 
     /**
-     * Plays the replay until the `destinationTime` or end of replay is reached. Note that it may take some time to reach the destination time(especially if you are trying to rewind time), because the game state data is generated on the fly and not stored in memory. (It would probably use huge amounts of RAM.)
+     * Plays the replay until the `destinationTime` or end of replay is reached. Note that it may take some time to reach the 
+     * destination time(especially if you are trying to rewind time), because the game state data is generated on the fly and 
+     * not stored in memory. (It would probably use huge amounts of RAM.)
      * 
      * @param destinationTime The desired time in milliseconds.
      * 
      * @returns void.
      */
     declare setTime: (destinationTime)=>void;
+
+    /**
+     * Plays the replay until the `destinationFrameNo` or end of replay is reached. Note that it may take some time to reach the 
+     * destination frame number(especially if you are trying to rewind time), because the game state data is generated on the fly 
+     * and not stored in memory. (It would probably use huge amounts of RAM.)
+     * 
+     * @param destinationFrameNo The desired frame number.
+     * 
+     * @returns void.
+     */
+    declare setCurrentFrameNo: (destinationFrameNo)=>void;
 
     /**
      * Releases the resources that are used by this object.
@@ -7808,7 +7847,8 @@ declare namespace MainReturnType {
     declare destroy: ()=>void;
 
     /**
-     * Called when the destination time has been reached, which only happens some time after a call to `setTime(destinationTime)`.
+     * Called when the destination time or frame number has been reached, which only happens some time after 
+     * a call to `setTime(destinationTime)` or `setCurrentFrameNo(destinationFrameNo)`.
      * 
      * @returns void.
      */
@@ -7896,6 +7936,28 @@ declare namespace MainReturnType {
      * @returns The new `ReplayData` structure that contains all of the information inside the binary replay data.
      */
     export function readAll(uint8Array: Uint8Array): ReplayData;
+
+    /**
+     * Trims the given `ReplayData` between given frame numbers `beginFrameNo` and `endFrameNo`, both of which can be omitted and are 
+     * inclusive. If omitted, `beginFrameNo` defaults to `0` and `endFrameNo` defaults to `replayData.totalFrames-1`.
+     * 
+     * @param replayData The ReplayData structure that needs to be trimmed.
+     * @param params An optional object that may contain `beginFrameNo` and `endFrameNo` integer keys.
+     * 
+     * @returns void.
+     */
+    export function trim(replayData: ReplayData, params?: { beginFrameNo?: int, endFrameNo?: int }): void;
+
+    /**
+     * Trims the given `ReplayData` between given frame numbers `beginFrameNo` and `endFrameNo`, both of which can be omitted and are 
+     * inclusive. If omitted, `beginFrameNo` defaults to `0` and `endFrameNo` defaults to `replayData.totalFrames-1`.
+     * 
+     * @param replayData The ReplayData structure that needs to be trimmed.
+     * @param params An optional object that may contain `beginFrameNo` and `endFrameNo` integer keys.
+     * 
+     * @returns A Promise that is resolved when the trimming job is finished.
+     */
+    export function trimAsync(replayData: ReplayData, params?: { beginFrameNo?: int, endFrameNo?: int }): Promise<void>;
 
     /**
      * Converts all information inside the given `ReplayData` structure into a `Uint8Array` and returns it. 

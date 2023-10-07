@@ -1,0 +1,358 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/ccapture.js-npmfixed@1.1.0/build/CCapture.all.min.js"></script>
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
+    <style>
+      .settingsTitle {
+        display: flex;
+        flex-direction: row;
+        font-size: 30px;
+      }
+      .settingsRow {
+        display: flex;
+        flex-direction: row;
+      }
+      .settingsCell {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="display: block;">
+      Select or drag/drop a replay file here: <input class="willDisable" type="file" id="file"></file>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <div class="settingsTitle">
+        Replay file information:
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Room name:</div>
+        <div class="settingsCell"><input id="roomName" type="text" value="" disabled /></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Frame count:</div>
+        <div class="settingsCell"><input id="frameCount" type="number" value="" disabled /></div>
+      </div>
+      <div class="settingsTitle">
+        CCapture Settings:
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Capture format:</div>
+        <div class="settingsCell">
+          <select id="cFormat" class="willDisable">
+            <option value="png">png images</option>
+            <option value="jpg">jpg images</option>
+            <option value="gif">gif</option>
+            <option value="webm" selected>webm</option>
+            <!--option value="ffmpegserver" selected>ffmpegserver</option-->
+          </select>
+        </div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Capture frame rate:</div>
+        <div class="settingsCell"><input id="cFrameRate" class="willDisable" type="number" value="60"/></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Capture quality:</div>
+        <div class="settingsCell"><input id="cQuality" class="willDisable" type="number" value="1" step="0.01"/></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell"><input id="cMotionBlurFrames" class="willDisable" type="checkbox" />Motion Blur</div>
+      </div>
+      <div class="settingsTitle">
+        Replay Player Settings:
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Canvas width on screen:</div>
+        <div class="settingsCell"><input id="cws" class="willDisable" type="number" value="320"/></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Canvas height on screen:</div>
+        <div class="settingsCell"><input id="chs" class="willDisable" type="number" value="240"/></div>
+      </div>
+      <!--div class="settingsRow">
+        <div class="settingsCell">Canvas draw width:</div>
+        <div class="settingsCell"><input id="cdw" class="willDisable" type="number" value="1920"/></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Canvas draw height:</div>
+        <div class="settingsCell"><input id="cdh" class="willDisable" type="number" value="1080"/></div>
+      </div-->
+      <div class="settingsRow">
+        <div class="settingsCell">Renderer:</div>
+        <div class="settingsCell"><select id="renderer"></select></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Follow Player:</div>
+        <div class="settingsCell"><select id="roomPlayers"></select></div>
+      </div>
+      <div class="settingsRow">
+        <div class="settingsCell">Speed:</div>
+        <div class="settingsCell"><input id="playSpeed" type="number" value="1" step="0.01" /></div>
+      </div>
+    </div>
+    <div style="display: block;">
+      <button id="start" class="willDisable">Click to start</button>
+      <span id="cfn"></span>
+    </div>
+    <div style="display: block;">
+      <canvas id="canvas"></canvas>
+    </div>
+    <script>
+      const API = abcHaxballAPI({
+        setTimeout: window.setTimeout,
+        clearTimeout: window.clearTimeout,
+        setInterval: window.setInterval,
+        clearInterval: window.clearInterval,
+        console: window.console,
+        requestAnimationFrame: window.requestAnimationFrame,
+        cancelAnimationFrame: window.cancelAnimationFrame,
+        RTCPeerConnection: window.RTCPeerConnection, 
+        RTCIceCandidate: window.RTCIceCandidate, 
+        RTCSessionDescription: window.RTCSessionDescription, 
+        crypto: window.crypto,
+        WebSocket: window.WebSocket,
+        XMLHttpRequest: window.XMLHttpRequest,
+        performance: window.performance,
+        JSON5: window.JSON5,
+        pako: window.pako
+      },{
+        noVariableValueChangeEvent: true,
+        noWebRTC: true
+      }); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
+
+      function loadFile(file){
+        return new Promise((resolve, reject)=>{
+          var reader = new FileReader();
+          reader.onload = function(evt){
+            resolve(evt.target.result);
+          };
+          reader.onerror = function(evt){
+            reject();
+          };
+          reader.readAsArrayBuffer(file);
+        });
+      }
+
+      function loadImage(url){
+        return new Promise((resolve, reject)=>{
+          var img = document.createElement("img");
+          img.onload = ()=>{
+            resolve(img);
+          };
+          img.onerror = (x)=>{
+            resolve(x);
+          };
+          img.src = url;
+        });
+      }
+
+      function importAddon(addonType, name){
+        return new Promise((resolve, reject)=>{
+          window.module = {};
+          var s = document.createElement("script");
+          s.src = "./"+addonType+"/"+name+".js";
+          document.body.appendChild(s);
+          var int = setInterval(()=>{
+            if (window.module.exports==null)
+              return;
+            clearInterval(int);
+            var tmp = window.module.exports;
+            window.module = {};
+            resolve(tmp);
+          }, 1);
+        });
+      }
+
+      function importAddons(globalAddonsVariable, names){
+        return Promise.all(names.map((name)=>importAddon(globalAddonsVariable, name))).then((x)=>{
+          window.module = null;
+          x.test = "abc";
+          return x;
+        });
+      }
+
+      var obj = {
+        canvas: document.getElementById("canvas")
+      };
+
+      var cws = document.getElementById("cws"), chs = document.getElementById("chs")/*, cdw = document.getElementById("cdw"), cdh = document.getElementById("cdh")*/;
+      var cFormat = document.getElementById("cFormat"), cFrameRate = document.getElementById("cFrameRate"), cQuality = document.getElementById("cQuality");
+      var cMotionBlurFrames = document.getElementById("cMotionBlurFrames"), file = document.getElementById("file"), start = document.getElementById("start"), renderers;
+      var roomName = document.getElementById("roomName"), roomPlayers = document.getElementById("roomPlayers");
+      var frameCount = document.getElementById("frameCount"), playSpeed = document.getElementById("playSpeed");
+      var sRenderer = document.getElementById("renderer"), cfn = document.getElementById("cfn");
+      var currentRenderer = null, rendererNames = ["defaultRenderer", "sandboxRenderer"];
+
+      Promise.all([importAddons("renderers", rendererNames), loadImage("./images/grass.png"), loadImage("./images/concrete.png"), loadImage("./images/concrete2.png"), loadImage("./images/typing.png")]).then(([rendererFs, grass, concrete, concrete2, typing])=>{
+        obj.images = { grass, concrete, concrete2, typing };
+        renderers = rendererFs.map((Class)=>new Class(API, obj));
+        var sbr = renderers[1];
+        sbr.squarePlayers = true;
+        sbr.showVertices = true;
+        sbr.showGoals = true;
+        sbr.showPlanes = true;
+        sbr.showSpawnPoints = true;
+        sbr.showInvisibleJoints = true;
+        sbr.showInvisibleSegments = true;
+      });
+
+      rendererNames.forEach((x, i)=>{
+        var option = document.createElement("option");
+        option.innerText = x;
+        option.value = i;
+        sRenderer.appendChild(option);
+      });
+
+      file.onchange = function(){
+        loadFile(file.files[0]).then((replayData)=>{
+          var { totalFrames, roomData, events } = API.Replay.readAll(new Uint8Array(replayData));
+          frameCount.value = totalFrames;
+          roomName.value = roomData.name;
+          roomPlayers.innerHTML = "<option>Ball</option>";
+          var players = {};
+          roomData.players.forEach(({id, name})=>{
+            players[id] = { name };
+          });
+          events.forEach((x)=>{
+            if (x.eventType==API.OperationType.JoinRoom){
+              var p = players[x.id];
+              if (!p)
+                p = players[x.id] = {};
+              p.name = x.name;
+              p.join = x.frameNo;
+            }
+            else if (x.eventType==API.OperationType.KickBanPlayer){
+              var p = players[x.id];
+              if (!p)
+                return;
+              p.leave = x.frameNo;
+            }
+          });
+          Object.keys(players).forEach((id)=>{
+            var p = players[id];
+            var option = document.createElement("option");
+            var str = "["+id+"] " + p.name;
+            if (p.join!=null)
+              str+=" [j:"+p.join+"]";
+            if (p.leave!=null)
+              str+=" [l:"+p.leave+"]";
+            option.innerText = str;
+            option.value = parseInt(id);
+            roomPlayers.appendChild(option);
+          });
+        });
+      };
+
+      function checkNumber(value, int){
+        var newValue = int ? parseInt(value) : parseFloat(value);
+        if (isNaN(newValue))
+          return null;
+        return newValue;
+      }
+
+      start.onclick = function(){
+        if (!file.files[0]){
+          alert("Select a replay file first.");
+          return;
+        }
+        var params = {};
+        function checker(x, y, z, t){
+          var tmp = checkNumber(x.value, y);
+          if (tmp==null){
+            alert("Invalid "+t+".");
+            return false;
+          }
+          params[z] = tmp;
+          return true;
+        }
+        if (![
+          [playSpeed, false, "playSpeed", "playing speed"],
+          [cws, true, "cws", "canvas width on screen"],
+          [chs, true, "chs", "canvas height on screen"],
+          /*[cdw, true, "cdw", "canvas draw width"],
+          [cdh, true, "cdh", "canvas draw height"],*/
+          [cFrameRate, false, "cFrameRate", "capture frame rate"],
+          [cQuality, false, "cQuality", "capture quality"],
+        ].reduce((prev, curr)=>{
+          if (!prev)
+            return false;
+          return checker(curr[0], curr[1], curr[2]);
+        }, true))
+          return;
+        var speed = params.playSpeed;
+        document.querySelectorAll(".willDisable").forEach((element)=>{
+          element.disabled = true;
+        });
+        obj.paintGame = true;
+        currentRenderer = renderers[sRenderer.value] || renderers[0];
+        var capturer = new CCapture({
+          framerate: params.cFrameRate,
+          motionBlurFrames: cMotionBlurFrames.checked,
+          format: cFormat.value,
+          quality: params.cQuality,
+          workersPath: "./vendor/",
+          verbose: false,
+          display: false
+        });
+        loadFile(file.files[0]).then((replayData)=>{
+          var fid = checkNumber(roomPlayers.value, true);
+          renderers.forEach((renderer)=>{
+            renderer.room = {};
+            renderer.initialize();
+            renderer.followPlayerId = fid;
+          });
+          /*canvas.width = params.cdw;
+          canvas.height = params.cdh;*/
+          canvas.style = "width: "+params.cws+"px; height: "+params.chs+"px;";
+          canvas.onwheel = function(e){
+            currentRenderer.onWheel(e);
+          };
+          roomPlayers.onchange = ()=>{
+            fid = checkNumber(roomPlayers.value, true);
+            renderers.forEach((renderer)=>{
+              renderer.followPlayerId = fid;
+            });
+          };
+          sRenderer.onchange = function(){
+            currentRenderer = renderers[sRenderer.value] || renderers[0];
+          };
+          playSpeed.onchange = ()=>{
+            speed = checkNumber(playSpeed.value, false);
+            if (speed==null || speed<0)
+              return;
+            replayReader.setSpeed(speed);
+          };
+          let replayReader = API.Replay.read(new Uint8Array(replayData), {
+            render: (extrapolatedRoomState)=>{
+              currentRenderer.render(extrapolatedRoomState);
+              capturer.capture(canvas);
+              cfn.innerText = "Current Frame No: " + replayReader.getCurrentFrameNo() + " | FPS: " + currentRenderer.fps();
+            }
+          });
+          replayReader.onEnd = ()=>{ // the end of replay data is reached.
+            replayReader.destroy();
+            capturer.stop();
+            capturer.save(/*(blob)=>{console.log(URL.createObjectURL(blob));}*/);
+            renderers.forEach((renderer)=>{
+              renderer.finalize();
+            });
+            canvas.wheel = null;
+            roomPlayers.onchange = null;
+            sRenderer.onchange = null;
+            playSpeed.onchange = null;
+            cfn.innerText = "";
+            obj.paintGame = false;
+            document.querySelectorAll(".willDisable").forEach((element)=>{
+              element.disabled = false;
+            });
+          };
+          capturer.start();
+          replayReader.setSpeed(speed);
+        });
+      };
+    </script>
+  </body>
+</html>

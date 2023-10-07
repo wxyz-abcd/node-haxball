@@ -39,6 +39,7 @@ If you don't want this, you need to modify the source codes to use our proxy ser
     more parameters for creating a room in our API, but this is enough for now. There is currently no parameter available for this page.
 
     - `replayViewer.html`: This is a page to load/view a replay file. Since there is no need for a full-blown chat component here, all chat is written in console.
+    - `replayToVideo.html`: This is a page to view and convert a replay file to a gif/webm/mp4 video using the CCapture library. The outputs are huge files that probably need to be compressed before they can be uploaded anywhere. Also notice that CCapture's mp4 feature requires a custom server for the conversion. You can read more about the library here: https://github.com/spite/ccapture.js/.
 
   There is also another main html file called `game.html`, but it's not for direct usage. It is opened automatically when you create or join a room with canvas 
   capabilities. Most of the basic game functionalities have been implemented, and should work correctly.

@@ -436,7 +436,9 @@ function abcHaxballAPI(window, config){
       //mc.ts (init webrtc) contents:
       var b = new RTCPeerConnection({ iceServers: [] });
       try {
-        b.createAnswer()["catch"](function () {});
+        b.createAnswer()["catch"](function () {
+          b.close(); // otherwise causing memory leak in some cases.
+        });
       } catch (e) {
         var a = a.RTCPeerConnection.prototype,
           c = a.createOffer,
@@ -4659,6 +4661,9 @@ function abcHaxballAPI(window, config){
         obj.Lf = r.G(data.canBeStored, oc);
     },
 
+    runSteps: function(count){
+      this.C(count);
+    }
   };
 
   ///////////////////////////////////////////////////////////////
@@ -7860,7 +7865,7 @@ function abcHaxballAPI(window, config){
         return a;
       }
     };
-    requestAnimationFrame(G(this, this.bf));
+    this.De = requestAnimationFrame(G(this, this.bf));
     this.Qr = setInterval(function () {
       a.C();
     }, 50);
@@ -8132,7 +8137,7 @@ function abcHaxballAPI(window, config){
       ya.C();
       render && Kc();
     };
-    raf(bf);
+    De = raf(bf);
     this.clearCallbacks = function () {
       ya.T.iq = null;
       ya.T.tl = null;
@@ -8371,7 +8376,7 @@ function abcHaxballAPI(window, config){
       render && Kc();
     };
     function initialize(){
-      raf(bf);
+      De = raf(bf);
       ya.T.iq = (b)=>{
         ia.i(callbacks.onPlayerInputChange, b.V, b.ob);
       };
@@ -8698,6 +8703,9 @@ function abcHaxballAPI(window, config){
         b.P = byId;
         room.receiveEvent(b);
       },
+      executeEvent: function(eventObj){
+        room.receiveEvent(eventObj);
+      },
       setSimulationSpeed: function(speedCoeff){
         room.setSpeed(speedCoeff);
       },
@@ -8761,6 +8769,12 @@ function abcHaxballAPI(window, config){
         jb.er(destinationTime);
         //c.Wf || (c.Wf = !0, c.Vp(), c.el())
       },
+      getCurrentFrameNo: ()=>{
+        return jb.Y;
+      },
+      setCurrentFrameNo: (destinationFrameNo)=>{
+        jb.er(jb.mh * destinationFrameNo);
+      },
       destroy: ()=>{
         b.ia();
       }
@@ -8814,6 +8828,72 @@ function abcHaxballAPI(window, config){
       data.events.push(gg);
     }
     return data;
+  }
+
+  function trimReplaySync(replayData, prms){
+    if (!replayData)
+      return;
+    var { roomData, events, totalFrames } = replayData;
+    var beginFrameNo = prms?.beginFrameNo || 0;
+    if (beginFrameNo<0)
+      beginFrameNo = 0;
+    var endFrameNo = prms?.endFrameNo || (totalFrames-1);
+    if (endFrameNo>=totalFrames)
+      endFrameNo = totalFrames-1;
+    if (endFrameNo<beginFrameNo)
+      return;
+    var i = 0, j = 0, event = events[0];
+    while(j<beginFrameNo){
+      while(j==event?.frameNo){
+        event.apply(roomData);
+        event = events[++i];
+      }
+      j++;
+      roomData.C(1);
+    }
+    events = events.filter((evt)=>(evt.frameNo>=beginFrameNo && evt.frameNo<=endFrameNo));
+    events.forEach((evt)=>{
+      evt.frameNo-=beginFrameNo;
+    });
+    replayData.events = events;
+    replayData.totalFrames = endFrameNo-beginFrameNo+1;
+  }
+
+  function trimReplayAsync(replayData, prms){
+    if (!replayData)
+      return Promise.resolve();
+    var { roomData, events, totalFrames } = replayData;
+    var beginFrameNo = prms?.beginFrameNo || 0;
+    if (beginFrameNo<0)
+      beginFrameNo = 0;
+    var endFrameNo = prms?.endFrameNo || (totalFrames-1);
+    if (endFrameNo>=totalFrames)
+      endFrameNo = totalFrames-1;
+    if (endFrameNo<beginFrameNo)
+      return Promise.resolve();
+    var i = 0, j = 0, event = events[0];
+    return new Promise((resolve, reject)=>{
+      var interval;
+      interval = setInterval(()=>{
+        if (j>=beginFrameNo){
+          clearInterval(interval);
+          events = events.filter((evt)=>(evt.frameNo>=beginFrameNo && evt.frameNo<=endFrameNo));
+          events.forEach((evt)=>{
+            evt.frameNo-=beginFrameNo;
+          });
+          replayData.events = events;
+          replayData.totalFrames = endFrameNo-beginFrameNo;
+          resolve();
+          return;
+        }
+        while(j==event?.frameNo){
+          event.apply(roomData);
+          event = events[++i];
+        }
+        j++;
+        roomData.C(1);
+      }, 0);
+    });
   }
 
   function writeAllReplay(replayData){
@@ -10942,7 +11022,9 @@ function abcHaxballAPI(window, config){
       ReplayData: ReplayData,
       read: readReplay,
       readAll: readAllReplay,
-      writeAll: writeAllReplay
+      writeAll: writeAllReplay,
+      trim: trimReplaySync,
+      trimAsync: trimReplayAsync
       //Recorder: ac
     },
     Query: {

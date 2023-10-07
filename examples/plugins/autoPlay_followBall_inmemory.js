@@ -3,7 +3,7 @@ module.exports = function(API){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory", false, { // "autoPlay_followBall_inmemory" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. This bot creates a fake player(id=65535) in host's memory and controls it using fake events.`,
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
@@ -47,7 +47,7 @@ module.exports = function(API){
   this.onGameTick = function(customData){
     // get the original data object of the next bot
     var cp = that.room.getPlayer(65535);
-    var playerDisc = cp?.disc;
+    var playerDisc = cp?.disc?.ext;
 
     // coordinates: playerDisc.pos.x, playerDisc.pos.y
     // speed: playerDisc.speed.x, playerDisc.speed.y
@@ -57,7 +57,7 @@ module.exports = function(API){
       return;
 
     // get the original data object of the ball
-    var ball = that.room.getBall();
+    var ball = that.room.getBall().ext;
 
     // coordinates: ball.pos.x, ball.pos.y
     // speed: ball.speed.x, ball.speed.y
