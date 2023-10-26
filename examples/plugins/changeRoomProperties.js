@@ -99,6 +99,25 @@ module.exports = function(API){
     value: randomizeFlag
   });
 
+  this.defineVariable({
+    name: "fixPlayerCount",
+    description: "Whether to fix the number of players in the room.", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.defineVariable({
+    name: "playerCount",
+    description: "Number of players currently in the room.", 
+    type: VariableType.Integer,
+    value: 1,
+    range: {
+      min: 0,
+      max: 30,
+      step: 1
+    }
+  });
+
   var that = this;
   
   function applyValues(){
@@ -132,6 +151,44 @@ module.exports = function(API){
       }
     });
   }
+  
+  function updatePlayerCount(){
+    if (that.fixPlayerCount)
+      return;
+    that.playerCount = that.room.players.length;
+  }
+  
+  function updateRoomPlayerCount(){
+    var v = null;
+    if (that.fixPlayerCount){
+      v = parseInt(that.playerCount);
+      if (isNaN(v) || v<0 || v>30)
+        v = 0;
+    }
+    that.room.setProperties({
+      playerCount: v
+    });
+  }
+  
+  this.onPlayerJoin = function(playerObj, customData){
+    updatePlayerCount();
+  };
+  
+  this.onPlayerLeave = function(playerObj, reason, isBanned, byId, customData){
+    updatePlayerCount();
+  };
+
+  this.onVariableValueChange = function(addOnObj, variableName, oldValue, value){
+    if (addOnObj!=that)
+      return;
+    if (variableName=="fixPlayerCount"){
+      updateRoomPlayerCount();
+      if (!value)
+        updatePlayerCount();
+    }
+    else if (variableName=="playerCount")
+      updateRoomPlayerCount();
+  };
 
   const allCountries = [{
     "name": "Afghanistan",
