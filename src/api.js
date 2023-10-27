@@ -1256,7 +1256,7 @@ function abcHaxballAPI(window, config){
           (c = e - c),
           (f.x = a.x + d * c),
           (f.y = a.y + b * c),
-          (pObj._CDD_ && pObj._CDD_(this.v, this.playerId, oldA.v, oldA.playerId)));
+          (pObj._CDD_ && pObj._CDD_(this.jl, this.playerId, oldA.jl, oldA.playerId)));
       }
     },
     Qn: function (a, id1, id2, pObj) {

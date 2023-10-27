@@ -2,7 +2,7 @@ module.exports = function(API){
   const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "sokoban", true, { // "sokoban" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
+  Plugin.call(this, "CMD_sokoban", true, { // "CMD_sokoban" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
     version: "0.1",
     author: "abc & AlliBalliBaba",
     description: `This plugin sets up a sokoban game.`,
