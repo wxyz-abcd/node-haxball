@@ -1220,7 +1220,7 @@ function abcHaxballAPI(window, config){
       this.h = a.M();
       this.v = a.M();
     },
-    Pn: function (a, pObj) {
+    Pn: function (id1, id2, a, pObj) {
       var b = this.a,
         c = a.a,
         d = b.x - c.x,
@@ -1256,7 +1256,7 @@ function abcHaxballAPI(window, config){
           (c = e - c),
           (f.x = a.x + d * c),
           (f.y = a.y + b * c),
-          (pObj._CDD_ && pObj._CDD_(this.jl, this.playerId, oldA.jl, oldA.playerId)));
+          (pObj._CDD_ && pObj._CDD_(id1, this.playerId, id2, oldA.playerId)));
       }
     },
     Qn: function (a, id1, id2, pObj) {
@@ -1630,7 +1630,7 @@ function abcHaxballAPI(window, config){
         c = this.F[d];
         d += 1;
         for (e = this.F.length; d < e; )
-          (f = this.F[d++]), 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Pn(f, pObj);
+          (f = this.F[d++]), 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Pn(id, d-1, f, pObj);
         if (0 != c.aa) {
           d = 0;
           for (e = this.qa; d < e.length; )
@@ -10943,7 +10943,7 @@ function abcHaxballAPI(window, config){
     _fixNames(ua, ["cGroup", "cMask", "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
     _fixNames(nb, ["color", "strength", "maxLength", "minLength", "d1", "d0"]);
     _fixNames(Eb, ["kickback", "radius", "cGroup", "gravity", "bCoef", "invMass", "damping", "acceleration", "kickingAcceleration", "kickingDamping", "kickStrength"]);
-    _fixNames(ca, [null, null, "ext", "id", "cGroup", "cMask", null, "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
+    _fixNames(ca, [null, null, "ext", null, "cGroup", "cMask", null, "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
     _fixNames(h, ["vertices", "segments", "planes", "goals", "discs", "joints", "redSpawnPoints", "blueSpawnPoints", "playerPhysics", "defaultStadiumId", "maxViewWidth", "cameraFollow", "canBeStored", "fullKickOffReset", "name", "width", "height", "bgType", "bgColor", "bgWidth", "bgHeight", "bgKickOffRadius", "bgCornerRadius", "spawnDistance", "bgGoalLine"]);
     _fixNames(Fa, [null, "ext", "discs", "vertices", "planes", "segments", "joints"]);
     _fixNames(O, [null, "ext", "pauseGameTickCounter", "timeElapsed", "blueScore", "redScore", null, "state", "goalTickCounter", "physicsState", "timeLimit", "scoreLimit", "stadium", null]);

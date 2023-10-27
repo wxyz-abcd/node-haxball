@@ -1584,11 +1584,6 @@ declare namespace MainReturnType {
   declare type MovableDisc = {
 
     /**
-     * The id(index) of this Disc.
-     */
-    id: int;
-
-    /**
      * The position of this Disc.
      */
     pos: Point;
