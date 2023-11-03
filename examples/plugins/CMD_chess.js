@@ -109,16 +109,6 @@ module.exports = function(API){
     }
   };
 
-  function runAfterGameTick(callback, ticks=1){
-    if (ticks<=0){
-      callback();
-      return;
-    }
-    Promise.resolve().then(()=>{
-      runAfterGameTick(callback, ticks-1);
-    });
-  }
-
   /*
    * Copyright (c) 2020, Jeff Hlywa (jhlywa@gmail.com)
    * All rights reserved.
@@ -1908,9 +1898,9 @@ module.exports = function(API){
       var team = (color=="b") ? 2 : 1, flag = (team==1) ? that.redFlag : that.blueFlag;
       var p = props[type];
       that.room.fakePlayerJoin(id, that.playerNames ? p.name : "", flag, p.avatar);
-      runAfterGameTick(()=>{
+      Utils.runAfterGameTick(()=>{
         that.room.setPlayerTeam(id, team);
-        runAfterGameTick(()=>{
+        Utils.runAfterGameTick(()=>{
           that.room.setPlayerDiscProperties(id, {
             x: offsetX+x*that.boxSize,
             y: offsetY+y*that.boxSize
@@ -1996,7 +1986,7 @@ module.exports = function(API){
     if (!currentPlayer)
       return;
     lastPlayerIdxs[newTurn-1] = nextPlayerIdx;
-    runAfterGameTick(()=>{
+    Utils.runAfterGameTick(()=>{
       if (pawnPromotion)
         resetPlayer(currentPlayer);
       else
@@ -2145,7 +2135,7 @@ module.exports = function(API){
     pawnPromotion = null;
     Promise.all(parr).then(()=>{
       acceptMoveTeamsForPieces = false;
-      runAfterGameTick(()=>{
+      Utils.runAfterGameTick(()=>{
         that.room.players.forEach((p)=>{
           if (p.id>=48000 && p.id<48064)
             return;
@@ -2157,7 +2147,7 @@ module.exports = function(API){
           setTimeout(()=>{
             that.room?.stopGame();
           }, 5000);
-        runAfterGameTick(()=>{
+        Utils.runAfterGameTick(()=>{
           var n = 0;
           var a = that.room?.players.filter((x, i)=>{
             if ((x.id<48000 || x.id>=48064)&&i<(n+32)){
@@ -2248,7 +2238,7 @@ module.exports = function(API){
   }
   
   function announceInfo(text){
-    runAfterGameTick(()=>{
+    Utils.runAfterGameTick(()=>{
       that.room.librariesMap.commands?.announceInfo(text);
     }, 4);
   }
@@ -2443,7 +2433,7 @@ module.exports = function(API){
     if (!currentPlayer || currentPlayer.id==id)
       nextPlayer();
     if (id!=currentPlayer?.id)
-      runAfterGameTick(()=>{
+      Utils.runAfterGameTick(()=>{
         resetPlayer(id);
       });
   };

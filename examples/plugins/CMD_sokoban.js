@@ -191,7 +191,7 @@ module.exports = function(API){
   
   function checkEndGame(player){
     if (gameState.findIndex((row)=>(row.findIndex((cell)=>(cell.tile==2 || cell.tile==3))>=0))<0){
-      Promise.resolve().then(()=>{
+      Utils.runAfterGameTick(()=>{
         that.room.sendAnnouncement("["+player.id+"]"+player.name+" has won.", null, 0xff0000);
         nextStadium();
       });

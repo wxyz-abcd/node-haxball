@@ -223,6 +223,7 @@ Room.create({
   - `ReplayData`: The structure that holds all of the data inside a replay file.
     - `roomData`: The initial `RoomState` of the replay, including all the information about the current stadium, game state, players, etc.
     - `events`: All events in this replay ordered by their respective `frameNo`.
+    - `goalMarkers`: All team goals in this replay ordered by their respective `frameNo`.
     - `totalFrames`: Total number of frames in this replay.
     - `version`: Version number of the replay. Must currently be equal to `3`.
 
@@ -241,6 +242,7 @@ Room.create({
   - `colorToNumber(color)`: returns the number representation of the given html color string (rgba representation).
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. `dirX` = oneof\[`-1`:left, `0`:still, `1`:right\], `dirY` = oneof\[`-1`:up, `0`:still, `1`:down\], `kick` = `true`/`false`.
   - `reverseKeyState(state)`: returns the `dirX`, `dirY`, `kick` parameters that were used to generate the given integer `state` with `Utils.keyState` function.
+  - `runAfterGameTick(callback, ticks)`: runs a `callback` function after `ticks` game ticks. if omitted, `ticks` defaults to `1`.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
   - `geoFromJSON(json)`: creates and returns a GeoLocation object from a json object that should have `lat`, `lon` and `flag` keys.
   - `geoFromString(jsonStr)`: creates and returns a GeoLocation object from a stringified json object that should have `lat`, `lon` and `flag` keys.
@@ -623,6 +625,12 @@ Room.create({
       - `customData = onBeforePlayerObjectCreated(playerObj)`: a player object(`playerObj`) was created.
       - `onPlayerObjectCreated(playerObj, customData)`: a player object(`playerObj`) was created.
       - `onAfterPlayerObjectCreated(playerObj, customData)`: a player object(`playerObj`) was created.
+      - `customData = onBeforePlayerDiscCreated(playerObj)`: the disc that represents the player object(`playerObj`) was created.
+      - `onPlayerDiscCreated(playerObj, customData)`: the disc that represents the player object(`playerObj`) was created.
+      - `onAfterPlayerDiscCreated(playerObj, customData)`: the disc that represents the player object(`playerObj`) was created.
+      - `customData = onBeforePlayerDiscDestroyed(playerObj)`: the disc that represents the player object(`playerObj`) was destroyed.
+      - `onPlayerDiscDestroyed(playerObj, customData)`: the disc that represents the player object(`playerObj`) was destroyed.
+      - `onAfterPlayerDiscDestroyed(playerObj, customData)`: the disc that represents the player object(`playerObj`) was destroyed.
       - `customData = onBeforePlayerJoin(playerObj)`: a player(`playerObj`) joined the room.
       - `onPlayerJoin(playerObj, customData)`: a player(`playerObj`) joined the room.
       - `onAfterPlayerJoin(playerObj, customData)`: a player(`playerObj`) joined the room.
@@ -762,6 +770,8 @@ Room.create({
       - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (`stadium`) by player(`byId`).
       - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (`value`) by player(`byId`).
       - `onPlayerObjectCreated(playerObj, customData)`: a player object(`playerObj`) was created.
+      - `onPlayerDiscCreated(playerObj, customData)`: the disc that represents the player object(`playerObj`) was created.
+      - `onPlayerDiscDestroyed(playerObj, customData)`: the disc that represents the player object(`playerObj`) was destroyed.
       - `onPlayerJoin(playerObj, customData)`: a player(`playerObj`) joined the room.
       - `onGamePauseChange(isPaused, byId, customData)`: room's game paused status was set to (`isPaused`) by player(`byId`).
       - `onPlayerChat(id, message, customData)`: a chat message with content(`message`) was received from player(`id`).
@@ -829,6 +839,8 @@ Room.create({
       - `onStadiumChange(stadium, byId, customData)`: room's current stadium was set to (`stadium`) by player(`byId`).
       - `onTeamsLockChange(value, byId, customData)`: room's team lock status was set to (`value`) by player(`byId`).
       - `onPlayerObjectCreated(playerObj, customData)`: a player object(`playerObj`) was created.
+      - `onPlayerDiscCreated(playerObj, customData)`: the disc that represents the player object(`playerObj`) was created.
+      - `onPlayerDiscDestroyed(playerObj, customData)`: the disc that represents the player object(`playerObj`) was destroyed.
       - `onPlayerJoin(playerObj, customData)`: a player(`playerObj`) joined the room.
       - `onGamePauseChange(isPaused, byId, customData)`: room's game paused status was set to (`isPaused`) by player(`byId`).
       - `onPlayerChat(id, message, customData)`: a chat message with content(`message`) was received from player(`id`).

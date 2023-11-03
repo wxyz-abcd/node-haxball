@@ -107,6 +107,14 @@ module.exports = function(API){
   this.onPlayerObjectCreated = function(playerObj, customData){};
   this.onAfterPlayerObjectCreated = function(playerObj, customData){};
 
+  this.onBeforePlayerDiscCreated = function(playerObj){/*return customData;*/};
+  this.onPlayerDiscCreated = function(playerObj, customData){};
+  this.onAfterPlayerDiscCreated = function(playerObj, customData){};
+
+  this.onBeforePlayerDiscDestroyed = function(playerObj){/*return customData;*/};
+  this.onPlayerDiscDestroyed = function(playerObj, customData){};
+  this.onAfterPlayerDiscDestroyed = function(playerObj, customData){};
+
   this.onBeforePlayerJoin = function(playerObj){/*return customData;*/};
   this.onPlayerJoin = function(playerObj, customData){};
   this.onAfterPlayerJoin = function(playerObj, customData){};

@@ -51,7 +51,7 @@ module.exports = function(API){
 
   var that = this;
 
-  var smallestBotId = 65535, largestBotId = 65535, botIds = [], keyStates = {}, dummyPromise = Promise.resolve();
+  var smallestBotId = 65535, largestBotId = 65535, botIds = [], keyStates = {};
 
   var addBot = function(name, flag, avatar, conn, auth){
     if (botIds.length >= that.maxConcurrentBotCount)
@@ -135,7 +135,7 @@ module.exports = function(API){
 
       // apply current keys
       var keyState = Utils.keyState(dirX, dirY, kick);
-      dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+      Utils.runAfterGameTick(()=>{ // this is just a way of doing this outside onGameTick callback.
         // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
         // this happens because requestAnimationFrame is being used. 
         // therefore, we are trying to limit consequent sending.

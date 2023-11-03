@@ -170,7 +170,7 @@ module.exports = function(API){
   }
 
   function resetCoordinateLater(playerId){
-    Promise.resolve().then(()=>{
+    Utils.runAfterGameTick(()=>{
       if (stadium)
         that.room.setPlayerDiscProperties(playerId, {
           x: 60-stadium.width,

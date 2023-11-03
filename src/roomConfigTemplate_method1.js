@@ -93,6 +93,14 @@ function defineRoomCallbacks(room){
   room.onPlayerObjectCreated = function(playerObj, customData){};
   room.onAfterPlayerObjectCreated = function(playerObj, customData){};
 
+  room.onBeforePlayerDiscCreated = function(playerObj){/*return customData;*/};
+  room.onPlayerDiscCreated = function(playerObj, customData){};
+  room.onAfterPlayerDiscCreated = function(playerObj, customData){};
+
+  room.onBeforePlayerDiscDestroyed = function(playerObj){/*return customData;*/};
+  room.onPlayerDiscDestroyed = function(playerObj, customData){};
+  room.onAfterPlayerDiscDestroyed = function(playerObj, customData){};
+
   room.onBeforePlayerJoin = function(playerObj){/*return customData;*/};
   room.onPlayerJoin = function(playerObj, customData){};
   room.onAfterPlayerJoin = function(playerObj, customData){};

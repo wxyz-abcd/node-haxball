@@ -107,6 +107,14 @@ module.exports = function(API){
     console.log("onPlayerObjectCreated...", playerObj, customData);
   };
 
+  this.onPlayerDiscCreated = function(playerObj, customData){
+    console.log("onPlayerDiscCreated...", playerObj, customData);
+  };
+
+  this.onPlayerDiscDestroyed = function(playerObj, customData){
+    console.log("onPlayerDiscDestroyed...", playerObj, customData);
+  };
+
   this.onPlayerJoin = function(playerObj, customData){
     console.log("onPlayerJoin...", playerObj, customData);
   };

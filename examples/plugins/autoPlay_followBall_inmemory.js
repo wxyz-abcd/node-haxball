@@ -33,7 +33,7 @@ module.exports = function(API){
     }
   });
 
-  var that = this, oldKeyState = 0, dummyPromise = Promise.resolve();
+  var that = this, oldKeyState = 0;
 
   this.onPluginActiveChange = function(plugin, customData){
     if (plugin.name!=that.name)
@@ -83,7 +83,7 @@ module.exports = function(API){
 
     // apply current keys
     var newKeyState = Utils.keyState(dirX, dirY, kick);
-    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+    Utils.runAfterGameTick(()=>{ // this is just a way of doing this outside onGameTick callback.
       // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
       // this happens because requestAnimationFrame is being used. 
       // therefore, we are trying to limit consequent sending.

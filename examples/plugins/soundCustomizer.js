@@ -1,15 +1,10 @@
-/**
- * 
- * TODO: Add other sounds as parameter, Winning,losing,ball kicking etc. done(?)
- * TODO: Update variable names.
- */
 
 module.exports = function(API){
   const { AllowFlags, Plugin, VariableType } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "soundCustomizer", true, {
-    version: "0.1",
+    version: "0.2",
     author: "0x00",
     description: "A sound customizer plugin that changes sound of any event.",
     allowFlags: AllowFlags.CreateRoom|AllowFlags.JoinRoom // We allow this plugin to be activated on both CreateRoom and JoinRoom.
@@ -82,7 +77,7 @@ module.exports = function(API){
       type:VariableType.Boolean,
       value:true
   });
-  let onCollisionSound, msgSound, onPBKSound, opponentScoreSound, cpTeamScoreSound , onGESounds;
+  let onCollisionSound, chatMsgNotificationSound, onPBKSound, opponentScoreSound, cpTeamScoreSound , onGESounds;
   //#endregion Variables
   /**
    * 
@@ -91,7 +86,7 @@ module.exports = function(API){
    * @returns {void}
    */    
    function playSound(audio, index){ 
-      if(Array.isArray(audio) && (!isNaN(index) || audio[index])){
+      if(Array.isArray(audio) && (!isNaN(index) && audio[index])){
           audio[index].play().catch(console.error);
           return;
       }
@@ -100,13 +95,15 @@ module.exports = function(API){
   this.initialize = () => {
       onGESounds  = [new Audio(this.winningSound), new Audio(this.losingSound)];
       onCollisionSound = new Audio(this.collisionSound);
-      msgSound = new Audio(this.onMsgSound);
+      chatMsgNotificationSound = new Audio(this.onMsgSound);
       onPBKSound = new Audio(this.ballKickSound);
       opponentScoreSound = new Audio(this.opponentScoreSound);
       cpTeamScoreSound = new Audio(this.cPTeamScoreSound);
   };
   this.finalize = function(){
-       onPBKSound.remove() && onGESounds.forEach((e) => e.remove()) && (onPBKSound = opponentScoreSound = cpTeamScoreSound = onGESounds = null);
+      onPBKSound.remove() && opponentScoreSound.remove() && cpTeamScoreSound.remove() && opponentScoreSound.remove() && onCollisionSound.remove() && chatMsgNotificationSound.remove() && onGESounds.forEach((e) => e.remove()) 
+      &&
+      (onPBKSound = opponentScoreSound = cpTeamScoreSound = onGESounds = chatMsgNotificationSound = null);
   };
   /**
    * 
@@ -132,7 +129,7 @@ module.exports = function(API){
               onPBKSound.src = newValue
               break;
           case "onMsgSound":
-            msgSound.src = newValue
+            chatMsgNotificationSound.src = newValue
             break;
           case "cPTeamScoreSound":
               cpTeamScoreSound.src = newValue;
@@ -156,22 +153,23 @@ module.exports = function(API){
    * @returns 
    */
   this.onPlayerBallKick = (playerId, customData) => {
-      if(this.onlyCurrentPlayer && playerId === this.room.currentPlayerId)
-          return playSound(onPBKSound);
+      if(this.onlyCurrentPlayer)
+          return playerId === this.room.currentPlayerId && playSound(onPBKSound);
       playSound(onPBKSound);
   }
   this.onGameEnd = (winningTeamID) => playSound(onGESounds, Number(winningTeamID === this.room.currentPlayer.team.id))
   /**
    * 
-   * @param {Number?} discId 
-   * @param {Number?} discPlayerId 
-   * @param {Number?} segmentId 
-   * @param {*} customData 
+   * @param {Number?} discId1 
+   * @param {Number?} discPlayerId1 
+   * @param {Number?} discId2 
+   * @param {Number?} discPlayerId2 
+   * @returns {void}
    */
   this.onCollisionDiscVsDisc = (discId1,discPlayerId1,discId2,discPlayerId2) => {
       if(!this.enableCDVD||[discId1, discId2].includes(0)) return;
-      if(this.onlyCurrentPlayer && [discPlayerId1, discPlayerId2].includes(this.room.currentPlayerId))
-          return playSound(onCollisionSound);
+      if(this.onlyCurrentPlayer)
+          return ([discPlayerId1, discPlayerId2].includes(this.room.currentPlayerId)) && playSound(onCollisionSound);
       playSound(onCollisionSound);
   }
   /**
@@ -183,8 +181,8 @@ module.exports = function(API){
    */
   this.onCollisionDiscVsSegment = (discId, discPlayerId, segmentId, customData) => {
       if(!this.enableCDVS) return;
-      if(this.onlyCurrentPlayer && discPlayerId === this.room.currentPlayerId)
-          return playSound(onCollisionSound);
+      if(this.onlyCurrentPlayer)
+          return  (discPlayerId === this.room.currentPlayerId) && playSound(onCollisionSound);
       playSound(onCollisionSound);
   }
   /**
@@ -196,8 +194,8 @@ module.exports = function(API){
    */
   this.onCollisionDiscVsPlane = (discId, discPlayerId, segmentId, customData) => {
       if(!this.enableCDVP) return;
-      if(this.onlyCurrentPlayer &&  discPlayerId === this.room.currentPlayerId)
-          return playSound(onCollisionSound);
+      if(this.onlyCurrentPlayer)
+          return (discPlayerId === this.room.currentPlayerId) && playSound(onCollisionSound);
       playSound(onCollisionSound);
   }
   /**
@@ -207,5 +205,5 @@ module.exports = function(API){
    * @param {*} customData 
    * @returns {void}
    */
-  this.onPlayerChat = (id, message,customData) => playSound(msgSound);
+  this.onPlayerChat = (id, message,customData) => playSound(chatMsgNotificationSound);
 };

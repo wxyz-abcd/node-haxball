@@ -74,7 +74,7 @@ module.exports = function(API){
     value: true
   });
 
-  var that = this, dummyPromise = Promise.resolve(), originalRoomData;
+  var that = this, originalRoomData;
 
   this.initialize = function(){
     originalRoomData = that.room.state; // this object pointer never changes while inside a room, so we can store it here.
@@ -231,7 +231,7 @@ module.exports = function(API){
 
     // apply current keys
     var keyState = Utils.keyState(dirX, dirY, kick);
-    dummyPromise.then(()=>{ // this is just a way of doing this outside onGameTick callback.
+    Utils.runAfterGameTick(()=>{ // this is just a way of doing this outside onGameTick callback.
       // sending keystate on EVERY game tick causes desync when you deactivate game's browser tab. 
       // this happens because requestAnimationFrame is being used. 
       // therefore, we are trying to limit consequent sending.

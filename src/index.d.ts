@@ -2823,6 +2823,26 @@ declare namespace MainReturnType {
     onPlayerObjectCreated?: (playerObj: Player, customData?: object)=>object|undefined,
 
     /**
+     * Called just after a disc object has been assigned to a player object.
+     * 
+     * @param playerObj The new Player object that has just been assigned a disc object.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onPlayerDiscCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+
+    /**
+     * Called just after a disc object has been removed from a player object.
+     * 
+     * @param playerObj The Player object whose disc object has just been removed.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onPlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>object|undefined,
+
+    /**
      * Called just after a player has joined the room.
      * 
      * @param playerObj The data representation of the player that has just joined the room.
@@ -3902,6 +3922,46 @@ declare namespace MainReturnType {
     onAfterPlayerObjectCreated?: (playerObj: Player, customData?: object)=>void,
 
     /**
+     * Called just after a disc object has been assigned to a player object.
+     * 
+     * @param playerObj The new Player object that has just been assigned a disc object.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforePlayerDiscCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+
+    /**
+     * Called just after a disc object has been assigned to a player object.
+     * 
+     * @param playerObj The new Player object that has just been assigned a disc object.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onAfterPlayerDiscCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+
+    /**
+     * Called just after a disc object has been removed from a player object.
+     * 
+     * @param playerObj The Player object whose disc object has just been removed.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforePlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>object|undefined,
+
+    /**
+     * Called just after a disc object has been removed from a player object.
+     * 
+     * @param playerObj The Player object whose disc object has just been removed.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onAfterPlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>object|undefined,
+
+    /**
      * Called just after a player has joined the room.
      * 
      * @param playerObj The data representation of the player that has just joined the room.
@@ -4392,6 +4452,16 @@ declare namespace MainReturnType {
      * @returns An object that holds values for x, y directions and kick.
      */
     export function reverseKeyState(state: int): {dirX: Direction, dirY: Direction, kick: boolean};
+
+    /**
+     * Runs a `callback` function after `ticks` game ticks.
+     * 
+     * @param callback The function to run.
+     * @param ticks Number of ticks to wait before running the callback function. Defaults to `1`.
+     * 
+     * @returns void.
+     */
+    export function runAfterGameTick(callback: ()=>void, ticks: int): void;
 
     /**
      * Connects to Haxball's backend server, retrieves your location based on IP address using backend's geolocation API and returns it. Might throw errors.
@@ -7910,7 +7980,12 @@ declare namespace MainReturnType {
       /**
        * All events in this replay ordered by their respective `frameNo`.
        */
-      events: any[];
+      events: (HaxballEvent | {frameNo: int})[];
+
+      /**
+       * All team goals in this replay ordered by their respective `frameNo`.
+       */
+      goalMarkers: {teamId: int, frameNo: int}[];
 
       /**
        * Total number of frames in this replay.
