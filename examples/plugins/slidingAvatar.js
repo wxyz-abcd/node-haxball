@@ -2,7 +2,7 @@ module.exports = function (API) {
   const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
-  Plugin.call(this, "slidingAvatar", true, {
+  Plugin.call(this, "slidingAvatar", false, {
     version: "0.1",
     author: "JerryOldson",
     description: `This plugin will slide the characters of your avatar.`,
@@ -13,7 +13,7 @@ module.exports = function (API) {
     name: "avatar",
     description: "The avatar you want to have.",
     type: VariableType.String,
-    value: "ABC"
+    value: "JerryOldson"
   });
 
   this.defineVariable({
