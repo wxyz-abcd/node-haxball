@@ -1,10 +1,10 @@
 module.exports = function(API, params){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "default.min",
-    version: "1.03",
+    version: "1.04",
     author: "basro & abc",
     description: `This is the default renderer currently used in Haxball, with the exception that most if not all of the camera bugs have been fixed.`
   });
@@ -299,6 +299,7 @@ module.exports = function(API, params){
     this.td = new Sb();
     this.sa = params.canvas;//window.document.createElement("canvas");
     this.sa.mozOpaque = !0;
+    this.sa.style.filter = "";
     this.c = this.sa.getContext("2d", { alpha: !1 });
     this.Lo = this.c.createPattern(/*n.Ko*/params.images?.grass, null);
     this.Wn = this.c.createPattern(/*n.Vn*/params.images?.concrete, null);

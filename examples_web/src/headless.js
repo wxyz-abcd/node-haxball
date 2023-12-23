@@ -1,6 +1,4 @@
-//var API;
 var roomCallback = function(room){
-  //const { OperationType, VariableType, ConnectionState, AllowFlags, Callback, Utils, Room, Replay, RoomConfig, Plugin, Renderer, Impl } = API;
   var eLink = document.getElementById("link");
   // This is a headless bot test:
   room.onRoomLink = (roomLink, customData)=>{
@@ -15,4 +13,4 @@ var roomCallback = function(room){
     room.setPlayerAdmin(id, true); // make everybody admin
   };
 };
-/*API = */init(true, roomCallback);
+init(true, roomCallback);

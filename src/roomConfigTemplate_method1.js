@@ -173,6 +173,10 @@ function defineRoomCallbacks(room){
   room.onBansClear = function(customData){};
   room.onAfterBansClear = function(customData){};
 
+  room.onBeforeBanClear = function(id){/*return customData;*/};
+  room.onBanClear = function(id, customData){};
+  room.onAfterBanClear = function(id, customData){};
+
   room.onBeforeRoomRecaptchaModeChange = function(on){/*return customData;*/};
   room.onRoomRecaptchaModeChange = function(on, customData){};
   room.onAfterRoomRecaptchaModeChange = function(on, customData){};

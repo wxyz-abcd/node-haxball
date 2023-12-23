@@ -67,7 +67,8 @@ function EnglishLanguage(API){
     [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: " + abbr,
     [ErrorCodes.CurrentLanguageRemovalError]: ()=>"Current language cannot be removed. Change to a different language first.",
     [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Language does not exist: " + abbr,
-    [ErrorCodes.BadActorError]: ()=>"Bad Actor"
+    [ErrorCodes.BadActorError]: ()=>"Bad Actor",
+    [ErrorCodes.AuthBannedError]: (auth)=>"Auth banned: "+auth,
   };
 
   const ConnectionStateTextMap = {

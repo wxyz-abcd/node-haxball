@@ -30,7 +30,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = require("node-haxball")();
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = require("node-haxball")();
 // Use example code here.
 ```
 
@@ -52,7 +52,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window, {
           proxy: {
             WebSocketUrl: "wss://surf-emerald-armadillo.glitch.me/",
             HttpUrl: "https://surf-emerald-armadillo.glitch.me/rs/"
@@ -75,7 +75,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -251,6 +251,37 @@ Room.create({
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
   - `stadiumChecksum(stadium)`: calculate checksum for given `stadium`. returns `null` for original maps.
 
+- `EventFactory`: Contains static functions to create all kinds of event messages.
+
+  - `create(type)`: creates and returns an event message depending on the `type` parameter. returns `null` if `type` is not one of the types defined inside `OperationType` enum.
+  - `checkConsistency(data)`: creates and returns an event message that can be used to trigger a consistency check. `data` should be an `ArrayBuffer`.
+  - `sendAnnouncement(msg, color, style, sound)`: creates and returns an event message that can be used to send an announcement message(`msg`) with properties(`color`, `style`, `sound`).
+  - `sendChatIndicator(active)`: creates and returns an event message that can be used to set the chat indicator status of a player to `active`.
+  - `sendInput(input)`: creates and returns an event message that can be used to triggers an input(keys) event. 0<=`input`<=31.
+  - `sendChat(msg)`: creates and returns an event message that can be used to send chat message(`msg`).
+  - `joinRoom(id, name, flag, avatar, conn, auth)`: creates and returns an event message that can be used to trigger a player join event.
+  - `setHeadlessAvatar(id, avatar)`: creates and returns an event message that can be used to set the headless avatar of a player(`ìd`) to `avatar`.
+  - `kickBanPlayer(id, reason, ban)`: creates and returns an event message that can be used to trigger a player(`id`) leave event.
+  - `reorderPlayers(playerIdList, moveToTop)`: creates and returns an event message that can be used to reorder players in a room.
+  - `startGame()`: creates and returns an event message that can be used to start the game.
+  - `stopGame()`: creates and returns an event message that can be used to stop the game.
+  - `pauseResumeGame(paused)`: creates and returns an event message that can be used to pause or resume a game.
+  - `setScoreLimit(value)`: creates and returns an event message that can be used to set the score limit of a game to `value`.
+  - `setTimeLimit(value)`: creates and returns an event message that can be used to set the time limit of a game to `value`.
+  - `setStadium(stadium)`: creates and returns an event message that can be used to set the current stadium of a room to `stadium`.
+  - `setPlayerTeam(playerId, teamId)`: creates and returns an event message that can be used to move a player(`playerId`) to a team(`teamId`).
+  - `setTeamsLock(value)`: creates and returns an event message that can be used to lock or unlock the teams.
+  - `setPlayerAdmin(playerId, value)`: creates and returns an event message that can be used to give/take away admin priveleges of a player(`playerId`).
+  - `autoTeams()`: creates and returns an event message that can be used to trigger an autoTeams event.
+  - `setPlayerSync(value)`: creates and returns an event message that can be used to set the synchronization status of a player.
+  - `ping(values)`: creates and returns an event message that can be used to set the pings of all players in a room.
+  - `setAvatar(value)`: creates and returns an event message that can be used to set the avatar of a player to `value`.
+  - `setTeamColors(teamId, colors)`: creates and returns an event message that can be used to set the colors of a team(`teamId`) to `colors`. `colors` must be an instance of the `Impl.Core.ka`(TeamColors) class.
+  - `setKickRateLimit(min, rate, burst)`: creates and returns an event message that can be used to set the kick rate limit of a room.
+  - `setDiscProperties(id, data)`: creates and returns an event message that can be used to set the properties of a disc(`id`) to `data`.
+  - `setPlayerDiscProperties(id, data)`: creates and returns an event message that can be used to set the properties of the disc of a player(`id`) to `data`.
+  - `customEvent(type, data)`: creates and returns an event message that can be used to trigger a custom event with properties(`type`, `data`).
+
 - `Query`: Static functions to query map features. `roomState` should be either `room.state` or `room.stateExt`.
   - `getVertexIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
   - `getVertexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
@@ -401,6 +432,8 @@ Room.create({
     - `redScore`: red team's current score. `null` if game is not active. read-only.
     - `blueScore`: blue team's current score. `null` if game is not active. read-only.
     - `timeElapsed`: elapsed time in current game. `null` if game is not active. read-only.
+    - `currentFrameNo`: the current frame number of the room. read-only.
+    - `banList`: the current list of banned players. read-only. host-only.
 
   - `functions`:
     - `leave()`: leaves the room.
@@ -410,6 +443,9 @@ Room.create({
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
     - `setExtrapolation(extrapolation)`: sets the client's `extrapolation` value in msecs.
     - `clearBans()`: clears all bans. host-only.
+    - `clearBan(id)`: clears the ban of a player(`id`). host-only.
+    - `executeEvent(event, byId)`: executes any event inside this room. host-only.
+    - `clearEvents()`: clears the event queue. can be useful when the game engine is stuck.
     - `setAvatar(avatar)`: sets the current player's client `avatar`.
     - `setPlayerAvatar(id, value, headless)`: sets the avatar of player(`id`) to `avatar`. `headless` is a boolean to determine whether the headless or client avatar is being set. host-only.
     - `setChatIndicatorActive(active)`: sets the current player's chat indicator status. `active`: `true`/`false`.
@@ -685,6 +721,9 @@ Room.create({
       - `customData = onBeforeBansClear()`: all bans were cleared. host-only.
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onAfterBansClear(customData)`: all bans were cleared. host-only.
+      - `customData = onBeforeBanClear(id)`: the ban of a player(`id`) was cleared. host-only.
+      - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
+      - `onAfterBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
       - `customData = onBeforeRoomRecaptchaModeChange(on)`: room's recaptcha mode was set to (`on`). host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
       - `onAfterRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
@@ -790,6 +829,7 @@ Room.create({
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
+      - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
       - `onRoomRecordingChange(value, customData)`: recording started(`value`=`true`) or stopped(`value` is `arraybuffer`). triggered individually.
       - `onRoomPropertiesChange(props, customData)`: room's properties(`props`) were changed. host-only.
@@ -859,6 +899,7 @@ Room.create({
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
+      - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
       - `onRoomRecordingChange(value, customData)`: recording started(`value`=`true`) or stopped(`value` is `ArrayBuffer`). triggered individually.
       - `onRoomPropertiesChange(props, customData)`: room's properties(`props`) were changed. host-only.
@@ -929,10 +970,11 @@ Room.create({
 
 <div> - Initial testing environment by <a href="https://github.com/mertushka">mertushka <img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
 <div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - Lots of testing and various plugins by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
+<div> - Lots of testing and various plugins by <a href="https://github.com/jerryoldson">JerryOldson <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a></div>
+<div> - Lots of testing and Portuguese language translation by <a href="https://github.com/guguxh">Juze <img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
 <div> - Room.modifyFrameNo by <a href="https://github.com/hxgd1">Punisher <img width="20" src="https://avatars.githubusercontent.com/u/114198188?v=4"/></a></div>
-<div> - Lots of testing and Porteguese language translation by <a href="https://github.com/guguxh">Juze <img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
 <div> - Autoplay bot examples improved by <a href="https://github.com/K0nfy">K0nfy <img width="20" src="https://avatars.githubusercontent.com/u/27099419?v=4"/></a></div>
-<div> - Rest of the features by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
 <div> - Docs formatted by <a href="https://github.com/uzayyli">uzaylı <img width="20" src="https://avatars.githubusercontent.com/u/87779551?v=4"/></a></div>
 <div></div>
 <div>We will continue to add all contributors to this list.</div>

@@ -1,11 +1,11 @@
 module.exports = function(API, params){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
   const { RendererTextIndices: TextIndices } = Language.indices;
   
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "sandbox",
-    version: "1.3",
+    version: "1.4",
     author: "basro & abc",
     description: `This is a customized renderer with aimbot designed specifically for the new sandbox mode for Haxball. Disable followMode to zoom using mouse wheel.`
   });
@@ -424,6 +424,7 @@ module.exports = function(API, params){
     this.textRenderer = new CanvasTextRenderer(); // td
     this.canvas = params.canvas; // sa
     this.canvas.mozOpaque = true;
+    this.canvas.style.filter = "";
     this.ctx = this.canvas.getContext("2d", { alpha: false });
     this.grassPattern = this.ctx.createPattern(/*n.Ko*/params.images?.grass, null); // Lo
     this.concretePattern = this.ctx.createPattern(/*n.Vn*/params.images?.concrete, null); // Wn

@@ -164,6 +164,13 @@ declare namespace MainReturnType {
     ReorderPlayers = 23,
     
     /**
+     * The operation to check whether the client is in sync 
+     * with the host. This requires the sender to be a client 
+     * of the current room.
+     */
+    CheckConsistency = 24,
+    
+    /**
      * The operation to trigger a custom event. This requires 
      * the receiver to use this API, otherwise the operation
      * will not be sent to that client. This might create
@@ -171,7 +178,7 @@ declare namespace MainReturnType {
      * custom event includes important changes such as 
      * stadium objects, names, etc.
      */
-    CustomEvent = 24
+    CustomEvent = 25
   }
 
   /**
@@ -184,41 +191,46 @@ declare namespace MainReturnType {
   export enum VariableType {
 
     /**
+     * The void type. Used to show a button. Its value should be a function that will be executed when the button is clicked.
+     */
+    Void = 0,
+
+    /**
      * The boolean type. Can be `true` or `false`.
      */
-    Boolean = 0,
+    Boolean = 1,
 
     /**
      * The integer type. Can be any integer. Should be used 
      * with a `range` property to define its range.
      */
-    Integer = 1,
+    Integer = 2,
 
     /**
      * The number type. Can be any real number or +-Infinity or NaN. 
      * Should be used with a `range` property to define its range.
      */
-    Number = 2,
+    Number = 3,
 
     /**
      * The string type. Can be any string. Should be used 
      * with a `range` property to define the range of its length.
      */
-    String = 3,
+    String = 4,
 
     /**
      * The color type. This is in fact currently an integer in 
      * the range [-1, 16777216]. Specialized only to be edited 
      * with a color picker component inside a GUI environment.
      */
-    Color = 4,
+    Color = 5,
 
     /**
      * The collision flags type. This is in fact an ordinary 
      * integer. Specialized only to be edited with a collision
      * flags editor component inside a GUI environment.
      */
-    CollisionFlags = 5,
+    CollisionFlags = 6,
 
     /**
      * The coordinate type. This is in fact an ordinary array 
@@ -227,7 +239,7 @@ declare namespace MainReturnType {
      * Specialized to be edited with a coordinate editor 
      * component inside a GUI environment.
      */
-    Coordinate = 6,
+    Coordinate = 7,
 
     /**
      * The team type. Currently, the only accepted values for 
@@ -235,7 +247,7 @@ declare namespace MainReturnType {
      * `2` is the blue team. Specialized to be edited with a 
      * team selector component inside a GUI environment.
      */
-    Team = 7,
+    Team = 8,
 
     /**
      * The team type. Currently, the only accepted values for 
@@ -244,7 +256,7 @@ declare namespace MainReturnType {
      * Specialized to be edited with a team selector component 
      * inside a GUI environment.
      */
-    TeamWihSpec = 8,
+    TeamWithSpec = 9,
 
     /**
      * The background type. Currently, the only accepted values for 
@@ -253,7 +265,7 @@ declare namespace MainReturnType {
      * Specialized to be edited with a background selector component 
      * inside a GUI environment.
      */
-    BgType = 9,
+    BgType = 10,
 
     /**
      * The camera follow type. Currently, the only accepted values for 
@@ -261,7 +273,7 @@ declare namespace MainReturnType {
      * `1` means to follow the current player. Specialized to be edited 
      * with a camera follow selector component inside a GUI environment.
      */
-    CameraFollow = 10,
+    CameraFollow = 11,
 
     /**
      * The kickOffReset type. Currently, the only accepted values for 
@@ -269,14 +281,32 @@ declare namespace MainReturnType {
      * reset and `1` means "partial" kick off reset. Specialized to be edited 
      * with a camera follow selector component inside a GUI environment.
      */
-    KickOffReset = 11,
+    KickOffReset = 12,
 
     /**
      * The flag type. This is in fact a string value that represents the 
      * country code of a country. Specialized to be edited with a flag 
      * selector component inside a GUI environment.
      */
-    Flag = 12
+    Flag = 13,
+
+    /**
+     * The file type. Should be editable with a file selector component 
+     * inside a GUI environment.
+     */
+    File = 14,
+
+    /**
+     * The playerId type. Should be editable with a player selector component
+     * inside a GUI environment.
+     */
+    PlayerId = 15,
+
+    /**
+     * The keys array type. Should be editable with a keyboard keys editor component
+     * inside a GUI environment.
+     */
+    Keys = 16
   }
 
   /**
@@ -778,7 +808,12 @@ declare namespace MainReturnType {
     /**
      * ()=>"Bad Actor"
      */
-    BadActorError = 55
+    BadActorError = 55,
+
+    /**
+     * (auth)=>"Auth banned: " + auth
+     */
+    AuthBannedError = 56
   }
 
   declare enum RendererTextIndices {
@@ -844,6 +879,10 @@ declare namespace MainReturnType {
   }
 
   declare type int = number;
+  declare type uint8 = number;
+  declare type uint16 = number;
+  declare type int32 = number;
+  declare type uint32 = number;
 
   declare type TextToNumberMap = {
     [x: string]: number;
@@ -962,7 +1001,23 @@ declare namespace MainReturnType {
     /**
      * Id of the player who triggered this event.
      */
-    public byId: int;
+    public byId: uint16;
+
+    /**
+     * Creates a copy of this event object.
+     */
+    public copy: ()=>HaxballEvent;
+  };
+
+  /**
+   * The event message structure that is created when a consistency check has to be performed.
+   */
+  declare class ConsistencyCheckEvent extends HaxballEvent {
+
+    /**
+     * The consistency data to be checked.
+     */
+    public data: ArrayBuffer;
   };
 
   /**
@@ -1006,7 +1061,7 @@ declare namespace MainReturnType {
      *  - The color value can be converted into a rgba string via API's `Utils.numberToColor` function.
      *  - The special value `-1` means `transparent` color.
      */
-    public color: int;
+    public color: int32;
 
     /**
      * The style of the announcement message. Must be one of the following:
@@ -1031,7 +1086,7 @@ declare namespace MainReturnType {
      * Id of the player who will receive the announcement. 
      * If `null`, everyone receives it. Can not be modified.
      */
-    public readonly targetId: int | null;
+    public readonly targetId: uint16 | null;
   };
 
   /**
@@ -1060,7 +1115,7 @@ declare namespace MainReturnType {
     /**
      * Id of the player whose admin status is changed.
      */
-    public playerId: int;
+    public playerId: uint16;
 
     /**
      * The new admin status value.
@@ -1087,7 +1142,7 @@ declare namespace MainReturnType {
     /**
      * Id of the player whose team is changed.
      */
-    public playerId: int;
+    public playerId: uint16;
 
     /**
      * The new team.
@@ -1141,7 +1196,7 @@ declare namespace MainReturnType {
     /**
      * Id of the new player.
      */
-    public id: int;
+    public id: uint16;
 
     /**
      * Name of the new player.
@@ -1177,7 +1232,7 @@ declare namespace MainReturnType {
     /**
      * Id of the player whose headless avatar is changed.
      */
-    public playerId: int;
+    public playerId: uint16;
 
     /**
      * The new headless avatar value. ( max length = 2 )
@@ -1210,7 +1265,7 @@ declare namespace MainReturnType {
      * Id of the player who will receive the chat. 
      * If `null`, everyone receives it. Can not be modified.
      */
-    public readonly targetId: int | null;
+    public readonly targetId: uint16 | null;
   };
 
   /**
@@ -1243,7 +1298,7 @@ declare namespace MainReturnType {
     /**
      * Type of the custom event. This value can be anything you want.
      */
-    public type: uint8;
+    public type: uint32;
 
     /**
      * Custom data of the custom event. This value can be anything you want.
@@ -1260,7 +1315,7 @@ declare namespace MainReturnType {
     /**
      * Id of the player who left the room.
      */
-    public id: int;
+    public id: uint16;
 
     /**
      * The reason of kick/ban. ( max length = 100 )
@@ -1282,7 +1337,7 @@ declare namespace MainReturnType {
     /**
      * Id of the players who will be reordered in the player list.
      */
-    public playerIdList: int[];
+    public playerIdList: uint16[];
 
     /**
      * Whether the players will be moved to the top or bottom of the list.
@@ -1298,7 +1353,7 @@ declare namespace MainReturnType {
     /**
      * Id of the disc/player whose properties are changed.
      */
-    public id: int;
+    public id: uint16;
 
     /**
      * If `true`, this is triggered by room.setPlayerDiscProperties, and `id` is the player's id.
@@ -1311,7 +1366,7 @@ declare namespace MainReturnType {
      * `[x, y, xspeed, yspeed, xgravity, ygravity, radius, bCoeff, invMass, damping]`
      * If any of these values are `null`, it means that that value is not modified.
      */
-    public data1: (float32 | null)[];
+    public data1: (number | null)[];
 
     /**
      * Contains the integer properties that are sent, in this order:
@@ -1638,7 +1693,7 @@ declare namespace MainReturnType {
     /**
      * Id of the player that owns this Disc, or `null` if it is not owned by a player.
      */
-    playerId: int | null;
+    playerId: uint16 | null;
 
     /**
      * The extrapolated version of this Disc, or `null` if the data is not available.
@@ -1882,6 +1937,11 @@ declare namespace MainReturnType {
      * Whether this is a custom Stadium or a default Stadium.
      */
     readonly isCustom: boolean;
+
+    /**
+     * Creates a copy of this Stadium object.
+     */
+    copy: ()=>Stadium;
   };
 
   /**
@@ -1908,6 +1968,11 @@ declare namespace MainReturnType {
      *   - The special value `-1` means `transparent` color.
      */
     inner: int[];
+
+    /**
+     * Creates a copy of this TeamColors object.
+     */
+    copy: ()=>TeamColors;
   };
 
   /**
@@ -2193,6 +2258,11 @@ declare namespace MainReturnType {
      * The extrapolated version of this GameState, or `null` if the data is not available.
      */
     ext: GameState | null;
+
+    /**
+     * Creates a copy of this GameState object.
+     */
+    copy: ()=>GameState;
   };
 
   declare interface RoomStateBase {
@@ -2376,6 +2446,16 @@ declare namespace MainReturnType {
     onBansClear?: (customData?: object)=>object|undefined;
 
     /**
+     * Called just after the ban of a player has been cleared using `room.clearBan(id)`.
+     * 
+     * @param id Id of the player whose ban has just been cleared.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBanClear?: (id: uint16, customData?: object)=>object|undefined;
+
+    /**
      * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
      * 
      * @param on The new value; whether to request recaptcha or not while joining the room.
@@ -2495,7 +2575,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerBallKick?: (playerId: int, customData?: object)=>object|undefined,
+    onPlayerBallKick?: (playerId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after a goal has been scored.
@@ -2717,7 +2797,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerSyncChange?: (playerId: int, value: boolean, customData?: object)=>object|undefined,
+    onPlayerSyncChange?: (playerId: uint16, value: boolean, customData?: object)=>object|undefined,
 
     /**
      * Called just after an "auto" event has been triggered to automatically move at least one, at most two players from spectators to teams.
@@ -2731,7 +2811,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onAutoTeams?: (playerId1: int, teamId1: int, playerId2: int | null, teamId2: int | null, byId: int, customData?: object)=>object|undefined,
+    onAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the score limit has been changed.
@@ -2742,7 +2822,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onScoreLimitChange?: (value: int, byId: int, customData?: object)=>object|undefined,
+    onScoreLimitChange?: (value: int, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the time limit has been changed.
@@ -2753,7 +2833,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTimeLimitChange?: (value: int, byId: int, customData?: object)=>object|undefined,
+    onTimeLimitChange?: (value: int, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player's admin rights have been given/taken.
@@ -2765,7 +2845,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerAdminChange?: (id: int, isAdmin: boolean, byId: int, customData?: object)=>object|undefined,
+    onPlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player has changed his/her avatar.
@@ -2776,7 +2856,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerAvatarChange?: (id: int, value: string, customData?: object)=>object|undefined,
+    onPlayerAvatarChange?: (id: uint16, value: string, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player has been moved to a different team.
@@ -2788,7 +2868,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerTeamChange?: (id: int, teamId: int, byId: int, customData?: object)=>object|undefined,
+    onPlayerTeamChange?: (id: uint16, teamId: int, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the room's current stadium has been changed.
@@ -2799,7 +2879,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onStadiumChange?: (stadium: Stadium, byId: int, customData?: object)=>object|undefined,
+    onStadiumChange?: (stadium: Stadium, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the room's teams have been locked/unlocked.
@@ -2810,7 +2890,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTeamsLockChange?: (value: boolean, byId: int, customData?: object)=>object|undefined,
+    onTeamsLockChange?: (value: boolean, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player object has been created. This callback can be used to define custom properties inside all player objects.
@@ -2861,7 +2941,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGamePauseChange?: (isPaused: boolean, byId: int, customData?: object)=>object|undefined,
+    onGamePauseChange?: (isPaused: boolean, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after a chat message has been received.
@@ -2872,7 +2952,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerChat?: (id: int, message: string, customData?: object)=>object|undefined,
+    onPlayerChat?: (id: uint16, message: string, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player's input has been changed.
@@ -2883,7 +2963,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerInputChange?: (id: int, value: int, customData?: object)=>object|undefined,
+    onPlayerInputChange?: (id: uint16, value: int, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player has activated or deactivated his/her chat indicator. This happens when a player focuses/loses focus on the chat input component in the website.
@@ -2894,7 +2974,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerChatIndicatorChange?: (id: int, value: boolean, customData?: object)=>object|undefined,
+    onPlayerChatIndicatorChange?: (id: uint16, value: boolean, customData?: object)=>object|undefined,
 
     /**
      * Called just after a player has left the room.
@@ -2907,7 +2987,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: int, customData?: object)=>object|undefined,
+    onPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after a team's colors have been changed.
@@ -2919,7 +2999,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTeamColorsChange?: (teamId: int, value: TeamColors, byId: int, customData?: object)=>object|undefined,
+    onTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the room's kick rate limit has been changed.
@@ -2932,7 +3012,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onKickRateLimitChange?: (min: int, rate: int, burst: int, byId: int, customData?: object)=>object|undefined,
+    onKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the game has been started.
@@ -2942,7 +3022,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGameStart?: (byId: int, customData?: object)=>object|undefined,
+    onGameStart?: (byId: uint16, customData?: object)=>object|undefined,
 
     /**
      * Called just after the game has been stopped.
@@ -2952,7 +3032,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGameStop?: (byId: int, customData?: object)=>object|undefined
+    onGameStop?: (byId: uint16, customData?: object)=>object|undefined
   }
 
   /**
@@ -2974,7 +3054,7 @@ declare namespace MainReturnType {
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
      */
-    modifyPlayerData?: (playerId: int, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: object)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerData?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: object)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -2985,7 +3065,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyPlayerPing?: (playerId: int, ping: int, customData?: object)=>number,
+    modifyPlayerPing?: (playerId: uint16, ping: int, customData?: object)=>number,
 
     /**
      * If defined, runs only for the current player in a client room and modifies its `ping` value.
@@ -3033,7 +3113,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onCustomEvent?: (type: int, data: object, byId: int, customData?: object)=>object|undefined
+    onCustomEvent?: (type: uint32, data: object, byId: uint16, customData?: object)=>object|undefined
   }
 
   declare interface HostOnlyRoomConfigCallbacks {
@@ -3070,6 +3150,25 @@ declare namespace MainReturnType {
      * @returns void.
      */
     onAfterBansClear?: (customData?: object)=>void,
+
+    /**
+     * Called just after the ban of a player has been cleared using `room.clearBan(id)`.
+     * 
+     * @param id Id of the player whose ban has just been cleared.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforeBanClear?: (id: int)=>object|undefined;
+
+    /**
+     * Called just after the ban of a player has been cleared using `room.clearBan(id)`.
+     * 
+     * @param id Id of the player whose ban has just been cleared.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void.
+     */
+    onAfterBanClear?: (id: int, customData?: object)=>void;
 
     /**
      * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
@@ -3290,7 +3389,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerBallKick?: (playerId: int)=>object|undefined,
+    onBeforePlayerBallKick?: (playerId: uint16)=>object|undefined,
 
     /**
      * Called just after the ball has been kicked.
@@ -3300,7 +3399,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerBallKick?: (playerId: int, customData?: object)=>void,
+    onAfterPlayerBallKick?: (playerId: uint16, customData?: object)=>void,
 
     /**
      * Called just after a goal has been scored.
@@ -3421,7 +3520,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int)=>object|undefined,
+    onBeforeCollisionDiscVsDisc?: (discId1: int, discPlayerId1: uint16, discId2: int, discPlayerId2: uint16)=>object|undefined,
 
     /**
      * Called just after a collision has happened between two discs.
@@ -3434,7 +3533,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int, customData?: object)=>void,
+    onAfterCollisionDiscVsDisc?: (discId1: int, discPlayerId1: uint16, discId2: int, discPlayerId2: uint16, customData?: object)=>void,
 
     /**
      * Called just after a collision has happened between a disc and a segment.
@@ -3446,7 +3545,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int)=>object|undefined,
+    onBeforeCollisionDiscVsSegment?: (discId: int, discPlayerId: uint16, segmentId: int)=>object|undefined,
 
     /**
      * Called just after a collision has happened between a disc and a segment.
@@ -3458,7 +3557,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int, customData?: object)=>void,
+    onAfterCollisionDiscVsSegment?: (discId: int, discPlayerId: uint16, segmentId: int, customData?: object)=>void,
 
     /**
      * Called just after a collision has happened between a disc and a plane.
@@ -3470,7 +3569,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int)=>object|undefined,
+    onBeforeCollisionDiscVsPlane?: (discId: int, discPlayerId: uint16, planeId: int)=>object|undefined,
 
     /**
      * Called just after a collision has happened between a disc and a plane.
@@ -3482,7 +3581,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int, customData?: object)=>void
+    onAfterCollisionDiscVsPlane?: (discId: int, discPlayerId: uint16, planeId: int, customData?: object)=>void
   }
 
   declare interface LocalRoomConfigCallbacks {
@@ -3711,7 +3810,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerSyncChange?: (playerId: int, value: boolean)=>object|undefined,
+    onBeforePlayerSyncChange?: (playerId: uint16, value: boolean)=>object|undefined,
 
     /**
      * Called just after a player's synchronization status has changed.
@@ -3722,7 +3821,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerSyncChange?: (playerId: int, value: boolean, customData?: object)=>void,
+    onAfterPlayerSyncChange?: (playerId: uint16, value: boolean, customData?: object)=>void,
 
     /**
      * Called just after an "auto" event has been triggered to automatically move at least one, at most two players from spectators to teams.
@@ -3735,7 +3834,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeAutoTeams?: (playerId1: int, teamId1: int, playerId2: int | null, teamId2: int | null, byId: int)=>object|undefined,
+    onBeforeAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16)=>object|undefined,
 
     /**
      * Called just after an "auto" event has been triggered to automatically move at least one, at most two players from spectators to teams.
@@ -3749,7 +3848,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterAutoTeams?: (playerId1: int, teamId1: int, playerId2: int | null, teamId2: int | null, byId: int, customData?: object)=>void,
+    onAfterAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the score limit has been changed.
@@ -3759,7 +3858,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeScoreLimitChange?: (value: int, byId: int)=>object|undefined,
+    onBeforeScoreLimitChange?: (value: int, byId: uint16)=>object|undefined,
 
     /**
      * Called just after the score limit has been changed.
@@ -3770,7 +3869,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterScoreLimitChange?: (value: int, byId: int, customData?: object)=>void,
+    onAfterScoreLimitChange?: (value: int, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the time limit has been changed.
@@ -3780,7 +3879,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTimeLimitChange?: (value: int, byId: int)=>object|undefined,
+    onBeforeTimeLimitChange?: (value: int, byId: uint16)=>object|undefined,
 
     /**
      * Called just after the time limit has been changed.
@@ -3791,7 +3890,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterTimeLimitChange?: (value: int, byId: int, customData?: object)=>void,
+    onAfterTimeLimitChange?: (value: int, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after a player's admin rights have been given/taken.
@@ -3802,7 +3901,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerAdminChange?: (id: int, isAdmin: boolean, byId: int)=>object|undefined,
+    onBeforePlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16)=>object|undefined,
 
     /**
      * Called just after a player's admin rights have been given/taken.
@@ -3814,7 +3913,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerAdminChange?: (id: int, isAdmin: boolean, byId: int, customData?: object)=>void,
+    onAfterPlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after a player has changed his/her avatar.
@@ -3824,7 +3923,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerAvatarChange?: (id: int, value: string)=>object|undefined,
+    onBeforePlayerAvatarChange?: (id: uint16, value: string)=>object|undefined,
 
     /**
      * Called just after a player has changed his/her avatar.
@@ -3835,7 +3934,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerAvatarChange?: (id: int, value: string, customData?: object)=>void,
+    onAfterPlayerAvatarChange?: (id: uint16, value: string, customData?: object)=>void,
 
     /**
      * Called just after a player has been moved to a different team.
@@ -3846,7 +3945,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerTeamChange?: (id: int, teamId: int, byId: int)=>object|undefined,
+    onBeforePlayerTeamChange?: (id: uint16, teamId: int, byId: uint16)=>object|undefined,
 
     /**
      * Called just after a player has been moved to a different team.
@@ -3858,7 +3957,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerTeamChange?: (id: int, teamId: int, byId: int, customData?: object)=>void,
+    onAfterPlayerTeamChange?: (id: uint16, teamId: int, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the room's current stadium has been changed.
@@ -3868,7 +3967,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeStadiumChange?: (stadium: Stadium, byId: int)=>object|undefined,
+    onBeforeStadiumChange?: (stadium: Stadium, byId: uint16)=>object|undefined,
 
     /**
      * Called just after the room's current stadium has been changed.
@@ -3879,7 +3978,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterStadiumChange?: (stadium: Stadium, byId: int, customData?: object)=>void,
+    onAfterStadiumChange?: (stadium: Stadium, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the room's teams have been locked/unlocked.
@@ -3900,7 +3999,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterTeamsLockChange?: (value: boolean, byId: int, customData?: object)=>void,
+    onAfterTeamsLockChange?: (value: boolean, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after a player object has been created. This callback can be used to define custom properties inside all player objects.
@@ -3988,7 +4087,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGamePauseChange?: (isPaused: boolean, byId: int)=>object|undefined,
+    onBeforeGamePauseChange?: (isPaused: boolean, byId: uint16)=>object|undefined,
 
     /**
      * Called just after the game has been paused or resumed.
@@ -3999,7 +4098,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGamePauseChange?: (isPaused: boolean, byId: int, customData?: object)=>void,
+    onAfterGamePauseChange?: (isPaused: boolean, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after a chat message has been received.
@@ -4009,7 +4108,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerChat?: (id: int, message: string)=>object|undefined,
+    onBeforePlayerChat?: (id: uint16, message: string)=>object|undefined,
 
     /**
      * Called just after a chat message has been received.
@@ -4020,7 +4119,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerChat?: (id: int, message: string, customData?: object)=>void,
+    onAfterPlayerChat?: (id: uint16, message: string, customData?: object)=>void,
 
     /**
      * Called just after a player's input has been changed.
@@ -4030,7 +4129,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerInputChange?: (id: int, value: int)=>object|undefined,
+    onBeforePlayerInputChange?: (id: uint16, value: int)=>object|undefined,
 
     /**
      * Called just after a player's input has been changed.
@@ -4041,7 +4140,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerInputChange?: (id: int, value: int, customData?: object)=>void,
+    onAfterPlayerInputChange?: (id: uint16, value: int, customData?: object)=>void,
 
     /**
      * Called just after a player has activated or deactivated his/her chat indicator. This happens when a player focuses/loses focus on the chat input component in the website.
@@ -4051,7 +4150,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerChatIndicatorChange?: (id: int, value: boolean)=>object|undefined,
+    onBeforePlayerChatIndicatorChange?: (id: uint16, value: boolean)=>object|undefined,
 
     /**
      * Called just after a player has activated or deactivated his/her chat indicator. This happens when a player focuses/loses focus on the chat input component in the website.
@@ -4062,7 +4161,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerChatIndicatorChange?: (id: int, value: boolean, customData?: object)=>void,
+    onAfterPlayerChatIndicatorChange?: (id: uint16, value: boolean, customData?: object)=>void,
 
     /**
      * Called just after a player has left the room.
@@ -4074,7 +4173,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: int)=>object|undefined,
+    onBeforePlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16)=>object|undefined,
 
     /**
      * Called just after a player has left the room.
@@ -4087,7 +4186,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: int, customData?: object)=>void,
+    onAfterPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after a team's colors have been changed.
@@ -4098,7 +4197,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTeamColorsChange?: (teamId: int, value: TeamColors, byId: int)=>object|undefined,
+    onBeforeTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16)=>object|undefined,
 
     /**
      * Called just after a team's colors have been changed.
@@ -4110,7 +4209,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterTeamColorsChange?: (teamId: int, value: TeamColors, byId: int, customData?: object)=>void,
+    onAfterTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the room's kick rate limit has been changed.
@@ -4122,7 +4221,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeKickRateLimitChange?: (min: int, rate: int, burst: int, byId: int)=>object|undefined,
+    onBeforeKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16)=>object|undefined,
 
     /**
      * Called just after the room's kick rate limit has been changed.
@@ -4135,7 +4234,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterKickRateLimitChange?: (min: int, rate: int, burst: int, byId: int, customData?: object)=>void,
+    onAfterKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the game has been started.
@@ -4144,7 +4243,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameStart?: (byId: int)=>object|undefined,
+    onBeforeGameStart?: (byId: uint16)=>object|undefined,
 
     /**
      * Called just after the game has been started.
@@ -4154,7 +4253,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGameStart?: (byId: int, customData?: object)=>void,
+    onAfterGameStart?: (byId: uint16, customData?: object)=>void,
 
     /**
      * Called just after the game has been stopped.
@@ -4163,7 +4262,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameStop?: (byId: int)=>object|undefined,
+    onBeforeGameStop?: (byId: uint16)=>object|undefined,
 
     /**
      * Called just after the game has been stopped.
@@ -4173,7 +4272,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGameStop?: (byId: int, customData?: object)=>void
+    onAfterGameStop?: (byId: uint16, customData?: object)=>void
   }
 
   declare interface ModifierRoomConfigCallbacks {
@@ -4192,7 +4291,7 @@ declare namespace MainReturnType {
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
      */
-    modifyPlayerDataBefore?: (playerId: int, name: string, flag: string, avatar: string, conn: string, auth: string)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerDataBefore?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
 
     /**
      * Called just before the player has joined the room. Using this callback, you may block all players or modify all players' name, flag and avatar properties just before they join the room.
@@ -4209,7 +4308,7 @@ declare namespace MainReturnType {
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
      */
-    modifyPlayerDataAfter?: (playerId: int, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: object)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerDataAfter?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: object)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -4220,7 +4319,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyPlayerPingBefore?: (playerId: int, ping: int)=>number,
+    modifyPlayerPingBefore?: (playerId: uint16, ping: int)=>number,
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -4232,7 +4331,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyPlayerPingAfter?: (playerId: int, ping: int, customData?: object)=>number,
+    modifyPlayerPingAfter?: (playerId: uint16, ping: int, customData?: object)=>number,
 
     /**
      * If defined, runs only for the current player in a client room and modifies its `ping` value.
@@ -4315,7 +4414,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCustomEvent?: (type: int, data: object, byId: int)=>object|undefined,
+    onBeforeCustomEvent?: (type: int, data: object, byId: uint16)=>object|undefined,
 
     /**
      * Called just after a custom event has been triggered.
@@ -4327,7 +4426,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCustomEvent?: (type: int, data: object, byId: int, customData?: object)=>void
+    onAfterCustomEvent?: (type: int, data: object, byId: uint16, customData?: object)=>void
   }
 
   declare interface RendererCallbacks {
@@ -4588,7 +4687,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onError?: (error: Errors.HBError, playerId: int)=>void
+    onError?: (error: Errors.HBError, playerId: uint16)=>void
   };
 
   declare type JoinRoomParams = {
@@ -4839,7 +4938,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    playerJoin(id: int, name: string, flag: string, avatar: string, conn: string, auth: string): void;
+    playerJoin(id: uint16, name: string, flag: string, avatar: string, conn: string, auth: string): void;
 
     /**
      * Removes a player from the room.
@@ -4848,7 +4947,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    playerLeave(playerId: int): void;
+    playerLeave(playerId: uint16): void;
 
     /**
      * Sets the current key state of a player.
@@ -4858,7 +4957,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    playerInput(input: int, byId: int): void;
+    playerInput(input: int, byId: uint16): void;
 
     /**
      * Sends a chat message as a player.
@@ -4868,7 +4967,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    playerChat(msg: string, byId: int): void;
+    playerChat(msg: string, byId: uint16): void;
 
     /**
      * Sets the current player's key state. (added for compatibility with normal rooms.)
@@ -4887,7 +4986,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerChatIndicator(value: int, byId: int): void;
+    setPlayerChatIndicator(value: int, byId: uint16): void;
 
     /**
      * Sets the avatar of a player.
@@ -4897,7 +4996,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerAvatar(value: string, byId: int): void;
+    setPlayerAvatar(value: string, byId: uint16): void;
 
     /**
      * Sets the current stadium using a fake identity.
@@ -4908,7 +5007,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setCurrentStadium(value: Stadium, byId: int, onError: ErrorCallback): void;
+    setCurrentStadium(value: Stadium, byId: uint16, onError: ErrorCallback): void;
 
     /**
      * Sends an announcement message to a player.
@@ -4933,7 +5032,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    sendAnnouncement(msg: string, color: int, style: int, sound: int, targetId: int, byId: int): void;
+    sendAnnouncement(msg: string, color: int, style: int, sound: int, targetId: uint16, byId: uint16): void;
 
     /**
      * Starts the game using a fake identity.
@@ -4942,7 +5041,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    startGame(byId: int): void;
+    startGame(byId: uint16): void;
 
     /**
      * Stops the game using a fake identity.
@@ -4951,7 +5050,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    stopGame(byId: int): void;
+    stopGame(byId: uint16): void;
 
     /**
      * Pauses/resumes the game using a fake identity.
@@ -4963,7 +5062,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setGamePaused(value: boolean, byId: int): void;
+    setGamePaused(value: boolean, byId: uint16): void;
 
     /**
      * Sets the game's score limit using a fake identity.
@@ -4973,7 +5072,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setScoreLimit(value: int, byId: int): void;
+    setScoreLimit(value: int, byId: uint16): void;
 
     /**
      * Sets the game's time limit using a fake identity.
@@ -4983,7 +5082,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setTimeLimit(value: int, byId: int): void;
+    setTimeLimit(value: int, byId: uint16): void;
 
     /**
      * Locks/unlocks the teams using a fake identity.
@@ -4993,7 +5092,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setTeamsLock(value: int, byId: int): void;
+    setTeamsLock(value: int, byId: uint16): void;
 
     /**
      * Removes the last 2 players from spectators and adds them to opposite teams in order using a fake identity.
@@ -5002,7 +5101,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    autoTeams(byId: int): void;
+    autoTeams(byId: uint16): void;
 
     /**
      * Moves a player to a team using a fake identity.
@@ -5013,7 +5112,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerTeam(playerId: int, teamId: int, byId: int): void;
+    setPlayerTeam(playerId: uint16, teamId: int, byId: uint16): void;
 
     /**
      * Sets the room's kick rate limit using a fake identity.
@@ -5025,7 +5124,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setKickRateLimit(min: int, rate: int, burst: int, byId: int): void;
+    setKickRateLimit(min: int, rate: int, burst: int, byId: uint16): void;
 
     /**
      * Sets the colors of a team using a fake identity.
@@ -5039,7 +5138,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setTeamColors(teamId: int, angle: int, colors: int[], byId: int): void;
+    setTeamColors(teamId: int, angle: int, colors: int[], byId: uint16): void;
 
     /**
      * Gives/takes away the admin status of a player using a fake identity.
@@ -5052,7 +5151,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerAdmin(playerId: int, value: boolean, byId: int): void;
+    setPlayerAdmin(playerId: int, value: boolean, byId: uint16): void;
 
     /**
      * Kicks/bans a player using a fake identity.
@@ -5065,7 +5164,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    kickPlayer(playerId: int, reason: string, ban: boolean, byId: int): void;
+    kickPlayer(playerId: uint16, reason: string, ban: boolean, byId: uint16): void;
 
     /**
      * Set the synchronization status of a player.
@@ -5075,7 +5174,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerSync(value: boolean, byId: int): void;
+    setPlayerSync(value: boolean, byId: uint16): void;
 
     /**
      * Sets the ping values of all players.
@@ -5085,7 +5184,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    sendPingData(valueFunc: int[], byId: int): void;
+    sendPingData(valueFunc: int[], byId: uint16): void;
 
     /**
      * Sets the properties of a disc.
@@ -5112,7 +5211,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setDiscProperties(discId: int, type: int, data: any[], byId: int): void;
+    setDiscProperties(discId: uint16, type: int, data: any[], byId: uint16): void;
 
     /**
      * Triggers a fake custom event using a fake identity.
@@ -5123,7 +5222,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    sendCustomEvent(type: int, data: object, byId: int): void;
+    sendCustomEvent(type: int, data: object, byId: uint16): void;
 
     /**
      * Frees the resources that are used by this object.
@@ -6758,7 +6857,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    updatePlayer(playerId: int, data: UpdatePlayerParams): void;
+    updatePlayer(playerId: uint16, data: UpdatePlayerParams): void;
 
     /**
      * Removes a vertex from the current room.
@@ -6831,7 +6930,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    removePlayer(playerId: int): void;
+    removePlayer(playerId: uint16): void;
 
     /**
      * Updates the current stadium's only the given player physics values.
@@ -6904,7 +7003,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakePlayerJoin(id: int, name: string, flag: string, avatar: string, conn: string, auth: string): void;
+    fakePlayerJoin(id: uint16, name: string, flag: string, avatar: string, conn: string, auth: string): void;
 
     /**
      * Triggers a fake leave room event. The player, although seemingly leaving the room, still watches the room, waiting for a new fake player join event. All parameters except `id` may be different in the new `fakePlayerJoin` call, which allows player's `name`, `flag`, `avatar`, `conn` and `auth` to change without the player entirely leaving the room.
@@ -6913,9 +7012,9 @@ declare namespace MainReturnType {
      * 
      * @param id Id of the player leaving. `id`=0 will cause desync on clients. (Because there's a special check for this case in original clients.)
      * 
-     * @returns An object that has the following strucure: `{ id: int, name: string, flag: string, avatar: string, conn: string, auth: string }`.
+     * @returns An object that has the following strucure: `{ id: uint16, name: string, flag: string, avatar: string, conn: string, auth: string }`.
      */
-    fakePlayerLeave(id: int): { id: int, name: string, flag: string, avatar: string, conn: string, auth: string };
+    fakePlayerLeave(id: uint16): { id: uint16, name: string, flag: string, avatar: string, conn: string, auth: string };
 
     /**
      * Triggers a fake input(keys) event that apparently originated from the player whose id is `byId`.
@@ -6925,7 +7024,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSendPlayerInput(input: int, byId: int): void;
+    fakeSendPlayerInput(input: int, byId: uint16): void;
 
     /**
      * Triggers a fake chat event that apparently originated from the player whose id is `byId`.
@@ -6935,7 +7034,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSendPlayerChat(msg: string, byId: int): void;
+    fakeSendPlayerChat(msg: string, byId: uint16): void;
 
     /**
      * Triggers a fake chat indicator change event that apparently originated from the player whose id is `byId`.
@@ -6945,7 +7044,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetPlayerChatIndicator(value: boolean, byId: int): void;
+    fakeSetPlayerChatIndicator(value: boolean, byId: uint16): void;
 
     /**
      * Triggers a fake avatar change event that apparently originated from the player whose id is `byId`.
@@ -6955,7 +7054,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetPlayerAvatar(value: string, byId: int): void;
+    fakeSetPlayerAvatar(value: string, byId: uint16): void;
 
     /**
      * Triggers a fake admin status change event for the player whose id is `playerId` that apparently originated from the player whose id is `byId`.
@@ -6966,7 +7065,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetPlayerAdmin(playerId: int, value: boolean, byId: int): void;
+    fakeSetPlayerAdmin(playerId: uint16, value: boolean, byId: uint16): void;
 
     /**
      * Triggers a fake player sync status change event that apparently originated from the player whose id is `byId`.
@@ -6976,7 +7075,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetPlayerSync(value: boolean, byId: int): void;
+    fakeSetPlayerSync(value: boolean, byId: uint16): void;
 
     /**
      * Triggers a fake stadium change event that apparently originated from the player whose id is `byId`. The game must be stopped first.
@@ -6984,7 +7083,7 @@ declare namespace MainReturnType {
      * @param value The new stadium of the current room.
      * @param byId Id of the player who will look like he/she sent this event.
      */
-    fakeSetStadium(value: Stadium, byId: int): void;
+    fakeSetStadium(value: Stadium, byId: uint16): void;
 
     /**
      * Triggers a fake game start event that apparently originated from the player whose id is `byId`.
@@ -6993,7 +7092,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeStartGame(byId: int): void;
+    fakeStartGame(byId: uint16): void;
 
     /**
      * Triggers a fake game stop event that apparently originated from the player whose id is `byId`. The game must be started first.
@@ -7002,7 +7101,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeStopGame(byId: int): void;
+    fakeStopGame(byId: uint16): void;
 
     /**
      * Triggers a fake game pause/resume event that apparently originated from the player whose id is `byId`. The game must be started first.
@@ -7012,7 +7111,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetGamePaused(value: boolean, byId: int): void;
+    fakeSetGamePaused(value: boolean, byId: uint16): void;
 
     /**
      * Triggers a fake score limit change event that apparently originated from the player whose id is `byId`.
@@ -7022,7 +7121,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetScoreLimit(value: int, byId: int): void;
+    fakeSetScoreLimit(value: int, byId: uint16): void;
 
     /**
      * Triggers a fake time limit change event that apparently originated from the player whose id is `byId`.
@@ -7032,7 +7131,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetTimeLimit(value: int, byId: int): void;
+    fakeSetTimeLimit(value: int, byId: uint16): void;
 
     /**
      * Triggers a fake teams lock change event that apparently originated from the player whose id is `byId`.
@@ -7042,7 +7141,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetTeamsLock(value: boolean, byId: int): void;
+    fakeSetTeamsLock(value: boolean, byId: uint16): void;
 
     /**
      * Triggers a fake auto teams event that apparently originated from the player whose id is `byId`.
@@ -7051,7 +7150,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeAutoTeams(byId: int): void;
+    fakeAutoTeams(byId: uint16): void;
 
     /**
      * Triggers a fake player team change event for the player whose id is `playerId` that apparently originated from the player whose id is `byId`.
@@ -7062,7 +7161,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetPlayerTeam(playerId: int, teamId: int, byId: int): void;
+    fakeSetPlayerTeam(playerId: uint16, teamId: int, byId: uint16): void;
 
     /**
      * Triggers a fake kick rate limit change event that apparently originated from `player(byId)`. 
@@ -7074,7 +7173,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetKickRateLimit(min: int, rate: int, burst: int, byId: int): void;
+    fakeSetKickRateLimit(min: int, rate: int, burst: int, byId: uint16): void;
 
     /**
      * Triggers a team color change event for the team whose id is `teamId` that apparently originated from the player whose id is `byId`. 
@@ -7086,7 +7185,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeSetTeamColors(teamId: int, angle: int, colors: int[], byId: int): void;
+    fakeSetTeamColors(teamId: int, angle: int, colors: int[], byId: uint16): void;
 
     /**
      * Triggers a fake leave/kick/ban event for the player whose id is `playerId` that apparently originated from the player whose id is `byId`.
@@ -7098,7 +7197,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    fakeKickPlayer(playerId: int, reason: string | null, ban: boolean, byId: int): void;
+    fakeKickPlayer(playerId: uint16, reason: string | null, ban: boolean, byId: uint16): void;
   }
 
   declare interface RoomBase {
@@ -7233,6 +7332,16 @@ declare namespace MainReturnType {
     readonly timeElapsed: int | null;
 
     /**
+     * The current frame number of the room. read-only.
+     */
+    readonly currentFrameNo: int;
+
+    /**
+     * The current list of banned players. read-only. host-only.
+     */
+    readonly banList: ({ id: uint16, name: string, auth: string, conn: string, ips: string[] })[];
+
+    /**
      * Leaves the current room. Also releases the resources used by this object.
      * 
      * @returns void.
@@ -7300,6 +7409,32 @@ declare namespace MainReturnType {
     clearBans(): void;
 
     /**
+     * Clears the ban of a player. host-only.
+     * 
+     * @param id Id of the player whose ban will be cleared.
+     * 
+     * @returns void.
+     */
+    clearBan(id: uint16): void;
+
+    /**
+     * Executes any event inside this room. host-only.
+     * 
+     * @param event The event to be executed.
+     * @param byId Id of the player of whom this event will be executed by.
+     * 
+     * @returns void.
+     */
+    executeEvent(event: HaxballEvent, byId: uint16): void;
+
+    /**
+     * Clears the event queue. Can be useful when the game engine is stuck.
+     * 
+     * @returns void.
+     */
+    clearEvents(): void;
+
+    /**
      * Sets the current player's client `avatar` value.
      * 
      * @param avatar The desired avatar value. `avatar.length` must be <= `2`.
@@ -7317,7 +7452,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerAvatar(id: int, value: string, headless: boolean): void;
+    setPlayerAvatar(id: uint16, value: string, headless: boolean): void;
 
     /**
      * Sets the current player's chat indicator status.
@@ -7365,7 +7500,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    sendChat(msg: string, targetId: int | null): void;
+    sendChat(msg: string, targetId: uint16 | null): void;
 
     /**
      * Sends an announcement message. host-only.
@@ -7389,7 +7524,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    sendAnnouncement(msg: string, targetId: int | null, color: int, style: int, sound: int): void;
+    sendAnnouncement(msg: string, targetId: uint16 | null, color: int, style: int, sound: int): void;
 
     /**
      * Sets the properties of a disc. host-only.
@@ -7435,7 +7570,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerDiscProperties(playerId: int, properties: SetDiscPropertiesParams): void;
+    setPlayerDiscProperties(playerId: uint16, properties: SetDiscPropertiesParams): void;
 
     /**
      * Removes all of the players whose ids exist in the array `playerIdList`, and adds them back in the given order to the top or bottom of the player list depending on the `moveToTop` value. host-only.
@@ -7445,7 +7580,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    reorderPlayers(playerIdList: int[], moveToTop: boolean): void;
+    reorderPlayers(playerIdList: uint16[], moveToTop: boolean): void;
 
     /**
      * Creates a `CustomEvent` event message with given `type` and `data` properties and sends it. The values `type` and `data` completely depend on your custom event's order and logic. Note that the message can only be received by the users of this modified client.
@@ -7455,7 +7590,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    sendCustomEvent(type: int, data: object): void;
+    sendCustomEvent(type: uint32, data: object): void;
 
     /**
      * Returns the current player's key state value.
@@ -7592,7 +7727,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerTeam(playerId: int, teamId: int): void;
+    setPlayerTeam(playerId: uint16, teamId: int): void;
 
     /**
      * Give/take away admin rights to/from a player. admin-only.
@@ -7602,7 +7737,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerAdmin(playerId: int, isAdmin: boolean): void;
+    setPlayerAdmin(playerId: uint16, isAdmin: boolean): void;
 
     /**
      * Kicks or bans a player.
@@ -7613,7 +7748,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    kickPlayer(playerId: int, reason: string | null, isBanning: boolean): void;
+    kickPlayer(playerId: uint16, reason: string | null, isBanning: boolean): void;
 
     /**
      * Returns the Player object for the player whose id is `id`.
@@ -7622,7 +7757,7 @@ declare namespace MainReturnType {
      * 
      * @returns A Player object.
      */
-    getPlayer(id: int): Player;
+    getPlayer(id: uint16): Player;
 
     /**
      * Returns the ball disc.
@@ -7668,7 +7803,7 @@ declare namespace MainReturnType {
      * 
      * @returns A Disc object.
      */
-    getPlayerDisc(playerId: int, extrapolated?: boolean): Disc;
+    getPlayerDisc(playerId: uint16, extrapolated?: boolean): Disc;
 
     /**
      * Returns the disc that belongs to the player whose id is `playerId`. Faster than `getPlayerDisc`, but experimental. Use at your own risk.
@@ -7677,7 +7812,7 @@ declare namespace MainReturnType {
      * 
      * @returns A Disc object.
      */
-    getPlayerDisc_exp(playerId: int): Disc;
+    getPlayerDisc_exp(playerId: uint16): Disc;
 
     /**
      * Activate or deactivate the plugin whose name is `name`.
@@ -7819,6 +7954,348 @@ declare namespace MainReturnType {
      * @returns An instance of the SandboxRoom structure.
      */
     static sandbox(callbacks: CommonlyUsedCallbacks & CustomCallbacks, options: SandboxOptions): SandboxRoom;
+  }
+
+  /***
+   * Contains static functions to create all kinds of event messages.
+   */
+  export interface EventFactory {}
+  export namespace EventFactory {
+
+    /**
+     * Creates a HaxballEvent object that can be used to trigger events.
+     * Returning event's various values might also be required to be set before it can be used,
+     * depending on the value of `type` parameter.
+     * 
+     * @param type The type of the event.
+     * 
+     * @returns An instance of HaxballEvent, or undefined if the given type is not a recognized value.
+     */
+    export function create(type: OperationType): HaxballEvent|undefined;
+
+    /**
+     * Creates a ConsistencyCheckEvent object that can be used to trigger a consistency check. 
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param data The consistency data to check.
+     * 
+     * @returns An instance of ConsistencyCheckEvent.
+     */
+    export function checkConsistency(data: ArrayBuffer): ConsistencyCheckEvent;
+
+    /**
+     * Creates a SendAnnouncementEvent object that can be used to trigger a sendAnnouncement event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param msg The contents of the announcement message.
+     * @param color The color of the announcement message. Range: -1 <= `color` < 16777216. 
+     *  - The color value can be converted into a rgba string via API's `Utils.numberToColor` function.
+     *  - The special value `-1` means `transparent` color.
+     * @param style The style of the announcement message. Must be one of the following:
+     *  - 0: use document's default font style.
+     *  - 1: fontWeight = "bold".
+     *  - 2: fontStyle = "italic".
+     *  - 3: fontSize = "12px".
+     *  - 4: fontWeight = "bold", fontSize = "12px".
+     *  - 5: fontWeight = "italic", fontSize = "12px".
+     * @param sound The sound of the announcement message. Must be one of the following: 
+     *  - 0: no sound.
+     *  - 1: chat sound.
+     *  - 2: highlight sound.
+     * 
+     * @returns An instance of SendAnnouncementEvent.
+     */
+    export function sendAnnouncement(msg: string, color: int32, style: uint8, sound: uint8): SendAnnouncementEvent;
+
+    /**
+     * Creates a SendChatIndicatorEvent object that can be used to trigger a sendChatIndicator event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param active The desired chat indicator status. (0: passive, 1: active.)
+     * 
+     * @returns An instance of SendChatIndicatorEvent.
+     */
+    export function sendChatIndicator(active: uint8): SendChatIndicatorEvent;
+
+    /**
+     * Creates a SendInputEvent object that can be used to trigger a sendInput event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param input The desired input value. ( 0 <= input < 32 )
+     * 
+     * @returns An instance of SendInputEvent.
+     */
+    export function sendInput(input: uint32): SendInputEvent;
+
+    /**
+     * Creates a SendChatEvent object that can be used to trigger a sendChat event.
+     * Returning event's byId is also required to be set before it can be used. 
+     * 
+     * @param msg The chat message.
+     * 
+     * @returns An instance of SendChatEvent.
+     */
+    export function sendChat(msg: string): SendChatEvent;
+
+    /**
+     * Creates a JoinRoomEvent object that can be used to trigger a joinRoom event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param id Id of the new player.
+     * @param name Name of the new player.
+     * @param flag Flag of the new player.
+     * @param avatar Avatar of the new player.
+     * @param conn Connection string of the new player.
+     * @param auth Auth of the new player.
+     * 
+     * @returns An instance of JoinRoomEvent.
+     */
+    export function joinRoom(id: uint16, name: string, flag: string, avatar: string, conn: string, auth: string): JoinRoomEvent;
+
+    /**
+     * Creates a SetHeadlessAvatarEvent object that can be used to trigger a setHeadlessAvatar event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param id Id of the player whose headless avatar is intended to be changed.
+     * @param value The new headless avatar value.
+     * 
+     * @returns An instance of SetHeadlessAvatarEvent.
+     */
+    export function setHeadlessAvatar(id: uint16, avatar: string): SetHeadlessAvatarEvent;
+
+    /**
+     * Creates a KickBanPlayerEvent object that can be used to trigger a kickBanPlayer event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param id Id of the desired player to be kicked/banned.
+     * @param reason Reason of kicking/banning.
+     *   - If `null`, this event is interpreted as the player leaving by himself/herself.
+     * @param ban Whether this is a banning event or not.
+     * 
+     * @returns An instance of KickBanPlayerEvent.
+     */
+    export function kickBanPlayer(id: uint16, reason: string, ban: boolean): KickBanPlayerEvent;
+
+    /**
+     * Creates a ReorderPlayersEvent object that can be used to trigger a reorderPlayers event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param playerIdList The ids of players that are desired to be removed from the room's players list, reordered to match the order in idList and added back to the room's players list.
+     * @param moveToTop Whether to add the players to the top or bottom of the room's players list.
+     * 
+     * @returns An instance of ReorderPlayersEvent.
+     */
+    export function reorderPlayers(playerIdList: uint16[], moveToTop: boolean): ReorderPlayersEvent;
+
+    /**
+     * Creates a StartGameEvent object that can be used to trigger a startGame event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @returns An instance of StartGameEvent.
+     */
+    export function startGame(): StartGameEvent;
+
+    /**
+     * Creates a StopGameEvent object that can be used to trigger a stopGame event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @returns An instance of StopGameEvent.
+     */
+    export function stopGame(): StopGameEvent;
+
+    /**
+     * Creates a PauseResumeGameEvent object that can be used to trigger a pauseResumeGame event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param paused Whether the game is desired to be paused or resumed.
+     * 
+     * @returns An instance of PauseResumeGameEvent.
+     */
+    export function pauseResumeGame(paused: boolean): PauseResumeGameEvent;
+
+    /**
+     * Creates a SetLimitEvent object that can be used to trigger a setScoreLimit event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param value The desired score limit of the game.
+     * 
+     * @returns An instance of SetLimitEvent.
+     */
+    export function setScoreLimit(value: int): SetLimitEvent;
+
+    /**
+     * Creates a SetLimitEvent object that can be used to trigger a setTimeLimit event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param value The desired time limit of the game.
+     * 
+     * @returns An instance of SetLimitEvent.
+     */
+    export function setTimeLimit(value: int): SetLimitEvent;
+
+    /**
+     * Creates a SetStadiumEvent object that can be used to trigger a setStadium event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param stadium The desired stadium value.
+     * 
+     * @returns An instance of SetStadiumEvent.
+     */
+    export function setStadium(stadium: Stadium): SetStadiumEvent;
+
+    /**
+     * Creates a SetPlayerTeamEvent object that can be used to trigger a setPlayerTeam event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param playerId Id of the player whose team is desired to be changed.
+     * @param teamId Id of the desired team.
+     * 
+     * @returns An instance of SetPlayerTeamEvent.
+     */
+    export function setPlayerTeam(playerId: uint16, teamId: uint8): SetPlayerTeamEvent;
+
+    /**
+     * Creates a SetTeamsLockEvent object that can be used to trigger a setTeamsLock event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param value The desired teams lock value of the game.
+     * 
+     * @returns An instance of SetTeamsLockEvent.
+     */
+    export function setTeamsLock(value: boolean): SetTeamsLockEvent;
+
+    /**
+     * Creates a SetPlayerAdminEvent object that can be used to trigger a setPlayerAdmin event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param playerId Id of the player whose admin status is being set.
+     * @param value The desired admin status of the player.
+     * 
+     * @returns An instance of SetPlayerAdminEvent.
+     */
+    export function setPlayerAdmin(playerId: uint16, value: boolean): SetPlayerAdminEvent;
+
+    /**
+     * Creates a AutoTeamsEvent object that can be used to trigger an autoTeams event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @returns An instance of AutoTeamsEvent.
+     */
+    export function autoTeams(): AutoTeamsEvent;
+
+    /**
+     * Creates a SetPlayerSyncEvent object that can be used to trigger a setPlayerSync event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param value The desired synchronization status.
+     * 
+     * @returns An instance of SetPlayerSyncEvent.
+     */
+    export function setPlayerSync(value: boolean): SetPlayerSyncEvent;
+
+    /**
+     * Creates a PingEvent object that can be used to update the ping values of all player.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param values The desired ping values for all players.
+     * 
+     * @returns An instance of PingEvent.
+     */
+    export function ping(values: int32[]): PingEvent;
+
+    /**
+     * Creates a SetAvatarEvent object that can be used to trigger a setAvatar event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param value The desired avatar value. `value.length` must be <= `2`.
+      * 
+     * @returns An instance of SetAvatarEvent.
+    */
+    export function setAvatar(value: string): SetAvatarEvent;
+
+    /**
+     * Creates a SetTeamColorsEvent object that can be used to trigger a setTeamColors event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param teamId Id of the team whose colors are desired to be changed.
+     *   - `1`: red.
+     *   - `2`: blue.
+     * @param colors An instance of `TeamColors` that defines the colors of a team.
+     * 
+     * @returns An instance of SetTeamColorsEvent.
+     */
+    export function setTeamColors(teamId: uint8, colors: TeamColors): SetTeamColorsEvent;
+
+    /**
+     * Creates a SetKickRateLimitEvent object that can be used to trigger a setKickRateLimit event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param min The desired min value of kick rate limit.
+     * @param rate The desired rate value of kick rate limit.
+     * @param burst The desired burst value of kick rate limit.
+     * 
+     * @returns An instance of SetKickRateLimitEvent.
+     */
+    export function setKickRateLimit(min: int, rate: int, burst: int): SetKickRateLimitEvent;
+
+    /**
+     * Creates a SetDiscPropertiesEvent object that can be used to trigger a setDiscProperties event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param id Id of the disc whose properties are desired to be changed.
+     * @param data The desired properties to set. This will not change the omitted keys of the disc. `properties` has the following structure:
+     *   - `x: number | null`: The desired x coordinate of the disc.
+     *   - `y: number | null`: The desired y coordinate of the disc.
+     *   - `xspeed: number | null`: The desired x component of the speed of the disc.
+     *   - `yspeed: number | null`: The desired y component of the speed of the disc.
+     *   - `xgravity: number | null`: The desired x component of the gravity of the disc.
+     *   - `ygravity: number | null`: The desired y component of the gravity of the disc.
+     *   - `radius: number | null`: The desired radius of the disc.
+     *   - `bCoeff: number | null`: The desired bouncing coefficient of the disc.
+     *   - `invMass: number | null`: The desired inverse mass of the disc.
+     *   - `damping: number | null`: The desired damping of the disc.
+     *   - `color: int | null`: The desired color of the disc.
+     *   - `cMask: int | null`: The desired collision mask of the disc.
+     *   - `cGroup: int | null`: The desired collision group of the disc.
+     * 
+     * @returns An instance of SetDiscPropertiesEvent.
+     */
+    export function setDiscProperties(id: uint16, data: object): SetDiscPropertiesEvent;
+
+    /**
+     * Creates a SetDiscPropertiesEvent object that can be used to trigger a setPlayerDiscProperties event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param id Id of the player whose disc properties are desired to be changed.
+     * @param data The desired properties to set. This will not change the omitted keys of the disc. `properties` has the following structure:
+     *   - `x: number | null`: The desired x coordinate of the disc.
+     *   - `y: number | null`: The desired y coordinate of the disc.
+     *   - `xspeed: number | null`: The desired x component of the speed of the disc.
+     *   - `yspeed: number | null`: The desired y component of the speed of the disc.
+     *   - `xgravity: number | null`: The desired x component of the gravity of the disc.
+     *   - `ygravity: number | null`: The desired y component of the gravity of the disc.
+     *   - `radius: number | null`: The desired radius of the disc.
+     *   - `bCoeff: number | null`: The desired bouncing coefficient of the disc.
+     *   - `invMass: number | null`: The desired inverse mass of the disc.
+     *   - `damping: number | null`: The desired damping of the disc.
+     *   - `color: int | null`: The desired color of the disc.
+     *   - `cMask: int | null`: The desired collision mask of the disc.
+     *   - `cGroup: int | null`: The desired collision group of the disc.
+     * 
+     * @returns An instance of SetDiscPropertiesEvent.
+     */
+    export function setPlayerDiscProperties(id: uint16, data: object): SetDiscPropertiesEvent;
+
+    /**
+     * Creates a CustomEvent object that can be used to trigger a custom event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param type The type of the custom event.
+     * @param data The data of the custom event. (Any JSON object)
+     * 
+     * @returns An instance of CustomEvent.
+     */
+    export function customEvent(type: uint32, data: object): CustomEvent;
   }
 
   /**

@@ -67,6 +67,7 @@ module.exports = function(API, canvas){
   this.onExtrapolationChange = function(value, customData){};
   this.onHandicapChange = function(value, customData){};
   this.onBansClear = function(customData){};
+  this.onBanClear = function(id, customData){};
   this.onRoomRecaptchaModeChange = function(on, customData){};
   this.onRoomRecordingChange = function(value, customData){};
   this.onRoomPropertiesChange = function(props, customData){};

@@ -187,6 +187,10 @@ module.exports = function(API){
   this.onBansClear = function(customData){};
   this.onAfterBansClear = function(customData){};
 
+  this.onBeforeBanClear = function(id){/*return customData;*/};
+  this.onBanClear = function(id, customData){};
+  this.onAfterBanClear = function(id, customData){};
+
   this.onBeforeRoomRecaptchaModeChange = function(on){/*return customData;*/};
   this.onRoomRecaptchaModeChange = function(on, customData){};
   this.onAfterRoomRecaptchaModeChange = function(on, customData){};

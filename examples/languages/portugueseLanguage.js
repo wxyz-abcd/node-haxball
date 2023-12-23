@@ -60,7 +60,8 @@ export default function PortugueseLanguage(API){
     [ErrorCodes.LanguageAlreadyExistsError]: (abbr) => "Essa linguagem já existe: " + abbr,
     [ErrorCodes.CurrentLanguageRemovalError]: () => "A linguagem atual não pode ser removida. Mude para outra linguagem, primeiro.",
     [ErrorCodes.LanguageDoesNotExistError]: (abbr) => "Essa linguagem não existe: " + abbr,
-    [ErrorCodes.BadActorError]: () => "Bad Actor"
+    [ErrorCodes.BadActorError]: () => "Bad Actor",
+    [ErrorCodes.AuthBannedError]: (auth)=>"Auth banido: "+auth,
   };
 
   const ConnectionStateTextMap = {

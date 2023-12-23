@@ -58,7 +58,8 @@ export default function TurkishLanguage(API){
     [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Dil zaten mevcut: " + abbr,
     [ErrorCodes.CurrentLanguageRemovalError]: ()=>"Seçili dil silinemez. Önce başka bir dil seçiniz.",
     [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Dil mevcut değil: " + abbr,
-    [ErrorCodes.BadActorError]: ()=>"Kötü Aktör"
+    [ErrorCodes.BadActorError]: ()=>"Kötü Aktör",
+    [ErrorCodes.AuthBannedError]: (auth)=>"Auth yasaklı: "+auth,
   };
 
   const ConnectionStateTextMap = {
