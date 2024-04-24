@@ -13,7 +13,11 @@ module.exports = function(API){
   });
 
   var that = this, stdin, listener = function(d) {
-    vm.runInContext(d.toString().trim(), that.room); // process the string as a command in the room context.
+    try {
+      vm.runInContext(d.toString().trim(), that.room); // process the string as a command in the room context.
+    } catch (err) {
+      console.error(`Error while executing the command: ${err}`);
+    }
   };
 
   this.initialize = function(){
