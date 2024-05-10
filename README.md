@@ -1,4 +1,4 @@
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball) [![NPM Version](https://img.shields.io/npm/v/node-haxball?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/node-haxball?style=flat-square)](https://npmjs.org/package/node-haxball) [![Proxy Server Status](https://img.shields.io/endpoint?label=proxy%20server&style=flat-square&url=https%3A%2F%2Fsurf-emerald-armadillo.glitch.me%2Fstatus)](https://surf-emerald-armadillo.glitch.me)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball) [![NPM Version](https://img.shields.io/npm/v/node-haxball?style=flat-square)](https://www.npmjs.com/package/node-haxball) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/node-haxball?style=flat-square)](https://npmjs.org/package/node-haxball) [![Proxy Server Status](https://img.shields.io/endpoint?label=proxy%20server&style=flat-square&url=https%3A%2F%2Fnode-haxball.glitch.me%2Fstatus)](https://node-haxball.glitch.me)
 
 [![License](https://img.shields.io/github/license/wxyz-abcd/node-haxball?style=flat-square)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/wxyz-abcd/node-haxball?style=flat-square)](https://github.com/wxyz-abcd/node-haxball/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/wxyz-abcd/node-haxball?style=flat-square) ![Repository Size](https://img.shields.io/github/repo-size/wxyz-abcd/node-haxball?style=flat-square)
 
@@ -36,7 +36,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
 
 #### 💻 Usage on Browser
 
-  - NOTE: Usage on Browser currently relies on our <a href="https://surf-emerald-armadillo.glitch.me">proxy server</a>. (Will expire at the end of each month and not work for several days.)
+  - NOTE: Usage on Browser currently relies on our <a href="https://node-haxball.glitch.me">proxy server</a>. (Will expire at the end of each month and not work for several days.)
   - If you do not wish to use proxy server (which has some limitations), you will need our browser extension to change headers. (look at our <a href="https://github.com/wxyz-abcd/node-haxball/tree/main/haxballOriginModifier">haxballOriginModifier project</a>.)
   - <a href="https://abc-haxball-proxy.infinityfreeapp.com/?no_proxy_server=true">Alternate URL</a> (No proxy server yet.)
   - Moreover; if you have a custom backend server for Haxball, you can use it with this API too.
@@ -54,8 +54,8 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
       <script>
         var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window, {
           proxy: {
-            WebSocketUrl: "wss://surf-emerald-armadillo.glitch.me/",
-            HttpUrl: "https://surf-emerald-armadillo.glitch.me/rs/"
+            WebSocketUrl: "wss://node-haxball.glitch.me/",
+            HttpUrl: "https://node-haxball.glitch.me/rs/"
           }
         });
         // Use example code here.
