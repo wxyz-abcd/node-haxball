@@ -9,8 +9,6 @@
     - replay mode functions
     - sandbox mode functions
     - plugins, renderers, etc. (they probably need seperate tests. I will probably not automate their tests, because it will cause tests to become too many.)
-  - detected bugs:
-    - sendCustomEvent: Clients are currently not receiving the custom events. I'm not sure why I disabled that feature back then.
 */
 
 module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green, red, magenta, blue}, exit})=>{
