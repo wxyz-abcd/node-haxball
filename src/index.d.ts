@@ -178,7 +178,24 @@ declare namespace MainReturnType {
      * custom event includes important changes such as 
      * stadium objects, names, etc.
      */
-    CustomEvent = 25
+    CustomEvent = 25,
+
+    /**
+     * The operation to trigger a binary custom event. This 
+     * requires the receiver to use this API, otherwise the 
+     * operation will not be sent to that client. This might
+     * create desynchronization issues for non-API clients 
+     * if the custom event includes important changes such as 
+     * stadium objects, names, etc.
+     */
+    BinaryCustomEvent = 26,
+
+    /**
+     * The operation to set a player's backend identity. This 
+     * requires the receiver to use this API, otherwise the 
+     * operation will not be sent to that client.
+     */
+    SetPlayerIdentity = 27
   }
 
   /**
@@ -531,351 +548,284 @@ declare namespace MainReturnType {
   declare enum ErrorCodes {
 
     /**
-     * ()=>""
+     * ""
      */
     Empty = 0,
 
     /**
-     * (reason)=>"Connection closed"+((reason!=null)?" ("+reason+")":"")
+     * 'Connection closed$1?(" $1":"")'
      */
     ConnectionClosed = 1,
 
     /**
-     * ()=>"Game state timeout"
+     * "Game state timeout"
      */
     GameStateTimeout = 2,
 
     /**
-     * ()=>"The room was closed."
+     * "The room was closed."
      */
     RoomClosed = 3,
 
     /**
-     * ()=>"The room is full."
+     * "The room is full."
      */
     RoomFull = 4,
 
     /**
-     * ()=>"Wrong password."
+     * "Wrong password."
      */
     WrongPassword = 5,
 
     /**
-     * ()=>"You are banned from this room."
+     * "You are banned from this room."
      */
     BannedBefore = 6,
 
     /**
-     * ()=>"Incompatible game version."
+     * "Incompatible game version."
      */
     IncompatibleVersion = 7,
 
     /**
-     * ()=>"Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues"
+     * "Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues"
      */
     FailedHost = 8,
 
     /**
-     * ()=>"An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."
+     * "An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."
      */
     Unknown = 9,
 
     /**
-     * ()=>"Cancelled"
+     * "Cancelled"
      */
     Cancelled = 10,
 
     /**
-     * ()=>"Failed to connect to peer."
+     * "Failed to connect to peer."
      */
     FailedPeer = 11,
 
     /**
-     * (reason, ban, byName)=>"You were "+(ban?"banned":"kicked")+(byName?.length>0?(" by "+byName):"")+(reason?.length>0?(" ("+reason+")"):"")
+     * 'You were $2?("banned":"kicked")$3?(" by $3":"")$1?(" ($1)":"")'
      */
     KickedNow = 12,
 
     /**
-     * ()=>"Failed"
+     * "Failed"
      */
     Failed = 13,
 
     /**
-     * ()=>"Master connection error"
+     * "Master connection error"
      */
     MasterConnectionError = 14,
 
     /**
-     * (section, index)=>"Error in \"" + section + "\" index: " + index
+     * 'Error in "$1" index: $2'
      */
     StadiumParseError = 15,
 
     /**
-     * (lineNumber)=>"SyntaxError in line: " + lineNumber
+     * "SyntaxError in line: $1"
      */
     StadiumParseSyntaxError = 16,
 
     /**
-     * ()=>"Error loading stadium file."
+     * "Error loading stadium file."
      */
     StadiumParseUnknownError = 17,
 
     /**
-     * (object, type)=>"Cannot cast " + K.ye(object) + " to " + K.ye(type)
+     * "Cannot cast $1 to $2"
      */
     ObjectCastError = 18,
 
     /**
-     * ()=>"too many"
+     * "too many"
      */
     TeamColorsReadError = 19,
 
     /**
-     * (offset, charCode)=>"Cannot decode UTF8 character at offset " + offset + ": charCode (" + charCode + ") is invalid"
+     * "Cannot decode UTF8 character at offset $1: charCode ($2) is invalid"
      */
     UTF8CharacterDecodeError = 20,
 
     /**
-     * ()=>"Read too much"
+     * "Read too much"
      */
     ReadTooMuchError = 21,
 
     /**
-     * (expectedLength)=>"Actual string length differs from the specified: " + expectedLength + " bytes"
+     * "Actual string length differs from the specified: $1 bytes"
      */
     ReadWrongStringLengthError = 22,
 
     /**
-     * (num)=>"Cannot encode UTF8 character: charCode (" + num + ") is negative"
+     * "Cannot encode UTF8 character: charCode ($1) is negative"
      */
     EncodeUTF8CharNegativeError = 23,
 
     /**
-     * (num)=>"Cannot encode UTF8 character: charCode (" + num + ") is too large (>= 0x80000000)"
+     * "Cannot encode UTF8 character: charCode ($1) is too large (>= 0x80000000)"
      */
     EncodeUTF8CharTooLargeError = 24,
 
     /**
-     * (num)=>"Cannot calculate length of UTF8 character: charCode (" + num + ") is negative"
+     * "Cannot calculate length of UTF8 character: charCode ($1) is negative"
      */
     CalculateLengthOfUTF8CharNegativeError = 25,
 
     /**
-     * (num)=>"Cannot calculate length of UTF8 character: charCode (" + num + ") is too large (>= 0x80000000)"
+     * "Cannot calculate length of UTF8 character: charCode ($1) is too large (>= 0x80000000)"
      */
     CalculateLengthOfUTF8CharTooLargeError = 26,
 
     /**
-     * ()=>"Can't resize buffer to a capacity lower than 1"
+     * "Can't resize buffer to a capacity lower than 1"
      */
     BufferResizeParameterTooSmallError = 27,
 
     /**
-     * ()=>"Bad color"
+     * "Bad color"
      */
     BadColorError = 28,
 
     /**
-     * ()=>"Bad team value"
+     * "Bad team value"
      */
     BadTeamError = 29,
 
     /**
-     * ()=>"Error"
+     * "Error"
      */
     StadiumLimitsExceededError = 30,
 
     /**
-     * ()=>"Class doesn't have a config"
+     * "Class doesn't have a config"
      */
     MissingActionConfigError = 31,
 
     /**
-     * ()=>"Tried to pack unregistered action"
+     * "Tried to pack unregistered action"
      */
     UnregisteredActionError = 32,
 
     /**
-     * ()=>"missing implementation"
+     * "missing implementation"
      */
     MissingImplementationError = 33,
 
     /**
-     * ()=>"message too long"
+     * "message too long"
      */
     AnnouncementActionMessageTooLongError = 34,
 
     /**
-     * ()=>"message too long"
+     * "message too long"
      */
     ChatActionMessageTooLongError = 35,
 
     /**
-     * ()=>"string too long"
+     * "string too long"
      */
     KickBanReasonTooLongError = 36,
 
     /**
-     * ()=>"Invalid team id"
+     * "Invalid team id"
      */
     ChangeTeamColorsInvalidTeamIdError = 37,
 
     /**
-     * ()=>"Recaptcha requested. Either set onRequestRecaptcha or set a working token while creating/joining a room."
+     * "Recaptcha requested. Either set onRequestRecaptcha or set a working token while creating/joining a room."
      */
     MissingRecaptchaCallbackError = 38,
 
     /**
-     * ()=>"The replay data is of a different version"
+     * "The replay data is of a different version"
      */
     ReplayFileVersionMismatchError = 39,
 
     /**
-     * ()=>"Couldn't load replay data."
+     * "Couldn't load replay data."
      */
     ReplayFileReadError = 40,
 
     /**
-     * ()=>"id and authObj cannot be null. (inside 1st parameter)"
+     * "id and authObj cannot be null. (inside 1st parameter)"
      */
     JoinRoomNullIdAuthError = 41,
 
     /**
-     * (conn, auth, name)=>"name too long"
+     * "name too long"
      */
     PlayerNameTooLongError = 42,
 
     /**
-     * (conn, auth, name, flag)=>"country too long"
+     * "country too long"
      */
     PlayerCountryTooLongError = 43,
 
     /**
-     * (conn, auth, name, flag, avatar)=>"avatar too long"
+     * "avatar too long"
      */
     PlayerAvatarTooLongError = 44,
 
     /**
-     * (conn, auth, name, flag, avatar)=>"Player join not allowed: " + name + " " + flag + " " + avatar + " " + conn + " " + auth
+     * "Player join not allowed: $3 $4 $5 $1 $2"
      */
     PlayerJoinBlockedByMPDError = 45,
 
     /**
-     * (playerObj)=>"Player join event blocked by OperationReceived: " + playerObj
+     * "Player join event blocked by OperationReceived: $1"
      */
     PlayerJoinBlockedByORError = 46,
 
     /**
-     * (pluginIndex)=>"Plugin not found at index " + pluginIndex
+     * "Plugin not found at index $1"
      */
     PluginNotFoundError = 47,
 
     /**
-     * ()=>"Plugin name should not change"
+     * "Plugin name should not change"
      */
     PluginNameChangeNotAllowedError = 48,
 
     /**
-     * (libraryIndex)=>"Library not found at index " + libraryIndex
+     * "Library not found at index $1"
      */
     LibraryNotFoundError = 49,
 
     /**
-     * ()=>"Library name should not change"
+     * "Library name should not change"
      */
     LibraryNameChangeNotAllowedError = 50,
     
     /**
-     * ()=>"Invalid id format"
+     * "Invalid id format"
      */
     AuthFromKeyInvalidIdFormatError = 51,
 
     /**
-     * (abbr)=>"Language already exists: " + abbr
-     */
-    LanguageAlreadyExistsError = 52,
-
-    /**
-     * ()=>"Current language cannot be removed. Change to a different language first."
-     */
-    CurrentLanguageRemovalError = 53,
-
-    /**
-     * (abbr)=>"Language does not exist: " + abbr
-     */
-    LanguageDoesNotExistError = 54,
-
-    /**
-     * ()=>"Bad Actor"
+     * "Bad Actor"
      */
     BadActorError = 55,
 
     /**
-     * (auth)=>"Auth banned: " + auth
+     * "Auth banned: $1"
      */
-    AuthBannedError = 56
-  }
-
-  declare enum RendererTextIndices {
-    /**
-     * "Time is"
-     */
-    timeIsUp1 = 0,
+    AuthBannedError = 56,
 
     /**
-     * "Up!"
+     * "Basro's backend is not compatible with the login system, so the identity token and identity events are disabled."
      */
-    timeIsUp2 = 1,
+    NoProxyIdentityProblem = 57,
 
     /**
-     * "Red is"
+     * "Solution: Use a proxy server and handle the login data there."
      */
-    redIsVictorious1 = 2, 
-
-    /**
-     * "Victorious!"
-     */
-    redIsVictorious2 = 3,
-
-    /**
-     * "Red"
-     */
-    redScores1 = 4, 
-
-    /**
-     * "Scores!"
-     */
-    redScores2 = 5, 
-
-    /**
-     * "Blue is"
-     */
-    blueIsVictorious1 = 6, 
-
-    /**
-     * "Victorious!"
-     */
-    blueIsVictorious2 = 7, 
-
-    /**
-     * "Blue"
-     */
-    blueScores1 = 8, 
-
-    /**
-     * "Scores!"
-     */
-    blueScores2 = 9, 
-
-    /**
-     * "Game"
-     */
-    gamePaused1 = 10, 
-
-    /**
-     * "Paused" 
-     */
-    gamePaused2 = 11
+    NoProxyIdentitySolution = 58    
   }
 
   declare type int = number;
@@ -883,17 +833,14 @@ declare namespace MainReturnType {
   declare type uint16 = number;
   declare type int32 = number;
   declare type uint32 = number;
+  declare type TemplateString = string;
 
   declare type TextToNumberMap = {
     [x: string]: number;
   }
 
-  declare type NumberToTextMap = {
-    [x: number]: string;
-  }
-
-  declare type NumberToTextFuncMap = {
-    [x: number]: (...args: any[]) => string;
+  declare type NumberToTemplateStringMap = {
+    [x: number]: TemplateString;
   }
 
   /**
@@ -1308,6 +1255,38 @@ declare namespace MainReturnType {
   };
 
   /**
+   * The event message structure that is created when a binary custom event is triggered by this API.
+   */
+  declare class BinaryCustomEvent extends HaxballEvent {
+
+    /**
+     * Type of the binary custom event. This value can be anything you want.
+     */
+    public type: uint32;
+
+    /**
+     * Custom binary data of the binary custom event. This value can be anything you want.
+     */
+    public data: Uint8Array;
+  };
+
+  /**
+   * The event message structure that is created when an identity event is triggered by this API.
+   */
+  declare class IdentityEvent extends HaxballEvent {
+
+    /**
+     * Id of the player whose identity data is desired to be changed.
+     */
+    public id: uint16;
+
+    /**
+     * The identity data that should be received from the backend. It can be any JSON object.
+     */
+    public data: object;
+  };
+
+  /**
    * The event message structure that is created when a player leaves the room or is kicked/banned by the host.
    */
   declare class KickBanPlayerEvent extends HaxballEvent {
@@ -1406,6 +1385,49 @@ declare namespace MainReturnType {
      * The ping values of all players in the same order as the players list.
      */
     public values: int[];
+  };
+
+  declare type BanEntryId = uint32;
+
+  /**
+   * These values help understand the type of a ban entry instance inside a room's ban list.
+   */
+  export enum BanEntryType {
+
+    /**
+     * A ban rule referring to a player's id.
+     */
+    Player = 0,
+
+    /**
+     * A ban rule referring to an IP address/range.
+     */
+    IP = 1,
+
+    /**
+     * A ban rule referring to a player's auth string.
+     */
+    Auth = 2
+  };
+
+  declare type NumericIPv4 = uint32;
+  declare type NumericIPv6 = BigInt;
+  declare type AuthString = string;
+
+  declare type BanEntry = {
+    id: BanEntryId;
+    type: BanEntryType;
+    value: {pId: int, pName: string, ips: string[], auth: AuthString} | NumericIPv4 | NumericIPv6 | AuthString;
+  };
+
+  declare type IPv4Range = {
+    ip: NumericIPv4,
+    mask: NumericIPv4
+  };
+
+  declare type IPv6Range = {
+    ip: NumericIPv6,
+    mask: NumericIPv6
   };
 
   /**
@@ -1998,6 +2020,22 @@ declare namespace MainReturnType {
     color: int;
 
     /**
+     * The default defense direction on the x axis for this Team.
+     */
+    defenseDir: Direction;
+
+    /**
+     * The default cMask of this Team's player objects. (This value | 39) is 
+     * overwritten into all of the players' cMask values whenever a goal is scored.
+     */
+    cMask: int;
+
+    /**
+     * The default cGroup of this Team's player objects.
+     */
+    cGroup: int;
+
+    /**
      * The name of this Team.
      */
     name: string;
@@ -2006,11 +2044,6 @@ declare namespace MainReturnType {
      * The customized colors of this Team.
      */
     colors: TeamColors;
-
-    /**
-     * The class name for this Team. (This may be removed soon.)
-     */
-    className: string;
   };
 
   declare namespace Team {
@@ -2159,6 +2192,11 @@ declare namespace MainReturnType {
      * The extrapolated version of this Player, or `null` if the data is not available.
      */
     ext: Player | null;
+
+    /**
+     * The identity data of the current player that is received from a backend/proxy server.
+     */
+    identity: object | null;
   };
 
   /**
@@ -2456,7 +2494,7 @@ declare namespace MainReturnType {
     onBanClear?: (id: uint16, customData?: object)=>object|undefined;
 
     /**
-     * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
+     * Called just after the room's recaptcha mode was changed using `room.requireRecaptcha = on`.
      * 
      * @param on The new value; whether to request recaptcha or not while joining the room.
      * @param customData the custom data that was returned from the previous callback.
@@ -2464,6 +2502,16 @@ declare namespace MainReturnType {
      * @returns void or a custom data to pass to the next callback.
      */
     onRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>object|undefined;
+
+    /**
+     * Called just a little after the room's token was changed using `room.token = value`.
+     * 
+     * @param token The new token of the room.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onRoomTokenChange?: (token: string, customData?: object)=>object|undefined;
   }
 
   /**
@@ -3114,6 +3162,30 @@ declare namespace MainReturnType {
      * @returns void or a custom data to pass to the next callback.
      */
     onCustomEvent?: (type: uint32, data: object, byId: uint16, customData?: object)=>object|undefined
+
+    /**
+     * Called just after a binary custom event has been triggered.
+     * 
+     * @param type Any integer value to hold the type of the custom event.
+     * @param data Any Uint8Array to store the properties of the custom event. This object is directly sent/received by Haxball's original event mechanism.
+     * @param byId Id of the player who has triggered this custom event.
+     * @param customData Any custom data that might be returned from the previous addon's calback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: object)=>object|undefined
+
+    /**
+     * Called just after an identity event has been triggered.
+     * 
+     * @param id Id of the player whose identity data is desired to be changed.
+     * @param data The identity data that should be received from the backend. It can be any JSON object.
+     * @param byId Id of the player who has triggered this custom event.
+     * @param customData Any custom data that might be returned from the previous addon's calback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: object)=>object|undefined
   }
 
   declare interface HostOnlyRoomConfigCallbacks {
@@ -3171,7 +3243,7 @@ declare namespace MainReturnType {
     onAfterBanClear?: (id: int, customData?: object)=>void;
 
     /**
-     * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
+     * Called just after the room's recaptcha mode was changed using `room.requireRecaptcha = value`.
      * 
      * @param on The new value; whether to request recaptcha or not while joining the room.
      * 
@@ -3180,7 +3252,7 @@ declare namespace MainReturnType {
     onBeforeRoomRecaptchaModeChange?: (on: boolean)=>object|undefined,
 
     /**
-     * Called just after the room's recaptcha mode was changed using `room.setRecaptcha(on)`.
+     * Called just after the room's recaptcha mode was changed using `room.requireRecaptcha = value`.
      * 
      * @param on The new value; whether to request recaptcha or not while joining the room.
      * @param customData the custom data that was returned from the previous callback.
@@ -3188,6 +3260,25 @@ declare namespace MainReturnType {
      * @returns void.
      */
     onAfterRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>void
+
+    /**
+     * Called just a little after the room's token was changed using `room.token = value`.
+     * 
+     * @param token The new token of the room.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforeRoomTokenChange?: (token: string)=>object|undefined;
+
+    /**
+     * Called just a little after the room's token was changed using `room.token = value`.
+     * 
+     * @param token The new token of the room.
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void.
+     */
+    onAfterRoomTokenChange?: (token: string, customData?: object)=>void;
   }
 
   declare interface HostTriggeredRoomConfigCallbacks {
@@ -4427,6 +4518,54 @@ declare namespace MainReturnType {
      * @returns void.
      */
     onAfterCustomEvent?: (type: int, data: object, byId: uint16, customData?: object)=>void
+
+    /**
+     * Called just after a binary custom event has been triggered.
+     * 
+     * @param type Any integer value to hold the type of the custom event.
+     * @param data Any Uint8Array to store the properties of the custom event. This object is directly sent/received by Haxball's original event mechanism.
+     * @param byId Id of the player who has triggered this custom event.
+     * @param customData Any custom data that might be returned from the previous addon's calback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforeBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16)=>object|undefined
+
+    /**
+     * Called just after a binary custom event has been triggered.
+     * 
+     * @param type Any integer value to hold the type of the custom event.
+     * @param data Any Uint8Array to store the properties of the custom event. This object is directly sent/received by Haxball's original event mechanism.
+     * @param byId Id of the player who has triggered this custom event.
+     * @param customData Any custom data that might be returned from the previous addon's calback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onAfterBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: object)=>void
+
+    /**
+     * Called just after an identity event has been triggered.
+     * 
+     * @param id Id of the player whose identity data is desired to be changed.
+     * @param data The identity data that should be received from the backend. It can be any JSON object.
+     * @param byId Id of the player who has triggered this custom event.
+     * @param customData Any custom data that might be returned from the previous addon's calback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforeIdentityEvent?: (id: uint16, data: object, byId: uint16)=>object|undefined
+
+    /**
+     * Called just after an identity event has been triggered.
+     * 
+     * @param id Id of the player whose identity data is desired to be changed.
+     * @param data The identity data that should be received from the backend. It can be any JSON object.
+     * @param byId Id of the player who has triggered this custom event.
+     * @param customData Any custom data that might be returned from the previous addon's calback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onAfterIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: object)=>void
   }
 
   declare interface RendererCallbacks {
@@ -4532,6 +4671,70 @@ declare namespace MainReturnType {
      */
     export function colorToNumber(color: string): int;
 
+    /**
+     * Returns the numeric representation of the given ip address. Returns null if 
+     * the input string is ill-formatted.
+     * 
+     * @param ip The ip address to be converted.
+     * 
+     * @returns An integer for ipv4 string, a BigInt for ipv6 string.
+     */
+    export function ipToNumber(ip: string): NumericIPv4 | NumericIPv6 | null;
+
+    /**
+     * Returns the ip address string of a given numeric representation. Returns null if 
+     * the input number is invalid.
+     * 
+     * @param ip The numeric representation of an ip address to be converted.
+     * 
+     * @returns A formatted ip string.
+     */
+    export function numberToIp(ip: NumericIPv4 | NumericIPv6): string | null;
+
+    /**
+     * Returns the numeric representation of the given auth string. Returns null if 
+     * the length of the auth string is not 43.
+     * 
+     * @param auth The auth value to be converted.
+     * 
+     * @returns A BigInt.
+     */
+    export function authToNumber(auth: string): BigInt;
+
+    /**
+     * Returns the auth string for the numeric representation of it. Returns null if 
+     * the input number is invalid.
+     * 
+     * @param auth The numeric representation of an auth string to be converted.
+     * 
+     * @returns An auth string.
+     */
+    export function numberToAuth(auth: BigInt): string;
+
+    /**
+     * Compares the bits of `value1` and `value2` at the exact positions that 
+     * are `1` in the given `bitMask`.
+     * 
+     * @param value1 The first value to be compared.
+     * @param value2 The second value to be compared.
+     * @param bitMask The bit mask that represents which bits to compare.
+     * 
+     * @returns A boolean whose value is true if all bits that are compared are equal.
+     */
+    export function compareBits(value1: NumericIPv4, value2: NumericIPv4, bitMask: NumericIPv4): boolean;
+
+    /**
+     * Compares the bits of `value1` and `value2` at the exact positions that 
+     * are `1` in the given `bitMask`.
+     * 
+     * @param value1 The first value to be compared.
+     * @param value2 The second value to be compared.
+     * @param bitMask The bit mask that represents which bits to compare.
+     * 
+     * @returns A boolean whose value is true if all bits that are compared are equal.
+     */
+    export function compareBits(value1: NumericIPv6, value2: NumericIPv6, bitMask: NumericIPv6): boolean;
+  
     /**
      * Returns an integer key state value, only to be used with `Room.setKeyState`. 
      * 
@@ -4759,6 +4962,11 @@ declare namespace MainReturnType {
      * A custom proxy agent to use for the room's connection. This method does not work in browsers. Defaults to `null`.
      */
     proxyAgent?: ProxyAgentLike;
+
+    /**
+     * A token that represents a user data in a database of a custom proxy/backend server. If successful, room will create and emit an IdentityEvent for this player.
+     */
+    identityToken?: string;
 
     /**
      * Do not modify this value. This value is `null` until joinRoom or createRoom operation is successful. After that, a pointer to the created/joined room object is auto-assigned to this variable.
@@ -5225,6 +5433,28 @@ declare namespace MainReturnType {
     sendCustomEvent(type: int, data: object, byId: uint16): void;
 
     /**
+     * Triggers a fake binary custom event using a fake identity.
+     * 
+     * @param type The type of the custom event.
+     * @param data Any custom binary data for this specific event.
+     * @param byId Id of the player who triggered this custom binary event.
+     * 
+     * @returns void.
+     */
+    sendBinaryCustomEvent(type: uint32, data: Uint8Array, byId: uint16): void;
+
+    /**
+     * Triggers a fake identity event using a fake identity.
+     * 
+     * @param id Id of the player whose identity data is being changed.
+     * @param data The new identity data. It can be any JSON object.
+     * @param byId Id of the player who triggered this identity event.
+     * 
+     * @returns void.
+     */
+    setPlayerIdentity(id: uint16, data: object, byId: uint16): void;
+
+    /**
      * Frees the resources that are used by this object.
      * 
      * @returns void.
@@ -5273,7 +5503,18 @@ declare namespace MainReturnType {
      * does not have a password; and vice versa. Set to `null` to disable 
      * this behavior.
      */
-    fakePassword?: boolean | null
+    fakePassword?: boolean | null,
+
+    /**
+     * If set, disables the player count check while players are joining 
+     * your room.
+     */
+    unlimitedPlayerCount?: boolean,
+
+    /**
+     * Changes whether to send room info to the room list backend server or not.
+     */
+    showInRoomList?: boolean
   }
 
   declare interface SetDiscPropertiesParams {
@@ -7339,7 +7580,53 @@ declare namespace MainReturnType {
     /**
      * The current list of banned players. read-only. host-only.
      */
-    readonly banList: ({ id: uint16, name: string, auth: string, conn: string, ips: string[] })[];
+    readonly banList: BanEntry[];
+
+    /**
+     * The current password of the room. read-only. host-only.
+     */
+    readonly password: string;
+
+    /**
+     * The current geolocation of the room. read-only. host-only.
+     */
+    readonly geo: {lat: number, lon: number, flag: number};
+
+    /**
+     * The current maximum number of players of the room. read-only. host-only.
+     */
+    readonly maxPlayerCount: int16;
+
+    /**
+     * The current fake password value of the room. read-only. host-only.
+     */
+    readonly fakePassword: boolean | null;
+
+    /**
+     * The current fixed player count value of the room. read-only. host-only.
+     */
+    readonly fixedPlayerCount: int16 | null;
+
+    /**
+     * Whether the room is currently being shown in the room list of 
+     * the backend server or not. read-only. host-only.
+     */
+    readonly showInRoomList: boolean;
+
+    /**
+     * Whether the room's player count checking is disabled or not. read-only. host-only.
+     */
+    readonly unlimitedPlayerCount: boolean;
+
+    /**
+     * The current recaptcha token of the room. If changed, it will also refresh the room link. host-only.
+     */
+    token: string;
+
+    /**
+     * The current join-recaptcha status of the room. host-only.
+     */
+    requireRecaptcha: boolean;
 
     /**
      * Leaves the current room. Also releases the resources used by this object.
@@ -7358,6 +7645,8 @@ declare namespace MainReturnType {
      *   - `playerCount: int | null`: An integer value to fix the player count of the current room to that number, or `null` to return to normal behaviour. Original Haxball backend has the current restriction about this value: `0` <= `playerCount` <= `30`. If the room does not satisfy this, it is not shown in the room list.
      *   - `maxPlayerCount: int | null`: The maximum player count value of the current room. Original Haxball backend has the current restriction about this value: `0` <= `maxPlayerCount` <= `30`. If the room does not satisfy this, it is not shown in the room list.
      *   - `fakePassword: boolean | null`: If set to `true` or `false`, the room will set its password-protected status to your value. Passing `null` disables this behaviour.
+     *   - `unlimitedPlayerCount: boolean`: If set to `true`, bypasses the player count checks, resulting in unlimited maximum player count. However, the default backend will not show the room in the room list if the player count > `30`.
+     *   - `showInRoomList: boolean`: Whether to show this room in the room list or not.
      * 
      * @returns void.
      */
@@ -7365,6 +7654,8 @@ declare namespace MainReturnType {
 
     /**
      * Enables or disables recaptcha-solving to join this room. host-only.
+     * 
+     * @deprecated Will be removed soon. Use `room.requireRecaptcha` property instead.
      * 
      * @param on The desired activation status of room's recaptcha mode.
      * 
@@ -7400,6 +7691,44 @@ declare namespace MainReturnType {
      * @returns void.
      */
     setExtrapolation(extrapolation: int): void;
+
+    /**
+     * Bans a player from joining the room. host-only.
+     * 
+     * @param playerId Id of the player to ban.
+     * 
+     * @returns Id of the new ban entry if successful, otherwise null.
+     */
+    addPlayerBan(playerId: uint16): BanEntryId | null;
+
+    /**
+     * Bans all given ip(range)(s) from joining the room. host-only.
+     * 
+     * @param ips The ip(range)(s) to ban.
+     * 
+     * @returns An array that contains; for each ip (range) parameter in the 
+     * given order, the id of the new ban entry if successful, otherwise null.
+     */
+    addIpBan(...ips: (string | IPv4Range | IPv6Range)[]): (BanEntryId | null)[];
+
+    /**
+     * Bans all given auth(s) from joining the room. host-only.
+     * 
+     * @param auths The auth(s) to ban.
+     * 
+     * @returns An array that contains; for each auth parameter in the 
+     * given order, the id of the new ban entry if successful, otherwise null.
+     */
+    addAuthBan(...auths: string[]): (BanEntryId | null)[];
+
+    /**
+     * Removes the ban entry with the given id. host-only.
+     * 
+     * @param id Id of the ban entry to remove.
+     * 
+     * @returns True if the ban entry was removed, otherwise false.
+     */
+    removeBan(id: BanEntryId): boolean;
 
     /**
      * Clears all bans. host-only.
@@ -7587,11 +7916,34 @@ declare namespace MainReturnType {
      * 
      * @param type The type of the custom event.
      * @param data Any custom data for this specific event. This is converted to a string via `JSON.stringify` while being serialized.
+     * @param targetId If given, sends this event only to the player with this id if the player is using this modified client.
      * 
      * @returns void.
      */
-    sendCustomEvent(type: uint32, data: object): void;
+    sendCustomEvent(type: uint32, data: object, targetId?: uint16): void;
 
+    /**
+     * Creates a `BinaryCustomEvent` event message with given `type` and `data` properties and sends it. The values `type` and `data` completely depend on your custom event's order and logic. Note that the message can only be received by the users of this modified client.
+     * 
+     * @param type The type of the binary custom event.
+     * @param data Any custom binary data for this specific event.
+     * @param targetId If given, sends this event only to the player with this id if the player is using this modified client.
+     * 
+     * @returns void.
+     */
+    sendBinaryCustomEvent(type: uint32, data: Uint8Array, targetId?: uint16): void;
+
+    /**
+     * Creates an `IdentityEvent` event message with given player `id` and `data` properties and sends it. This event sets `playerObject.identity` value to the given `data` object for all clients. Note that the message can only be received by the users of this modified client.
+     * 
+     * @param id Id of the player whose identity data is being changed.
+     * @param data The new identity data. It can be any JSON object.
+     * @param targetId If given, sends this event only to the player with this id if the player is using this modified client.
+     * 
+     * @returns void.
+     */
+    setPlayerIdentity(id: uint16, data: object, targetId?: uint16): void;
+    
     /**
      * Returns the current player's key state value.
      * 
@@ -8296,6 +8648,28 @@ declare namespace MainReturnType {
      * @returns An instance of CustomEvent.
      */
     export function customEvent(type: uint32, data: object): CustomEvent;
+
+    /**
+     * Creates a BinaryCustomEvent object that can be used to trigger a binary custom event.
+     * Returning event's byId is also required to be set before it can be used.
+     * 
+     * @param type The type of the binary custom event.
+     * @param data Any custom binary data for this specific event.
+     * 
+     * @returns An instance of BinaryCustomEvent.
+     */
+    export function binaryCustomEvent(type: uint32, data: Uint8Array): BinaryCustomEvent;
+
+    /**
+     * Creates an IdentityEvent object that can be used to trigger a identity event.
+     * Returning event's byId must be set to 0 before it can be used.
+     * 
+     * @param id Id of the player whose identity data is desired to be changed.
+     * @param data The identity data that should be received from the backend. It can be any JSON object.
+     * 
+     * @returns An instance of IdentityEvent.
+     */
+    export function setPlayerIdentity(id: uint16, data: object): IdentityEvent;
   }
 
   /**
@@ -8901,71 +9275,76 @@ declare namespace MainReturnType {
     constructor(name: string, metadata?: any);
   }
 
-  export namespace Language {
+  export interface Language {}
+  export class Language {
 
     /**
-     * This is the abbreviation of the current language. Defaults to `'GB'`. It is possible to change the language of the whole API by changing this value directly; throws error if the language does not exist.
+     * This is the global current language instance. You can change this value directly. Defaults to `null`.
      */
-    export var current: string;
+    static current: Language|null;
 
     /**
-     * Contains all name mappings for the current language, namely `errorsTextMap`, `connectionStateTextMap` and `rendererTextMap`.
+     * Converts a template string to a normal string using the given parameters in `arr`.
+     * template string may include placeholders to represent the parameters. ("$1" for first
+     * parameter, "$2" for second parameter, and so on.) template string may also include 
+     * the ? operator for simple conditioning. You may look at the language files for examples.
+     * 
+     * @param s The template string to convert
+     * @param arr Parameters to replace the placeholders in the template string.
+     * 
+     * @returns A finalized version of the template string that has all the placeholders 
+     * replaced by the parameters, or `null` if something went wrong.
      */
-    export var currentData: {
+    static resolveText(s: TemplateString, arr: any[]): (string|null);
+
+    /**
+     * This function is called internally inside the constructor of all Addons by default. 
+     * The function body is empty by default. This means that the `metadata` values are not 
+     * stored in Addon objects by default, because they are not useful in a non-GUI 
+     * node.js environment. If we want to make use of the `metadata`, we might override 
+     * this behavior by overriding this method. Remember that this should be done _after_ 
+     * initializing the API and _before_ initializing any Addons.
+     * 
+     * @param metadata An object that holds some metadata values. This value might depend 
+     * on what you want to do with this API. The examples in the GitHub repo are intended 
+     * to be shown in a web application GUI that can be accessed by anyone. Therefore, 
+     * they use the following structure for this object:
+     *   - `name: string`: Name of the RoomConfig that will be displayed on the GUI.
+     *   - `version: number`: The current version number of this RoomConfig.
+     *   - `author: string`: The author of this RoomConfig.
+     *   - `description: string`: A detailed description of this RoomConfig.
+     *   - `allowFlags: int`: This value defines whether it is possible to use this Addon 
+     * while hosting or joining (or both) a room. Renderers do not use this key.
+     * 
+     * @returns void.
+     */
+    defineMetadata: (metadata?: any)=>void;
+
+    /**
+     * The abbreviation of this Language.
+     */
+    abbr: string;
+
+    /**
+     * The main data object that has all of the Language data of this API.
+     */
+    api: {
 
       /**
-       * An object that has a description function for each error code where each function returns a string. 
+       * The language data for the errors of this API. Must map all error codes to template strings.
        */
-      errorsTextMap: NumberToTextFuncMap,
-
-      /**
-       * An object that maps each `connectionState` number to a `string` value. 
-       */
-      connectionStateTextMap: NumberToTextMap,
-      
-      /**
-       * An object that maps each `rendererTextIndex` number to a `string` value. 
-       */
-      rendererTextMap: NumberToTextMap
+      errors: NumberToTemplateStringMap
     };
 
     /**
-     * Contains the global name-to-integer mappings that shortly describe the language string.
-     */
-    export const indices: {
-
-      /**
-       * Name-to-integer mapping that shortly describes the error codes used in `HBError` class. Note that this is the same object as `Errors.ErrorCodes`.
-       */
-      ErrorCodes: TextToNumberMap,
-
-      /**
-       * Name-to-integer mapping that shortly describes the connection states encountered while joining a room. Note that this is the same object as the API's global `ConnectionState` object.
-       */
-      ConnectionState: TextToNumberMap,
-
-      /**
-       * Name-to-integer mapping that shortly describes the default renderer's language text indices used inside the current default renderers.
-       */
-      RendererTextIndices: TextToNumberMap
-    };
-
-    /**
-     * Adds a new language with given properties. Throws an error while trying to add an already-existing language.
+     * Creates a new `Language` instance. 
      * 
-     * @param abbr The language abbreviation value. Must be unique. This value is automatically transformed into upper-case. 
-     * @param errorsTextMap An object that has a description function for each error code where each function returns a string. 
-     * @param connectionStateTextMap An object that maps each `connectionState` number to a `string` value. 
-     * @param rendererTextMap An object that maps each `rendererTextIndex` number to a `string` value. 
-     */
-    export function add(abbr: string, errorsTextMap: NumberToTextFuncMap, connectionStateTextMap: NumberToTextMap, rendererTextMap: NumberToTextMap): void;
-
-    /**
-     * Removes the language that has the given abbreviation value(`abbr`). Throws error while trying to remove a non-existent or current language.
+     * @param abbr Abbreviation of the new Language.
+     * @param metadata Any information that we would want to show/update inside a GUI application about this Library. This is not used by the API by default, but we can reprogram the Library's prototype to make use of this value if we want.
      * 
-     * @param abbr The language abbreviation value. This value is automatically transformed into upper-case. 
+     * @returns void.
      */
-    export function remove(abbr: string): void;
+    constructor(abbr: string, metadata?: any);
 
   }
 
@@ -9098,11 +9477,6 @@ declare namespace MainReturnType {
          * Object that stores custom color values to render striped team colors.
          */
         colors: ka;
-
-        /**
-         * Name of the class for HTML elements. Can be either "t-spec", "t-red", or "t-blue".
-         */
-        className: string;
       }
 
       /**
@@ -9355,6 +9729,11 @@ declare class LibConfig {
    * If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
    */
   noWebRTC?: boolean;
+
+  /**
+   * A token that represents a user data in a database of a custom proxy/backend server.
+   */
+  identityToken?: string;
 };
 
 export = (object?: WindowLike, config?: LibConfig)=>MainReturnType;

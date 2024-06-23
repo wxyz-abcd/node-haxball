@@ -24,7 +24,7 @@ function init(headless, roomCallback){
     }
   }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   if (!headless){
     Callback.add("KeyDown"); // this defines room._onKeyDown(). We will use this callback when keyDown event happens. It will trigger all roomConfig, plugin and renderer callbacks.
@@ -159,24 +159,27 @@ function init(headless, roomCallback){
     window.close();
     return;
   }
-  if (params.autoPlay)
-    importPlugins(["autoPlay_defensive"], ()=>{
-      if (headless)
-        doAction(params);
-      else
-        importLibraries(["aimbot"], ()=>{
-          importRenderers(["defaultRenderer"], ()=>{
-            doAction(params);
+  importLanguages(["englishLanguage"], ()=>{
+    Language.current = new languages.englishLanguage(API);
+    if (params.autoPlay)
+      importPlugins(["autoPlay_defensive"], ()=>{
+        if (headless)
+          doAction(params);
+        else
+          importLibraries(["aimbot"], ()=>{
+            importRenderers(["defaultRenderer"], ()=>{
+              doAction(params);
+            });
           });
-        });
-    });
-  else if (headless)
-    doAction(params);
-  else
-    importLibraries(["aimbot"], ()=>{
-      importRenderers(["defaultRenderer"], ()=>{
-        doAction(params);
       });
-    });
+    else if (headless)
+      doAction(params);
+    else
+      importLibraries(["aimbot"], ()=>{
+        importRenderers(["defaultRenderer"], ()=>{
+          doAction(params);
+        });
+      });
+  });
   return API;
 }

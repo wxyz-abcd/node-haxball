@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Library.prototype);
   Library.call(this, "permissions", { // "permissions" is library's name. Every library should have a unique name.
@@ -76,7 +76,7 @@ module.exports = function(API){
         .button:active {
           background-color: #193449;
         }
-        .button:disabled {
+        .button[disabled] {
           background-color: #3e3e3e;
         }
         .button .tooltip {

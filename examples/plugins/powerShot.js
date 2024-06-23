@@ -1,9 +1,9 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "powerShot", true, { // "powerShot" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc & JerryOldson",
     description: `This plugin implements the powershot feature.`,
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
@@ -24,7 +24,7 @@ module.exports = function(API){
   this.defineVariable({
     name: "ballSpeed",
     type: VariableType.Number,
-    value: 10,
+    value: 12,
     range: {
       min: 0,
       max: 30,
@@ -43,7 +43,7 @@ module.exports = function(API){
   this.defineVariable({
     name: "ticksThreshold",
     type: VariableType.Integer,
-    value: 50,
+    value: 8,
     range: {
       min: 1,
       max: 1000,
@@ -55,13 +55,37 @@ module.exports = function(API){
   this.defineVariable({
     name: "swingGravity",
     type: VariableType.Number,
-    value: 0.15,
+    value: 0.05,
     range: {
       min: 0,
-      max: 2,
+      max: 1,
       step: 0.001
     },
     description: "Gravity effect for swinging the ball."
+  });
+
+  this.defineVariable({
+    name: "swingGravityDescentCoeff",
+    type: VariableType.Number,
+    value: 0.5,
+    range: {
+      min: 0,
+      max: 1,
+      step: 0.01
+    },
+    description: "Gravity descent effect for more realistic swinging."
+  });
+  
+  this.defineVariable({
+    name: "ticksPerSwingGravityUpdate",
+    type: VariableType.Integer,
+    value: 1,
+    range: {
+      min: 1,
+      max: 100,
+      step: 1
+    },
+    description: "Number of ticks of the interval that the update of ball's gravity will happen."
   });
   
   this.defineVariable({
@@ -90,7 +114,7 @@ module.exports = function(API){
     description: "If enabled, other players will be able to use the powerShot shortcut key via the powerShot_clientSide plugin."
   });
   
-  var that = this, nearestPlayerId = null, ticks = 0, psTicks = 0, swingActive = false, color = null;
+  var that = this, nearestPlayerId = null, ticks = 0, psTicks = 0, swingActive = false, color = null, cc = -1;
 
   function updateColor(){
     color = parseInt(that.ballColor.substring(1),16);
@@ -111,32 +135,39 @@ module.exports = function(API){
     swingActive = false;
   };
   
-  function powerShot(player){
-    var ball = that.room.gameState.physicsState.discs[0];
+  function powerShot(player, c=1){
+    var ball = that.room?.gameState?.physicsState?.discs?.[0];
+    if (!ball)
+      return;
     var dx = ball.pos.x-player.disc.pos.x, dy = ball.pos.y-player.disc.pos.y, d = Math.sqrt(dx*dx+dy*dy);
+    var _dx = dx/d, _dy = dy/d;
     var obj = { 
-      xspeed: that.ballSpeed*dx/d,
-      yspeed: that.ballSpeed*dy/d
+      xspeed: that.ballSpeed*_dx,
+      yspeed: that.ballSpeed*_dy
     };
+    cc = c;
     if (that.swingGravity!=0){
       swingActive = true;
-      obj.ygravity = -Math.sign(obj.yspeed)*that.swingGravity;
+      obj.xgravity = -cc*_dy*that.swingGravity;
+      obj.ygravity = cc*_dx*that.swingGravity;
     }
     psTicks = 1;
     Utils.runAfterGameTick(()=>{
       that.room.setDiscProperties(0, obj);
-      that.onPowerShot && that.onPowerShot(player);
+      that.onPowerShot && that.onPowerShot(player, cc);
     });
   }
   
-  function tryPowershot(playerId){
-    var ball = that.room.gameState.physicsState.discs[0];
+  function tryPowershot(playerId, c=1){
+    var ball = that.room?.gameState?.physicsState?.discs?.[0];
+    if (!ball)
+      return;
     var player = that.room.getPlayer(playerId), p = player?.disc?.pos;
     if (!p)
       return;
     if (Math.sqrt((p.x-ball.pos.x)*(p.x-ball.pos.x)+(p.y-ball.pos.y)*(p.y-ball.pos.y))>that.triggerDistance+ball.radius+player.disc.radius)
       return;
-    powerShot(player);
+    powerShot(player, c);
   }
   
   this.onPlayerBallKick = function(playerId){
@@ -152,6 +183,16 @@ module.exports = function(API){
       psTicks++;
       if (psTicks>that.maxTicks)
         resetBallGravity();
+      else{
+        var dx = ball.speed.x, dy = ball.speed.y, d = Math.sqrt(dx*dx+dy*dy);
+        if (psTicks%that.ticksPerSwingGravityUpdate==0){
+          var g = (1+(that.swingGravityDescentCoeff-1)*(psTicks/that.maxTicks))*that.swingGravity;
+          that.room.setDiscProperties(0, {
+            xgravity: -cc*(dy/d)*g,
+            ygravity: cc*(dx/d)*g
+          });
+        }
+      }
     }
     that.room.players.forEach((player)=>{
       if (!player.disc)
@@ -171,7 +212,8 @@ module.exports = function(API){
       ticks = 0;
       if (!swingActive)
         Utils.runAfterGameTick(()=>{
-          that.room.setDiscProperties(0, { color: that.room.state.stadium.discs[0].color });
+          if (ball.color!=that.room.state.stadium.discs[0].color)
+            that.room.setDiscProperties(0, { color: that.room.state.stadium.discs[0].color });
         });
       return;
     }
@@ -181,9 +223,10 @@ module.exports = function(API){
     ticks++;
     if (ticks>that.ticksThreshold)
       Utils.runAfterGameTick(()=>{
-        that.room.setDiscProperties(0, { 
-          color: color
-        });
+        if (ball.color!=color)
+          that.room.setDiscProperties(0, { 
+            color: color
+          });
       });
   };
 
@@ -191,7 +234,7 @@ module.exports = function(API){
     swingActive = false;
     psTicks = 0;
     Utils.runAfterGameTick(()=>{
-      that.room.setDiscProperties(0, { ygravity: 0, color: that.room.state.stadium.discs[0].color });
+      that.room.setDiscProperties(0, { xgravity: 0, ygravity: 0, color: that.room.state.stadium.discs[0].color });
       that.onPowerShotEnd && that.onPowerShotEnd();
     });
   }
@@ -218,13 +261,19 @@ module.exports = function(API){
   };
   
   this.onKeyDown = function(e){
-    if (e.code=="KeyQ")
-      tryPowershot(0);
+    if (e.code=="KeyZ")
+      tryPowershot(0, -1);
+    else if (e.code=="KeyC")
+      tryPowershot(0, 1);
   };
   
   this.onOperationReceived = function(type, msg){
-    if (type==OperationType.CustomEvent && msg.type==57 && that.clientEnabled)
-      tryPowershot(msg.byId);
+    if (type==OperationType.CustomEvent && that.clientEnabled){
+      if (msg.type==57)
+        tryPowershot(msg.byId, 1);
+      else if (msg.type==58)
+        tryPowershot(msg.byId, -1);
+    }
     return true;
   };
 

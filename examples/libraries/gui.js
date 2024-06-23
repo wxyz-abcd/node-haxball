@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Library.prototype);
   Library.call(this, "gui", { // "gui" is library's name. Every library should have a unique name.
@@ -35,5 +35,16 @@ module.exports = function(API){
     script.type = "text/javascript";
     script.text = jsContent;
     win.document.body.appendChild(script);
+  };
+
+  this.downloadFile = function(fileName, contents){
+    var c = window.document.createElement("a");
+    window.document.body.appendChild(c);
+    var d = URL.createObjectURL(new Blob([contents], { type: "octet/stream" }));
+    c.href = d;
+    c.download = fileName;
+    c.click();
+    URL.revokeObjectURL(d);
+    c.remove();
   };
 };

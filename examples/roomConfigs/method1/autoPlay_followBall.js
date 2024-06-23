@@ -4,25 +4,30 @@ const minCoordAlignDelta = 0.5, minKickDistance = 2;
 
 function roomCallback(room){ // examples start from here.
   room.onGameTick = () => {
-    // get the original data object of the current player
-    var playerDisc = room.getPlayerDisc(room.currentPlayerId);
-
-    // coordinates: playerDisc.pos.x, playerDisc.pos.y
-    // speed: playerDisc.speed.x, playerDisc.speed.y
-    // radius: playerDisc.radius
-
+    // get the extrapolated disc of the data object of the current player
+    var cp = that.room.currentPlayer, playerDisc = cp?.disc?.ext;
     if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
       return;
 
-    // get the original data object of the ball
-    var ball = room.getBall();
+    // get the extrapolated game state object
+    var { state, gameState, gameStateExt } = that.room;
+    gameState = gameStateExt || gameState;
 
-    // coordinates: ball.pos.x, ball.pos.y
-    // speed: ball.speed.x, ball.speed.y
-    // radius: ball.radius
+    // get the original extrapolated data object of the ball
+    var ball = gameState.physicsState.discs[0];
+
+    // get the coordinates of the ball
+    var {x, y} = ball?.pos || {};
+
+    // if ball is not reachable, do nothing.
+    if (x==null || isNaN(x) || !isFinite(x) || y==null || isNaN(y) || !isFinite(y)) // check 
+      return;
+
+    // speed: playerDisc.speed.x, playerDisc.speed.y
+    // radius: playerDisc.radius
 
     // calculate delta difference for both x and y axis.
-    var deltaX = ball.pos.x - playerDisc.pos.x, deltaY = ball.pos.y - playerDisc.pos.y;
+    var deltaX = x - playerDisc.pos.x, deltaY = y - playerDisc.pos.y, dirX, dirY, kick;
 
     // x direction:
     if (Math.abs(deltaX) < minCoordAlignDelta) // we can omit small delta.

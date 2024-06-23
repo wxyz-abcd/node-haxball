@@ -30,7 +30,7 @@
 npm install node-haxball
 ```
 ```js
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = require("node-haxball")();
+const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = require("node-haxball")();
 // Use example code here.
 ```
 
@@ -52,7 +52,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window, {
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window, {
           proxy: {
             WebSocketUrl: "wss://node-haxball.glitch.me/",
             HttpUrl: "https://node-haxball.glitch.me/rs/"
@@ -75,7 +75,7 @@ const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, Col
     </head>
     <body>
       <script>
-        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window); 
+        var { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = abcHaxballAPI(window); 
         // You do not need a proxy server if you use browser's extension mechanism.
         // Use example code here.
       </script>
@@ -153,6 +153,7 @@ Room.create({
     - `version`: Haxball's expected version number. Defaults to: `9`.
     - `noVariableValueChangeEvent`: if `true`, disables the mechanism that enables variable value change event which in turn improves performance while reaching a variable's value that was defined by any `Addon.defineVariable` function. (Variable will have a directly accessable, actual value; instead of a property that points to the actual variable.) Defaults to: `false`.
     - `noWebRTC`: If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
+    - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. Defaults to `null`.
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
 - `VariableType`: Different types of variables that can be defined in a Plugin or a Renderer with its corresponding `defineVariable` function. Should be used in a GUI environment.
@@ -163,15 +164,24 @@ Room.create({
 - `CameraFollow`: These values help understand whether the camera will follow the player or not. This is only used as a variable in all stadiums.
 - `BackgroundType`: This is the type of the variable in a stadium that defines its background texture type.
 - `GamePlayState`: This type lets us understand the actual state of the game. This type only exists in a GameState object.
-- `Language`: Methods for global language handling. (Look inside `examples/languages/englishLanguage.js` for usage example.)
-  - `add(abbr, errorsTextMap, connectionStateTextMap, rendererTextMap)`: Adds a new language with given properties. `abbr` is auto-transformed into upper-case. `errorsTextMap` must be an `object` that has a description function for each error code where each function returns a string. `connectionStateTextMap` must be an `object` that maps each `connectionState` to a `string` value. `rendererTextMap` must be an `object` that maps each `rendererTextIndex` to a `string` value. throws error while trying to add an already-existing language.
-  - `remove(abbr)`: Removes the language with given abbreviation(`abbr`). `abbr` is auto-transformed into upper-case. throws error while trying to remove a non-existent or current language.
-  - `current`: This is the abbreviation of the current language. Defaults to `'GB'`. It is possible to change the language of the whole API by changing this value directly; throws error if language does not exist.
-  - `currentData`: read-only. Returns all name mappings for the current language, namely `errorsTextMap` and `rendererTextMap` that are already described in `Language.add` above.
-  - `indices`: read-only. Returns the global name-to-integer mappings that shortly describe the language string.
-    - `ConnectionState`: Name-to-integer mapping that shortly describes the connection state codes that occur while trying to join a room. Note that this is the same object as the global `ConnectionState` object.
-    - `ErrorCodes`: Name-to-integer mapping that shortly describes the error codes used in `HBError` class. Note that this is the same object as `Errors.ErrorCodes`.
-    - `RendererTextIndices`: Name-to-integer mapping that shortly describes the default renderer's language text indices used inside the current default renderers.
+- `BanEntryType`: These values help understand the type of a ban entry instance inside a room's ban list.
+
+- `Language`: A class that defines a language. Any language should be based on this class.
+
+  - `static properties`:
+    - `current`: The global current Language instance. It is essential to assign a language object to this property to be able to see the error messages using a line such as `API.Language.current = new EnglishLanguage(API)`. Defaults to `null`.
+
+  - `static functions`:
+    - `resolveText(str, array)`: Converts a template string(`str`) to a normal string using the given parameters(`array`).
+
+  - `constructor(abbr, metadata)`: creates a new `Language` instance. `abbr` should be a unique abbreviation string to identify the language. `metadata` is the information that you would want to show/update inside a GUI application.
+
+  - `properties`:
+    - `abbr`: the abbreviation of the language that is used while sending a LanguageChanged signal through the API.
+    - `api`: The root data object that should have an `errors` key which has to contain string representations for each ErrorCode value.
+
+  - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `Language` object. These are defined in `Language.prototype`.
+    - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `Language` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the languages in the examples folder uses the following `metadata` structure: `{name, version, author, description}`.
 
 - `Errors`: Global error handling objects.
   - `ErrorCodes`: Name to integer mapping that shortly describes the error codes used in `HBError` class.
@@ -240,6 +250,11 @@ Room.create({
   - `calculateAllRoomDistances(geo, roomList)`: calculates the distances to the given geoLocation `geo` of all rooms in given `roomList` and stores them inside each room's `dist` property.
   - `numberToColor(number)`: returns the html color string (rgba representation) of the given `number`. (0 <= `number` <= 16777215)
   - `colorToNumber(color)`: returns the number representation of the given html color string (rgba representation).
+  - `ipToNumber(ip)`: returns the numeric representation of an ip string, or null if the string is not formatted. Used internally in banList implementation.
+  - `numberToIp(ip)`: returns the string representation of a numeric ip value, or null if the number is not valid. Used internally in banList implementation.
+  - `authToNumber(auth)`: returns the numeric representation of an auth string, or null if the string is not 43 characters long. Used internally in banList implementation.
+  - `numberToAuth(auth)`: returns the string representation of a numeric auth value, or null if the number is not valid. Used internally in banList implementation.
+  - `compareBits(value1, value2, bitMask)`: returns true if all of the bits of numbers given as `value1` and `value2` are equal only at the positions whose bit values are `1` inside the `bitMask`. Used internally in banList implementation.
   - `keyState(dirX, dirY, kick)`: returns an integer key state value to be used in `Room.setKeyState`. `dirX` = oneof\[`-1`:left, `0`:still, `1`:right\], `dirY` = oneof\[`-1`:up, `0`:still, `1`:down\], `kick` = `true`/`false`.
   - `reverseKeyState(state)`: returns the `dirX`, `dirY`, `kick` parameters that were used to generate the given integer `state` with `Utils.keyState` function.
   - `runAfterGameTick(callback, ticks)`: runs a `callback` function after `ticks` game ticks. if omitted, `ticks` defaults to `1`.
@@ -281,6 +296,8 @@ Room.create({
   - `setDiscProperties(id, data)`: creates and returns an event message that can be used to set the properties of a disc(`id`) to `data`.
   - `setPlayerDiscProperties(id, data)`: creates and returns an event message that can be used to set the properties of the disc of a player(`id`) to `data`.
   - `customEvent(type, data)`: creates and returns an event message that can be used to trigger a custom event with properties(`type`, `data`).
+  - `binaryCustomEvent(type, data)`: creates and returns an event message that can be used to trigger a binary custom event with properties(`type`, `data`).
+  - `setPlayerIdentity(id, data)`: creates and returns an event message that can be used to trigger a player identity event with properties(`id`, `data`).
 
 - `Query`: Static functions to query map features. `roomState` should be either `room.state` or `room.stateExt`.
   - `getVertexIndexAtMapCoord(roomState, mapCoordinate, threshold)`: Finds the index of the first vertex that has a distance to `mapCoordinate` lower than `threshold`.
@@ -341,6 +358,7 @@ Room.create({
         - `version`: Haxball's version number. other clients cannot join this room if their version number is different than this number. default value is `9`.
         - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. you may assign a negative value to disable this feature. default value is `-1`(msec).
         - `proxyAgent`: a custom proxy agent for the room's connection. This method does not work in browsers. Defaults to `null`.
+        - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. Defaults to `null`.
 
         --- event callbacks section ---
         - `onSuccess(room)`: joined/created `room`.
@@ -404,6 +422,8 @@ Room.create({
           - `sendPingData(valueFunc, byId)`: creates and applies a fake event by player(`byId`) to change all ping values with `valueFunc`. `byId` must be `0`.
           - `setDiscProperties(discId, type, data, byId)`: creates and applies a fake event by player(`byId`) to set disc(`discId`) properties to `data`. `byId` must be `0`.
           - `sendCustomEvent(type, data, byId)`: creates and applies a fake custom event with properties(`type`, `data`) by player(`byId`).
+          - `sendBinaryCustomEvent(type, data, byId)`: creates and applies a fake binary custom event with properties(`type`, `data`) by player(`byId`).
+          - `setPlayerIdentity(id, data, byId)`: creates and applies a fake event by player(`byId`) to set the identity of player(`id`) to `data`.
           - `destroy()`: Frees the resources that are used by this object.
 
   - `properties`:
@@ -434,11 +454,20 @@ Room.create({
     - `timeElapsed`: elapsed time in current game. `null` if game is not active. read-only.
     - `currentFrameNo`: the current frame number of the room. read-only.
     - `banList`: the current list of banned players. read-only. host-only.
+    - `requireRecaptcha`: whether the room requires recaptcha to join or not. host-only.
+    - `token`: the current recaptcha token of the room. if changed, it will also refresh the room link. host-only.
+    - `password`: the current password of the room. read-only. host-only.
+    - `geo`: the current geolocation of the room. read-only. host-only.
+    - `maxPlayerCount`: the current maximum number of players of the room. read-only. host-only.
+    - `fakePassword`: the current fake password value of the room. read-only. host-only.
+    - `fixedPlayerCount`: the current fixed player count value of the room. read-only. host-only.
+    - `showInRoomList`: whether the room is currently being shown in the room list of the backend server or not. read-only. host-only.
+    - `unlimitedPlayerCount`: whether the room's player count checking is disabled or not. read-only. host-only.
 
   - `functions`:
     - `leave()`: leaves the room.
-    - `setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword })`: sets the room's properties.
-    - `setRecaptcha(on)`: sets the room's recaptcha mode. `on`: `true`/`false`.
+    - `setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword, unlimitedPlayerCount, showInRoomList })`: sets the room's properties.
+    - `setRecaptcha(on)`: sets the room's recaptcha mode. `on`: `true`/`false`. *DEPRECATED*: use `room.requireRecaptcha = on` instead.
     - `setKickRateLimit(min, rate, burst)`: sets the room's kick rate limit.
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
     - `setExtrapolation(extrapolation)`: sets the client's `extrapolation` value in msecs.
@@ -457,7 +486,9 @@ Room.create({
     - `setDiscProperties(discId, properties)`: set disc(`discId`) `properties`. host-only.
     - `setPlayerDiscProperties(playerId, properties)`: set player(`playerId`)'s disc `properties`. host-only.
     - `reorderPlayers(playerIdList, moveToTop)`: remove all players with ids in `playerIdList` and re-add them in the given order to the (top or bottom)(`moveToTop`) of the player list. host-only.
-    - `sendCustomEvent(type, data)`: sends a `CustomEvent(type, data)` that can only be received by the users of this modified client.
+    - `sendCustomEvent(type, data, targetId)`: sends a `CustomEvent(type, data)` that can only be received by the users of this modified client. if `targetId`(host-only) is specified, the event is only sent to player(`targetId`).
+    - `sendBinaryCustomEvent(type, data, targetId)`: sends a `BinaryCustomEvent(type, data)` that can only be received by the users of this modified client. if `targetId`(host-only) is specified, the event is only sent to player(`targetId`).
+    - `setPlayerIdentity(id, data, targetId)`:  sends a `SetPlayerIdentityEvent(type, data)` to set the identity data(`playerObject.identity`) of player(`id`) to `data`. that can only be received by the users of this modified client. if `targetId`(host-only) is specified, the event is only sent to player(`targetId`).
     - `getKeyState()`: get current key state.
     - `setKeyState(state)`: set current key state to `state`.
     - `startGame()`: start game.
@@ -483,6 +514,10 @@ Room.create({
     - `getDisc(discId, extrapolated = true)`: get the original disc object for disc(`discId`).
     - `getPlayerDisc(playerId, extrapolated = true)`: get the original disc object for player(`playerId`).
     - `getPlayerDisc_exp(playerId)`: get the original disc object for player(`playerId`). faster than `getPlayerDisc`, but experimental. use at your own risk.
+    - `addPlayerBan(playerId)`: bans a player(`playerId`) from joining the room. host-only.
+    - `addIpBan(...ips)`: bans all given ip(range)(s) from joining the room. host-only.
+    - `addAuthBan(...auths)`: bans all given auth(s) from joining the room. host-only.
+    - `removeBan(id)`: removes the ban entry(id). host-only.
     - `setPluginActive(name, active)`: activate/deactivate the plugin(`name`).
     - `startRecording()`: start recording replay data. returns `true` if succeeded, `false` otherwise. recording should not be started before calling this.
     - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.
@@ -727,6 +762,9 @@ Room.create({
       - `customData = onBeforeRoomRecaptchaModeChange(on)`: room's recaptcha mode was set to (`on`). host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
       - `onAfterRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
+      - `customData = onBeforeRoomTokenChange(token)`: room's token was set to (`token`). host-only.
+      - `onRoomTokenChange(token, customData)`: room's token was set to (`token`). host-only.
+      - `onAfterRoomTokenChange(token, customData)`: room's token was set to (`token`). host-only.
       - `customData = onBeforeRoomRecordingChange(value)`: recording started(`value`=`true`) or stopped(`value` is `arraybuffer`). triggered individually.
       - `onRoomRecordingChange(value, customData)`: recording started(`value`=`true`) or stopped(`value` is `arraybuffer`). triggered individually.
       - `onAfterRoomRecordingChange(value, customData)`: recording started(`value`=`true`) or stopped(`value` is `arraybuffer`). triggered individually.
@@ -745,6 +783,9 @@ Room.create({
       - `customData = onBeforeCustomEvent(type, data, byId)`: a custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
       - `onCustomEvent(type, data, byId, customData)`: a custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
       - `onAfterCustomEvent(type, data, byId, customData)`: a custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `customData = onBeforeBinaryCustomEvent(type, data, byId)`: a binary custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `onBinaryCustomEvent(type, data, byId, customData)`: a binary custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `onAfterBinaryCustomEvent(type, data, byId, customData)`: a binary custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
       - `customData = onBeforePluginActiveChange(plugin)`: a `plugin` was activated/deactivated. triggered individually.
       - `onPluginActiveChange(plugin, customData)`: a `plugin` was activated/deactivated. triggered individually.
       - `onAfterPluginActiveChange(plugin, customData)`: a `plugin` was activated/deactivated. triggered individually.
@@ -831,12 +872,15 @@ Room.create({
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
+      - `onRoomTokenChange(token, customData)`: room's token was set to (`token`). host-only.
       - `onRoomRecordingChange(value, customData)`: recording started(`value`=`true`) or stopped(`value` is `arraybuffer`). triggered individually.
       - `onRoomPropertiesChange(props, customData)`: room's properties(`props`) were changed. host-only.
       - `onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData)`: a collision happened between disc(`discId1`, `playerId1`) and disc(`discId2`, `playerId2`). triggered individually.
       - `onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData)`: a collision happened between disc(`discId`, `discPlayerId`) and segment(`segmentId`). triggered individually.
       - `onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData)`: a collision happened between disc(`discId`, `discPlayerId`) and plane(`planeId`). triggered individually.
       - `onCustomEvent(type, data, byId, customData)`: a custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `onBinaryCustomEvent(type, data, byId, customData)`: a binary custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `onIdentityEvent(id, data, byId, customData)`: a player(`id`) has identified itself as `data`. custom-(host,client)s-only.
       - `onPluginActiveChange(plugin, customData)`: a plugin was activated/deactivated. triggered individually.
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
@@ -901,12 +945,15 @@ Room.create({
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
       - `onRoomRecaptchaModeChange(on, customData)`: room's recaptcha mode was set to (`on`). host-only.
+      - `onRoomTokenChange(token, customData)`: room's token was set to (`token`). host-only.
       - `onRoomRecordingChange(value, customData)`: recording started(`value`=`true`) or stopped(`value` is `ArrayBuffer`). triggered individually.
       - `onRoomPropertiesChange(props, customData)`: room's properties(`props`) were changed. host-only.
       - `onCollisionDiscVsDisc(discId1, discPlayerId1, discId2, discPlayerId2, customData)`: a collision happened between disc(`discId1`, `playerId1`) and disc(`discId2`, `playerId2`). triggered individually.
       - `onCollisionDiscVsSegment(discId, discPlayerId, segmentId, customData)`: a collision happened between disc(`discId`, `discPlayerId`) and segment(`segmentId`). triggered individually.
       - `onCollisionDiscVsPlane(discId, discPlayerId, planeId, customData)`: a collision happened between disc(`discId`, `discPlayerId`) and plane(`planeId`). triggered individually.
       - `onCustomEvent(type, data, byId, customData)`: a custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `onBinaryCustomEvent(type, data, byId, customData)`: a binary custom event(`type`, `data`) was triggered by player(`byId`). custom-(host,client)s-only.
+      - `onIdentityEvent(id, data, byId, customData)`: a player(`id`) has identified itself as `data`. custom-(host,client)s-only.
       - `onPluginActiveChange(plugin, customData)`: a plugin was activated/deactivated. triggered individually.
       - `onConfigUpdate(oldRoomConfigObj, newRoomConfigObj, customData)`: an old roomConfig object(`oldRoomConfigObj`) was replaced by a new roomConfig object(`newRoomConfigObj`).
       - `onRendererUpdate(oldRendererObj, newRendererObj, customData)`: an old renderer object(`oldRendererObj`) was replaced by a new renderer object(`newRendererObj`).
@@ -974,6 +1021,7 @@ Room.create({
 <div> - Lots of testing and various plugins by <a href="https://github.com/jerryoldson">JerryOldson <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a></div>
 <div> - Lots of testing and Portuguese language translation by <a href="https://github.com/guguxh">Juze <img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
 <div> - Room.modifyFrameNo by <a href="https://github.com/hxgd1">Punisher <img width="20" src="https://avatars.githubusercontent.com/u/114198188?v=4"/></a></div>
+<div> - Some links fixed by <a href="https://github.com/ChasmSolacer">ChasmSolacer <img width="20" src="https://avatars.githubusercontent.com/u/46286197?v=4"/></a></div>
 <div> - Autoplay bot examples improved by <a href="https://github.com/K0nfy">K0nfy <img width="20" src="https://avatars.githubusercontent.com/u/27099419?v=4"/></a></div>
 <div> - Docs formatted by <a href="https://github.com/uzayyli">uzaylı <img width="20" src="https://avatars.githubusercontent.com/u/87779551?v=4"/></a></div>
 <div></div>

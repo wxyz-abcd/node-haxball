@@ -1,11 +1,10 @@
 module.exports = function(API, params){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
-  const { RendererTextIndices: TextIndices } = Language.indices;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
   
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "sandbox",
-    version: "1.4",
+    version: "1.5",
     author: "basro & abc",
     description: `This is a customized renderer with aimbot designed specifically for the new sandbox mode for Haxball. Disable followMode to zoom using mouse wheel.`
   });
@@ -197,6 +196,43 @@ module.exports = function(API, params){
   var thisRenderer = this, { H: Point, p: Team, ka: TeamColors } = Impl.Core, roomLibrariesMap = null;;
   var selectedObj = null;
 
+  // language-related stuff
+
+  const LanguageData = {
+    "GB": [
+      "Time is", "Up!", 
+      "Red is", "Victorious!", 
+      "Red", "Scores!", 
+      "Blue is", "Victorious!", 
+      "Blue", "Scores!", 
+      "Game", "Paused" 
+    ],
+    "TR": [
+      "Süre", "Doldu!", 
+      "Kırmızı Takım", "Kazandı!", 
+      "Kırmızı Takım", "Gol Attı!", 
+      "Mavi Takım", "Kazandı!", 
+      "Mavi Takım", "Gol Attı!", 
+      "Oyun", "Durduruldu" 
+    ],
+    "PT": [
+      "O tempo", "Acabou!",
+      "O vermelho é", "Vitorioso!",
+      "O vermelho", "Marca!",
+      "O azul é", "Vitorioso!",
+      "Pontuações", "Azuis!",
+      "Jogo em", "Pausa"
+    ],
+    "ES": [
+      "¡El tiempo ha", "Terminado!",
+      "¡El red ha", "Ganado!",
+      "¡Punto para el", "Red!",
+      "¡El azul ha", "Ganado!",
+      "¡Punto para el", "Blue!",
+      "Juego en", "Pausa"
+    ]
+  };
+
   // start of basro's renderer logic
 
   function Animator(values){ // Ib
@@ -272,15 +308,15 @@ module.exports = function(API, params){
   };
 
   function CanvasTextRenderer(){ // Sb
-    const { rendererTextMap: TextMap } = Language.currentData;
+    const TextMap = LanguageData[Language.current?.abbr||"GB"];
     this.time = 0; // xc
     this.textQueue = []; // ab
-    this.timeUp = new CanvasText([TextMap[TextIndices.timeIsUp1], TextMap[TextIndices.timeIsUp2]], 16777215); // Ar // ["Time is", "Up!"]
-    this.redVictory = new CanvasText([TextMap[TextIndices.redIsVictorious1], TextMap[TextIndices.redIsVictorious2]], 15035990); // Gq // ["Red is", "Victorious!"]
-    this.redScore = new CanvasText([TextMap[TextIndices.redScores1], TextMap[TextIndices.redScores2]], 15035990); // Fq // ["Red", "Scores!"]
-    this.blueVictory = new CanvasText([TextMap[TextIndices.blueIsVictorious1], TextMap[TextIndices.blueIsVictorious2]], 625603); // Cn // ["Blue is", "Victorious!"]
-    this.blueScore = new CanvasText([TextMap[TextIndices.blueScores1], TextMap[TextIndices.blueScores2]], 625603); // Bn // ["Blue", "Scores!"]
-    this.gamePause = new CanvasText([TextMap[TextIndices.gamePaused1], TextMap[TextIndices.gamePaused2]], 16777215); // eq // ["Game", "Paused"]
+    this.timeUp = new CanvasText([TextMap[0], TextMap[1]], 16777215); // Ar // ["Time is", "Up!"]
+    this.redVictory = new CanvasText([TextMap[2], TextMap[3]], 15035990); // Gq // ["Red is", "Victorious!"]
+    this.redScore = new CanvasText([TextMap[4], TextMap[5]], 15035990); // Fq // ["Red", "Scores!"]
+    this.blueVictory = new CanvasText([TextMap[6], TextMap[7]], 625603); // Cn // ["Blue is", "Victorious!"]
+    this.blueScore = new CanvasText([TextMap[8], TextMap[9]], 625603); // Bn // ["Blue", "Scores!"]
+    this.gamePause = new CanvasText([TextMap[10], TextMap[11]], 16777215); // eq // ["Game", "Paused"]
   }
   CanvasTextRenderer.prototype = {
     addText: function(textObj){ // Pa
@@ -323,7 +359,7 @@ module.exports = function(API, params){
     if (c1.angle!=c2.angle || c1.text!=c2.text)
       return false;
     var a1 = c1.inner, a2 = c2.inner;
-    if (a1.length!=a2.length)
+    if (a1==a2 || a1.length!=a2.length)
       return false;
     for (var i=0;i<a1.length;i++)
       if (a1[i]!=a2[i])
@@ -333,7 +369,7 @@ module.exports = function(API, params){
   var /*PlayerDecorator.*/copyTeamColors = function(to, from){ // ao
     to.angle = from.angle;
     to.text = from.text;
-    to.inner = from.inner.slice(0);
+    to.inner = from.inner?.slice(0);
   };
   PlayerDecorator.prototype = {
     initialize: function(){
@@ -387,7 +423,7 @@ module.exports = function(API, params){
     },
     createInnerFillPattern: function(/*avatarText*/){
       var colorArray = this.teamColors.inner;
-      if (colorArray.length==0)
+      if (!colorArray || colorArray.length==0)
         return;
 
       // fill the colors

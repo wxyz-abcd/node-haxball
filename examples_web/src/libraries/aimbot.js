@@ -1,9 +1,9 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Library.prototype);
   Library.call(this, "aimbot", { // "aimbot" is library's name. Every library should have a unique name.
-    version: 0.1,
+    version: 0.2,
     author: "abc",
     description: `An aimbot`
   });
@@ -41,6 +41,13 @@ module.exports = function(API){
     description: "Color of aimbot's line (in css format)",
     type: VariableType.String,
     value: "rgba(255,255,255,0.35)"
+  });
+
+  this.defineVariable({
+    name: "followPlayerId",
+    description: "Id of the player that the aimbot will follow (if >=0)", 
+    type: VariableType.Integer,
+    value: -1
   });
 
   var thisLibrary = this;
@@ -94,7 +101,11 @@ module.exports = function(API){
   this.calculateAndDraw = function(followDisc, mapObjects, ctx){
     if (!thisLibrary.active)
       return;
-    var ball = mapObjects.F[0];
+    var ball = mapObjects.F[0], fpId = thisLibrary.followPlayerId;
+    if (fpId>=0){
+      var d = thisLibrary.room.players.find((x)=>x.id==fpId)?.disc;
+      d && (followDisc = d);
+    }
     if (ball && followDisc){
       var coord = ball.a, baseCoord = followDisc.a, remainingDist = thisLibrary.distThreshold;
       var xb = coord.x, yb = coord.y;

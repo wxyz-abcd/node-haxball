@@ -26,7 +26,6 @@ function abcHaxballAPI(window, config){
   (config.backend.secure==null) && (config.backend.secure = true);
   (config.fixNames==null) && (config.fixNames = true);
   
-  var currentLanguageAbbr = "GB";
   const defaultVersion = config.version || 9;
 
   const ConnectionState = {
@@ -63,7 +62,9 @@ function abcHaxballAPI(window, config){
     JoinRoom: 22,
     ReorderPlayers: 23,
     CheckConsistency: 24,
-    CustomEvent: 25
+    CustomEvent: 25,
+    BinaryCustomEvent: 26,
+    SetPlayerIdentity: 27
   };
 
   const CollisionFlags = {
@@ -198,107 +199,13 @@ function abcHaxballAPI(window, config){
     LibraryNotFoundError: 49,
     LibraryNameChangeNotAllowedError: 50,
     AuthFromKeyInvalidIdFormatError: 51,
-    LanguageAlreadyExistsError: 52,
-    CurrentLanguageRemovalError: 53,
-    LanguageDoesNotExistError: 54,
+    //LanguageAlreadyExistsError: 52,
+    //CurrentLanguageRemovalError: 53,
+    //LanguageDoesNotExistError: 54,
     BadActorError: 55,
-    AuthBannedError: 56
-  };
-
-  const RendererTextIndices = {
-    timeIsUp1: 0,
-    timeIsUp2: 1,
-    redIsVictorious1: 2, 
-    redIsVictorious2: 3,
-    redScores1: 4, 
-    redScores2: 5, 
-    blueIsVictorious1: 6, 
-    blueIsVictorious2: 7, 
-    blueScores1: 8, 
-    blueScores2: 9, 
-    gamePaused1: 10, 
-    gamePaused2: 11
-  };
-  
-  const EnglishErrorsTextMap = {
-    [ErrorCodes.Empty]: ()=>"",
-    [ErrorCodes.ConnectionClosed]: (reason)=>"Connection closed" + ((reason != null) ? " ("+reason+")" : ""),
-    [ErrorCodes.GameStateTimeout]: ()=>"Game state timeout",
-    [ErrorCodes.RoomClosed]: ()=>"The room was closed.",
-    [ErrorCodes.RoomFull]: ()=>"The room is full.",
-    [ErrorCodes.WrongPassword]: ()=>"Wrong password.",
-    [ErrorCodes.BannedBefore]: ()=>"You are banned from this room.",
-    [ErrorCodes.IncompatibleVersion]: ()=>"Incompatible game version.",
-    [ErrorCodes.FailedHost]: ()=>"Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues",
-    [ErrorCodes.Unknown]: ()=>"An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console.",
-    [ErrorCodes.Cancelled]: ()=>"Cancelled",
-    [ErrorCodes.FailedPeer]: ()=>"Failed to connect to peer.",
-    [ErrorCodes.KickedNow]: (reason, ban, byName)=>"You were " + (ban ? "banned" : "kicked") + (byName?.length > 0 ? (" by " + byName) : "") + (reason?.length > 0 ? (" ("+reason+")") : ""),
-    [ErrorCodes.Failed]: ()=>"Failed",
-    [ErrorCodes.MasterConnectionError]: ()=>"Master connection error",
-    [ErrorCodes.StadiumParseError]: (section, index)=>"Error in \"" + section + "\" index: " + index,
-    [ErrorCodes.StadiumParseSyntaxError]: (lineNumber)=>"SyntaxError in line: " + lineNumber,
-    [ErrorCodes.StadiumParseUnknownError]: ()=>"Error loading stadium file.",
-    [ErrorCodes.ObjectCastError]: (object, type)=>"Cannot cast " + K.ye(object) + " to " + K.ye(type),
-    [ErrorCodes.TeamColorsReadError]: ()=>"too many",
-    [ErrorCodes.UTF8CharacterDecodeError]: (offset, charCode)=>"Cannot decode UTF8 character at offset " + offset + ": charCode (" + charCode + ") is invalid",
-    [ErrorCodes.ReadTooMuchError]: ()=>"Read too much",
-    [ErrorCodes.ReadWrongStringLengthError]: (expectedLength)=>"Actual string length differs from the specified: " + expectedLength + " bytes",
-    [ErrorCodes.EncodeUTF8CharNegativeError]: (num)=>"Cannot encode UTF8 character: charCode (" + num + ") is negative",
-    [ErrorCodes.EncodeUTF8CharTooLargeError]: (num)=>"Cannot encode UTF8 character: charCode (" + num + ") is too large (>= 0x80000000)",
-    [ErrorCodes.CalculateLengthOfUTF8CharNegativeError]: (num)=>"Cannot calculate length of UTF8 character: charCode (" + num + ") is negative",
-    [ErrorCodes.CalculateLengthOfUTF8CharTooLargeError]: (num)=>"Cannot calculate length of UTF8 character: charCode (" + num + ") is too large (>= 0x80000000)",
-    [ErrorCodes.BufferResizeParameterTooSmallError]: ()=>"Can't resize buffer to a capacity lower than 1",
-    [ErrorCodes.BadColorError]: ()=>"Bad color",
-    [ErrorCodes.BadTeamError]: ()=>"Bad team value",
-    [ErrorCodes.StadiumLimitsExceededError]: ()=>"Error",
-    [ErrorCodes.MissingActionConfigError]: ()=>"Class doesn't have a config",
-    [ErrorCodes.UnregisteredActionError]: ()=>"Tried to pack unregistered action",
-    [ErrorCodes.MissingImplementationError]: ()=>"missing implementation",
-    [ErrorCodes.AnnouncementActionMessageTooLongError]: ()=>"message too long",
-    [ErrorCodes.ChatActionMessageTooLongError]: ()=>"message too long",
-    [ErrorCodes.KickBanReasonTooLongError]: ()=>"string too long",
-    [ErrorCodes.ChangeTeamColorsInvalidTeamIdError]: ()=>"Invalid team id",
-    [ErrorCodes.MissingRecaptchaCallbackError]: ()=>"Recaptcha requested. Either set onRequestRecaptcha or set a working token while creating/joining a room.",
-    [ErrorCodes.ReplayFileVersionMismatchError]: ()=>"The replay data is of a different version",
-    [ErrorCodes.ReplayFileReadError]: ()=>"Couldn't load replay data.",
-    [ErrorCodes.JoinRoomNullIdAuthError]: ()=>"id and authObj cannot be null. (inside 1st parameter)",
-    [ErrorCodes.PlayerNameTooLongError]: (conn, auth, name)=>"name too long",
-    [ErrorCodes.PlayerCountryTooLongError]: (conn, auth, name, flag)=>"country too long",
-    [ErrorCodes.PlayerAvatarTooLongError]: (conn, auth, name, flag, avatar)=>"avatar too long",
-    [ErrorCodes.PlayerJoinBlockedByMPDError]: (conn, auth, name, flag, avatar)=>"Player join not allowed: " + name + " " + flag + " " + avatar + " " + conn + " " + auth,
-    [ErrorCodes.PlayerJoinBlockedByORError]: (playerObj)=>"Player join event blocked by OperationReceived: " + playerObj,
-    [ErrorCodes.PluginNotFoundError]: (pluginIndex)=>"Plugin not found at index " + pluginIndex,
-    [ErrorCodes.PluginNameChangeNotAllowedError]: ()=>"Plugin name should not change",
-    [ErrorCodes.AuthFromKeyInvalidIdFormatError]: ()=>"Invalid id format",
-    [ErrorCodes.LanguageAlreadyExistsError]: (abbr)=>"Language already exists: " + abbr,
-    [ErrorCodes.CurrentLanguageRemovalError]: ()=>"Current language cannot be removed. Change to a different language first.",
-    [ErrorCodes.LanguageDoesNotExistError]: (abbr)=>"Language does not exist: " + abbr,
-    [ErrorCodes.BadActorError]: ()=>"Bad Actor",
-    [ErrorCodes.AuthBannedError]: (auth)=>"Auth banned: "+auth,
-  };
-
-  const EnglishConnectionStateTextMap = {
-    [ConnectionState.ConnectingToMaster]: "Connecting to master",
-    [ConnectionState.ConnectingToPeer]: "Connecting to peer",
-    [ConnectionState.AwaitingState]: "Awaiting state",
-    [ConnectionState.Active]: "Active",
-    [ConnectionState.ConnectionFailed]: "Connection Failed",
-  };
-
-  const EnglishRendererTextMap = {
-    [RendererTextIndices.timeIsUp1]: "Time is", 
-    [RendererTextIndices.timeIsUp2]: "Up!", 
-    [RendererTextIndices.redIsVictorious1]: "Red is", 
-    [RendererTextIndices.redIsVictorious2]: "Victorious!", 
-    [RendererTextIndices.redScores1]: "Red", 
-    [RendererTextIndices.redScores2]: "Scores!", 
-    [RendererTextIndices.blueIsVictorious1]: "Blue is", 
-    [RendererTextIndices.blueIsVictorious2]: "Victorious!", 
-    [RendererTextIndices.blueScores1]: "Blue", 
-    [RendererTextIndices.blueScores2]: "Scores!", 
-    [RendererTextIndices.gamePaused1]: "Game", 
-    [RendererTextIndices.gamePaused2]: "Paused" 
+    AuthBannedError: 56,
+    NoProxyIdentityProblem: 57,
+    NoProxyIdentitySolution: 58
   };
 
   // global functions to run nullable functions:
@@ -336,7 +243,6 @@ function abcHaxballAPI(window, config){
 
   /////////////////////////////////
 
-  const allLanguages = {};
   var currentLanguage = null, allRooms = []; // all current room objects have to be stored in this array so that they can receive the language changed signal directly from API.
 
   function removeRoomFromList(room){
@@ -348,71 +254,20 @@ function abcHaxballAPI(window, config){
     allRooms.splice(idx, 1);
   }
 
-  function LanguageData(){
-    this.errorsTextMap = null;
-    this.connectionStateTextMap = null;
-    this.rendererTextMap = null;
-  }
-
-  const Language = {
-    add: function(abbr, errorsTextMap, connectionStateTextMap, rendererTextMap){
-      abbr = (abbr || "").toUpperCase();
-      if (allLanguages[abbr]!=null)
-        throw createError(ErrorCodes.LanguageAlreadyExistsError, abbr); // "Language already exists: "+abbr
-      var langData = new LanguageData();
-      langData.errorsTextMap = errorsTextMap;
-      langData.connectionStateTextMap = connectionStateTextMap;
-      langData.rendererTextMap = rendererTextMap;
-      allLanguages[abbr] = langData;
-    },
-    remove: function(abbr){
-      abbr = (abbr || "").toUpperCase();
-      if (abbr==currentLanguageAbbr)
-        throw createError(ErrorCodes.CurrentLanguageRemovalError, abbr); // "Current language cannot be removed. Change to a different language first."
-      if (!allLanguages[abbr])
-        throw createError(ErrorCodes.LanguageDoesNotExistError, abbr); // "Language does not exist: "+abbr
-      delete allLanguages[abbr];
-    }
-  };
-
   Object.defineProperty(Language, "current", {
     get: function(){
-      return currentLanguageAbbr;
+      return currentLanguage;
     },
-    set: function(abbr){
-      abbr = (abbr || "").toUpperCase();
-      if (!Object.keys(allLanguages).includes(abbr))
-        throw createError(ErrorCodes.LanguageDoesNotExistError, abbr); // "Language does not exist: "+abbr
-      if (currentLanguageAbbr==abbr)
-        return;
-      currentLanguageAbbr = abbr;
-      currentLanguage = allLanguages[abbr];
+    set: function(langObj){
+      currentLanguage = langObj;
       allRooms.forEach((room)=>{
-        ia.i(room._onLanguageChange, abbr);
+        ia.i(room._onLanguageChange, langObj?.abbr);
       });
     }
   });
 
-  Object.defineProperty(Language, "currentData", {
-    get: function(){
-      return currentLanguage;
-    }
-  });
-
-  Object.defineProperty(Language, "indices", {
-    get: function(){
-      return {
-        ErrorCodes,
-        ConnectionState,
-        RendererTextIndices
-      };
-    }
-  });
-
-  Language.add("GB", EnglishErrorsTextMap, EnglishConnectionStateTextMap, EnglishRendererTextMap);
-  // one may add all languages here.
-
-  currentLanguage = allLanguages[currentLanguageAbbr];
+  var gls = (id, params)=>Language.resolveText(currentLanguage?.api?.errors?.[id], params||[]);
+  var clpip = (s)=>(console.warn(gls(ErrorCodes.NoProxyIdentityProblem)||"NoProxyIdentityProblem"), s = gls(ErrorCodes.NoProxyIdentitySolution), s && console.warn(s))
 
   function HBError(){
     this.code = ErrorCodes.Empty;
@@ -421,12 +276,7 @@ function abcHaxballAPI(window, config){
 
   HBError.prototype = {
     toString: function(){
-      var f = currentLanguage.errorsTextMap[this.code];
-      if (!f)
-        return null;
-      if (!this.params)
-        return f();
-      return f(...this.params);
+      return gls(this.code, this.params);
     }
   };
 
@@ -563,7 +413,7 @@ function abcHaxballAPI(window, config){
   nc.gf = function (a) {
     a = a.split(" ");
     if ("typ" != a[6]) throw new q(null);
-    return { Jr: a[7], Xo: a[4] };
+    return { Jr: a[7], Xo: a[4] }; // port: parseInt(a[5])
   };
   
   function dc() {
@@ -618,14 +468,13 @@ function abcHaxballAPI(window, config){
     this.ed = 16777215;
     this.fb = [];
   }
-  function p(a, b, c, d, e, f, g, k) {
+  function p(a, b, c, d, e, k) {
     this.pg = null;
     this.$ = a;
     this.R = b;
     this.Ch = c;
     this.cp = d;
     this.w = e;
-    this.io = f;
     this.v = k;
     this.wm = new ka();
     this.wm.fb.push(b);
@@ -750,6 +599,7 @@ function abcHaxballAPI(window, config){
     this.conn = null; // player conn
     this.auth = null; // player auth
     this.customClient = false; // is player using our client?
+    this.identity = null;
   }
   function Fa() {
     this.hc = -1;
@@ -808,8 +658,12 @@ function abcHaxballAPI(window, config){
   U.Qc = function (a, b) {
     return a.length <= b ? a : D.substr(a, 0, b);
   };
+  U.Ur = function (b) {
+    for (var a = "", l = 0; l < b.length; ) a += J.Wg(b.charAt(l++), b.charAt(l++));
+    return a;
+  };
   U.Zr = function (a) { // calculating hash for conn
-    for (var b = "", c = 0, d = a.byteLength; c < d; ) b += J.Vg(a[c++], 2);
+    for (var b = "", c = 0, d = a.byteLength; c < d; ) b += String.fromCharCode(a[c++]);
     return b;
   };
 
@@ -927,7 +781,7 @@ function abcHaxballAPI(window, config){
   };
   r.G = function (a, b) {
     if (r.pn(a, b)) return a;
-    throw new q(createError(ErrorCodes.ObjectCastError, a, b)); // "Cannot cast " + K.ye(a) + " to " + K.ye(b)
+    throw new q(createError(ErrorCodes.ObjectCastError, K.ye(a), K.ye(b))); // "Cannot cast " + a + " to " + b
   };
   r.wj = function (a) {
     a = r.sn.call(a).slice(8, -1);
@@ -983,9 +837,9 @@ function abcHaxballAPI(window, config){
 
   p.b = !0;
   p.prototype = { f: p };
-  p.spec = p.Ia = new p(0, 16777215, 0, -1, "Spectators", "t-spec", 0, 0);
-  p.red = p.fa = new p(1, 15035990, -1, 8, "Red", "t-red", 0, 2);
-  p.blue = p.xa = new p(2, 5671397, 1, 16, "Blue", "t-blue", 0, 4);
+  p.spec = p.Ia = new p(0, 16777215, 0, -1, "Spectators", 0);
+  p.red = p.fa = new p(1, 15035990, -1, 8, "Red", 2);
+  p.blue = p.xa = new p(2, 5671397, 1, 16, "Blue", 4);
   p.Ia.pg = p.Ia;
   p.fa.pg = p.xa;
   p.xa.pg = p.fa;
@@ -1731,7 +1585,6 @@ function abcHaxballAPI(window, config){
   n.Vr = (config.backend.secure?"wss":"ws")+"://"+config.backend.hostnameWs+"/";
   n.Ee = (config.proxy?.HttpUrl ? config.proxy.HttpUrl : ((config.backend.secure?"https":"http")+"://"+config.backend.hostname+"/rs/"));
   n.Vf = [{ urls: "stun:stun.l.google.com:19302" }];
-  //n.A = new Yb();
 
   F.b = !0;
   F.jo = function (a, b) {
@@ -1783,20 +1636,13 @@ function abcHaxballAPI(window, config){
           (k & 63)),
         (b += 6);
     else
-      throw new q(createError(ErrorCodes.UTF8CharacterDecodeError, b, c));
-      /*throw new q(
-        "Cannot decode UTF8 character at offset " +
-          b +
-          ": charCode (" +
-          c +
-          ") is invalid"
-      );*/
+      throw new q(createError(ErrorCodes.UTF8CharacterDecodeError, b, c)); // "Cannot decode UTF8 character at offset " + b + ": charCode (" + c + ") is invalid"
     return { char: c, length: b - l };
   };
   F.prototype = {
     sb: function (a) {
       null == a && (a = this.o.byteLength - this.a);
-      if (this.a + a > this.o.byteLength) throw new q(createError(ReadTooMuchError)); // "Read too much"
+      if (this.a + a > this.o.byteLength) throw new q(createError(ErrorCodes.ReadTooMuchError)); // "Read too much"
       var b = new Uint8Array(this.o.buffer, this.o.byteOffset + this.a, a);
       this.a += a;
       return b;
@@ -1864,14 +1710,7 @@ function abcHaxballAPI(window, config){
           (b += c.length),
           (d += String.fromCodePoint(c["char"]));
       if (b != a)
-        throw new q(createError(ErrorCodes.ReadWrongStringLengthError, (b - a)));
-        /*
-        throw new q(
-          "Actual string length differs from the specified: " +
-            (b - a) +
-            " bytes"
-        );
-        */
+        throw new q(createError(ErrorCodes.ReadWrongStringLengthError, (b - a))); // "Actual string length differs from the specified: " + (b - a) +" bytes"
       this.a = b;
       return d;
     },
@@ -1901,9 +1740,7 @@ function abcHaxballAPI(window, config){
   w.uo = function (a, b, c) {
     var d = c;
     if (0 > a)
-      throw new q(
-        createError(ErrorCodes.EncodeUTF8CharNegativeError, a) // "Cannot encode UTF8 character: charCode (" + a + ") is negative"
-      );
+      throw new q(createError(ErrorCodes.EncodeUTF8CharNegativeError, a)); // "Cannot encode UTF8 character: charCode (" + a + ") is negative"
     if (128 > a) b.setUint8(c, a & 127), ++c;
     else if (2048 > a)
       b.setUint8(c, ((a >> 6) & 31) | 192),
@@ -2137,6 +1974,10 @@ function abcHaxballAPI(window, config){
     if (null != b) for (; c.length < b; ) c = "0" + c;
     return c;
   };
+  J.Wg = function (a, b) {
+    const t = "0123456789ABCDEF";
+  	return String.fromCharCode((t.indexOf(a)<<4)|(t.indexOf(b)));
+  };
 
   Fb.b = !0;
   Fb.prototype = {
@@ -2168,7 +2009,7 @@ function abcHaxballAPI(window, config){
       this.Xe = a.B();
       this.I = a.B();
       a.Sa = !1;
-      if (30 < this.I || 30 < this.Xe) throw new q(null);
+      //if (30 < this.I || 30 < this.Xe) throw new q(null);
       this.Pj();
     },
     f: Fb,
@@ -5493,6 +5334,95 @@ function abcHaxballAPI(window, config){
     }
   });
   
+  function BinaryCustomEvent() {
+    this.da = 0;
+    this.type = 0;
+    this.data = null;
+    this.P = 0;
+  }
+  BinaryCustomEvent.la = function(type, data){
+    var msg = new BinaryCustomEvent();
+    msg.type = type;
+    msg.data = data;
+    return msg;
+  }
+  BinaryCustomEvent.b = true;
+  BinaryCustomEvent.ma = m;
+  BinaryCustomEvent.prototype = C(m.prototype, {
+    apply: function (a) {
+      var b = a.na(this.P);
+      null != b && a._BCE_ && a._BCE_(this.type, this.data, this.P);
+    },
+    ua: function (a) {
+      var b = w.ha();
+      b.tb(this.type);
+      b.Vb(this.data);
+      b = pako.deflateRaw(b.Sb());
+      a.tb(b.byteLength);
+      a.Vb(b);
+    },
+    va: function (a) {
+      a = pako.inflateRaw(a.sb(a.hb()));
+      var b = new F(new DataView(a.buffer, a.byteOffset, a.byteLength));
+      this.type = b.hb();
+      this.data = b.sb();
+    },
+    copy: function () {
+      var a = new Uint8Array();
+      a.set(this.data);
+      return mCopy(BinaryCustomEvent.la(this.type, a), this);
+    },
+    f: BinaryCustomEvent,
+  });
+  Object.defineProperty(BinaryCustomEvent.prototype, "eventType", {
+    get(){
+      return OperationType.BinaryCustomEvent;
+    }
+  });
+  
+  function IdentityEvent() {
+    this.da = 0;
+    this.id = 0;
+    this.data = null;
+    this.P = 0;
+  }
+  IdentityEvent.la = function(id, data){
+    var msg = new IdentityEvent();
+    msg.id = id;
+    msg.data = data;
+    return msg;
+  }
+  IdentityEvent.b = true;
+  IdentityEvent.ma = m;
+  IdentityEvent.prototype = C(m.prototype, {
+    apply: function (a) {
+      if (0 != this.P)
+        return;
+      b = a.na(this.id);
+      null != b && a._IE_ && (
+        b.identity = this.data,
+        a._IE_(this.id, this.data, this.P)
+      );
+    },
+    ua: function (a) {
+      a.tb(this.id);
+      a.mc(JSON.stringify(this.data));
+    },
+    va: function (a) {
+      this.id = a.hb();
+      this.data = JSON.parse(a.ic());
+    },
+    copy: function () {
+      return mCopy(IdentityEvent.la(this.id, JSON.parse(JSON.stringify(this.data))), this);
+    },
+    f: IdentityEvent,
+  });
+  Object.defineProperty(IdentityEvent.prototype, "eventType", {
+    get(){
+      return OperationType.SetPlayerIdentity;
+    }
+  });
+
   function Y() {
     this.da = 0;
     this.V = 0;
@@ -5918,6 +5848,8 @@ function abcHaxballAPI(window, config){
   La.za = m.Fa({ Ba: !1, Aa: !1 });
   la.za = m.Fa({ Ba: !1, Aa: !1 });
   CustomEvent.za = m.Fa({ Ba: !1, Aa: !1 });
+  BinaryCustomEvent.za = m.Fa({ Ba: !1, Aa: !1 });
+  IdentityEvent.za = m.Fa({ Ba: !1, Aa: !1 });
 
   m.Ha(rb);
   m.Ha(na);
@@ -5944,6 +5876,8 @@ function abcHaxballAPI(window, config){
   m.Ha(qb);
   m.Ha(ob);
   m.Ha(CustomEvent);
+  m.Ha(BinaryCustomEvent);
+  m.Ha(IdentityEvent);
 
   function ub(a, b) {
     this.ya = a;
@@ -6420,7 +6354,6 @@ function abcHaxballAPI(window, config){
   };
   
   function Nb(a) {
-    this.gd = null;
     this.Eq = 1e4;
     this.wd = !0;
     var b = this;
@@ -6503,9 +6436,14 @@ function abcHaxballAPI(window, config){
     },
   };
   
-  function wb(a, b, c, d, e, f, proxyAgent) {
+  function wb(a, b, c, d, e, f, proxyAgent, identityToken) {
     this.rh = this.yh = !1;
     this.proxyAgent = proxyAgent;
+    this.identityToken = identityToken;
+    if (!config.proxy && identityToken){
+      clpip();
+      identityToken = null;
+    }
     var g = this;
     this.pa = new Va(0, b, d);
     this.pa.bd = function () {
@@ -6520,6 +6458,7 @@ function abcHaxballAPI(window, config){
       g.jr = b;
       config.proxy?.WebSocketUrl && (a = config.proxy.WebSocketUrl);
       (!a.endsWith("client")) && (((!a.endsWith("/")) && (a += "/")), a += "client");
+      var protocols = identityToken ? [identityToken] : [];
       if (g.proxyAgent || config.proxy?.WebSocketChangeOriginAllowed){ // custom environment
         var propsObj = {};
         if (g.proxyAgent)
@@ -6528,10 +6467,10 @@ function abcHaxballAPI(window, config){
           propsObj.headers = {
             Origin: (config.backend.secure?"https":"http")+"://"+config.backend.hostname
           };
-        g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f), propsObj);
+        g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f), protocols, propsObj);
       }
       else // browser
-        g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f));
+        g.X = new WebSocket(a + "?id=" + c + (null == f ? "" : "&token=" + f), protocols);
       g.X.binaryType = "arraybuffer";
       g.X.onclose = function (a) {
         g.yh || g.Oe(Ob.lh(a.code));
@@ -6663,7 +6602,7 @@ function abcHaxballAPI(window, config){
         var f = w.ha();
         f.Ub(b.version);
         f.Db(b.password);
-        c.pc = new wb(b.ij, b.iceServers, a, Zb.Km, f, b.gn, c.haxball.proxyAgent || config.proxyAgent);
+        c.pc = new wb(b.ij, b.iceServers, a, Zb.Km, f, b.gn, c.haxball.proxyAgent || config.proxyAgent, c.haxball.identityToken || config.identityToken);
         c.pc.rh = e;
         c.pc.zd = function (a) {
           c.pc = null;
@@ -6939,11 +6878,202 @@ function abcHaxballAPI(window, config){
     f: xa,
   });
   
+  const BanEntryType = {
+    Player: 0,
+    IP: 1,
+    Auth: 2
+  };
+
+  function BanList(objLb){
+    function IPBanEntry(){
+      this.ipv6 = false;
+      this.value = null;
+      this.mask = null;
+    }
+    IPBanEntry.create = function(value, mask){
+      if (value==null)
+        return;
+      const entry = new IPBanEntry(), cn = value.__proto__.constructor.name;
+      entry.ipv6 = (cn=="BigInt");
+      entry.value = value;
+      entry.mask = (cn!=mask?.__proto__.constructor.name) ? (entry.ipv6 ? 340282366920938463463374607431768211455n : -1) : mask;
+      return entry;
+    };
+    var list = [], n = 1, authSet = new Set(), ipEntries = [];
+    this.addPlayer = (playerObj)=>{
+      var e = objLb.Ie.get(playerObj?.V)?.pa;
+      if (!e || list.findIndex((x)=>x.type==BanEntryType.Player && x.value.pId==playerObj.V)>-1)
+        return;
+      var ips = [];
+      if (e.gd)
+        ips.push(U.Ur(e.gd));
+      e.oe.forEach((ip)=>{
+        if (!ips.includes(ip))
+          ips.push(ip);
+      });
+      ips.forEach((ip)=>{
+        var num = ipToNumber(ip);
+        if (!num)
+          return;
+        ipEntries.push(IPBanEntry.create(num));
+      });
+      authSet.add(playerObj.auth);
+      list.push({
+        id: n,
+        type: BanEntryType.Player,
+        value: {
+          pId: playerObj.V,
+          pName: playerObj.w,
+          ips: ips,
+          auth: playerObj.auth
+        }
+      });
+      return n++;
+    };
+    this.addIp = (...eList)=>{
+      return eList.map((e)=>{
+        var t = typeof e;
+        if (t=="string")
+          e = {
+            ip: e
+          };
+        else if (t!="object")
+          return;
+        var n1 = ipToNumber(e.ip);
+        if (n1==null)
+          return;
+        const ipv6 = n1.__proto__.constructor.name=="BigInt";
+        var n2 = ipToNumber(e.mask);
+        if (n1.__proto__.constructor.name!=n2?.__proto__.constructor.name){
+          n2 = ipv6 ? 340282366920938463463374607431768211455n : -1;
+          e.mask = numberToIp(n2);
+        }
+        for (var i=0;i<list.length;i++){
+          const x = list[i];
+          if (x.type==BanEntryType.IP && n1==ipToNumber(x.value.ip) && n2==ipToNumber(x.value.mask))
+            return;
+        }
+        ipEntries.push(IPBanEntry.create(n1, n2));
+        list.push({
+          id: n,
+          type: BanEntryType.IP,
+          value: e
+        });
+        return n++;
+      });
+    };
+    this.addAuth = (...eList)=>{
+      return eList.map((e)=>{
+        if (authSet.has(e))
+          return;
+        list.push({
+          id: n,
+          type: BanEntryType.Auth,
+          value: e
+        });
+        authSet.add(e);
+        return n++;
+      });
+    };
+    this.checkIp = (ip)=>{
+      const num = ipToNumber(ip);
+      if (num==null)
+        return false;
+      const ipv6 = num.__proto__.constructor.name=="BigInt";
+      for (var i=0;i<ipEntries.length;i++){
+        const x = ipEntries[i];
+        if (ipv6==x.ipv6 && compareBits(num, x.value, x.mask))
+          return true;
+      }
+      return false;
+    };
+    this.checkAuth = (auth)=>{
+      return authSet.has(auth);
+    };
+    const removeIp = (ip, mask)=>{
+      const n1 = ipToNumber(ip);
+      if (n1==null)
+        return;
+      const ipv6 = n1.__proto__.constructor.name=="BigInt";
+      var n2 = ipToNumber(mask);
+      if (n2==null)
+        n2 = ipv6 ? 340282366920938463463374607431768211455n : -1;
+      const isDefaultMask = (n2==(ipv6 ? 340282366920938463463374607431768211455n : -1));
+      var idx = [];
+      for (var i=0;i<ipEntries.length;i++){
+        const x = ipEntries[i];
+        if (ipv6==x.ipv6 && n1==x.value && n2==x.mask)
+          idx.push(i);
+      }
+      while(idx.length>0)
+        ipEntries.splice(idx.pop(), 1);
+      idx.length = 0;
+      list.forEach((x, i)=>{
+        if (isDefaultMask && x.type==BanEntryType.Player && x.value.ips.findIndex((ip)=>ipToNumber(ip)==n1)>-1){
+          x.type = BanEntryType.Auth;
+          x.value = x.value.auth;
+        }
+        else if (x.type==BanEntryType.IP && n1==ipToNumber(x.value.ip) && n2==ipToNumber(x.value.mask))
+          idx.push(i);
+      });
+      while(idx.length>0)
+        list.splice(idx.pop(), 1);
+    };
+    const removeAuth = (auth)=>{
+      authSet.delete(auth);
+      var idx = [], ips = [];
+      list.forEach((x, i)=>{
+        if (x.type==BanEntryType.Player && auth==x.value.auth){
+          ips.splice(ips.length, 0, ...x.value.ips);
+          idx.push(i);
+        }
+        else if (x.type==BanEntryType.Auth && auth==x.value)
+          idx.push(i);
+      });
+      while(idx.length>0)
+        list.splice(idx.pop(), 1);
+      this.addIp(...ips);
+    };
+    this.remove = (id)=>{
+      var idx = list.findIndex((x)=>x.id==id);
+      if (idx<0)
+        return false;
+      var {type, value} = list.splice(idx, 1)[0];
+      switch(type){
+        case BanEntryType.Player:
+          value.ips.forEach((ip)=>{removeIp(ip);});
+          removeAuth(value.auth);
+          break;
+        case BanEntryType.IP:
+          removeIp(value.ip, value.mask);
+          break;
+        case BanEntryType.Auth:
+          removeAuth(value);
+          break;
+      }
+      return true;
+    };
+    this.removePlayer = (playerId)=>{
+      var idx = list.findIndex((x)=>(x.type==0 && x.value?.pId==playerId));
+      if (idx<0)
+        return false;
+      var {value} = list.splice(idx, 1)[0];
+      value.ips.forEach((ip)=>{removeIp(ip);});
+      removeAuth(value.auth);
+      return true;
+    };
+    this.clear = ()=>{
+      authSet.clear();
+      ipEntries.length = 0;
+      list.length = 0;
+    };
+    this.getList = ()=>{
+      return JSON.parse(JSON.stringify(list));
+    };
+  }
+
   function Sa(haxball, a, b, c, d) {
     this.haxball = haxball;
-    this.th = new Set();
-    this.If = new Set();
-    this.xx = new Set();
     this.Ag = this.nf = this.dm = !1;
     this.Mc = null;
     this.$ = "";
@@ -7054,6 +7184,12 @@ function abcHaxballAPI(window, config){
         if (null == a) throw new q(null);
         config.proxy?.WebSocketUrl && (b = config.proxy?.WebSocketUrl);
         (!b.endsWith("host")) && (((!b.endsWith("/")) && (b += "/")), b += "host");
+        var tkn = d.haxball.identityToken || config.identityToken;
+        if (!config.proxy && tkn){
+          clpip();
+          tkn = null;
+        }
+        var protocols = tkn ? [tkn] : [];
         if (d.haxball.proxyAgent || config.proxyAgent || config.proxy?.WebSocketChangeOriginAllowed){ // custom environment
           var propsObj = {};
           if (d.haxball.proxyAgent || config.proxyAgent)
@@ -7062,10 +7198,10 @@ function abcHaxballAPI(window, config){
             propsObj.headers = {
               Origin: (config.backend.secure?"https":"http")+"://"+config.backend.hostname
             };
-          d.X = new WebSocket(b + "?token=" + a, propsObj);
+          d.X = new WebSocket(b + "?token=" + a, protocols, propsObj);
         }
         else // browser
-          d.X = new WebSocket(b + "?token=" + a);
+          d.X = new WebSocket(b + "?token=" + a, protocols);
         d.X.binaryType = "arraybuffer";
         d.X.onopen = function () {
           d.So();
@@ -7122,7 +7258,20 @@ function abcHaxballAPI(window, config){
           break;
         case 6:
           this.Qo(a);
+          break;
+        case 111:
+          this.Zo(a);
+          break;
       }
+    },
+    Zo: function(a, b) {
+      setTimeout(()=>{
+        try {
+          this.haxball.room?.setPlayerIdentity?.(a.hb(), a.wg());
+        } catch (t) {
+          b && this.sf(b, 4111);
+        }
+      }, 3000);
     },
     Oh: function (a) {
       var b = a.hb(),
@@ -7146,12 +7295,12 @@ function abcHaxballAPI(window, config){
     Ro: function (a, b, c, d, e, f) {
       var g = this;
       if (16 <= this.od.size) this.sf(a, 4104);
-      else if (this.th.has(b)) this.sf(a, 4102);
+      else if (this.banList.checkIp(b)) this.sf(a, 4102);
       else {
         for (var k = [], l = 0; l < d.length; ) {
           var t = Sa.vk(d[l++]);
           if (null != t) {
-            if (this.If.has(t)) {
+            if (this.banList.checkIp(t)) {
               this.sf(a, 4102);
               return;
             }
@@ -7160,7 +7309,7 @@ function abcHaxballAPI(window, config){
         }
         if (
           null != this.Vj &&
-          ((l = new F(e.o)), (l.a = e.a), (e = this.Vj(b, l)), 1 == e.nb)
+          ((l = new F(e.o)), (l.a = e.a), (e = this.Vj(l)), 1 == e.nb)
         ) {
           this.sf(a, e.reason);
           return;
@@ -7168,7 +7317,8 @@ function abcHaxballAPI(window, config){
         var h = new Va(a, this.Vf, this.In);
         f && (h.ak = 2500);
         h.oe = k;
-        h.gd = b;
+        h.gd = "";
+        for (l=0;l<b.length;l++) h.gd += J.Vg(b.charCodeAt(l));
         this.od.set(a, h);
         h.bd = function () {
           g.Nc(0, h, null);
@@ -7207,7 +7357,7 @@ function abcHaxballAPI(window, config){
       var c = this.od.get(a);
       if (null != c) {
         var d = Sa.vk(b);
-        if (null != d && (c.oe.push(d), this.If.has(d))) return;
+        if (null != d && (c.oe.push(d), this.banList.checkIp(d))) return;
         c.yj(b);
       }
     },
@@ -7288,23 +7438,6 @@ function abcHaxballAPI(window, config){
         (this.Ul = setTimeout(function () {
           b.Ji();
         }, (this.Zq + Math.random() * this.$q) | 0));
-    },
-    zn: function (a, p) {
-      for (var b = 0, c = a.oe; b < c.length; ) this.If.add(c[b++]);
-      null != a.gd && this.th.add(a.gd);
-      this.xx.add(p.auth);
-      return { Rs: a.oe, Ps: a.gd, w: p.w, a: p.auth };
-    },
-    Ud: function () {
-      this.If.clear();
-      this.th.clear();
-      this.xx.clear();
-    },
-    td: function(a) {
-      for (var b = 0, c = a.Rs; b < c.length; )
-        this.If["delete"](c[b++]);
-      this.th["delete"](a.Ps);
-      this.xx["delete"](a.a);
     },
     f: Sa,
   };
@@ -7460,7 +7593,6 @@ function abcHaxballAPI(window, config){
   
   function Lb(haxball, a) {
     this.haxball = haxball;
-    this.Kj = new Map();
     this.Ib = null;
     this.fg = 32;
     this.Ie = new Map();
@@ -7475,8 +7607,12 @@ function abcHaxballAPI(window, config){
     this.Jk = 0; // Quantized frame no
     this.uc = 0;
     this.upc = false;
+    this.Ks = true;
+    this.cpc = null;
+    this.fPwd = null;
     this.Li = performance.now();
     this.Ic = new Sa(haxball, this.tp, a.iceServers, Zb.Km, a.gn);
+    this.Ic.banList = new BanList(this);
     this.Ic.Vj = G(this, this.Oo);
     this.Ic.bl = function (a) {
       b.Lp(a);
@@ -7501,7 +7637,7 @@ function abcHaxballAPI(window, config){
       var e = this.Ie.get(a.V);
       if (null != e) {
         if (d)
-          this.Kj.set(a.V, this.Ic.zn(e.pa, a));
+          this.Ic.banList.addPlayer(a);
         a = w.ha();
         a.l(5);
         a.l(d ? 1 : 0);
@@ -7513,15 +7649,24 @@ function abcHaxballAPI(window, config){
       }
     },
     Ud: function () {
-      this.Ic.Ud();
-      this.Kj.clear();
-      A.i(this.haxball.room._onBansClear);
+      if (this.Ic.banList.clear())
+        A.i(this.haxball.room._onBansClear);
     },
     td: function(a) {
-      var b = this.Kj.get(a);
-      null != b && this.Ic.td(b);
-      this.Kj["delete"](a);
-      y.i(this.haxball.room._onBanClear, a);
+      if (this.Ic.banList.removePlayer(a))
+        y.i(this.haxball.room._onBanClear, a);
+    },
+    xd1: function(playerObject) {
+      return this.Ic.banList.addPlayer(playerObject);
+    },
+    xd2: function(...values) {
+      return this.Ic.banList.addIp(...values);
+    },
+    xd3: function(...values) {
+      return this.Ic.banList.addAuth(...values);
+    },
+    xd4: function(id) {
+      return this.Ic.banList.remove(id);
     },
     Fi: function (a) {
       this.Ic.Fi(a);
@@ -7538,7 +7683,12 @@ function abcHaxballAPI(window, config){
       this.Ci();
       0 < this.ac.length && this.Eg(this.Zh(a), 1);
     },
-    ra_custom: function (a, senderId, onlyCustom) { // custom events will only be sent to custom clients.
+    /*
+    // backup, just in case. the current code will probably break whenever we try to trigger 
+    // a physical event like setting a disc's properties within any custom event handler.
+    // Cg(a) or a.apply(this.T) might be called directly outside all if's, but the checking 
+    // of the number of connected clients (this.ac.length) seemingly prevents it.
+    ra_custom: function (a, senderId, onlyCustom) {
       a.P = senderId;
       var b;
       0 < this.ac.length && ( 
@@ -7546,6 +7696,24 @@ function abcHaxballAPI(window, config){
           a.apply(this.T),
           this.Eg_custom(a, 1)
         ) : (
+          b = this.Y + this.wi + this.bc,
+          a.zf.Aa || (b = this.Y),
+          a.mb = b,
+          this.Cg(a),
+          this.Ci(),
+          this.Eg(this.Zh(a), 1)
+        )
+      );
+    },
+    */
+    ra_custom: function (a, senderId, onlyCustom) { // custom events will only be sent to custom clients.
+      a.P = senderId;
+      var b; // a.apply(this.T) may be here, out of condition.
+      onlyCustom ? (
+        a.apply(this.T), // risky move
+        this.Eg_custom(a, 1)
+      ) : (
+        (0 < this.ac.length) && (
           b = this.Y + this.wi + this.bc,
           a.zf.Aa || (b = this.Y),
           a.mb = b,
@@ -7579,7 +7747,7 @@ function abcHaxballAPI(window, config){
       (this.bc < 0) && (this.bc = 0);
       return this.wk((performance.now() - this.Li) * this.Ac - this.Y + this.wi + this.bc + this.rd);
     },
-    Oo: function (a, b) {
+    Oo: function (b) {
       if (!this.upc && this.ac.length >= this.fg) return gc.kh(4100);
       try {
         if (b.Ob() != this.Sr) throw new q(null);
@@ -7658,7 +7826,7 @@ function abcHaxballAPI(window, config){
         e.yg && this.haxball.__internalData.customClientIds.has(e.$) && e.Rb(f, 0);
       }
     },
-    hr: function (a) {
+    hr: function (a) { // sends an info packet regarding current room status to backend
       var b = w.ha();
       b.l(1);
       var c = w.ha();
@@ -7671,6 +7839,13 @@ function abcHaxballAPI(window, config){
         this.il(d[e++], c);
       b.Vb(pako.deflateRaw(c.Sb()));
       a.Rb(b);
+    },
+    _r: function (a) {
+      setTimeout(()=>{
+        this.T.I.forEach((x)=>{
+          x.identity && this.haxball.room?.setPlayerIdentity(x.V, x.identity, a.$);
+        });
+      }, 3000);
     },
     gr: function () {
       this.Jk = this.Y;
@@ -7694,7 +7869,7 @@ function abcHaxballAPI(window, config){
         })
         .then(function (a) {
           try {
-            if (c.Ic.xx.has(a)){
+            if (c.Ic.banList.checkAuth(a)){
               //c.Ic.sf(c.up, 4102);
               throw new q(createError(ErrorCodes.AuthBannedError, a));
             }
@@ -7712,6 +7887,7 @@ function abcHaxballAPI(window, config){
               );
               b.yg = !0;
               c.hr(b);
+              c._r(b);
             }
           } catch (l) {
             c.xk(b, l instanceof q ? l.Ta : l);
@@ -7743,7 +7919,7 @@ function abcHaxballAPI(window, config){
     },
     xk: function (a, b) {
       ia.i(this.haxball.onHostError, b, a.$);
-      //window.console.log(b);
+      //console.log(b);
       this.Ie["delete"](a.$);
       D.remove(this.ac, a);
       a.yg && null != this.$k && this.$k(a.$);
@@ -7769,18 +7945,18 @@ function abcHaxballAPI(window, config){
         if (!g.Cm()) throw new q(3);
       }
       e.P = b.$;
-      if (!this.haxball.__internalData.onOperationReceived(e, this.Y, c))
-        return;
-      if (e.__proto__.f==CustomEvent){
-        this.haxball.__internalData.roomObj?.ya.ra_custom(e, e.P, true);
-        return;
-      }
-      else if (e.__proto__.f==qa && e.Pd.F.length==0)
-        return;
       f = this.Y;
       g = this.Y + 120;
       e.ue = d;
       e.mb = c < f ? f : c > g ? g : c;
+      if (e.__proto__.f==qa && e.Pd.F.length==0)
+        return;
+      else if (!this.haxball.__internalData.onOperationReceived(e, this.Y, c))
+        return;
+      if (e.__proto__.f==CustomEvent || e.__proto__.f==BinaryCustomEvent || e.__proto__.f==IdentityEvent){
+        this.haxball.__internalData.roomObj?.ya.ra_custom(e, e.P, true);
+        return;
+      }
       e.$m(this.T) && (this.Cg(e), this.Eg(this.Zh(e), 1));
     },
     f: Lb,
@@ -7900,12 +8076,12 @@ function abcHaxballAPI(window, config){
       if (haxball.__internalData.isHost){
         if (z==1){
           x.customClient = true;
-          haxball.__internalData.customClientIds.add(b.V);
+          haxball.__internalData.customClientIds.add(x.V);
         }
       }
       else if (z==0){
         x.customClient = true;
-        haxball.__internalData.customClientIds.add(b.V);
+        haxball.__internalData.customClientIds.add(x.V);
         x = a.T.na(y);
         if (x)
           x.customClient = true;
@@ -7915,6 +8091,12 @@ function abcHaxballAPI(window, config){
     };
     a.T._CE_ = (a, b, c)=>{
       Cb.i(haxball.room._onCustomEvent, a, b, c); // type, data, byUser
+    };
+    a.T._BCE_ = (a, b, c)=>{
+      Cb.i(haxball.room._onBinaryCustomEvent, a, b, c); // type, data, byUser
+    };
+    a.T._IE_ = (a, b, c)=>{
+      Cb.i(haxball.room._onIdentityEvent, a, b, c); // id, data, byUser
     };
     a.T._SDP_ = (a, b, c, d)=>{
       vb.i(haxball.room._onSetDiscProperties, a, b, c, d); // id, type, data1, data2
@@ -7971,6 +8153,7 @@ function abcHaxballAPI(window, config){
         vb.i(b.Np, d, e, null != g ? g.w : null, f)
       );
       vb.i(haxball.room._onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
+      haxball.__internalData.customClientIds.delete(d.V);
     };
     a.T.wl = function(a, b){
       ia.i(haxball.room._onPlayerChatIndicatorChange, a?.V, !b); // id, value
@@ -8060,9 +8243,13 @@ function abcHaxballAPI(window, config){
       ((b = function () {
         return c.splice((Math.random() * c.length) | 0, 1)[0];
       }),
-      e == d
-        ? 2 > f || (msg = S.la(b(), p.fa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)), msg = S.la(b(), p.xa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)))
-        : ((d = e > d ? p.fa : p.xa), msg = S.la(b(), d), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg))));
+      ((f == 1) ? (
+        msg = S.la(b(), Math.random()<0.5?p.fa:p.xa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg))
+      ) : (
+        (e == d)
+          ? (msg = S.la(b(), p.fa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)), msg = S.la(b(), p.xa), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)))
+          : ((d = e > d ? p.fa : p.xa), msg = S.la(b(), d), (haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg)))
+      )));
   };
   ba.prototype = {
     zr: function () {
@@ -8332,6 +8519,8 @@ function abcHaxballAPI(window, config){
       ya.T._TCC_ = null;
       ya.T._TLC2_ = null;
       ya.T._CE_ = null;
+      ya.T._BCE_ = null;
+      ya.T._IE_ = null;
       ya.T._SDP_ = null;
       ya.T._PD_ = null;
       ya.T._HC_ = null;
@@ -8423,6 +8612,12 @@ function abcHaxballAPI(window, config){
       };
       ya.T._CE_ = (a, b, c)=>{
         Cb.i(callbacks.onCustomEvent, a, b, c); // type, data, byUser
+      };
+      ya.T._BCE_ = (a, b, c)=>{
+        Cb.i(callbacks.onBinaryCustomEvent, a, b, c); // type, data, byUser
+      };
+      ya.T._IE_ = (a, b, c)=>{
+        Cb.i(callbacks.onIdentityEvent, a, b, c); // id, data, byUser
       };
       ya.T._SDP_ = (a, b, c, d)=>{
         vb.i(callbacks.onSetDiscProperties, a, b, c, d); // id, type, data1, data2
@@ -8627,6 +8822,12 @@ function abcHaxballAPI(window, config){
       ya.T._CE_ = (a, b, c)=>{
         Cb.i(callbacks.onCustomEvent, a, b, c); // type, data, byUser
       };
+      ya.T._BCE_ = (a, b, c)=>{
+        Cb.i(callbacks.onBinaryCustomEvent, a, b, c); // type, data, byUser
+      };
+      ya.T._IE_ = (a, b, c)=>{
+        Cb.i(callbacks.onIdentityEvent, a, b, c); // id, data, byUser
+      };
       ya.T._SDP_ = (a, b, c, d)=>{
         vb.i(callbacks.onSetDiscProperties, a, b, c, d); // id, type, data1, data2
       };
@@ -8700,6 +8901,8 @@ function abcHaxballAPI(window, config){
       ya.T._TCC_ = null;
       ya.T._TLC2_ = null;
       ya.T._CE_ = null;
+      ya.T._BCE_ = null;
+      ya.T._IE_ = null;
       ya.T._SDP_ = null;
       ya.T._PD_ = null;
       ya.T._HC_ = null;
@@ -8884,6 +9087,16 @@ function abcHaxballAPI(window, config){
       },
       sendCustomEvent: function(type, data, byId){
         var b = CustomEvent.la(type, data);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      sendBinaryCustomEvent: function(type, data, byId){
+        var b = BinaryCustomEvent.la(type, data);
+        b.P = byId;
+        room.receiveEvent(b);
+      },
+      setPlayerIdentity: function(id, data, byId){
+        var b = IdentityEvent.la(id, data);
         b.P = byId;
         room.receiveEvent(b);
       },
@@ -9190,7 +9403,7 @@ function abcHaxballAPI(window, config){
           return;
         msg.P = fakeId || 0;
         msg._TP = targetId; // this can not be modified
-        return internalData.onOperationReceived(msg, internalData.roomObj.ya.Y, null);
+        return internalData.onOperationReceived(msg, internalData.roomObj?.ya.Y, null);
       }
     };
     haxball.__internalData = internalData;
@@ -9246,12 +9459,12 @@ function abcHaxballAPI(window, config){
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
       //haxball.emit("roomJoin", haxball.room);
       y.i(haxball.onSuccess, haxball.room);
-      var poc = haxball.room._onPlayerObjectCreated;
+      var poc = haxball.room?._onPlayerObjectCreated;
       if (poc)
-        internalData.roomObj.ya.T.I.forEach(poc);
-      var pdc = haxball.room._onPlayerDiscCreated;
+        internalData.roomObj?.ya.T.I.forEach(poc);
+      var pdc = haxball.room?._onPlayerDiscCreated;
       if (pdc)
-        internalData.roomObj.ya.T.I.filter((x)=>(x.H!=null)).forEach(pdc);
+        internalData.roomObj?.ya.T.I.filter((x)=>(x.H!=null)).forEach(pdc);
     };
     haxball._onConnectionStateChange = function(state, param){
       console.log("internal event: ConnectionStateChange");
@@ -9390,9 +9603,7 @@ function abcHaxballAPI(window, config){
     haxball.config = haxball.config || {};
     haxball.libraries = haxball.libraries || [];
     fixStorage(haxball);
-    var {name, password, token, noPlayer, geo, playerCount, maxPlayerCount, unlimitedPlayerCount, fakePassword, showInRoomList, onError} = roomParams;
-    haxball.onHostError = onError;
-    (password == "") && (password = null);
+    haxball.onHostError = roomParams.onError;
     (haxball.version == null) && (haxball.version = defaultVersion);
     var internalData = createInternalData(haxball);
     var fLeaveRoom = function(){
@@ -9434,43 +9645,26 @@ function abcHaxballAPI(window, config){
       y.i(haxball.onSuccess, haxball.room);
       var poc = haxball.room._onPlayerObjectCreated;
       if (poc)
-        internalData.roomObj.ya.T.I.forEach(poc);
-    };
-    var b = {
-      name: name, 
-      password: password,
-      noPlayer: !!noPlayer,
-      qs: maxPlayerCount.toString(),
-      Ks: !showInRoomList,
-      t: token,
-      geo: geo,
-      cpc: playerCount, 
-      upc: !!unlimitedPlayerCount,
-      fPwd: (fakePassword==null) ? null : (!!fakePassword)
+        internalData.roomObj?.ya.T.I.forEach(poc);
     };
     var { storage } = haxball;
-    var a = storage.player_name;//n_A.fe.L();  // inserted here to get current nick
-    var cpc = b.cpc, fPwd = b.fPwd;
     function c() { // update & synchronize room data with haxball main server via websocket.
-      if (!b.Ks) {
+      if (l.Ks) {
         var a = new Fb();
         a.Id = haxball.version;
         a.w = g.jc;
-        a.I = (cpc!=null) ? cpc : g.I.length;
+        a.I = (l.cpc!=null) ? l.cpc : g.I.length;
         a.Xe = l.fg + 1;
-        a.ub = f.ub;
-        a.Ib = (fPwd==null) ? (null != l.Ib) : fPwd;
-        a.Ec = f.Ec;
-        a.Gc = f.Gc;
+        a.ub = l.geo.ub;
+        a.Ib = (l.fPwd==null) ? (null != l.Ib) : l.fPwd;
+        a.Ec = l.geo.Ec;
+        a.Gc = l.geo.Gc;
         var c = w.ha(16);
         a.ga(c);
         a = c.Kg();
         l.Fi(a);
       }
     }
-    var e = null,
-      f = null, // n_A.Lh(),
-      g = new fa();
     function parseGeo(geo){
       var geoData = storage.geo;//n_A.geo;
       return T.Rf({
@@ -9479,27 +9673,31 @@ function abcHaxballAPI(window, config){
         code: (geo && geo.flag) ? geo.flag : geoData.flag,
       });
     }
-    var f = parseGeo(b.geo);
-    g.jc = b.name;
-    if (!b.noPlayer){
-      var k = new ea();
-      k.w = a;
-      k.cb = !0;
-      k.Kd = f.ub;
-      k.Xb = storage.avatar;//n_A.sh.L();
-      k.customClient = true; // host is of course using the modified client :)
-      g.I.push(k);
-    }
+    var e = null, g = new fa();
+    g.jc = roomParams.name;
     var l = new Lb(haxball, {
       iceServers: n.Vf,
       ij: n.Ee + "api/host",
       state: g,
       version: haxball.version,
-      gn: b.t // token
+      gn: roomParams.token
     });
-    l.upc = b.upc;
-    l.fg = b.qs - 1;
-    l.Ib = b.password;
+    l.geo = parseGeo(roomParams.geo); // n_A.Lh(),
+    if (!roomParams.noPlayer){
+      var k = new ea();
+      k.w = storage.player_name; // n_A.fe.L();
+      k.cb = true;
+      k.Kd = l.geo.ub;
+      k.Xb = storage.avatar; // n_A.sh.L();
+      k.customClient = true; // host is of course using the modified client :)
+      g.I.push(k);
+    }
+    l.upc = !!roomParams.unlimitedPlayerCount;
+    l.Ks = !!roomParams.showInRoomList;
+    l.cpc = roomParams.playerCount;
+    l.fPwd = (roomParams.fakePassword==null) ? null : (!!roomParams.fakePassword);
+    l.fg = (roomParams.maxPlayerCount|0) - 1;
+    l.Ib = (roomParams.password=="") ? null : roomParams.password;
     c();
     var t = new ba(haxball, l);
     var m = setInterval(function () {
@@ -9564,6 +9762,10 @@ function abcHaxballAPI(window, config){
     };
     t.Of.Ud = G(l, l.Ud);
     t.Of.td = G(l, l.td);
+    t.Of.xd1 = G(l, l.xd1);
+    t.Of.xd2 = G(l, l.xd2);
+    t.Of.xd3 = G(l, l.xd3);
+    t.Of.xd4 = G(l, l.xd4);
     t.Of.__srp__ = function (a) {
       if (!a)
         return;
@@ -9573,14 +9775,18 @@ function abcHaxballAPI(window, config){
       if (a.hasOwnProperty("password"))
         props.password = l.Ib = a.password;
       if (a.hasOwnProperty("fakePassword"))
-        props.fakePassword = fPwd = a.fakePassword;
+        props.fakePassword = l.fPwd = a.fakePassword;
       if (a.hasOwnProperty("geo")){
         props.geo = a.geo;
         f = parseGeo(a.geo);
         k.Kd = f.ub;
       }
+      if (a.hasOwnProperty("unlimitedPlayerCount"))
+        props.unlimitedPlayerCount = l.upc = !!a.unlimitedPlayerCount;
+      if (a.hasOwnProperty("showInRoomList"))
+        props.showInRoomList = l.Ks = !!a.showInRoomList;
       if (a.hasOwnProperty("playerCount"))
-        props.playerCount = cpc = a.playerCount;
+        props.playerCount = l.cpc = a.playerCount;
       if (a.hasOwnProperty("maxPlayerCount"))
         props.maxPlayerCount = l.fg = (a.maxPlayerCount==null) ? null : (a.maxPlayerCount - 1);
       c();
@@ -9592,10 +9798,9 @@ function abcHaxballAPI(window, config){
       l.upc = a;
     };
     t.Of.__sfp__ = function (a) {
-      fPwd = a;
+      l.fPwd = a;
       c();
     };
-    
     internalData.isHost = true;
     internalData.roomObj = t;
     internalData.roomState = g;
@@ -9635,6 +9840,123 @@ function abcHaxballAPI(window, config){
     return (r<<16)|(g<<8)|b;
   }
 
+  function ipToNumber(ip){
+    if (ip?.includes(".")){
+      var x = ip.split(".");
+      if (x.length>4)
+        return;
+      while (x.length<4)
+        x.splice(0,0,"");
+      return x.reduce((old,x,i)=>{if (old==null) return; var t=parseInt(x.length>0?x:"0"); if (isNaN(t) || t<0 || t>255) return null; old|=t<<(24-i*8); return old;}, 0);
+    }
+    if (ip?.includes(":")){
+      var x = ip.split(":");
+      var idx = ip.indexOf("::");
+      if (idx!=ip.lastIndexOf("::"))
+        return;
+      if (idx>=0){
+        var l = x.length;
+        if (l>9)
+          return;
+        idx = x.findIndex((y)=>(y.length==0));
+        if (idx==0 || (idx==l-2 && x[l-1].length==0)){
+          x.splice(idx,1);
+          l--;
+        }
+        x[idx] = "0";
+        for (var i=0;i<8-l;i++)
+          x.splice(idx+1,0,"0");
+      }
+      if (x.length!=8)
+        return;
+      return x.reduce((old,x,i)=>{if (old==null) return; var t=parseInt(x,16); if (isNaN(t) || t<0 || t>65535) return; old|=BigInt(t)<<(112n-BigInt(i)*16n); return old;}, 0n);
+    }
+  }
+
+  function numberToIp(number){
+    var c = number?.__proto__.constructor.name;
+    if (c=="BigInt"){
+      var s=[], bseq={i:-1, l:0}, cseq={i:-1, l:0};
+      for (var i=0;i<8;i++){
+        var val=number&65535n;
+        if (val==0){
+          if (cseq.l==0)
+            cseq.i=7-i;
+          cseq.l++;
+          if (cseq.l>bseq.l){
+            bseq.l=cseq.l;
+            bseq.i=cseq.i;
+          }
+        }
+        else
+          cseq.l=0;
+        s.splice(0,0,val.toString(16));
+        number>>=16n;
+      }
+      if (bseq.l>0){
+        var i = bseq.i-bseq.l+1;
+        s.splice(i, bseq.l-1);
+        s[i]="";
+      }
+      var tmp = s.join(":");
+      if (tmp.length==0)
+        tmp="::";
+      else if (tmp.charAt(tmp.length-1)==":")
+        tmp+=":";
+      else if (tmp.charAt(0)==":")
+        tmp=":"+tmp;
+      return tmp;
+    }
+    else if (c=="Number"){
+      var s=[];
+      for (var i=0;i<4;i++){
+        s.splice(0,0,""+(number&255));
+        number>>=8;
+      }
+      return s.join(".");
+    }
+  }
+
+  function authToNumber(auth){
+    if (auth.length!=43)
+      return;
+    var x = 0n;
+    for (var i=0,j=252;i<43;i++,j-=6){
+      var c = auth.charCodeAt(i);
+      if (c==45) c=0;
+      else if (c==95) c=63;
+      else if (c>=48 && c<=57) c-=47;
+      else if (c>=65 && c<=90) c-=54;
+      else if (c>=97 && c<=122) c-=60;
+      else return;
+      x|=(BigInt(c)<<BigInt(j));
+    }
+    return x;
+  }
+
+  function numberToAuth(number){
+    var c = number?.__proto__.constructor.name;
+    if (c!="BigInt")
+      return;
+    var auth = "";
+    for (var i=0;i<43;i++){
+      var c = Number(number&63n);
+      if (c==0) c=45;
+      else if (c==63) c=95;
+      else if (c>=1 && c<=10) c+=47;
+      else if (c>=11 && c<=36) c+=54;
+      else if (c>=37 && c<=62) c+=60;
+      else return;
+      auth=String.fromCharCode(c)+auth;
+      number>>=6n;
+    }
+    return auth;
+  }
+
+  function compareBits(value1,value2,bitMask){
+    return !((value1^value2)&bitMask);
+  }
+  
   function stadiumChecksum(stadium) { // returns null for original maps, checksum value for custom maps
     return stadium.Pe() ? null : J.Vg(stadium.Sj(), 8);
   }
@@ -9814,7 +10136,7 @@ function abcHaxballAPI(window, config){
     });
     Object.defineProperty(this, "sdp", { // usage: require("sdp-transform").parse(sdp);
       get(){
-        return internalData.isHost ? null : internalData.roomObj.ya.pa.Ra.remoteDescription.sdp;
+        return internalData.isHost ? null : internalData.roomObj?.ya.pa.Ra.remoteDescription.sdp;
       }
     });
     Object.defineProperty(this, "isHost", {
@@ -9824,13 +10146,13 @@ function abcHaxballAPI(window, config){
     });
     Object.defineProperty(this, "currentPlayerId", {
       get(){
-        return internalData.roomObj.ya.uc;
+        return internalData.roomObj?.ya.uc;
       }
     });
     Object.defineProperty(this, "currentPlayer", {
       get(){
-        var id = internalData.roomObj.ya.uc;
-        return internalData.roomObj.ya.T.I.filter((x)=>(x.V==id))[0];
+        var id = internalData.roomObj?.ya.uc;
+        return internalData.roomObj?.ya.T.I.filter((x)=>(x.V==id))[0];
       }
     });
     Object.defineProperty(this, "state", {
@@ -9860,26 +10182,116 @@ function abcHaxballAPI(window, config){
     });
     Object.defineProperty(this, "banList", {
       get(){
-        var map = internalData.roomObj?.ya?.Kj;
-        if (!map)
-          return;
-        var it = map.keys(), list = [];
-        do {
-          var v = it.next();
-          if (v.done)
-            break;
-          var id = v.value, o = map.get(id);
-          list.push({
-            id: id,
-            conn: o.Ps,
-            ips: o.Rs.slice(),
-            name: o.w,
-            auth: o.a
-          });
-        } while(true);
-        return list;
+        return internalData.roomObj?.ya?.Ic?.banList?.getList();
       }
     });
+    Object.defineProperty(this, "token", {
+      get(){
+        return internalData.roomObj?.ya?.Ic?.Dg;
+      },
+      set(value){
+        var v = internalData.roomObj?.ya?.Ic;
+        if (!v)
+          return;
+        v.Dg = value;
+        v.Mh();
+        internalData.roomObj.Bg = "";
+        v.Ul = setTimeout(()=>{
+          v.Ji();
+          y.i(this._onRoomTokenChange, v.Dg);
+        }, 2*v.Zq);
+      }
+    });
+    Object.defineProperty(this, "requireRecaptcha", {
+      get(){
+        return internalData.roomObj?.ya?.Ic?.dm;
+      },
+      set(value){
+        internalData.roomObj?.ya?.Ic?.Ei(value);
+      }
+    });
+    Object.defineProperty(this, "name", {
+      get: function () {
+        return internalData.roomObj?.ya?.T.jc;
+      }
+    });
+    Object.defineProperty(this, "password", {
+      get: function () {
+        return internalData.roomObj?.ya?.Ib;
+      }
+    });
+    Object.defineProperty(this, "geo", {
+      get: function () {
+        return internalData.roomObj?.ya?.geo;
+      }
+    });
+    Object.defineProperty(this, "maxPlayerCount", {
+      get: function () {
+        var x = internalData.roomObj?.ya?.fg;
+        return (x==null) ? null : (x+1);
+      }
+    });
+    Object.defineProperty(this, "fakePassword", {
+      get: function () {
+        return internalData.roomObj?.ya?.fPwd;
+      }
+    });
+    Object.defineProperty(this, "fixedPlayerCount", {
+      get: function () {
+        return internalData.roomObj?.ya?.cpc;
+      }
+    });
+    Object.defineProperty(this, "showInRoomList", {
+      get: function () {
+        return internalData.roomObj?.ya?.Ks;
+      }
+    });
+    Object.defineProperty(this, "unlimitedPlayerCount", {
+      get: function () {
+        return internalData.roomObj?.ya?.upc;
+      }
+    });
+    Object.defineProperty(this, "link", {
+      get: function () {
+        return internalData.roomObj?.Bg;
+      }
+    });
+    Object.defineProperty(this, "timeLimit", {
+      get: function () {
+        return internalData.roomObj?.ya.T.Da;
+      }
+    });
+    Object.defineProperty(this, "scoreLimit", {
+      get: function () {
+        return internalData.roomObj?.ya.T.ib;
+      }
+    });
+    Object.defineProperty(this, "redScore", {
+      get: function () {
+        return (internalData.extrapolatedRoomState?.K || internalData.roomState?.K)?.Pb;
+      }
+    });
+    Object.defineProperty(this, "blueScore", {
+      get: function () {
+        return (internalData.extrapolatedRoomState?.K || internalData.roomState?.K)?.Kb;
+      }
+    });
+    Object.defineProperty(this, "timeElapsed", {
+      get: function () {
+        return (internalData.extrapolatedRoomState?.K || internalData.roomState?.K)?.Hc;
+      }
+    });
+    Object.defineProperty(this, "stadium", {
+      get: function () {
+        return internalData.roomObj?.ya.T.S;
+      }
+    });
+    Object.defineProperty(this, "players", {
+      get: function () {
+        return internalData.roomObj?.ya.T.I;
+      }
+    });
+
     this.kickTimeout = -1;
     this.libraries = libraries || [];
     this.librariesMap = this.libraries.reduce((acc, x)=>{
@@ -10102,6 +10514,7 @@ function abcHaxballAPI(window, config){
       internalData.roomObj?.Of.__srp__(properties);
     };
 
+    // this will be removed on the next release.
     this.setRecaptcha = function(on) { // on: true | false
       internalData.roomObj?.ya.Ic.Ei(on);
     };
@@ -10122,13 +10535,50 @@ function abcHaxballAPI(window, config){
       x.list.length = 0;
     };
 
-    this.sendCustomEvent = function(type, data) {
+    this.sendCustomEvent = function(type, data, targetId) {
+      var x = internalData.roomObj?.ya;
+      if (!x?.T || (targetId!=null && !x.T.na(targetId)?.customClient))
+        return;
       var msg = CustomEvent.la(type, data);
-      internalData.execOperationReceivedOnHost(msg)!=false && (
+      internalData.execOperationReceivedOnHost(msg, targetId)!=false && (
         (this.isHost ? 
-          internalData.roomObj?.ya.ra_custom(msg, internalData.roomObj.ya.uc, true) 
+          null != targetId ? internalData.dummyPromise.then(function() {
+            x._mf_(msg, targetId);
+          }) : x.ra_custom(msg, 0, true) 
         :
-          (internalData.roomObj?.ya?.T?.I[0].customClient && internalData.roomObj?.ya.ra(msg))
+          (x.T.na(0)?.customClient && x.ra(msg))
+        )
+      );
+    };
+
+    this.sendBinaryCustomEvent = function(type, data, targetId) {
+      var x = internalData.roomObj?.ya;
+      if (!x?.T || (targetId!=null && !x.T.na(targetId)?.customClient))
+        return;
+      var msg = BinaryCustomEvent.la(type, data);
+      internalData.execOperationReceivedOnHost(msg, targetId)!=false && (
+        (this.isHost ? 
+          null != targetId ? internalData.dummyPromise.then(function() {
+            x._mf_(msg, targetId);
+          }) : x.ra_custom(msg, 0, true) 
+        :
+          (x.T.na(0)?.customClient && x.ra(msg))
+        )
+      );
+    };
+
+    this.setPlayerIdentity = function(id, data, targetId) {
+      var x = internalData.roomObj?.ya;
+      if (!x?.T || (targetId!=null && !x.T.na(targetId)?.customClient))
+        return;
+      var msg = IdentityEvent.la(id, data);
+      internalData.execOperationReceivedOnHost(msg, targetId)!=false && (
+        (this.isHost ? 
+          null != targetId ? internalData.dummyPromise.then(function() {
+            x._mf_(msg, targetId);
+          }) : x.ra_custom(msg, 0, true) 
+        :
+          (x.T.na(0)?.customClient && x.ra(msg))
         )
       );
     };
@@ -10153,6 +10603,33 @@ function abcHaxballAPI(window, config){
         return;
       internalData.roomObj?.ya.Ud();
     };
+    
+    this.addPlayerBan = function(playerId) {
+      if (!internalData.isHost)
+        return;
+      var playerObj = internalData.roomObj?.ya.T.I.filter((x)=>x.V==playerId)[0];
+      if (!playerObj)
+        return;
+      return internalData.roomObj?.ya.xd1(playerObj);
+    };
+    
+    this.addIpBan = function(...values) {
+      if (!internalData.isHost)
+        return;
+      return internalData.roomObj?.ya.xd2(...values);
+    };
+    
+    this.addAuthBan = function(...values) {
+      if (!internalData.isHost)
+        return;
+      return internalData.roomObj?.ya.xd3(...values);
+    };
+    
+    this.removeBan = function(banId) {
+      if (!internalData.isHost)
+        return;
+      return internalData.roomObj?.ya.xd4(banId);
+    };
 
     this.setAvatar = function(avatar) {
       null != avatar && (avatar = avatar.substr(0, 2));
@@ -10162,6 +10639,8 @@ function abcHaxballAPI(window, config){
     };
 
     this.setPlayerAvatar = function(id, value, headless){ // host-only
+      if ((!internalData.isHost) && (headless || id!=internalData.roomObj.ya.uc))
+        return;
       var msg = headless ? qb.la(id, value) : ra.la(value);
       internalData.execOperationReceivedOnHost(msg, undefined, headless?0:id)!=false && internalData.roomObj?.ya.ra(msg);
     };
@@ -10172,7 +10651,7 @@ function abcHaxballAPI(window, config){
     };
 
     this.setChatIndicatorActive = function(active) {
-      var msg = na.la(active ? 1 : 0);
+      var msg = na.la(active ? 0 : 1);
       internalData.execOperationReceivedOnHost(msg)!=false && internalData.roomObj?.ya.ra(msg);
     };
 
@@ -10303,8 +10782,10 @@ function abcHaxballAPI(window, config){
     };
 
     this.resetTeams = function(){
-      internalData.roomObj?.ee(p.fa);
-      internalData.roomObj?.ee(p.xa);
+      var r = internalData.roomObj;
+      if (!r?.ya || !r.ya.T.I.filter((x)=>(x.V==r.ya.uc))[0]?.cb) // !! FIX ME: missing noPlayer check.
+        return;
+      p.byId.forEach((x,i)=>(i>0 && r.ee(x)))
     };
 
     this.startRecording = function(){ // return true(success)/false(failure - already recording)
@@ -10350,54 +10831,24 @@ function abcHaxballAPI(window, config){
     };
 
     this.changeTeam = function(teamId){
-      switch (teamId){
-        case 0: { 
-          internalData.roomObj?.mg(internalData.roomObj.ya.uc, p.Ia);
-          break; 
-        }
-        case 1: { 
-          internalData.roomObj?.mg(internalData.roomObj.ya.uc, p.fa);
-          break; 
-        }
-        case 2: { 
-          internalData.roomObj?.mg(internalData.roomObj.ya.uc, p.xa);
-          break; 
-        }
-      }
+      var t = p.byId[teamId];
+      if (!t)
+        return;
+      internalData.roomObj?.mg(internalData.roomObj?.ya.uc, t);
     };
 
     this.resetTeam = function(teamId){
-      switch (teamId){
-        case 0: { 
-          internalData.roomObj?.ee(p.Ia); 
-          break; 
-        }
-        case 1: { 
-          internalData.roomObj?.ee(p.fa); 
-          break; 
-        }
-        case 2: { 
-          internalData.roomObj?.ee(p.xa); 
-          break; 
-        }
-      }
+      var t = p.byId[teamId], r = internalData.roomObj;
+      if (!t || !r?.ya || !r.ya.T.I.filter((x)=>(x.V==r.ya.uc))[0]?.cb) // !! FIX ME: missing noPlayer check.
+        return;
+      internalData.roomObj?.ee(t);
     };
 
     this.setPlayerTeam = function(playerId, teamId){
-      switch (teamId){
-        case 0: { 
-          internalData.roomObj?.mg(playerId, p.Ia);
-          break; 
-        }
-        case 1: { 
-          internalData.roomObj?.mg(playerId, p.fa);
-          break; 
-        }
-        case 2: { 
-          internalData.roomObj?.mg(playerId, p.xa);
-          break; 
-        }
-      }
+      var t = p.byId[teamId];
+      if (!t)
+        return;
+      internalData.roomObj?.mg(playerId, t);
     };
 
     this.setPlayerAdmin = function(playerId, isAdmin){
@@ -10461,7 +10912,7 @@ function abcHaxballAPI(window, config){
     };
 
     this.fakeSetPlayerChatIndicator = function(value, byId){
-      fakeSend(byId, na.la(value));
+      fakeSend(byId, na.la(value ? 0 : 1));
     };
 
     this.fakeSetPlayerAvatar = function(value, byId){
@@ -10544,7 +10995,7 @@ function abcHaxballAPI(window, config){
     */
 
     this.getPlayer = function(id){
-      return internalData.roomObj.ya.T.I.filter((x)=>x.V==id)[0];
+      return internalData.roomObj?.ya.T.I.filter((x)=>x.V==id)[0];
     };
 
     this.getBall = function(extrapolated = true){
@@ -10575,60 +11026,6 @@ function abcHaxballAPI(window, config){
     this.getPlayerDisc_exp = function(playerId){
       return internalData.roomObj?.ya?.T?.I.filter((x)=>x.V==playerId)[0]?.H;
     };
-
-    Object.defineProperty(this, "name", {
-      get: function () {
-        return internalData.roomObj.ya.T.jc;
-      }
-    });
-
-    Object.defineProperty(this, "link", {
-      get: function () {
-        return internalData.roomObj.Bg;
-      }
-    });
-
-    Object.defineProperty(this, "timeLimit", {
-      get: function () {
-        return internalData.roomObj.ya.T.Da;
-      }
-    });
-
-    Object.defineProperty(this, "scoreLimit", {
-      get: function () {
-        return internalData.roomObj.ya.T.ib;
-      }
-    });
-
-    Object.defineProperty(this, "redScore", {
-      get: function () {
-        return internalData.extrapolatedRoomState?.K.Pb;
-      }
-    });
-
-    Object.defineProperty(this, "blueScore", {
-      get: function () {
-        return internalData.extrapolatedRoomState?.K.Kb;
-      }
-    });
-
-    Object.defineProperty(this, "timeElapsed", {
-      get: function () {
-        return internalData.extrapolatedRoomState?.K.Hc;
-      }
-    });
-
-    Object.defineProperty(this, "stadium", {
-      get: function () {
-        return internalData.roomObj.ya.T.S;
-      }
-    });
-
-    Object.defineProperty(this, "players", {
-      get: function () {
-        return internalData.roomObj.ya.T.I;
-      }
-    });
 
 
     // -------------------------------------------
@@ -10989,13 +11386,42 @@ function abcHaxballAPI(window, config){
     });
   }
 
+  function Language(abbr, metadata=null){
+    this.abbr = abbr;
+    this.api = {errors: {}};
+    this.defineMetadata(metadata);
+  }
+
+  // This function should be overridden when writing a GUI application using this API, before using this Language class.
+  Language.prototype.defineMetadata = function(x){};//x={name, version, author, description}
+
+  Language.resolveText = function(s, arr){
+    if (!s)
+      return;
+    var r1 = /\$([\d]+)\?\("([^"]*)":"([^"]*)"\)/gm, r2 = /\$([\d]+)/gm;
+    var x, s2="", i=0;
+    while((x=r1.exec(s))!=null){
+      s2+=s.substring(i,x.index)+(arr[x[1]-1]?x[2]:x[3]);
+      i=x.index+x[0].length;
+    }
+    s2+=s.substring(i);
+    s="";
+    i=0;
+    while((x=r2.exec(s2))!=null){
+      s+=s2.substring(i,x.index)+arr[x[1]-1];
+      i=x.index+x[0].length;
+    }
+    s+=s2.substring(i);
+    return s;
+  };
+
   function Library(name, metadata=null){
     this.name = name;
     this.defineMetadata(metadata);
   }
 
-  // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
-  Library.prototype.defineMetadata = function(x){},//x={name, version, author, description}
+  // These functions should be overridden when writing a GUI application using this API, before using this Library class.
+  Library.prototype.defineMetadata = function(x){};//x={version, author, description}
   Library.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     var { name, value } = x, that = this;
     if (config.noVariableValueChangeEvent)
@@ -11020,7 +11446,7 @@ function abcHaxballAPI(window, config){
   }
 
   // These functions should be overridden when writing a GUI application using this API, before using this RoomConfig class.
-  RoomConfig.prototype.defineMetadata = function(x){},//x={name, version, author, description, allowFlags}
+  RoomConfig.prototype.defineMetadata = function(x){};//x={name, version, author, description, allowFlags}
   RoomConfig.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     var { name, value } = x, that = this;
     if (config.noVariableValueChangeEvent)
@@ -11045,7 +11471,7 @@ function abcHaxballAPI(window, config){
   }
 
   // These functions should be overridden when writing a GUI application using this API, before using this Renderer class.
-  Renderer.prototype.defineMetadata = function(x){},//x={name, version, author, description}
+  Renderer.prototype.defineMetadata = function(x){};//x={name, version, author, description}
   Renderer.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     var { name, value } = x, that = this;
     if (config.noVariableValueChangeEvent)
@@ -11077,7 +11503,7 @@ function abcHaxballAPI(window, config){
   }
 
   // These functions should be overridden when writing a GUI application using this API, before using this Plugin class.
-  Plugin.prototype.defineMetadata = function(x){},//x={version, author, description, allowFlags}
+  Plugin.prototype.defineMetadata = function(x){};//x={version, author, description, allowFlags}
   Plugin.prototype.defineVariable = function(x){//x={name, type, value, range, description}
     var { name, value } = x, that = this;
     if (config.noVariableValueChangeEvent)
@@ -11156,9 +11582,12 @@ function abcHaxballAPI(window, config){
   createEventCallback("ExtrapolationChange", { params: ["new extrapolation value"] });
   createEventCallback("HandicapChange", { params: ["new handicap value"] });
   createEventCallback("RoomRecaptchaModeChange", { params: ["new recaptcha mode value"] });
+  createEventCallback("RoomTokenChange", { params: ["new token value"] });
   createEventCallback("RoomRecordingChange", { params: ["new value indicating whether the game is being recorded"] });
   createEventCallback("RoomPropertiesChange", { params: ["new room properties"] });
   createEventCallback("CustomEvent", { params: ["custom event type", "custom event data", "id of the player that triggered this event"] });
+  createEventCallback("BinaryCustomEvent", { params: ["custom event type", "custom event data", "id of the player that triggered this event"] });
+  createEventCallback("IdentityEvent", { params: ["id of the player who has just been identified", "user data", "id of the player that triggered this event"] });
   createEventCallback("PluginActiveChange", { params: ["the plugin object that has its active property changed"] });
   createEventCallback("ConfigUpdate", { params: ["old roomConfig object", "new roomConfig object"] });
   createEventCallback("RendererUpdate", { params: ["old renderer object", "new renderer object"] });
@@ -11186,7 +11615,7 @@ function abcHaxballAPI(window, config){
       });
     }
     _fixNames(ea, [null, "ext", "team", "disc", "kickRateMinTickCounter", "kickRateMaxTickCounter", "isKicking", "id", "input", "name", "ping", null, "flag", "sync", "headlessAvatar", "avatar", "avatarNumber", "isAdmin", null, null, null]);
-    _fixNames(p, ["rival", "id", "color", null, null, "name", "className", null, "colors"]);
+    _fixNames(p, ["rival", "id", "color", "defenseDir", "cMask", "name", "cGroup", "colors"]);
     _fixNames(ka, ["angle", "text", "inner"]);
     _fixNames(T, ["flag", "lon", "lat"]);
     _fixNames(B, ["id", "cGroup", "cMask", "bCoef", "pos"]);
@@ -11226,6 +11655,8 @@ function abcHaxballAPI(window, config){
     _fixNames(ma, [null, null, "rate", "burst", "byId"]);
     _fixNames(ob, [null, "id", "type", "data1", "data2", "byId"]);
     _fixNames(CustomEvent, [null, null, null, "byId"]);
+    _fixNames(BinaryCustomEvent, [null, null, null, "byId"]);
+    _fixNames(IdentityEvent, [null, null, null, "byId"]);
     _fixNames(Wb, ["data", "id", "dist"]);
     _fixNames(Fb, ["version", "name", "flag", "lat", "lon", "password", "maxPlayers", "players"]);
     Object.defineProperty(h.prototype, "isCustom", {
@@ -11245,6 +11676,7 @@ function abcHaxballAPI(window, config){
     CameraFollow, 
     BackgroundType, 
     GamePlayState,
+    BanEntryType,
     Callback: {
       add: createEventCallback,
       remove: destroyEventCallback
@@ -11256,6 +11688,11 @@ function abcHaxballAPI(window, config){
       calculateAllRoomDistances,
       numberToColor,
       colorToNumber,
+      ipToNumber,
+      numberToIp,
+      authToNumber,
+      numberToAuth,
+      compareBits,
       keyState,
       reverseKeyState,
       runAfterGameTick,
@@ -11287,7 +11724,7 @@ function abcHaxballAPI(window, config){
         return rb.la(msg, color, style, sound);
       },
       sendChatIndicator: (active)=>{
-        return na.la(active);
+        return na.la(active ? 0 : 1);
       },
       sendInput: (input)=>{
         return Ga.la(input);
@@ -11366,6 +11803,12 @@ function abcHaxballAPI(window, config){
       },
       customEvent: (type, data)=>{
         return CustomEvent.la(type, data);
+      },
+      binaryCustomEvent: (type, data)=>{
+        return BinaryCustomEvent.la(type, data);
+      },
+      setPlayerIdentity: (id, data)=>{
+        return IdentityEvent.la(id, data);
       }
     },
     Room: {

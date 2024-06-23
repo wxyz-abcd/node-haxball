@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <script src="../examples_web/src/vendor/json5.min.js"></script>
+    <script src="../examples_web/src/vendor/pako-jszip.min.js"></script>
+    <script src="../src/api.js"></script>
+  </head>
+  <body>
+    <script>
+      var API = abcHaxballAPI(window, {
+        proxy: {
+          HttpUrl: "https://node-haxball.glitch.me/rs/", 
+          WebSocketUrl: "wss://node-haxball.glitch.me/", 
+          WebSocketChangeOriginAllowed: false
+        }
+      });
+      var module = {};
+    </script>
+    <script src="test.js"></script>
+    <script>
+      var virtualConsole = {
+        line: [],
+        colors: [],
+        log: function (...a) {
+          var i = 0;
+          while (i<a.length){
+            var color = a[i++], msg = a[i++];
+            var appendToCurrentLine = !msg.endsWith("\r\n");
+            if (!appendToCurrentLine)
+              msg = msg.substring(0, msg.length-2);
+            virtualConsole.line.push("%c"+msg);
+            virtualConsole.colors.push("color: "+color+";");
+            if (appendToCurrentLine)
+              continue;
+            console.log(virtualConsole.line.join(""), ...virtualConsole.colors);
+            virtualConsole.line.length = 0;
+            virtualConsole.colors.length = 0;
+          }
+        },
+        clear: function () {
+          console.clear();
+          virtualConsole.line.length = 0;
+          virtualConsole.colors.length = 0;
+        }
+      }
+
+      module.exports(API, "thr1.AAAAAGZ4d3g2ntRmucrkyw.SCN52Q9dxas", {
+        log: virtualConsole.log,
+        colors: {
+          yellow: "rgb(160,160,30)",
+          green: "rgb(0,255,0)",
+          red: "rgb(255,0,0)", 
+          magenta: "rgb(255,0,255)",
+          blue: "rgb(0,0,255)"
+        },
+        exit: ()=>{
+          throw "exit app";
+        }
+      });
+    </script>
+  </body>
+</html>

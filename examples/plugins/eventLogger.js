@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "eventLogger", true, { // "eventLogger" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -180,6 +180,10 @@ module.exports = function(API){
     console.log("onRoomRecaptchaModeChange...", on, customData);
   };
 
+  this.onRoomTokenChange = function(token, customData){
+    console.log("onRoomTokenChange...", token, customData);
+  };
+
   this.onRoomPropertiesChange = function(props, customData){
     console.log("onRoomPropertiesChange...", props, customData);
   };
@@ -218,6 +222,14 @@ module.exports = function(API){
 
   this.onCustomEvent = function(type, data, byId, customData){
     console.log("onCustomEvent...", type, data, byId, customData);
+  };
+
+  this.onBinaryCustomEvent = function(type, data, byId, customData){
+    console.log("onBinaryCustomEvent...", type, data, byId, customData);
+  };
+
+  this.onIdentityEvent = function(id, data, byId, customData){
+    console.log("onIdentityEvent...", id, data, byId, customData);
   };
 
   this.onConfigUpdate = function(oldRoomConfigObj, newRoomConfigObj, customData){

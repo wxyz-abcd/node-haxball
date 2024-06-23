@@ -1,9 +1,9 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "changeRoomProperties", true, {
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: `This plugin lets you change room settings while you are hosting the room.`,
     allowFlags: AllowFlags.CreateRoom
@@ -79,6 +79,32 @@ module.exports = function(API){
   });
 
   this.defineVariable({
+    name: "unlimitedPlayerCount",
+    description: "Whether to check the maximum player count.", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.defineVariable({
+    name: "fakePassword",
+    description: "Show fake password value in the room list. (0: disable, 1: set to true, 2: set to false)", 
+    type: VariableType.Integer,
+    value: 0,
+    range: {
+      min: 0,
+      max: 2,
+      step: 1
+    }
+  });
+  
+  this.defineVariable({
+    name: "showInRoomList",
+    description: "Whether to show the room the room list.", 
+    type: VariableType.Boolean,
+    value: true
+  });
+
+  this.defineVariable({
     name: "apply",
     description: "Applies the current values of the variables to the room.", 
     type: VariableType.Void,
@@ -118,8 +144,63 @@ module.exports = function(API){
     }
   });
 
+  this.defineVariable({
+    name: "token",
+    description: "Desired token of the room.", 
+    type: VariableType.String,
+    value: "", 
+    range: {
+      min: 0,
+      max: 40
+    }
+  });
+
+  this.defineVariable({
+    name: "setToken",
+    description: "Sets the token of the room and effectively changes the room link. Use with caution.", 
+    type: VariableType.Void,
+    value: setToken
+  });
+
+  this.defineVariable({
+    name: "recaptchaRequired",
+    description: "Whether to require a recaptcha to enter the room.", 
+    type: VariableType.Boolean,
+    value: false
+  });
+
+  this.defineVariable({
+    name: "setRecaptchaRequired",
+    description: "Sets the requirement of a recaptcha to enter the room.", 
+    type: VariableType.Void,
+    value: setRecaptchaRequired
+  });
+
   var that = this;
+
+  this.initialize = function(){
+    var { name, password, geo, maxPlayerCount, unlimitedPlayerCount, fakePassword, showInRoomList, token, requireRecaptcha } = that.room;
+    that.roomName = name;
+    that.roomPassword = password || "";
+    that.roomLatitude = geo.lat;
+    that.roomLongitude = geo.lon;
+    that.roomFlag = geo.flag;
+    that.roomMaxPlayerCount = maxPlayerCount;
+    that.unlimitedPlayerCount = unlimitedPlayerCount;
+    that.fakePassword = (fakePassword == null) ? 0 : (fakePassword ? 1 : 2);
+    that.showInRoomList = showInRoomList;
+    that.token = token;
+    that.recaptchaRequired = requireRecaptcha;
+  };
   
+  function setToken(){
+    that.room.token = that.token;
+  }
+
+  function setRecaptchaRequired(){
+    that.room.requireRecaptcha = that.recaptchaRequired;
+  }
+
   function applyValues(){
     that.room.setProperties({
       name: that.roomName,
@@ -130,8 +211,9 @@ module.exports = function(API){
         flag: that.roomFlag
       },
       maxPlayerCount: that.roomMaxPlayerCount,
-      //playerCount: ,
-      //fakePassword: 
+      unlimitedPlayerCount: that.unlimitedPlayerCount,
+      fakePassword: (that.fakePassword==0) ? null : (that.fakePassword==1),
+      showInRoomList: that.showInRoomList
     });
   }
   

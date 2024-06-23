@@ -1,9 +1,9 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "CMD_autoPlay_mixed_inmemory_multiple", true, { // "CMD_autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.3",
+    version: "0.4",
     author: "abc",
     description: `This is an auto-playing bot that has 2 different modes. 
     - followBall mode always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
@@ -74,10 +74,9 @@ module.exports = function(API){
     value: true
   });
 
-  var that = this, originalRoomData, permissionCtx, permissionIds;
+  var that = this, permissionCtx, permissionIds;
 
   this.initialize = function(){
-    originalRoomData = that.room.state; // this object pointer never changes while inside a room, so we can store it here.
     permissionCtx = that.room.librariesMap.permissions?.createContext("autoPlayMixedInMemoryMultiple");
     if (permissionCtx)
       permissionIds = {
@@ -142,11 +141,6 @@ module.exports = function(API){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        /*
-        var byPlayer = originalRoomData.getPlayer(byId);
-        if (!byPlayer.isAdmin)
-          return;
-        */
         addBot(active, type, count, name, flag, avatar, conn, auth);
       }
     });
@@ -167,11 +161,6 @@ module.exports = function(API){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        /*
-        var byPlayer = originalRoomData.getPlayer(byId);
-        if (!byPlayer.isAdmin)
-          return;
-        */
         removeBot(count);
       }
     });
@@ -192,11 +181,6 @@ module.exports = function(API){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        /*
-        var byPlayer = originalRoomData.getPlayer(byId);
-        if (!byPlayer.isAdmin)
-          return;
-        */
         that.maxConcurrentBotCount = count;
       }
     });
@@ -219,11 +203,6 @@ module.exports = function(API){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        /*
-        var byPlayer = originalRoomData.getPlayer(byId);
-        if (!byPlayer.isAdmin)
-          return;
-        */
         var bot = bots.findIndex((x)=>(x.id==id));
         if (bot)
           bot.active = active;
@@ -252,11 +231,6 @@ module.exports = function(API){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        /*
-        var byPlayer = originalRoomData.getPlayer(byId);
-        if (!byPlayer.isAdmin)
-          return;
-        */
         var bot = bots.findIndex((x)=>(x.id==id));
         if (bot)
           bot.type = type;
@@ -275,11 +249,6 @@ module.exports = function(API){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return;
         }
-        /*
-        var byPlayer = originalRoomData.getPlayer(byId);
-        if (!byPlayer.isAdmin)
-          return true;
-        */
         that.botsActive = active;
       }
     });
@@ -293,7 +262,6 @@ module.exports = function(API){
     that.room.librariesMap?.commands?.remove("bot_type");
     that.room.librariesMap?.commands?.remove("bots_active");
     that.room.librariesMap?.permissions?.removeContext(permissionCtx);
-    originalRoomData = null;
     permissionCtx = null;
     permissionIds = null;
   };
@@ -325,38 +293,36 @@ module.exports = function(API){
     }
   };
 
-  var update = function(bot){
-    var { state, gameState, gameStateExt } = that.room;
-    gameState = gameStateExt || gameState;
+  var update = function(bot, state, x, y, radius){ // ball: x,y,radius
     var cp = state.getPlayer(bot.id);
     var playerDisc = cp?.disc?.ext;
     if (!playerDisc)
       return;
-    var teamId = cp.team.id, opponentTeamId = 3 - teamId;
-    var goals = state.stadium.goals, ball = gameState.physicsState.discs[0];
+    var teamId = cp.team.id; // , opponentTeamId = 3 - teamId
+    var goals = state.stadium.goals;
 
-    var targetX, targetY, sqrDistBetweenBallAndPlayer = (ball.pos.x-playerDisc.pos.x) * (ball.pos.x-playerDisc.pos.x) + (ball.pos.y-playerDisc.pos.y) * (ball.pos.y-playerDisc.pos.y);
+    var targetX, targetY, sqrDistBetweenBallAndPlayer = (x-playerDisc.pos.x) * (x-playerDisc.pos.x) + (y-playerDisc.pos.y) * (y-playerDisc.pos.y);
     switch (bot.type){
       case 0:{ // always follow ball
-        targetX = ball.pos.x;
-        targetY = ball.pos.y;
+        targetX = x;
+        targetY = y;
         break;
       }
       case 1:{ // wait at defense + follow ball when near it
         var maxDistanceToFollowBall = that.maxDistanceToFollowBallCoeff * state.stadium.width;
         //var b = false;
     
-        if (sqrDistBetweenBallAndPlayer > ((playerDisc.radius + ball.radius + maxDistanceToFollowBall) * (playerDisc.radius + ball.radius + maxDistanceToFollowBall))){
+        if (sqrDistBetweenBallAndPlayer > ((playerDisc.radius + radius + maxDistanceToFollowBall) * (playerDisc.radius + radius + maxDistanceToFollowBall))){
           var myGoal = goals.filter((g)=>(g.team.id==teamId))[0]; //, opponentGoal = goals[oppositeTeamId - 1];
           if (!myGoal)
             return;
           var MPofMyGoalX = (myGoal.p0.x + myGoal.p1.x) / 2, MPofMyGoalY = (myGoal.p0.y + myGoal.p1.y) / 2;
-          targetX = (ball.pos.x + MPofMyGoalX) / 2;
-          targetY = (ball.pos.y + MPofMyGoalY) / 2;
+          targetX = (x + MPofMyGoalX) / 2;
+          targetY = (y + MPofMyGoalY) / 2;
         }
         else{
-          targetX = ball.pos.x;
-          targetY = ball.pos.y;
+          targetX = x;
+          targetY = y;
           //b = true;
         }
         break;
@@ -375,13 +341,13 @@ module.exports = function(API){
     else
       dirY = Math.sign(deltaY);
 
-    //f(ball.pos.x, ball.pos.y, playerDisc.pos.x, playerDisc.pos.y, myGoal.p0.x, myGoal.p0.y, myGoal.p1.x, myGoal.p1.y)
+    //f(x, y, playerDisc.pos.x, playerDisc.pos.y, myGoal.p0.x, myGoal.p0.y, myGoal.p1.x, myGoal.p1.y)
 
-    //var angle_PlayerToBall = Math.atan2(ball.pos.y-playerDisc.pos.y, ball.pos.x-playerDisc.pos.x);
-    //var angle_BallToGoalDisc1 = Math.atan2(myGoal.p0.y-ball.pos.y, myGoal.p0.x-ball.pos.x);
-    //var angle_BallToGoalDisc2 = Math.atan2(myGoal.p1.y-ball.pos.y, myGoal.p1.x-ball.pos.x);
+    //var angle_PlayerToBall = Math.atan2(y-playerDisc.pos.y, x-playerDisc.pos.x);
+    //var angle_BallToGoalDisc1 = Math.atan2(myGoal.p0.y-y, myGoal.p0.x-x);
+    //var angle_BallToGoalDisc2 = Math.atan2(myGoal.p1.y-y, myGoal.p1.x-x);
 
-    var maxSqrDist = (playerDisc.radius + ball.radius + that.minKickDistance) * (playerDisc.radius + ball.radius + that.minKickDistance);
+    var maxSqrDist = (playerDisc.radius + radius + that.minKickDistance) * (playerDisc.radius + radius + that.minKickDistance);
     kick = (sqrDistBetweenBallAndPlayer < maxSqrDist);
     //console.log(bot.id, sqrDistBetweenBallAndPlayer, maxSqrDist, kick);
 
@@ -402,10 +368,25 @@ module.exports = function(API){
   this.onGameTick = function(customData){
     if (!that.botsActive)
       return;
+
+    // get the extrapolated game state object
+    var { state, gameState, gameStateExt } = that.room;
+    gameState = gameStateExt || gameState;
+
+    // get the original extrapolated data object of the ball
+    var ball = gameState.physicsState.discs[0];
+
+    // get the coordinates and radius of the ball
+    var {x, y, radius} = ball?.pos || {};
+
+    // if ball is not reachable, do nothing.
+    if (x==null || isNaN(x) || !isFinite(x) || y==null || isNaN(y) || !isFinite(y)) // check 
+      return;
+    
     bots.forEach((bot)=>{
       if (!bot.active)
         return;
-      update(bot);
+      update(bot, state, x, y, radius);
     });
   };
 };

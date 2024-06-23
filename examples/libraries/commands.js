@@ -47,11 +47,11 @@
 */
 
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Library.prototype);
   Library.call(this, "commands", { // "commands" is library's name. Every library should have a unique name.
-    version: 0.1,
+    version: 0.2,
     author: "abc",
     description: `This is a library to generalize and standardize the process of creating new chat commands.`
   });
@@ -335,7 +335,7 @@ module.exports = function(API){
           }
           case VariableType.String:{
             if (param.range!=null){
-              if ((param.range.min!=null && val.length<param.range.min) || (param.range.max!=null && val.length>param.range.max))
+              if ((param.range.min!=null && str.length<param.range.min) || (param.range.max!=null && str.length>param.range.max))
                 return {code: thisLibrary.ErrorCodes.StringLengthOutOfBounds, cmdName, value: str, pIdx: i, pName: param.name};
             }
             val = str;

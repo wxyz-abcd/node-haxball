@@ -1,3 +1,4 @@
+window.languages = {};
 window.libraries = {};
 window.plugins = {};
 window.renderers = {};
@@ -62,6 +63,26 @@ var importRenderer = function(name, onReady){
   }, 1);
 };
 
+var importLanguage = function(name, onReady){
+  if (window.languages[name]!=null){
+    onReady();
+    return;
+  }
+  window.module = {};
+  var s = document.createElement("script");
+  s.src = "./languages/"+name+".js";
+  document.body.appendChild(s);
+  var int = setInterval(()=>{
+    //console.log("next", name);
+    if (window.module.exports==null)
+      return;
+    clearInterval(int);
+    window.languages[name] = window.module.exports;
+    window.module = null;
+    onReady();
+  }, 1);
+};
+
 var importPlugins = function(names, onReady, n = 0){
   if (n>=names.length){
     onReady();
@@ -89,5 +110,15 @@ var importRenderers = function(names, onReady, n = 0){
   }
   importRenderer(names[n], ()=>{
     importRenderers(names, onReady, n+1);
+  });
+};
+
+var importLanguages = function(names, onReady, n = 0){
+  if (n>=names.length){
+    onReady();
+    return;
+  }
+  importLanguage(names[n], ()=>{
+    importLanguages(names, onReady, n+1);
   });
 };

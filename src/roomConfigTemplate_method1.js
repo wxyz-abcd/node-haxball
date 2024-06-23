@@ -181,6 +181,10 @@ function defineRoomCallbacks(room){
   room.onRoomRecaptchaModeChange = function(on, customData){};
   room.onAfterRoomRecaptchaModeChange = function(on, customData){};
 
+  room.onBeforeRoomTokenChange = function(token){/*return customData;*/};
+  room.onRoomTokenChange = function(token, customData){};
+  room.onAfterRoomTokenChange = function(token, customData){};
+
   room.onBeforeRoomRecordingChange = function(value){/*return customData;*/};
   room.onRoomRecordingChange = function(value, customData){};
   room.onAfterRoomRecordingChange = function(value, customData){};
@@ -204,6 +208,14 @@ function defineRoomCallbacks(room){
   room.onBeforeCustomEvent = function(type, data, byId){/*return customData;*/};
   room.onCustomEvent = function(type, data, byId, customData){};
   room.onAfterCustomEvent = function(type, data, byId, customData){};
+
+  room.onBeforeBinaryCustomEvent = function(type, data, byId){/*return customData;*/};
+  room.onBinaryCustomEvent = function(type, data, byId, customData){};
+  room.onAfterBinaryCustomEvent = function(type, data, byId, customData){};
+
+  room.onBeforeIdentityEvent = function(id, data, byId){/*return customData;*/};
+  room.onIdentityEvent = function(id, data, byId, customData){};
+  room.onAfterIdentityEvent = function(id, data, byId, customData){};
 
   room.onBeforePluginActiveChange = function(plugin){/*return customData;*/};
   room.onPluginActiveChange = function(plugin, customData){};

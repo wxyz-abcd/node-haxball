@@ -195,6 +195,10 @@ module.exports = function(API){
   this.onRoomRecaptchaModeChange = function(on, customData){};
   this.onAfterRoomRecaptchaModeChange = function(on, customData){};
 
+  this.onBeforeRoomTokenChange = function(token){/*return customData;*/};
+  this.onRoomTokenChange = function(token, customData){};
+  this.onAfterRoomTokenChange = function(token, customData){};
+
   this.onBeforeRoomRecordingChange = function(value){/*return customData;*/};
   this.onRoomRecordingChange = function(value, customData){};
   this.onAfterRoomRecordingChange = function(value, customData){};
@@ -218,6 +222,14 @@ module.exports = function(API){
   this.onBeforeCustomEvent = function(type, data, byId){/*return customData;*/};
   this.onCustomEvent = function(type, data, byId, customData){};
   this.onAfterCustomEvent = function(type, data, byId, customData){};
+
+  this.onBeforeBinaryCustomEvent = function(type, data, byId){/*return customData;*/};
+  this.onBinaryCustomEvent = function(type, data, byId, customData){};
+  this.onAfterBinaryCustomEvent = function(type, data, byId, customData){};
+
+  this.onBeforeIdentityEvent = function(id, data, byId){/*return customData;*/};
+  this.onIdentityEvent = function(id, data, byId, customData){};
+  this.onAfterIdentityEvent = function(id, data, byId, customData){};
 
   this.onBeforePluginActiveChange = function(plugin){/*return customData;*/};
   this.onPluginActiveChange = function(plugin, customData){};

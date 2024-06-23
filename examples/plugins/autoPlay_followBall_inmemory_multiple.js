@@ -1,9 +1,9 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_followBall_inmemory_multiple", true, { // "autoPlay_followBall_inmemory_multiple" is plugin's name, "false" means "not activated after initialization". Every plugin should have a unique name.
-    version: "0.3",
+    version: "0.4",
     author: "abc",
     description: `This is an auto-playing bot that always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
     This bot is capable of creating/removing fake bot players(id descending from 65535) in host's memory and controlling all of them at the same time using fake events.
@@ -95,6 +95,23 @@ module.exports = function(API){
   };
 
   this.onGameTick = function(customData){
+    var { state, gameState, gameStateExt } = that.room;
+    gameState = gameStateExt || gameState;
+
+    // get the original extrapolated data object of the ball
+    var ball = gameState.physicsState.discs[0];
+
+    // get the coordinates of the ball
+    var {x, y} = ball?.pos || {};
+
+    // if ball is not reachable, do nothing.
+    if (x==null || isNaN(x) || !isFinite(x) || y==null || isNaN(y) || !isFinite(y)) // check 
+      return;
+
+    // coordinates: ball.pos.x, ball.pos.y
+    // speed: ball.speed.x, ball.speed.y
+    // radius: ball.radius
+    
     botIds.forEach((botId)=>{
 
       // get the original data object of the next bot
@@ -108,15 +125,8 @@ module.exports = function(API){
       if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.
         return;
 
-      // get the original data object of the ball
-      var ball = that.room.getBall().ext;
-
-      // coordinates: ball.pos.x, ball.pos.y
-      // speed: ball.speed.x, ball.speed.y
-      // radius: ball.radius
-
       // calculate delta difference for both x and y axis.
-      var deltaX = ball.pos.x - playerDisc.pos.x, deltaY = ball.pos.y - playerDisc.pos.y, dirX, dirY, kick;
+      var deltaX = x - playerDisc.pos.x, deltaY = y - playerDisc.pos.y, dirX, dirY, kick;
 
       // x direction:
       if (Math.abs(deltaX) < that.minCoordAlignDelta) // we can omit small delta.
