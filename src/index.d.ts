@@ -323,7 +323,13 @@ declare namespace MainReturnType {
      * The keys array type. Should be editable with a keyboard keys editor component
      * inside a GUI environment.
      */
-    Keys = 16
+    Keys = 16,
+
+    /**
+     * A progress indicator. Its value should be an integer between 0 and 100, and
+     * null should disable the progressbar component inside a GUI environment.
+     */
+    Progress = 17
   }
 
   /**

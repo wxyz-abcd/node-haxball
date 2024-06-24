@@ -6,13 +6,27 @@ module.exports = function ({ Plugin, AllowFlags, VariableType }) {
     description: "This is a test to test the variable components.",
     allowFlags: AllowFlags.CreateRoom | AllowFlags.JoinRoom
   });
+  var that = this;
   this.defineVariable({
     name: "test1",
     type: VariableType.Void,
     value: function value() {
-      console.log("button test");
+      if (that.test18==null)
+        that.test18 = 0;
+      else{
+        var v = that.test18 + 1;
+        if (v>100)
+          v=null;
+        that.test18 = v;
+      }
     },
     description: "button test."
+  });
+  this.defineVariable({
+    name: "test18",
+    type: VariableType.Progress,
+    value: null,
+    description: "progress test"
   });
   this.defineVariable({
     name: "test2",

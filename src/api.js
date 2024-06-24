@@ -143,7 +143,8 @@ function abcHaxballAPI(window, config){
     Flag: 13,
     File: 14,
     PlayerId: 15,
-    Keys: 16
+    Keys: 16,
+    Progress: 17
   };
 
   const ErrorCodes = {

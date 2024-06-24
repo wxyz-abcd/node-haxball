@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
+  const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "modifyPlayerPing", true, { // "modifyPlayerPing" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -21,26 +21,56 @@ module.exports = function(API){
   });
   
   this.defineVariable({
-    name:"Change ping",
+    name:"isActive",
+    type:VariableType.Boolean,
+    value:true
+  })
+
+  this.defineVariable({
+    name:"update",
     type:VariableType.Void,
-    value: () => {
+    value: () => { 
       if(that.playerID == 0)
         return true && (that.room.hostPing = that.pingValue); 
-      playerList.set(Number(that.playerID), that.pingValue);
+      playerList.set(Number(that.playerID), {ping: that.pingValue, isActive:that.isActive});
     }
   });
 
-  var that = this, _hostPing = 0, playerList = new Map();
+  var that = this, 
+  _hostPing = 1987987987, // default value
+  playerList = new Map();
   //#endregion Variables
 
   //#region Callbacks
   this.initialize = function(){
     that.room.hostPing = _hostPing; // this is host-only. host ping has to be modified like this.
+    if(that.room.isHost)
+      that.modifyPlayerPing = function(playerId, ping, customData){
+        if(playerList.has(Number(playerId)) && playerList.get(Number(playerId)).isActive)
+          return playerList.get(Number(playerId)).ping;
+        return ping;
+      };
   };
-  this.modifyPlayerPing = function(playerId, ping, customData){
-    if(playerList.size != 0 && playerList.has(playerId))
-      return playerList.get(playerId);
-    return ping; // don't modify ping value.
+  this.onVariableValueChange = function(addonObject, variableName, oldValue, newValue){
+    if(addonObject != that) return;
+    const data = playerList.get(Number(that.playerID)) ?? {};    
+    switch(variableName)
+    {
+      case "playerID":
+        that.isActive = data?.isActive || true;
+        that.pingValue =data?.ping ?? -1;
+        break;
+      
+      case "isActive":
+        data.isActive = newValue;
+        playerList.set(Number(that.playerID),data)
+        break;
+      default:
+        break;
+    }
   };
-  //#endregion Callbacks
+  this.modifyClientPing = (ping, customData) => {
+    return ((playerList.has(this.room.currentPlayerId) && playerList.get(this.room.currentPlayerId).isActive) ? playerList.get(this.room.currentPlayerId).ping : ping);
+  }
+    //#endregion Callbacks
 };
