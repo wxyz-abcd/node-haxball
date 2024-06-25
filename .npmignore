@@ -117,3 +117,4 @@ api_fixednames.js
 package_git.json
 examples/*_halfMinified
 examples/renderers/*_halfMinified.js
+examples/api_structure/headless_web.js
