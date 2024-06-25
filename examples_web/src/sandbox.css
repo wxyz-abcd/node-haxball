@@ -1,0 +1,486 @@
+* {
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+
+.marginRight {
+  margin-right: 3px;
+}
+
+.canvasContainer {
+  position: relative;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.canvasSubContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.gameStateContainer {
+  position: absolute;
+  top: 0px;
+  left: calc(50% - 225px);
+  width: 450px;
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #1A2125;
+  padding: 5px;
+  border-radius: 0 0 5px 5px;
+  font: 900 20px Arial Black,Arial Bold,Gadget,sans-serif;
+}
+
+.teamIcon {
+  width: 23px;
+  height: 23px;
+  border-radius: 5px;
+}
+
+.teamIcon.red{
+  background-color: #E56E56;
+}
+
+.teamIcon.blue{
+  background-color: #5689E5;
+}
+
+.score{
+  width: 35px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.scoreBoard {
+  display: flex;
+  align-items: center;
+}
+
+.gameTime {
+  display: flex;
+  align-items: center;
+}
+
+.gameTime > .overtime {
+  margin-right: 20px;
+  visibility: hidden;
+}
+
+.gameTime > .overtime.on {
+  visibility: visible;
+  animation: 0.4s linear overtime-appear;
+}
+
+@keyframes overtime-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+}
+
+.gameTime.time-warn {
+  animation: 0.3s infinite alternate linear time-warn;
+}
+
+@keyframes time-warn {
+  from { 
+    color: white 
+  } 
+  to { 
+    color:#ff8080
+  }
+}
+
+.gameTime > .digit {
+  width: 15px;
+  text-align: center;
+}
+
+.toolbar2 {
+  width: calc(100% - 10px);
+  height: 34px;
+  background-color: cadetblue;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 5px;
+}
+
+.toolbar3 {
+  position: absolute;
+  left: 30px;
+  top: calc(50% - 116px);
+  width: 45px;
+  height: 233px;
+  background-color: cadetblue;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.5;
+  z-index: 50000;
+  padding: 10px;
+}
+
+.toolbar3button {
+  width: 100%;
+  justify-content: center;
+  clip-path: inset(0px 0px);
+}
+
+.toolbar3button.selected {
+  background-color: #00ff00;
+}
+
+.toolbar3button.active {
+  background-color: #0000ff;
+}
+
+.toolbar3menu {
+  position: absolute;
+  left: 86px;
+  top: calc(50% - 52px);
+  width: 70px;
+  height: 104px;
+  background-color: cadetblue;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.5;
+  z-index: 50000;
+  padding: 10px;
+}
+
+.statusbar {
+  font-size: 11px;
+  position: relative;
+  width: 100%;
+  height: 20px;
+  display: flex;
+  flex-direction: row;
+  color: #0d3463;
+  background-color: #b2b7be;
+  align-items: center;
+}
+
+.statuselement{
+  font-size: 11px;
+  border-left: 1px solid #777;
+  border-right: 1px solid #777;
+  padding: 0px 4px;
+  margin-right: 2px;
+}
+
+.statusbutton {
+  padding: 0px;
+  align-items: center;
+}
+
+.statusmessage {
+  height: 100%;
+  width: 40%;
+  display: flex;
+  align-items: center;
+}
+
+.statuscoords {
+  white-space: nowrap;
+}
+
+.statusbutton2 {
+  font-size: 11px;
+  padding: 0px 6px;
+  align-items: center;
+}
+
+.dialog {
+  position: absolute;
+  min-width: 50px;
+  min-height: 50px;
+  width: 400px;
+  max-width: 800px;
+  max-height: 600px;
+  background-color: #1A2125;
+  opacity: 0.8;
+  border: 1px solid gray;
+  display: flex;
+  flex-direction: column;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.dialogtitlebar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  background-color: #5689E5;
+  border-bottom: 1px solid gray;
+}
+
+.dialogtitle {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.dialogcontents {
+  width: 100%;
+  overflow-y: auto;
+}
+
+.toolbarbtn {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  opacity: 0.5;
+  z-index: 100000;
+}
+
+.gameMenu {
+  display: none;
+}
+.playerElement {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 20px;
+}
+.playerFlag {
+  position: absolute;
+  left: 2px;
+}
+.playerElement.spec:hover {
+  background: #888;
+}
+.playerElement.red:hover {
+  background: #855;
+}
+.playerElement.blue:hover {
+  background: #558;
+}
+.playerElement.selected {
+  background: #595;
+}
+.playerElement.spec.selected:hover {
+  background: #8cc;
+}
+.playerElement.red.selected:hover {
+  background: #895;
+}
+.playerElement.blue.selected:hover {
+  background: #598;
+}
+
+.right {
+  position: absolute;
+  right: 5px;
+  display: flex;
+}
+.checkLabel {
+  display: flex;
+  align-items: center;
+}
+.inputRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5;
+}
+
+#CollisionFlagsPicker {
+  left: 100px;
+  top: 100px;
+  width: 360px;
+  height: 142px;
+  padding: 4px;
+  position: absolute;
+  display: none;
+  flex-wrap: wrap;
+  border: 1px solid rgb(187, 187, 187);
+  background: rgb(255, 255, 255);
+  border-radius: 8px;
+  line-height: 28px;
+  overflow: hidden auto;
+  z-index: 5000;
+}
+
+#CollisionFlagsPicker > span {
+  padding: 2px;
+  margin: 1px 1px 0px 1px;
+  border: 1px solid black;
+  background-color: #929292;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#CollisionFlagsPicker > span:hover {
+  background-color: #b6b6b6;
+}
+
+#CollisionFlagsPicker > span.active {
+  background-color: #00bb00;
+}
+
+.vertexbtn_inner {
+  margin-left: -4px;
+  margin-top: -1px;
+  font-size: 17px;
+  color: #bb44cc;
+}
+
+.segmentbtn {
+  position: relative;
+  color: black;
+}
+
+.segmentbtn_inner {
+  position: absolute;
+  font-size: 12px;
+  color: #bb44cc;
+}
+
+.planebtn_inner {
+  font-weight: 100;
+  font-size: 27px;
+  margin-left: -5px;
+  margin-top: -1px;
+  color: #cc8833;
+}
+
+.jointbtn {
+  position: relative;
+  color: black;
+}
+
+.jointbtn_inner {
+  position: absolute;
+  top: 5px;
+  font-size: 12px;
+}
+
+.playerbtn {
+  position: relative;
+}
+
+.playerbtn_inner {
+  position: relative;
+  top: -3px;
+}
+.playerbtn:after {
+  position: absolute;
+  top: 13px;
+  font-size: 8px;
+  content: "abc";
+}
+
+.spawnpointbtn_inner {
+  margin-top: -3px;
+  margin-left: -4px;
+  font-size: 40px;
+  color: #458fc4;
+}
+
+.fixedTb2ButtonHeight {
+  height: 25px;
+}
+
+.Tb2Start.red {
+  color: transparent;
+  width: 44px;
+}
+
+.Tb2Start.red:after {
+  position: absolute;
+  top: 1px;
+  left: calc(50% - 8px);
+  color: white;
+  content: "\25a0";
+  font-size: 27px;
+}
+
+.flagSelector {
+  background-color: white;
+  color: black;
+}
+
+.snapshotButtons{
+  background-color: #d2dcdd;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.mr{
+  margin-right: 3px;
+}
+
+table{
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #555;
+  color: #683a3a;
+  overflow: auto;
+}
+
+table thead{
+  width: 100%;
+}
+
+table tr{
+  width: 100%;
+}
+
+table thead tr{
+  background-color: #598;
+}
+
+table tbody tr:nth-child(even){
+  background-color: #d5d5b8;
+}
+
+table tbody tr:nth-child(odd){
+  background-color: #c5c7e7;
+}
+
+table tbody tr:hover{
+  background-color: #9c7a7a;
+}
+
+table tbody tr.selected{
+  background-color: #c54242;
+}
+
+table th, table td{
+  border: 1px solid #555;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table th.firstColumn{
+  width: 30px;
+}
+
+table th.secondColumn{
+  width: calc(100% - 300px);
+}
+
+table th.thirdColumn{
+  width: 270px;
+}

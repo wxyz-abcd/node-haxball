@@ -20,7 +20,7 @@ If you don't want this, you need to modify the source codes to use our proxy ser
   You can select one of the html files to open it directly, or you can directly use the file by writing it in the address bar. For example, you will write 
   `http://localhost:5000/roomList` to go to `roomList.html` page.
 
-  There are 5 main files that you can directly start with:
+  There are 7 main files that you can directly start with:
 
     - `roomList.html`: This is the main interface, as it also is in the original Haxball webpage. It shows the list of rooms to join. You can create a new room, 
     join current rooms, or refresh the room list. All other pages are accessible from here. There are filters at the bottom of the page, you can experiment with 
@@ -40,6 +40,8 @@ If you don't want this, you need to modify the source codes to use our proxy ser
 
     - `replayViewer.html`: This is a page to load/view a replay file. Since there is no need for a full-blown chat component here, all chat is written in console.
     - `replayToVideo.html`: This is a page to view and convert a replay file to a gif/webm/mp4 video using the CCapture library. The outputs are huge files that probably need to be compressed before they can be uploaded anywhere. Also notice that CCapture's mp4 feature requires a custom server for the conversion. You can read more about the library here: https://github.com/spite/ccapture.js/.
+
+    - `sandbox.html`: This is a single-player sandbox mode of Haxball. It is also a live map editor where you can load/save maps, freeze/step-by-step/unfreeze/speed up/slow down the physics engine. It is also possible to take complete snapshots of the current room state and go back to that snapshot position later on; this feature is created as a replacement for the undo/redo feature that exists in normal editors. This page is almost completed, but it is quite old and it has to be rewritten sometime. There is currently no parameter available for this page.
 
   There is also another main html file called `game.html`, but it's not for direct usage. It is opened automatically when you create or join a room with canvas 
   capabilities. Most of the basic game functionalities have been implemented, and should work correctly.

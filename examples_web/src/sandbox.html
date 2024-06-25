@@ -1,0 +1,167 @@
+<html>
+  <head>
+    <script src="./addonImporter.js"></script>
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <!--script src="./vendor/api.js"></script-->
+    <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.5.1/jscolor.min.js" integrity="sha512-/e+XGe8oSD9M1t0NKNCrUlRsiyeFTiZw4+pmf0g8wTbc8IfiLwJsjTODc/pq3hKhKAdsehJs7STPvX7SkFSpOQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="./contextmenu.js"></script>
+    <script src="./flagSelector.js"></script>
+    <link rel="stylesheet" href="./scrollbar.css" />
+    <link rel="stylesheet" href="./button.css" />
+    <link rel="stylesheet" href="./canvas.css" />
+    <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./flagSelector.css" />
+    <link rel="stylesheet" href="./contextmenu.css" />
+    <link rel="stylesheet" href="./sandbox.css" />
+  </head>
+  <body>
+    <button class="button toolbarbtn">&#9776;</button>
+    <div class="toolbar2">
+      <div style="display:flex;flex-direction:row;align-items:center;padding-left:47px;">
+        <button class="button marginRight fixedTb2ButtonHeight">
+          Freeze
+        </button>
+        <label>Speed:</label><input class="marginRight" type="number" value="1" min="0" max="20" step="0.1" />
+        <button class="button marginRight fixedTb2ButtonHeight">
+          Step
+        </button>
+        <button class="button marginRight fixedTb2ButtonHeight Tb2Start">
+          Start
+        </button>
+        <button class="button fixedTb2ButtonHeight">
+          Pause/Resume
+        </button>
+      </div>
+      <div style="display:flex;flex-direction:row;align-items:center;">
+        <button class="button marginRight fixedTb2ButtonHeight">
+          Snapshots...
+        </button>
+        <button class="button marginRight fixedTb2ButtonHeight">
+          Load...
+        </button>
+        <button class="button fixedTb2ButtonHeight">
+          Save...
+        </button>
+      </div>
+    </div>
+    <div class="toolbar3">
+      <button class="button toolbar3button blue" title="Select">👆</button>
+      <button class="button toolbar3button blue" title="Vertex">&nbsp;<span class="vertexbtn_inner">o</span></button>
+      <button class="button toolbar3button blue segmentbtn" title="Segment">━<span class="segmentbtn_inner">o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o</span></button>
+      <button class="button toolbar3button blue" title="Goal">🥅</button>
+      <button class="button toolbar3button blue" title="Plane">&nbsp;<span class="planebtn_inner">┈</span></button>
+      <button class="button toolbar3button blue" title="Disc">🟡</button>
+      <button class="button toolbar3button blue jointbtn" title="Joint">━<span class="jointbtn_inner">🟡&nbsp;&nbsp;🟡</span></button>
+      <button class="button toolbar3button blue" title="Spawn Point">&nbsp;<span class="spawnpointbtn_inner">◌</span></button>
+      <button class="button toolbar3button blue playerbtn" title="Player"><span class="playerbtn_inner">🔴</span></button>
+    </div>
+    <div class="toolbar3menu">
+      <button class="button toolbar3button blue" title="Add">➕</button>
+      <button class="button toolbar3button blue" title="Update">✍️</button>
+      <button class="button toolbar3button blue" title="Remove">➖</button>
+      <button class="button toolbar3button blue" title="Show/Hide">👁</button>
+    </div>
+    <div class="canvasContainer">
+      <div class="canvasSubContainer">
+        <canvas></canvas>
+        <div class="gameStateContainer">
+          <div class="scoreBoard">
+            <div class="teamicon red"></div>
+            <div class="score">0</div>
+            <div>-</div>
+            <div class="score">0</div>
+            <div class="teamicon blue"></div>
+          </div>
+          <div class="gameTime">
+            <span class="overtime">OVERTIME!</span>
+            <span class="digit">0</span>
+            <span class="digit">0</span>
+            <span>:</span>
+            <span class="digit">0</span>
+            <span class="digit">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="gameMenu">
+      <div style="display:flex;flex-direction:row;width:100%;height:245px;justify-content:space-evenly;">
+        <div style="width:100%;text-align:center;">
+          <div style="width:100%;background:red;">
+            Red Team
+          </div>
+          <div style="height:100%;overflow-y:auto;position:relative;"></div>
+        </div>
+        <div style="width:100%;text-align:center;">
+          <div style="width:100%;background:#555;">
+            Spectators
+          </div>
+          <div style="height:100%;overflow-y:auto;position:relative;"></div>
+        </div>
+        <div style="width:100%;text-align:center;">
+          <div style="width:100%;background:blue;">
+            Blue Team
+          </div>
+          <div style="height:100%;overflow-y:auto;position:relative;"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:row;width:100%;justify-content:space-evenly;align-items:center;margin-bottom:4px;">
+        <div>
+          Name: <input type="text" style="width:100px" value="abc"></input>
+        </div>
+        <div>
+          Avatar: <input type="text" style="width:30px" value="XX"></input>
+        </div>
+        <button class="button">
+          Add
+        </button>
+        <button class="button">
+          Remove
+        </button>
+      </div>
+    </div>
+    <div class="snapshots">
+      <div class="snapshotButtons">
+        <button class="button mr">Save</button>
+        <button class="button mr">Load</button>
+        <button class="button mr">Delete</button>
+      </div>
+      <div style="height:398px;overflow:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th class="firstColumn">#</th>
+              <th class="secondColumn">Name</th>
+              <th class="thirdColumn">Picture</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="CollisionFlagsPicker" tabindex="-1"></div>
+    <div class="ctxmenu"></div>
+    <div class="statusbar">
+      <span class="statuselement statusmessage"></span>
+      <div class="statuselement" style="display:flex;flex-direction:row;justify-content:center;align-items:center;padding:0px 20px;">
+        <span>Tool:</span><select id="tool" class="button statuselement statusbutton"></select>
+        <select id="mapProperties" class="button statuselement statusbutton" style="height:17px;padding:0px 4px;">
+          <option style="display:none">Map Properties</option>
+          <option>General</option>
+          <option>Background</option>
+          <option>Player Physics</option>
+        </select>
+      </div>
+      <div style="flex-grow:1"></div>
+      <div class="statuselement" style="display:flex;flex-direction:row;width:200px;justify-content:center;align-items:center;">
+        <span class="statuscoords"></span>
+      </div>
+      <div class="statuselement" style="display:flex;flex-direction:row;width:130px;">
+        <label class="checkLabel marginRight"><input type="checkbox" id="playMode"></input>Play Mode</label>
+        <button id="menu" class="button green statusbutton2">Menu</button>
+      </div>
+    </div>
+    <script src="./sandbox.js"></script>
+  </body>
+</html>

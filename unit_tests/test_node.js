@@ -1,4 +1,4 @@
-require("./test.js")(require("../src/index.js")(), "thr1.AAAAAGZ4d3g2ntRmucrkyw.SCN52Q9dxas", {
+require("./test.js")(require("../src/index.js")(), "thr1.AAAAAGZ6cgAuUt1RU6Tp4w.P5AhIaIk_HM", {
   log: (...a)=>{
     process.stderr.write(a.join(""));
   },
