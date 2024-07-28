@@ -36,9 +36,11 @@ module.exports = function(window, config){
       backend: config?.backend,
       proxyAgent: config?.proxyAgent,
       fixNames: config?.fixNames,
+      stunServer: config?.stunServer,
       version: config?.version,
+      noVariableValueChangeEvent: config?.noVariableValueChangeEvent,
       noWebRTC: config?.noWebRTC,
-      noVariableValueChangeEvent: config?.noVariableValueChangeEvent
+      identityToken: config?.identityToken
     }
   );
 }

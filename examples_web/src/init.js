@@ -16,13 +16,16 @@ function init(headless, roomCallback){
     performance: window.performance,
     JSON5: window.JSON5,
     pako: window.pako
-  }/*,{
+  },{
+    noVariableValueChangeEvent: true
+    /*
     proxy: {
       WebSocketChangeOriginAllowed: false,
       WebSocketUrl: "wss://surf-emerald-armadillo.glitch.me/",
       HttpUrl: "https://surf-emerald-armadillo.glitch.me/rs/"
     }
-  }*/); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
+    */
+  }); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
   const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = API;
 
@@ -39,66 +42,23 @@ function init(headless, roomCallback){
       pluginsArray.push(new plugins.autoPlay_defensive(API));
     if (params.aimbot) // if we want aimbot library
       librariesArray.push(new libraries.aimbot(API));
-    if (params.createRoom)
-      Room.create({
-        name: params.r_name, 
-        password: params.r_pass, 
-        maxPlayerCount: params.r_mpc,
-        showInRoomList: params.r_sirl, 
-        noPlayer: false,
-        //playerCount: 25,
-        //unlimitedPlayerCount: true,
-        //fakePassword: false,
-        geo: { lat: params.r_lat, lon: params.r_lon, flag: params.r_flag },
-        token: params.token, 
-      }, {
-        storage: {
-          crappy_router: false,
-          player_name: params.p_name,
-          avatar: params.p_avatar,
-          fps_limit: 0,
-          geo: {
-            lat: params.p_lat,
-            lon: params.p_lon,
-            flag: params.p_flag
-          },
-          extrapolation: 0
-        }, 
-        libraries: librariesArray,
-        renderer: null,
-        plugins: pluginsArray,
-        onSuccess: (room)=>{ roomCallback(room, params); },
-        onRequestRecaptcha: ()=>{
-          alert("Token rejected. Get a fresh token first!");
-          window.close();
-        },
-        onLeave: ()=>{
-          alert("The room has been closed.");
-          window.close();
-        }
-      });
-    else{
-      var authPromise;
-      if (params.p_ak=="")
-        authPromise = Utils.generateAuth();
-      else
-        authPromise = Utils.authFromKey(params.p_ak);
-      authPromise.then((x)=>{
-        var authObj, alerted = false;
-        if (params.p_ak=="")
-          [params.p_ak, authObj] = x;
-        else
-          authObj = x;
-        Room.join({
-          id: params.r_id,
-          password: params.r_pass,
-          token: params.token,
-          authObj: authObj
+    switch (params.action){
+      case "create":{
+        Room.create({
+          name: decodeURIComponent(params.r_name), 
+          password: decodeURIComponent(params.r_pass), 
+          maxPlayerCount: params.r_mpc,
+          showInRoomList: params.r_sirl, 
+          noPlayer: false,
+          //playerCount: 25,
+          //unlimitedPlayerCount: true,
+          //fakePassword: false,
+          geo: { lat: params.r_lat, lon: params.r_lon, flag: params.r_flag },
+          token: params.token, 
         }, {
           storage: {
             crappy_router: false,
             player_name: params.p_name,
-            player_auth_key: params.p_ak,
             avatar: params.p_avatar,
             fps_limit: 0,
             geo: {
@@ -116,26 +76,82 @@ function init(headless, roomCallback){
             alert("Token rejected. Get a fresh token first!");
             window.close();
           },
-          onFailure: (x)=>{
-            if (alerted)
-              return;
-            alerted = true;
-            alert(x.toString());
-            window.close();
-          },
-          onLeave: (x)=>{
-            if (alerted)
-              return;
-            alerted = true;
-            alert(x.toString());
+          onLeave: ()=>{
+            alert("The room has been closed.");
             window.close();
           }
         });
-      }).catch((ex)=>{
-        console.log(ex);
-        alert("Auth key error.");
-        window.close();
-      });
+        break;
+      }
+      case "join":{
+        params.p_pass = decodeURIComponent(params.p_pass);
+        params.p_ak = decodeURIComponent(params.p_ak);
+        params.p_name = decodeURIComponent(params.p_name);
+        params.p_avatar = decodeURIComponent(params.p_avatar);
+        var authPromise;
+        if (params.p_ak=="")
+          authPromise = Utils.generateAuth();
+        else
+          authPromise = Utils.authFromKey(params.p_ak);
+        authPromise.then((x)=>{
+          var authObj, alerted = false;
+          if (params.p_ak=="")
+            [params.p_ak, authObj] = x;
+          else
+            authObj = x;
+          Room.join({
+            id: params.r_id,
+            password: params.r_pass,
+            token: params.token,
+            authObj: authObj
+          }, {
+            storage: {
+              crappy_router: false,
+              player_name: params.p_name,
+              player_auth_key: params.p_ak,
+              avatar: params.p_avatar,
+              fps_limit: 0,
+              geo: {
+                lat: params.p_lat,
+                lon: params.p_lon,
+                flag: params.p_flag
+              },
+              extrapolation: 0
+            }, 
+            libraries: librariesArray,
+            renderer: null,
+            plugins: pluginsArray,
+            onSuccess: (room)=>{ roomCallback(room, params); },
+            onRequestRecaptcha: ()=>{
+              alert("Token rejected. Get a fresh token first!");
+              window.close();
+            },
+            onFailure: (x)=>{
+              if (alerted)
+                return;
+              alerted = true;
+              alert(x.toString());
+              window.close();
+            },
+            onLeave: (x)=>{
+              if (alerted)
+                return;
+              alerted = true;
+              alert(x.toString());
+              window.close();
+            }
+          });
+        }).catch((ex)=>{
+          console.log(ex);
+          alert("Auth key error.");
+          window.close();
+        });
+        break;
+      }
+      case "watch":{
+        roomCallback();
+        break;
+      }
     }
   }
 
@@ -149,6 +165,10 @@ function init(headless, roomCallback){
       }
       case "join":{
         params = readJoinRoomParameters(q);
+        break;
+      }
+      case "watch":{
+        params = readWatchStreamParameters(q);
         break;
       }
       default:

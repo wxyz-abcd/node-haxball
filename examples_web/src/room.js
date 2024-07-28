@@ -57,7 +57,7 @@ function downloadFile(fileName, blobType, blobContents){
   c.remove();
 }
 
-var isAdmin = ()=>(room.currentPlayer?.isAdmin || room.isHost);
+var isAdmin = ()=>(room?.currentPlayer?.isAdmin || room?.isHost);
 
 function getInput(label, inputDefaultValue, cancelable, yesNo){
   return new Promise((resolve, reject)=>{
@@ -104,20 +104,20 @@ function makePlayerContainer(elem, player){
     addContextMenuItem(ctxMenu, player.isAdmin ? "Remove Admin" : "Give Admin", isAdmin(), ()=>{
       if (!isAdmin())
         return;
-      room.setPlayerAdmin(player.id, !player.isAdmin);
+      room?.setPlayerAdmin(player.id, !player.isAdmin);
     });
     addContextMenuItem(ctxMenu, "Kick", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       getInput("Reason:", "", true, false).then((reason)=>{
-        room.kickPlayer(player.id, reason, false);
+        room?.kickPlayer(player.id, reason, false);
       },()=>{});
     });
     addContextMenuItem(ctxMenu, "Ban", isAdmin(), ()=>{
       if (!isAdmin())
         return;
       getInput("Reason:", "", true, false).then((reason)=>{
-        room.kickPlayer(player.id, reason, true);
+        room?.kickPlayer(player.id, reason, true);
       },()=>{});
     });
     return false;
@@ -134,7 +134,7 @@ function makeTeamContainer(elem, team){
   elem.ondrop = (event)=>{
     event.preventDefault();
     var playerId = parseInt(event.dataTransfer.getData("player"));
-    !isNaN(playerId) && room.setPlayerTeam(playerId, team.id);
+    !isNaN(playerId) && room?.setPlayerTeam(playerId, team.id);
   };
   var bDiv = document.createElement("div");
   bDiv.className = "buttons";
@@ -142,14 +142,14 @@ function makeTeamContainer(elem, team){
   b1.className = "button center join-btn";
   b1.innerText = team.name;
   b1.onclick = ()=>{
-    room.setPlayerTeam(room.currentPlayerId, team.id);
+    room?.setPlayerTeam(room?.currentPlayerId, team.id);
   };
   bDiv.appendChild(b1);
   if (team!=Team.spec){
     b2 = document.createElement("button");
     b2.className = "button center reset-btn admin-only";
     b2.onclick = ()=>{
-      room.resetTeam(team.id);
+      room?.resetTeam(team.id);
     };
     bDiv.appendChild(b2);
   }
@@ -163,7 +163,7 @@ function makeTeamContainer(elem, team){
     b1.disabled = roomState.teamsLocked || gameActive;
     if (b2)
       b2.disabled = gameActive;
-    var isAdmin = room.currentPlayer?.isAdmin || room.isHost;
+    var isAdmin = room?.currentPlayer?.isAdmin || room?.isHost;
     var arr = roomState.players.filter(x=>(x.team.id==team.id));
     var newList = arr.map((x)=>(x.id+","+(x.isAdmin?"1":"0")+","+x.ping)).join("|");
     if (newList!=oldList){
@@ -180,13 +180,13 @@ function makeTeamContainer(elem, team){
 }
 
 eRec.onclick = function(){
-  if (room.isRecording()){
-    var data = room.stopRecording(), date = new Date();
+  if (room?.isRecording()){
+    var data = room?.stopRecording(), date = new Date();
     var fileName = "HBReplay-" + date.getFullYear() + "-" + make2Digits("" + (date.getMonth() + 1)) + "-" + make2Digits("" + date.getDate()) + "-" + make2Digits("" + date.getHours()) + "h" + make2Digits("" + date.getMinutes()) + "m.hbr2";
     downloadFile(fileName, "octet/stream", data);
   }
   else
-    room.startRecording();
+    room?.startRecording();
   update(API, room, roomState);
 };
 eLink.onclick = function(){
@@ -200,23 +200,23 @@ eLeave.onclick = function(){
   }, ()=>{});
 };
 eAuto.onclick = function(){
-  room.autoTeams();
+  room?.autoTeams();
 };
 eRand.onclick = function(){
-  room.randTeams();
+  room?.randTeams();
 };
 eLock.onclick = function(){
-  room.lockTeams();
+  room?.lockTeams();
 };
 eReset.onclick = function(){
-  room.resetTeam(1);
-  room.resetTeam(2);
+  room?.resetTeam(1);
+  room?.resetTeam(2);
 };
 eTimeLimit.onchange = function(event){
-  room.setTimeLimit(event.target.value);//timeLimitRef.current.selectedIndex
+  room?.setTimeLimit(event.target.value);//timeLimitRef.current.selectedIndex
 };
 eScoreLimit.onchange = function(event){
-  room.setScoreLimit(event.target.value);//scoreLimitRef.current.selectedIndex
+  room?.setScoreLimit(event.target.value);//scoreLimitRef.current.selectedIndex
 };
 ePickStadium.onclick = function(event){
   showContextMenu(ctxMenu, event.pageX-3, event.pageY+3, "Pick Stadium", true);
@@ -224,7 +224,7 @@ ePickStadium.onclick = function(event){
     addContextMenuItem(ctxMenu, stadium.name, isAdmin(), ()=>{
       if (!isAdmin())
         return;
-      room.setCurrentStadium(stadium);
+      room?.setCurrentStadium(stadium);
     });
   });
   addContextMenuItem(ctxMenu, "Load from file...", isAdmin(), ()=>{
@@ -242,7 +242,7 @@ ePickStadium.onclick = function(event){
         var x = API.Utils.parseStadium(fr.result, console.warn);
         if (!x)
           return;
-        room.setCurrentStadium(x);
+        room?.setCurrentStadium(x);
       };
       fr.readAsText(f.item(0));
     };
@@ -250,13 +250,13 @@ ePickStadium.onclick = function(event){
   });
 };
 eStartGame.onclick = function(){
-  room.startGame();
+  room?.startGame();
 };
 eStopGame.onclick = function(){
-  room.stopGame();
+  room?.stopGame();
 };
 ePauseGame.onclick = function(){
-  room.pauseGame();
+  room?.pauseGame();
 };
 
 function make2Digits(a) {
@@ -276,14 +276,14 @@ window.update = function(_API, _room, _roomState){
     roomState = _roomState;
   }
   var gameActive = (roomState.gameState != null);
-  var isAdmin = room.currentPlayer?.isAdmin || room.isHost;
+  var isAdmin = room?.currentPlayer?.isAdmin || room?.isHost;
   var disableActions = !isAdmin || gameActive;
   if (isAdmin)
     eRoomView.classList.add("admin");
   else
     eRoomView.classList.remove("admin");
   eRoomName.innerText = roomState.name;
-  if (room.isRecording())
+  if (room?.isRecording())
     eRec.classList.add("active");
   else
     eRec.classList.remove("active");

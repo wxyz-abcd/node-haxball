@@ -32,7 +32,7 @@ module.exports = function(API, params){
       min: 0,
       max: Infinity
     },
-    value: "https://media.discordapp.net/attachments/961697112175824976/1152320533665435750/kirby-puffy.png"
+    value: "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/imageRenderer/kirby-puffy.png"
   });
 
   this.defineVariable({
@@ -43,7 +43,7 @@ module.exports = function(API, params){
       min: 0,
       max: Infinity
     },
-    value: "https://media.discordapp.net/attachments/946161840432500826/1152349720031789166/image.png"
+    value: "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/imageRenderer/image.png"
   });
   
   this.defineVariable({
@@ -542,7 +542,7 @@ module.exports = function(API, params){
           continue;
         this.drawDisc(disc, null);
       }
-      roomLibrariesMap?.aimbot?.calculateAndDraw(followDisc, mapObjects, this.ctx);
+      roomLibrariesMap?.aimbot?.calculateAndDraw(followDisc, gameState, this.ctx);
       this.ctx.lineWidth = 3;
       this.ctx.resetTransform();
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);

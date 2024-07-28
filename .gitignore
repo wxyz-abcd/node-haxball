@@ -115,4 +115,5 @@ package_git.json
 examples/*_halfMinified
 examples/renderers/*_halfMinified.js
 examples_web/*_halfMinified
+examples_web/src/streamWatcher.*
 examples_web/src/vendor/api.js

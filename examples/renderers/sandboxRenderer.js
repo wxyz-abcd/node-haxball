@@ -580,7 +580,7 @@ module.exports = function(API, params){
           this.drawDisc(disc, null);
         }
       }
-      roomLibrariesMap?.aimbot?.calculateAndDraw(followDisc, mapObjects, this.ctx);
+      roomLibrariesMap?.aimbot?.calculateAndDraw(followDisc, gameState, this.ctx);
       this.ctx.lineWidth = 3;
       this.ctx.resetTransform();
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);

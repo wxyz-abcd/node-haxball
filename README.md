@@ -139,7 +139,7 @@ Room.create({
     - `console`, `performance`, `crypto`, (browser's window object should have these objects as well.)
     - `RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `WebSocket`, `XMLHttpRequest`, (these classes are used by Haxball for communication, browser's window object should have these classes as well.)
     - `JSON5`, `pako`. (These are two external libraries required by Haxball.)
-  - `config`: Custom configuration for backend/proxy server. Valid object keys are;
+  - `config`: Custom configuration for backend/proxy server as well as the library itself. Valid object keys are;
     - `backend`: Custom backend configuration. Valid object keys are:
       - `hostname`: backend's main domain url address. Defaults to: `www.haxball.com`.
       - `hostnameWs`: backend's url address for websocket connections. Defaults to: `p2p.haxball.com`.
@@ -148,6 +148,7 @@ Room.create({
       - `WebSocketChangeOriginAllowed`: browsers' websocket libraries do not allow origin change for security reasons, so we need a proxy server to change the websocket request's origin for us. If `true`, we do not need a proxy server. (we can do that in NW.js, for example)
       - `WebSocketUrl`: proxy websocket url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `wss://p2p.haxball.com/` for host and `wss://p2p2.haxball.com/` for client.
       - `HttpUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `https://www.haxball.com/rs/`.
+    - `stunServer`: the url address of an external stun server that is required for the communication via WebRTC to work correctly. Defaults to: `stun:stun.l.google.com:19302`.
     - `proxyAgent`: a global custom proxy agent for this api object. This method does not work in browsers. Defaults to `null`.
     - `fixNames`: fix some important variable names or not. Defaults to: `true`.
     - `version`: Haxball's expected version number. Defaults to: `9`.
@@ -165,6 +166,7 @@ Room.create({
 - `BackgroundType`: This is the type of the variable in a stadium that defines its background texture type.
 - `GamePlayState`: This type lets us understand the actual state of the game. This type only exists in a GameState object.
 - `BanEntryType`: These values help understand the type of a ban entry instance inside a room's ban list.
+- `PlayerPositionInGame`: These are the common player positions in most football manager games.
 
 - `Language`: A class that defines a language. Any language should be based on this class.
 
@@ -265,10 +267,15 @@ Room.create({
   - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
   - `stadiumChecksum(stadium)`: calculate checksum for given `stadium`. returns `null` for original maps.
+  - `promiseWithTimeout(promise, msec)`: returns a new promise that executes the given `promise` until `msec` time has passed. if timeout is reached, the promise is rejected.
+  - `trimStringIfLonger(str, length)`: if the given `str` is longer than the `length`, it is trimmed and returned; otherwise it is directly returned.
+  - `hexStrToNumber(str)`: converts the `playerObject.conn` values to readable ip address string.
+  - `byteArrayToIp(uint8Array)`: converts a uint8array that was read from basro's backend into a readable ip address string.
 
 - `EventFactory`: Contains static functions to create all kinds of event messages.
 
   - `create(type)`: creates and returns an event message depending on the `type` parameter. returns `null` if `type` is not one of the types defined inside `OperationType` enum.
+  - `createFromStream(reader)`: creates and returns an event message after reading it from a stream `reader`. the `reader` should be of type `Impl.Stream.F`.
   - `checkConsistency(data)`: creates and returns an event message that can be used to trigger a consistency check. `data` should be an `ArrayBuffer`.
   - `sendAnnouncement(msg, color, style, sound)`: creates and returns an event message that can be used to send an announcement message(`msg`) with properties(`color`, `style`, `sound`).
   - `sendChatIndicator(active)`: creates and returns an event message that can be used to set the chat indicator status of a player to `active`.
@@ -361,6 +368,7 @@ Room.create({
         - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. Defaults to `null`.
 
         --- event callbacks section ---
+        - `preInit(room)`: this is run as soon as the `room` object is created, just before the initialization of the plugins etc.
         - `onSuccess(room)`: joined/created `room`.
         - `onFailure(error)`: join room failed with error(`error`).
         - `onLeave(msg)`: triggered while leaving the room with reason(`msg`).
@@ -372,6 +380,33 @@ Room.create({
         - `cancel()`: should be used to cancel the process of joining a room.
         - `useRecaptchaToken(token)`: should be used to send the recaptcha token after `onRequestRecaptcha` event occurred. currently only working while creating a room. workaround: in order to send the token to try and join a recaptcha-protected room, cleanup old resources and use `Room.join` with the new token.
     
+    - `streamWatcher(initialStreamData, callbacks, options)`: creates a streamWatcher room.
+
+      - Parameters: 
+        - `initialStreamData`: must be an `Uint8Array` that is received just after connecting to a streaming room.
+        - `callbacks`: explained in `Room.sandbox`.
+        - `options`: explained in `Room.sandbox`.
+
+      - Returning streamWatcher room object:
+        - Properties:
+          - `state`: An object containing all information about the current room state. Note that this object also has all of the functions explained below in section: `sandbox mode functions`. (it only has `copy()` instead of `takeSnapshot()`)
+          - `gameState`: room's game state information. returns null if game is not active. read-only.
+          - `currentPlayerId`: Always returns 0. It is only added for compatibility with renderers. (And it is only used in the initialization code of renderers.)
+          - `currentFrameNo`: returns the frame number of the room state that you are currently observing.
+          - `maxFrameNo`: returns the original current frame number of the room where the game is actually being played.
+        - functions:
+          - `readStream(reader)`: reads the data stream for "interval" streaming mode.
+          - `readImmediateStream(reader)`: reads the data stream for "immediate" streaming mode.
+          - `takeSnapshot()`: returns a complete snapshot of the current room state.
+          - `useSnapshot(newRoomState)`: sets the current room state reference to `newRoomState`. `newRoomState` should be created by `takeSnapshot()` first.
+          - `setSimulationSpeed(coefficient)`: Changes the speed of the simulation. `coefficient` must be a real number >=0.
+            - `coefficient` = 0 : stop simulation.
+            - 0 < `coefficient` < 1 : slow-motion simulation.
+            - `coefficient` = 1 : normal speed simulation.
+            - `coefficient` > 1 : fast-motion simulation.
+          - `runSteps(count)`: runs the simulation `count` steps. simulation must be stopped for this function to work.
+          - `destroy()`: Frees the resources that are used by this object.
+
     - `sandbox(callbacks, options)`: creates a sandbox room.
     
       - Parameters: 
@@ -467,7 +502,6 @@ Room.create({
   - `functions`:
     - `leave()`: leaves the room.
     - `setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword, unlimitedPlayerCount, showInRoomList })`: sets the room's properties.
-    - `setRecaptcha(on)`: sets the room's recaptcha mode. `on`: `true`/`false`. *DEPRECATED*: use `room.requireRecaptcha = on` instead.
     - `setKickRateLimit(min, rate, burst)`: sets the room's kick rate limit.
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
     - `setExtrapolation(extrapolation)`: sets the client's `extrapolation` value in msecs.
@@ -521,7 +555,9 @@ Room.create({
     - `setPluginActive(name, active)`: activate/deactivate the plugin(`name`).
     - `startRecording()`: start recording replay data. returns `true` if succeeded, `false` otherwise. recording should not be started before calling this.
     - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.
-    - `isRecording()`: returns `true` if recording has started; `false` otherwise.
+    - `startStreaming({immediate = true, onClientCount, emitData})`: start streaming the game. currently, recording and streaming cannot be run simultaneously. returns `{onSuccess: ()=>void, onDataReceived: (data)=>void, interval: ()=>void}`.
+    - `stopStreaming()`: stop streaming the game.
+    - `isRecording()`: returns `true` if recording/streaming has started; `false` otherwise.
     - `setConfig(roomConfig)`: sets the `RoomConfig` object that contains all the main callbacks of this room. the `roomConfig` object should be derived from the provided `RoomConfig` class.
     - `mixConfig(newRoomConfig)`: adds all callbacks in `newRoomConfig` into the room's current RoomConfig object. if there are callbacks with the same name, a new callback is created that calls both of them. (current callback is called first.)
     - `updatePlugin(pluginIndex, newPluginObj)`: sets the `Plugin` at the specified `pluginIndex` to the `newPluginObj` object, initialization and activation are automatic. plugin names must be the same. the plugin object should be derived from the provided `Plugin` class.
@@ -618,6 +654,7 @@ Room.create({
   - `abstract callbacks`: These functions should be overridden when writing a GUI application using this API before creating any `RoomConfig` object. These are defined in `RoomConfig.prototype`.
     - `defineMetadata(metadata)`: Does nothing, returns nothing by default. This function should define the given `metadata` object inside this `RoomConfig` object. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) For example, the default roomConfig in the examples folder uses the following `metadata` structure: `{name, version, author, description, allowFlags}`.
     - `defineVariable({name, value, type, range, description})`: Defines the variable with the given `name` and `value` inside this `RoomConfig` object. The rest of the properties are not used by default for optimization purposes. (We do not need these values in a non-GUI environment.) This function should be used whenever a variable whose value is changeable from outside will be defined. Fires an `onVariableValueChange` event whenever this variable's value changes, if the global `config.noVariableValueChangeEvent` is not `true`.
+    - `setVariableGUIProps(varName, ...vals)`: Does nothing, returns nothing by default. This function might be used to modify some GUI properties regarding a specific variable called `varName`. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) `vals` should contain `{name: propName, value: propValue}` for each property named `name` that is required to set its new `value`. For example; in a GUI environment, `setVariableGUIProps("testVariable", {name: "visible", value: false})` could make the `testVariable` disappear from the GUI.
 
   - `modifier callbacks`:
     - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedName, modifiedFlag, modifiedAvatar]`. if `dataArray` is `null`, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
@@ -747,6 +784,9 @@ Room.create({
       - `customData = onBeforePingData(array)`: ping values for all players was received. may only be triggered by host.
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onAfterPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
+      - `customData = onBeforePingChange(instantPing, averagePing, maxPing)`: instant/average/max ping values for the current player were just calculated. client-only.
+      - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
+      - `onAfterPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `customData = onBeforeExtrapolationChange(value)`: extrapolation was set to (`value`). triggered individually.
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onAfterExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
@@ -867,6 +907,7 @@ Room.create({
       - `onPositionsReset(customData)`: positions were reset just after a goal. triggered individually.
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
+      - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
@@ -940,6 +981,7 @@ Room.create({
       - `onPositionsReset(customData)`: positions were reset after a goal. triggered individually.
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
+      - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
@@ -975,14 +1017,10 @@ Room.create({
     - `w`: StreamWriter class
 
   - `Utils`: Some utility classes (all of them may not be necessarily useful but still, why not export them?)
-    - `U`: string operations 1
-    - `D`: string operations 2
-    - `J`: string operations 3
-    - `K`: string operations 4
-    - `r`: mostly used for object casting
+    - `D`: string operations 1
+    - `J`: string operations 2
+    - `K`: string operations 3
     - `M`: webserver api operations
-    - `n`: connection constants
-    - `va`: RoomList operations
     - `q`: global error class
 
 

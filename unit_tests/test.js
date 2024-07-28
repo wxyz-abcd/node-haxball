@@ -961,7 +961,7 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
 
   var banList_addRemoveIp = (expectedFunc) => new Promise((resolve, reject)=>{
     setTimeout(()=>{
-      var bId = cRoom.addIpBan(Impl.Utils.U.Ur(cRoom.getPlayer(jRoom.currentPlayerId).conn))[0];
+      var bId = cRoom.addIpBan(Utils.hexStrToNumber(cRoom.getPlayer(jRoom.currentPlayerId).conn))[0];
       setTimeout(()=>{
         jRoom.leave();
         setTimeout(()=>{

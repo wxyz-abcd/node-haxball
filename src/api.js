@@ -25,8 +25,12 @@ function abcHaxballAPI(window, config){
   (!config.backend.hostnameWs) && (config.backend.hostnameWs = "p2p.haxball.com");
   (config.backend.secure==null) && (config.backend.secure = true);
   (config.fixNames==null) && (config.fixNames = true);
+  (config.stunServer==null) && (config.stunServer = "stun:stun.l.google.com:19302");
   
   const defaultVersion = config.version || 9;
+  const backendUrl = (config.backend.secure?"wss":"ws")+"://"+config.backend.hostnameWs+"/"; // n.Vr
+  const httpUrl = config.proxy?.HttpUrl || ((config.backend.secure?"https":"http")+"://"+config.backend.hostname+"/rs/"); // n.Ee
+  const stunServers = [{ urls: config.stunServer }]; // n.Vf
 
   const ConnectionState = {
     ConnectingToMaster: 0,
@@ -125,6 +129,30 @@ function abcHaxballAPI(window, config){
     AfterGoal: 2,
     Ending: 3
   };
+
+  const PlayerPositionInGame = {
+    None: 0,
+    GK: 1, // Goalkeeper
+    SW: 2, // Sweeper
+    WBL: 3, // Wing Back Left
+    DL: 4, // Defender Left
+    DC: 5, // Defender Centre
+    DR: 6, // Defender Right
+    WBR: 7, // Wing Back Right
+    DML: 8, // Defensive Midfielder Left
+    DMC: 9, // Defensive Midfielder Centre
+    DMR: 10, // Defensive Midfielder Right
+    ML: 11, // Midfielder Left
+    MC: 12, // Midfielder Centre
+    MR: 13, // Midfielder Right
+    AML: 14, // Attacking Midfielder Left
+    AMC: 15, // Attacking Midfielder Centre
+    AMR: 16, // Attacking Midfielder Right
+    FL: 17, // Left Forward
+    FC: 18, // Centre Forward
+    FR: 19, // Right Forward
+    ST: 20, // Striker
+  };
   
   const VariableType = {
     Void: 0,
@@ -144,7 +172,8 @@ function abcHaxballAPI(window, config){
     File: 14,
     PlayerId: 15,
     Keys: 16,
-    Progress: 17
+    Progress: 17,
+    PlayerPositionInGame: 18
   };
 
   const ErrorCodes = {
@@ -209,41 +238,6 @@ function abcHaxballAPI(window, config){
     NoProxyIdentitySolution: 58
   };
 
-  // global functions to run nullable functions:
-
-  function A() {}
-  A.b = !0;
-  A.i = function (a) {
-    null != a && a();
-  };
-  function y() {}
-  y.b = !0;
-  y.i = function (a, b) {
-    null != a && a(b);
-  };
-  function ia() {}
-  ia.b = !0;
-  ia.i = function (a, b, c) {
-    null != a && a(b, c);
-  };
-  function Cb() {}
-  Cb.b = !0;
-  Cb.i = function (a, b, c, d) {
-    null != a && a(b, c, d);
-  };
-  function vb() {}
-  vb.b = !0;
-  vb.i = function (a, b, c, d, e) {
-    null != a && a(b, c, d, e);
-  };
-  function Zz() {}
-  Zz.b = !0;
-  Zz.i = function (a, b, c, d, e, f) {
-    null != a && a(b, c, d, e, f);
-  };
-
-  /////////////////////////////////
-
   var currentLanguage = null, allRooms = []; // all current room objects have to be stored in this array so that they can receive the language changed signal directly from API.
 
   function removeRoomFromList(room){
@@ -262,7 +256,7 @@ function abcHaxballAPI(window, config){
     set: function(langObj){
       currentLanguage = langObj;
       allRooms.forEach((room)=>{
-        ia.i(room._onLanguageChange, langObj?.abbr);
+        room._onLanguageChange?.(langObj?.abbr);
       });
     }
   });
@@ -270,6 +264,34 @@ function abcHaxballAPI(window, config){
   var gls = (id, params)=>Language.resolveText(currentLanguage?.api?.errors?.[id], params||[]);
   var clpip = (s)=>(console.warn(gls(ErrorCodes.NoProxyIdentityProblem)||"NoProxyIdentityProblem"), s = gls(ErrorCodes.NoProxyIdentitySolution), s && console.warn(s))
 
+  function vvt(a, b) { // r.G -> validateValueType(value, type)
+    var c = null != b;
+    if (c){
+      switch (b) {
+        case Array:
+          c = a instanceof Array;
+          break;
+        case Boolean:
+          c = "boolean" == typeof a;
+          break;
+        case Number:
+          c = "number" == typeof a;
+          break;
+        case Integer:
+          c = ("number" == typeof a) && ((a | 0) === a);
+          break;
+        case String:
+          c = "string" == typeof a;
+          break;
+        default:
+          c = false;
+      }
+      if (c)
+        return a;
+    }
+    throw new q(createError(ErrorCodes.ObjectCastError, JSON.stringify(a), JSON.stringify(b))); // "Cannot cast " + a + " to " + b
+  };
+  
   function HBError(){
     this.code = ErrorCodes.Empty;
     this.params = null;
@@ -324,32 +346,19 @@ function abcHaxballAPI(window, config){
 
 
 
-  function hc() {}
-  hc.b = !0;
-  hc.Is = function (a, b) {
-    var c = new Uint8Array(this, a, null == b ? null : b - a),
-      d = new Uint8Array(c.byteLength);
-    d.set(c);
-    return d.buffer;
-  };
-  var rc = 0;
-  null == String.fromCodePoint &&
-    (String.fromCodePoint = function (a) {
-      return 65536 > a
-        ? String.fromCharCode(a)
-        : String.fromCharCode((a >> 10) + 55232) +
-            String.fromCharCode((a & 1023) + 56320);
-    });
+  //var rc = 0;
+  String.fromCodePoint || (String.fromCodePoint = (a) => (a<65536) ? String.fromCharCode(a) : (String.fromCharCode((a>>10)+55232)+String.fromCharCode((a&1023)+56320)));
   String.prototype.f = String;
   String.b = !0;
   Array.b = !0;
   Date.prototype.f = Date;
   Date.b = "Date";
-  null == ArrayBuffer.prototype.slice && (ArrayBuffer.prototype.slice = hc.Is);
-  var oc = Boolean, z = Number, sc = {}, Pb = {}, tc = {}, uc = {};
-  function bc() {}
-  bc.b = !0;
-  bc.prototype = { f: bc };
+  ArrayBuffer.prototype.slice || (ArrayBuffer.prototype.slice = function (a, b) {
+    var c = new Uint8Array(this, a, null == b ? null : b - a), d = new Uint8Array(c.byteLength);
+    d.set(c);
+    return d.buffer;
+  });
+  var Integer = {};
   function Bb(a) {
     this.xp = a;
   }
@@ -372,33 +381,23 @@ function abcHaxballAPI(window, config){
       return String(this.Ta);
     },
   });
-  function lc() {}
-  lc.b = !0;
-  lc.Dr = function (a, b) {
-    return new Promise(function (c, d) {
-      var e = setTimeout(function () {
-        d("Timed out");
-      }, b);
-      a.then(
-        function (a) {
-          clearTimeout(e);
-          c(a);
-        },
-        function (a) {
-          clearTimeout(e);
-          d(a);
-        }
-      );
+  var pWT = (promise, msec) => new Promise((c, d)=>{ // promiseWithTimeout
+    var e = setTimeout(()=>{
+      d("Timed out");
+    }, msec);
+    promise.then((a)=>{
+      clearTimeout(e);
+      c(a);
+    }, (a)=>{
+      clearTimeout(e);
+      d(a);
     });
-  };
-  function Ta() {}
-  Ta.b = !0;
-  function ya() {}// Moved this out for now... This process might have broken the app, because ya.zc values will get confused on multiple room joins. However, it seems to work correctly for now.
-  ya.b = !0;
-  ya.zc = 0;
-  function cc() {}
-  cc.b = !0;
-  cc.prototype = { f: cc };
+  });
+  var cH = (a) => (a.reduce((x,y)=>{x+=y;x+=x<<10;x^=x>>>6;return x;},0)|0); // calculateHash
+  var tSil = (a, b) => (a.length <= b ? a : D.substr(a, 0, b)); // U.Qc (trimStringIfLonger)
+  var hStn = (b) => { for (var a = "", l = 0; l < b.length; ) a += J.Wg(b.charAt(l++), b.charAt(l++));return a; }; // U.Ur (hexStrToNumber)
+  var bAti = (a) => { for (var b = "", c = 0, d = a.byteLength; c < d; ) b += String.fromCharCode(a[c++]);return b; }; // U.Zr (byteArrayToIp)
+  var yazc = 0; // ya.zc (current frame index?)
   function C(a, b) {
     var c = Object.create(a),
       d;
@@ -406,27 +405,10 @@ function abcHaxballAPI(window, config){
     b.toString !== Object.prototype.toString && (c.toString = b.toString);
     return c;
   }
-  function ga() {
-    return r.Be(this, "");
-  }
-  function nc() {}
-  nc.b = !0;
-  nc.gf = function (a) {
-    a = a.split(" ");
-    if ("typ" != a[6]) throw new q(null);
-    return { Jr: a[7], Xo: a[4] }; // port: parseInt(a[5])
-  };
-  
-  function dc() {
-    this.hash = 0;
-  }
-  function r() {}
-  function ec() {}
   function D() {}
   function J() {}
   function K() {}
   function M() {}
-  function U() {}
   function Fb() {
     this.Id = 0;
     this.w = "";
@@ -442,8 +424,6 @@ function abcHaxballAPI(window, config){
     this.$ = "";
     this.Le = Infinity;
   }
-  function va() {}
-  function n() {}
   function F(a, b) {
     null == b && (b = !1);
     this.o = a;
@@ -469,64 +449,12 @@ function abcHaxballAPI(window, config){
     this.ed = 16777215;
     this.fb = [];
   }
-  function p(a, b, c, d, e, k) {
-    this.pg = null;
+  function p(a, b, c, d, k) {
     this.$ = a;
     this.R = b;
     this.Ch = c;
     this.cp = d;
-    this.w = e;
     this.v = k;
-    this.wm = new ka();
-    this.wm.fb.push(b);
-  }
-  function B() {
-    this.ud = 0;
-    this.v = 32;
-    this.h = 63;
-    this.m = 1;
-    this.a = new H(0, 0);
-  }
-  function E() {
-    this.Hg = this.Ig = this.wa = null;
-    this.Yj = 0;
-    this.ca = this.W = this.Xd = null;
-    this.Cc = 0;
-    this.m = 1;
-    this.h = 63;
-    this.v = 32;
-    this.vb = 1 / 0;
-    this.Za = !0;
-    this.R = 0;
-  }
-  function L() {
-    this.v = 32;
-    this.h = 63;
-    this.m = 1;
-    this.Ua = 0;
-    this.wa = new H(0, 0);
-  }
-  function sb() {
-    this.qe = p.Ia;
-    this.ca = new H(0, 0);
-    this.W = new H(0, 0);
-  }
-  function ua() {
-    this.h = this.v = 63;
-    this.R = 16777215;
-    this.Ca = 0.99;
-    this.aa = 1;
-    this.m = 0.5;
-    this.Z = 10;
-    this.oa = new H(0, 0);
-    this.D = new H(0, 0);
-    this.a = new H(0, 0);
-  }
-  function nb() {
-    this.R = 0;
-    this.ne = 1 / 0;
-    this.Hb = this.ec = 100;
-    this.Yd = this.Zd = 0;
   }
   function Eb() {
     this.Se = 0;
@@ -539,22 +467,6 @@ function abcHaxballAPI(window, config){
     this.Te = 0.07;
     this.Ue = 0.96;
     this.Re = 5;
-  }
-  function ca() {
-    this.playerId = null; // playerId
-    this.hc = -1;
-    this.gc = null;
-    this.jl = 0;
-    this.h = this.v = 63;
-    this.Mj = 0;
-    this.R = 16777215;
-    this.Ca = 0.99;
-    this.aa = 1;
-    this.m = 0.5;
-    this.Z = 10;
-    this.oa = new H(0, 0);
-    this.D = new H(0, 0);
-    this.a = new H(0, 0);
   }
   function h() {
     this.J = [];
@@ -602,15 +514,1455 @@ function abcHaxballAPI(window, config){
     this.customClient = false; // is player using our client?
     this.identity = null;
   }
-  function Fa() {
-    this.hc = -1;
-    this.gc = null;
-    this.F = [];
-    this.J = null;
-    this.qa = null;
-    this.U = null;
-    this.pb = null;
-  }
+
+  var PhysicsEngine = (()=>{
+    function DotObject() { // B
+      //this.ud = 0;
+      this.v = 32;
+      this.h = 63;
+      this.m = 1;
+      this.a = new H(0, 0);
+    }
+    /*
+    DotObject.b = !0;
+    DotObject.prototype = {
+      ga: function (a) {
+        var b = this.a;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.m);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.a;
+        b.x = a.u();
+        b.y = a.u();
+        this.m = a.u();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      f: DotObject,
+    };
+    */
+    
+    function FiniteLinearObject() { // E
+      this.Hg = this.Ig = this.wa = null;
+      this.Yj = 0;
+      this.ca = this.W = this.Xd = null;
+      this.Cc = 0;
+      this.m = 1;
+      this.h = 63;
+      this.v = 32;
+      this.vb = 1 / 0;
+      //this.Za = !0;
+      //this.R = 0;
+    }
+
+    //FiniteLinearObject.b = !0;
+    const mn = 0.17435839227423353, ln = 5.934119456780721, dtR = 0.017453292519943295;
+    FiniteLinearObject.prototype = {
+      /*
+      ga: function (a) {
+        var b = 0,
+          c = a.a;
+        a.l(0);
+        a.l(this.W.ud);
+        a.l(this.ca.ud);
+        0 != this.Cc && ((b = 1), a.s(this.Cc));
+        this.vb != 1 / 0 && ((b |= 2), a.s(this.vb));
+        0 != this.R && ((b |= 4), a.O(this.R));
+        this.Za && (b |= 8);
+        a.o.setUint8(c, b);
+        a.s(this.m);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a, b) {
+        var c = a.B();
+        this.W = b[a.B()];
+        this.ca = b[a.B()];
+        this.Cc = 0 != (c & 1) ? a.u() : 0;
+        this.vb = 0 != (c & 2) ? a.u() : 1 / 0;
+        this.R = 0 != (c & 4) ? a.M() : 0;
+        this.Za = 0 != (c & 8);
+        this.m = a.u();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      */
+      Oc: function (a) {
+        a *= dtR;
+        if (0 > a) {
+          a = -a;
+          var b = this.W;
+          this.W = this.ca;
+          this.ca = b;
+          this.Cc = -this.Cc;
+        }
+        a > mn && a < ln && (this.vb = 1 / Math.tan(a / 2));
+      },
+      Co: function () {
+        return 0 != 0 * this.vb ? 0 : 114.59155902616465 * Math.atan(1 / this.vb);
+      },
+      he: function () {
+        if (0 == 0 * this.vb) {
+          var a = this.ca.a,
+            b = this.W.a,
+            c = 0.5 * (a.x - b.x),
+            a = 0.5 * (a.y - b.y),
+            b = this.W.a,
+            d = this.vb;
+          this.Xd = new H(b.x + c + -a * d, b.y + a + c * d);
+          a = this.W.a;
+          b = this.Xd;
+          c = a.x - b.x;
+          a = a.y - b.y;
+          this.Yj = Math.sqrt(c * c + a * a);
+          c = this.W.a;
+          a = this.Xd;
+          this.Hg = new H(-(c.y - a.y), c.x - a.x);
+          c = this.Xd;
+          a = this.ca.a;
+          this.Ig = new H(-(c.y - a.y), c.x - a.x);
+          0 >= this.vb &&
+            ((a = c = this.Hg),
+            (c.x = -a.x),
+            (c.y = -a.y),
+            (a = c = this.Ig),
+            (c.x = -a.x),
+            (c.y = -a.y));
+        } else
+          (a = this.W.a),
+            (b = this.ca.a),
+            (c = a.x - b.x),
+            (a = -(a.y - b.y)),
+            (b = Math.sqrt(a * a + c * c)),
+            (this.wa = new H(a / b, c / b));
+      },
+      //f: FiniteLinearObject,
+    };
+  
+    function InfiniteLinearObject() { // L
+      this.v = 32;
+      this.h = 63;
+      this.m = 1;
+      this.Ua = 0;
+      this.wa = new H(0, 0);
+    }
+    /*
+    InfiniteLinearObject.b = !0;
+    InfiniteLinearObject.prototype = {
+      ga: function (a) {
+        var b = this.wa;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.Ua);
+        a.s(this.m);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.wa;
+        b.x = a.u();
+        b.y = a.u();
+        this.Ua = a.u();
+        this.m = a.u();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      f: InfiniteLinearObject,
+    };
+    */
+
+    function FiniteLinearSensor() { // sb
+      //this.qe = p.Ia;
+      this.ca = new H(0, 0);
+      this.W = new H(0, 0);
+    }
+    FiniteLinearSensor.prototype = {
+      C: function (a, b) { // oldDiscPos, newDiscPos
+        var f = this.W,
+          g = this.ca,
+          k = b.x - a.x,
+          l = b.y - a.y;
+        return (0 < -(f.y - a.y) * k + (f.x - a.x) * l) != (0 < -(g.y - a.y) * k + (g.x - a.x) * l) && (
+          (k = g.x - f.x), 
+          (g = g.y - f.y),
+          (-(a.y - f.y) * k + (a.x - f.x) * g > 0) != (-(b.y - f.y) * k + (b.x - f.x) * g > 0)
+        );
+      }
+    };
+    /*
+    FiniteLinearSensor.b = !0;
+    FiniteLinearSensor.prototype = {
+      ga: function (a) {
+        var b = this.W;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.ca;
+        a.s(b.x);
+        a.s(b.y);
+        a.l(this.qe.$);
+      },
+      ja: function (a) {
+        var b = this.W;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.ca;
+        b.x = a.u();
+        b.y = a.u();
+        a = a.lf();
+        this.qe = 1 == a ? p.fa : 2 == a ? p.xa : p.Ia;
+      },
+      f: FiniteLinearSensor,
+    };
+    */
+    function CircularObject() { // ua
+      this.h = this.v = 63;
+      this.R = 16777215;
+      this.Ca = 0.99;
+      this.aa = 1;
+      this.m = 0.5;
+      this.Z = 10;
+      this.oa = new H(0, 0);
+      this.D = new H(0, 0);
+      this.a = new H(0, 0);
+    }
+    /*
+    CircularObject.b = !0;
+    CircularObject.prototype = {
+      ga: function (a) {
+        var b = this.a;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.D;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.oa;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.Z);
+        a.s(this.m);
+        a.s(this.aa);
+        a.s(this.Ca);
+        a.tb(this.R);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.a;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.D;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.oa;
+        b.x = a.u();
+        b.y = a.u();
+        this.Z = a.u();
+        this.m = a.u();
+        this.aa = a.u();
+        this.Ca = a.u();
+        this.R = a.hb();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      rp: function () {
+        var a = new ca();
+        this.Bk(a);
+        return a;
+      },
+      Bk: function (a) {
+        var b = a.a,
+          c = this.a;
+        b.x = c.x;
+        b.y = c.y;
+        b = a.D;
+        c = this.D;
+        b.x = c.x;
+        b.y = c.y;
+        b = a.oa;
+        c = this.oa;
+        b.x = c.x;
+        b.y = c.y;
+        a.Z = this.Z;
+        a.m = this.m;
+        a.aa = this.aa;
+        a.Ca = this.Ca;
+        a.R = this.R;
+        a.h = this.h;
+        a.v = this.v;
+      },
+      f: CircularObject,
+    };
+    */
+    function DistanceConstraint() { // nb
+      this.R = 0;
+      this.ne = 1 / 0;
+      this.Hb = this.ec = 100;
+      this.Yd = this.Zd = 0;
+    }
+    /*
+    DistanceConstraint.b = !0;
+    */
+    DistanceConstraint.prototype = {
+      /*
+      ga: function (a) {
+        a.l(this.Yd);
+        a.l(this.Zd);
+        a.s(this.Hb);
+        a.s(this.ec);
+        a.s(this.ne);
+        a.O(this.R);
+      },
+      ja: function (a) {
+        this.Yd = a.B();
+        this.Zd = a.B();
+        this.Hb = a.u();
+        this.ec = a.u();
+        this.ne = a.u();
+        this.R = a.M();
+      },
+      */
+      C: function (a) {
+        var b = a[this.Yd];
+        a = a[this.Zd];
+        if (null != b && null != a) {
+          var c = b.a,
+            d = a.a,
+            e = c.x - d.x,
+            c = c.y - d.y,
+            f = Math.sqrt(e * e + c * c);
+          if (!(0 >= f)) {
+            e /= f;
+            c /= f;
+            d = b.aa / (b.aa + a.aa);
+            d != d && (d = 0.5);
+            var g, k;
+            if (this.Hb >= this.ec) (g = this.Hb), (k = 0);
+            else if (f <= this.Hb) (g = this.Hb), (k = 1);
+            else if (f >= this.ec) (g = this.ec), (k = -1);
+            else return;
+            f = g - f;
+            if (0 == 0 * this.ne)
+              (d = this.ne * f * 0.5),
+                (e *= d),
+                (c *= d),
+                (k = d = b.D),
+                (b = b.aa),
+                (d.x = k.x + e * b),
+                (d.y = k.y + c * b),
+                (d = b = a.D),
+                (a = a.aa),
+                (b.x = d.x + -e * a),
+                (b.y = d.y + -c * a);
+            else {
+              g = f * d;
+              var l = b.a,
+                h = b.a;
+              l.x = h.x + e * g * 0.5;
+              l.y = h.y + c * g * 0.5;
+              h = l = a.a;
+              f -= g;
+              l.x = h.x - e * f * 0.5;
+              l.y = h.y - c * f * 0.5;
+              f = b.D;
+              g = a.D;
+              f = e * (f.x - g.x) + c * (f.y - g.y);
+              0 >= f * k &&
+                ((d *= f),
+                (b = k = b.D),
+                (k.x = b.x - e * d),
+                (k.y = b.y - c * d),
+                (a = b = a.D),
+                (d = f - d),
+                (b.x = a.x + e * d),
+                (b.y = a.y + c * d));
+            }
+          }
+        }
+      },
+      //f: DistanceConstraint,
+    };
+
+    function MoveableCircularObject() { // ca
+      //this.playerId = null; // playerId
+      //this.hc = -1;
+      //this.gc = null;
+      //this.jl = 0;
+      CircularObject.apply(this);
+      /*
+      this.h = this.v = 63;
+      this.R = 16777215;
+      this.Ca = 0.99;
+      this.aa = 1;
+      this.m = 0.5;
+      this.Z = 10;
+      this.oa = new H(0, 0);
+      this.D = new H(0, 0);
+      this.a = new H(0, 0);
+      */
+    }
+    /*
+    MoveableCircularObject.b = !0;
+    MoveableCircularObject.qd = function (a, b) {
+      a.Z = b.Z;
+      a.m = b.m;
+      a.aa = b.aa;
+      a.Ca = b.Ca;
+      a.R = b.R;
+      a.h = b.h;
+      a.v = b.v;
+      var c = a.a,
+        d = b.a;
+      c.x = d.x;
+      c.y = d.y;
+      c = a.D;
+      d = b.D;
+      c.x = d.x;
+      c.y = d.y;
+      c = a.oa;
+      d = b.oa;
+      c.x = d.x;
+      c.y = d.y;
+    };
+    */
+    MoveableCircularObject.prototype = {
+      /*
+      ga: function (a) {
+        var b = this.a;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.D;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.oa;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.Z);
+        a.s(this.m);
+        a.s(this.aa);
+        a.s(this.Ca);
+        a.tb(this.R);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.a;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.D;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.oa;
+        b.x = a.u();
+        b.y = a.u();
+        this.Z = a.u();
+        this.m = a.u();
+        this.aa = a.u();
+        this.Ca = a.u();
+        this.R = a.hb();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      */
+      Pn: function (id1, id2, a, pObj) {
+        var b = this.a,
+          c = a.a,
+          d = b.x - c.x,
+          b = b.y - c.y,
+          e = a.Z + this.Z,
+          f = d * d + b * b;
+        if (0 < f && f <= e * e) {
+          var oldA = a; // oldA
+          var f = Math.sqrt(f),
+            d = d / f,
+            b = b / f,
+            c = this.aa / (this.aa + a.aa),
+            e = e - f,
+            f = e * c,
+            g = this.a,
+            k = this.a;
+          g.x = k.x + d * f;
+          g.y = k.y + b * f;
+          k = g = a.a;
+          e -= f;
+          g.x = k.x - d * e;
+          g.y = k.y - b * e;
+          e = this.D;
+          f = a.D;
+          e = d * (e.x - f.x) + b * (e.y - f.y);
+          0 > e &&
+            ((e *= this.m * a.m + 1),
+            (c *= e),
+            (g = f = this.D),
+            (f.x = g.x - d * c),
+            (f.y = g.y - b * c),
+            (a = f = a.D),
+            (c = e - c),
+            (f.x = a.x + d * c),
+            (f.y = a.y + b * c),
+            (pObj._CDD_ && pObj._CDD_(id1, this.playerId, id2, oldA.playerId))); // (FIX)
+        }
+      },
+      Qn: function (a, id1, id2, pObj) {
+        var b, c, d;
+        if (0 != 0 * a.vb) {
+          b = a.W.a;
+          var e = a.ca.a;
+          c = e.x - b.x;
+          var f = e.y - b.y,
+            g = this.a;
+          d = g.x - e.x;
+          e = g.y - e.y;
+          g = this.a;
+          if (0 >= (g.x - b.x) * c + (g.y - b.y) * f || 0 <= d * c + e * f)
+            return;
+          c = a.wa;
+          b = c.x;
+          c = c.y;
+          d = b * d + c * e;
+        } else {
+          c = a.Xd;
+          d = this.a;
+          b = d.x - c.x;
+          c = d.y - c.y;
+          d = a.Hg;
+          e = a.Ig;
+          if ((0 < d.x * b + d.y * c && 0 < e.x * b + e.y * c) == 0 >= a.vb)
+            return;
+          e = Math.sqrt(b * b + c * c);
+          if (0 == e) return;
+          d = e - a.Yj;
+          b /= e;
+          c /= e;
+        }
+        e = a.Cc;
+        if (0 == e) 0 > d && ((d = -d), (b = -b), (c = -c));
+        else if ((0 > e && ((e = -e), (d = -d), (b = -b), (c = -c)), d < -e))
+          return;
+        d >= this.Z ||
+          ((d = this.Z - d),
+          (f = e = this.a),
+          (e.x = f.x + b * d),
+          (e.y = f.y + c * d),
+          (d = this.D),
+          (d = b * d.x + c * d.y),
+          0 > d &&
+            ((d *= this.m * a.m + 1),
+            (e = a = this.D),
+            (a.x = e.x - b * d),
+            (a.y = e.y - c * d),
+            (pObj._CDS_ && pObj._CDS_(id1, this.playerId, id2-1)))); // discId, discPlayerId, segmentId (FIX)
+      },
+      addVelocity: function(xc, yc){ // xc: dist_x/dist, yc: dist_y/dist
+        var h = this.D;
+        h.x += xc;
+        h.y += yc;
+      },
+      applyForce: function(force, xc, yc){ // xc: dist_x/dist, yc: dist_y/dist
+        var h = this.D, l = this.aa;
+        h.x += force * xc * l;
+        h.y += force * yc * l;
+      },
+      isMoving: function(){
+        var h = this.D;
+        return h.x * h.x + h.y * h.y > 0;
+      }
+      /*
+      sc: function () {
+        var a = yazc,
+          b = this.gc;
+        this.hc != a &&
+          (null == b && (this.gc = b = new MoveableCircularObject()), (this.hc = a), MoveableCircularObject.qd(b, this));
+        return b;
+      },
+      f: MoveableCircularObject,
+      */
+    };
+
+    function World() { // Fa
+      //this.hc = -1;
+      //this.gc = null;
+      this.F = [];
+      this.J = [];
+      this.qa = [];
+      this.U = [];
+      this.pb = [];
+      this.tc = [];
+    }
+    /*
+    World.b = !0;
+    World.qd = function (a, b) {
+      if (null == b.F) a.F = null;
+      else {
+        null == a.F && (a.F = []);
+        for (var c = a.F, d = b.F, e = d.length; c.length > e; ) c.pop();
+        for (var e = 0, f = d.length; e < f; ) {
+          var g = e++;
+          c[g] = d[g].sc();
+        }
+      }
+      a.J = b.J;
+      a.U = b.U;
+      a.qa = b.qa;
+      a.pb = b.pb;
+    };
+    */
+    World.prototype = {
+      /*
+      ga: function (a) {
+        a.l(this.F.length);
+        for (var b = 0, c = this.F.length; b < c; ) {
+          var d = b++,
+            e = this.F[d];
+          e.jl = d;
+          e.ga(a);
+        }
+      },
+      ja: function (a) {
+        this.F = [];
+        for (var b = a.B(), c = 0; c < b; ) {
+          ++c;
+          var d = new MoveableCircularObject();
+          d.ja(a);
+          this.F.push(d);
+        }
+      },
+      */
+      C: function (a, pObj) {
+        for (var b = 0, c = this.F; b < c.length; ) {
+          var d = c[b];
+          ++b;
+          var e = d.a,
+            f = d.a,
+            g = d.D;
+          e.x = f.x + g.x * a;
+          e.y = f.y + g.y * a;
+          f = e = d.D;
+          g = d.oa;
+          d = d.Ca;
+          e.x = (f.x + g.x) * d;
+          e.y = (f.y + g.y) * d;
+        }
+        a = 0;
+        for (b = this.F.length; a < b; ) {
+          d = a++;
+          var id = d;
+          c = this.F[d];
+          d += 1;
+          for (e = this.F.length; d < e; )
+            (f = this.F[d++]), 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Pn(id, d-1, f, pObj);
+          if (0 != c.aa) {
+            d = 0;
+            for (e = this.qa; d < e.length; )
+              if (((f = e[d]), ++d, 0 != (f.h & c.v) && 0 != (f.v & c.h))) {
+                var g = f.wa,
+                  k = c.a,
+                  g = f.Ua - (g.x * k.x + g.y * k.y) + c.Z;
+                if (0 < g) {
+                  var l = (k = c.a),
+                    h = f.wa;
+                  k.x = l.x + h.x * g;
+                  k.y = l.y + h.y * g;
+                  g = c.D;
+                  k = f.wa;
+                  g = g.x * k.x + g.y * k.y;
+                  0 > g &&
+                    ((g *= c.m * f.m + 1),
+                    (l = k = c.D),
+                    (f = f.wa),
+                    (k.x = l.x - f.x * g),
+                    (k.y = l.y - f.y * g),
+                    (pObj._CDP_ && pObj._CDP_(id, c.playerId, d-1))); // discId, discPlayerId, planeId
+                }
+              }
+            d = 0;
+            for (e = this.U; d < e.length; )
+              (f = e[d]), ++d, 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Qn(f, id, d, pObj);
+            d = 0;
+            for (e = this.J; d < e.length; )
+              if (
+                ((f = e[d]),
+                ++d,
+                0 != (f.h & c.v) &&
+                  0 != (f.v & c.h) &&
+                  ((k = c.a),
+                  (l = f.a),
+                  (g = k.x - l.x),
+                  (k = k.y - l.y),
+                  (l = g * g + k * k),
+                  0 < l && l <= c.Z * c.Z))
+              ) {
+                var l = Math.sqrt(l),
+                  g = g / l,
+                  k = k / l,
+                  l = c.Z - l,
+                  m = (h = c.a);
+                h.x = m.x + g * l;
+                h.y = m.y + k * l;
+                l = c.D;
+                l = g * l.x + k * l.y;
+                0 > l &&
+                  ((l *= c.m * f.m + 1),
+                  (h = f = c.D),
+                  (f.x = h.x - g * l),
+                  (f.y = h.y - k * l));
+              }
+          }
+        }
+        for (a = 0; 2 > a; )
+          for (++a, b = 0, c = this.pb; b < c.length; ) c[b++].C(this.F);
+      },
+
+      aMCO: function (obj) { // addMoveableCircularObject
+        this.F.push(obj);
+      },
+
+      rMCO: function (obj) { // removeMoveableCircularObject
+        D.remove(this.F, obj);
+      },
+
+      /*
+      sc: function () {
+        var a = yazc,
+          b = this.gc;
+        this.hc != a &&
+          (null == b && (this.gc = b = new World()), (this.hc = a), World.qd(b, this));
+        return b;
+      },
+      */
+      /*
+      addVertex: function(a){ // data: { x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }
+        var b = new DotObject();
+        b.a.x = a.x;
+        b.a.y = a.y;
+        var c = a.bCoef; null != c && (b.m = c);
+        c = a.cMask; null != c && (b.h = c);
+        a = a.cGroup; null != a && (b.v = a);
+        this.J.push(b);
+        return b;
+      },
+  
+      addSegment: function(data) { // data: { vertex0: Vertex, vertex1: Vertex, v0: number (if vertex0 is not provided), v1: number (if vertex1 is not provided), color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
+        var c = new FiniteLinearObject();
+        c.W = data.vertex0 || this.J[data.v0];
+        c.ca = data.vertex1 || this.J[data.v1];
+        var d = data.bias,
+          e = data.bCoef,
+          f = data.curve,
+          g = data.curveF,
+          k = data.vis,
+          l = data.cMask,
+          t = data.cGroup,
+          m = data.color;
+        null != d && (c.Cc = d);
+        null != e && (c.m = e);
+        null != g ? (c.vb = g) : null != f && c.Oc(f);
+        null != k && (c.Za = k);
+        null != l && (c.h = l);
+        null != t && (c.v = t);
+        null != m && (c.R = m);
+        c.he();
+        this.U.push(c);
+        return c;
+      },
+  
+      addGoal: function(data) { // data: { p0: [x: number, y: number], p1: [x: number, y: number], team: Team }
+        var b = new FiniteLinearSensor(),
+          c = data.p0,
+          d = data.p1,
+          e = b.W;
+        e.x = c[0];
+        e.y = c[1];
+        c = b.ca;
+        c.x = d[0];
+        c.y = d[1];
+        b.qe = data.team;
+        this.tc.push(b);
+        return b;
+      },
+  
+      addPlane: function(data) { // data: { normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }
+        var b = new InfiniteLinearObject(),
+          c = data.normal,
+          d = c[0],
+          c = c[1],
+          e = b.wa,
+          f = Math.sqrt(d * d + c * c);
+        e.x = d / f;
+        e.y = c / f;
+        b.Ua = data.dist;
+        d = data.bCoef;
+        c = data.cMask;
+        data = data.cGroup;
+        null != d && (b.m = d);
+        null != c && (b.h = c);
+        null != data && (b.v = data);
+        this.qa.push(b);
+        return b;
+      },
+  
+      addDisc: function(data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }
+        var disc = new MoveableCircularObject();
+        var c = data.pos,
+          d = data.speed,
+          e = data.gravity,
+          f = data.radius,
+          g = data.bCoef,
+          k = data.invMass,
+          l = data.damping,
+          t = data.color,
+          m = data.cMask,
+          n = data.cGroup, p;
+        null != c && ((p = disc.a), (p.x = c[0]), (p.y = c[1]));
+        null != d && ((c = disc.D), (c.x = d[0]), (c.y = d[1]));
+        null != e && ((d = disc.oa), (d.x = e[0]), (d.y = e[1]));
+        null != f && (disc.Z = f);
+        null != g && (disc.m = g);
+        null != k && (disc.aa = k);
+        null != l && (disc.Ca = l);
+        null != t && (disc.R = t);
+        null != m && (disc.h = m);
+        null != n && (disc.v = n);
+        this.F.push(disc);
+        return disc;
+      },
+  
+      addJoint: function(data) { // data: { d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }
+        var c = new DistanceConstraint(),
+          d = vvt(data.d0, Integer),
+          e = vvt(data.d1, Integer),
+          f = data.color,
+          g = data.strength,
+          k = data.length;
+        if (d >= this.F.length || 0 > d) throw new q(null);
+        if (e >= this.F.length || 0 > e) throw new q(null);
+        c.Yd = d;
+        c.Zd = e;
+        null == k
+          ? ((d = this.F[d]),
+            (k = this.F[e]),
+            null == d || null == k
+              ? (c.ec = c.Hb = 100)
+              : ((e = d.pos),
+                (k = k.pos),
+                (d = e.x - k.x),
+                (e = e.y - k.y),
+                (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
+          : k instanceof Array
+          ? ((c.Hb = k[0]), (c.ec = k[1]))
+          : (c.ec = c.Hb = k);
+        c.ne = null == g || "rigid" == g ? 1 / 0 : g;
+        null != f && (c.R = f);
+        this.pb.push(c);
+        return c;
+      },
+      */
+      //f: World,
+    };
+    return {
+      World,
+      DotObject,
+      FiniteLinearObject,
+      InfiniteLinearObject,
+      FiniteLinearSensor,
+      CircularObject,
+      DistanceConstraint,
+      MoveableCircularObject
+    };
+  })();
+
+  var { Fa, B, E, L, sb, ua, nb, ca } = (function extendPhysicsEngine(){
+
+    // B
+
+    function B() {
+      this.ud = 0;
+      PhysicsEngine.DotObject.apply(this);
+    };
+    B.b = !0;
+    B.prototype = C(PhysicsEngine.DotObject.prototype, {
+      ga: function (a) {
+        var b = this.a;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.m);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.a;
+        b.x = a.u();
+        b.y = a.u();
+        this.m = a.u();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      f: B,
+    });
+
+    // E
+
+    function E() {
+      PhysicsEngine.FiniteLinearObject.apply(this);
+      this.Za = true;
+      this.R = 0;
+    }
+    E.b = !0;
+    E.prototype = C(PhysicsEngine.FiniteLinearObject.prototype, {
+      ga: function (a) {
+        var b = 0,
+          c = a.a;
+        a.l(0);
+        a.l(this.W.ud);
+        a.l(this.ca.ud);
+        0 != this.Cc && ((b = 1), a.s(this.Cc));
+        this.vb != 1 / 0 && ((b |= 2), a.s(this.vb));
+        0 != this.R && ((b |= 4), a.O(this.R));
+        this.Za && (b |= 8);
+        a.o.setUint8(c, b);
+        a.s(this.m);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a, b) {
+        var c = a.B();
+        this.W = b[a.B()];
+        this.ca = b[a.B()];
+        this.Cc = 0 != (c & 1) ? a.u() : 0;
+        this.vb = 0 != (c & 2) ? a.u() : 1 / 0;
+        this.R = 0 != (c & 4) ? a.M() : 0;
+        this.Za = 0 != (c & 8);
+        this.m = a.u();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      f: E,
+    });
+
+    // L
+    
+    function L() {
+      PhysicsEngine.InfiniteLinearObject.apply(this);
+    }
+    L.b = !0;
+    L.prototype = C(PhysicsEngine.InfiniteLinearObject.prototype, {
+      ga: function (a) {
+        var b = this.wa;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.Ua);
+        a.s(this.m);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.wa;
+        b.x = a.u();
+        b.y = a.u();
+        this.Ua = a.u();
+        this.m = a.u();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      f: L,
+    });
+
+    // sb
+
+    function sb() {
+      this.qe = p.Ia;
+      PhysicsEngine.FiniteLinearSensor.apply(this);
+    }
+    sb.b = !0;
+    sb.prototype = C(PhysicsEngine.FiniteLinearSensor.prototype, {
+      ga: function (a) {
+        var b = this.W;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.ca;
+        a.s(b.x);
+        a.s(b.y);
+        a.l(this.qe.$);
+      },
+      ja: function (a) {
+        var b = this.W;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.ca;
+        b.x = a.u();
+        b.y = a.u();
+        a = a.lf();
+        this.qe = 1 == a ? p.fa : 2 == a ? p.xa : p.Ia;
+      },
+      f: sb,
+    });
+
+    // ua
+    
+    function ua() {
+      // this.R = 16777215;
+      PhysicsEngine.CircularObject.apply(this);
+    }
+    ua.b = !0;
+    ua.prototype = C(PhysicsEngine.CircularObject.prototype, {
+      ga: function (a) {
+        var b = this.a;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.D;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.oa;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.Z);
+        a.s(this.m);
+        a.s(this.aa);
+        a.s(this.Ca);
+        a.tb(this.R);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.a;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.D;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.oa;
+        b.x = a.u();
+        b.y = a.u();
+        this.Z = a.u();
+        this.m = a.u();
+        this.aa = a.u();
+        this.Ca = a.u();
+        this.R = a.hb();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      rp: function () {
+        var a = new ca();
+        this.Bk(a);
+        return a;
+      },
+      Bk: function (a) {
+        var b = a.a,
+          c = this.a;
+        b.x = c.x;
+        b.y = c.y;
+        b = a.D;
+        c = this.D;
+        b.x = c.x;
+        b.y = c.y;
+        b = a.oa;
+        c = this.oa;
+        b.x = c.x;
+        b.y = c.y;
+        a.Z = this.Z;
+        a.m = this.m;
+        a.aa = this.aa;
+        a.Ca = this.Ca;
+        a.R = this.R;
+        a.h = this.h;
+        a.v = this.v;
+      },
+      f: ua,
+    });
+
+    // nb
+    
+    function nb() {
+      // this.R = 0;
+      PhysicsEngine.DistanceConstraint.apply(this);
+    }
+    nb.b = !0;
+    nb.prototype = C(PhysicsEngine.DistanceConstraint.prototype, {
+      ga: function (a) {
+        a.l(this.Yd);
+        a.l(this.Zd);
+        a.s(this.Hb);
+        a.s(this.ec);
+        a.s(this.ne);
+        a.O(this.R);
+      },
+      ja: function (a) {
+        this.Yd = a.B();
+        this.Zd = a.B();
+        this.Hb = a.u();
+        this.ec = a.u();
+        this.ne = a.u();
+        this.R = a.M();
+      },
+      f: nb,
+    });
+
+    // ca
+    
+    function ca() {
+      this.playerId = null;
+      this.hc = -1;
+      this.gc = null;
+      this.jl = 0;
+      // this.R = 16777215;
+      PhysicsEngine.MoveableCircularObject.apply(this);
+    }
+    ca.b = !0;
+    ca.qd = function (a, b) {
+      a.Z = b.Z;
+      a.m = b.m;
+      a.aa = b.aa;
+      a.Ca = b.Ca;
+      a.R = b.R;
+      a.h = b.h;
+      a.v = b.v;
+      var c = a.a,
+        d = b.a;
+      c.x = d.x;
+      c.y = d.y;
+      c = a.D;
+      d = b.D;
+      c.x = d.x;
+      c.y = d.y;
+      c = a.oa;
+      d = b.oa;
+      c.x = d.x;
+      c.y = d.y;
+    };
+    ca.prototype = C(PhysicsEngine.MoveableCircularObject.prototype, {
+      ga: function (a) {
+        var b = this.a;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.D;
+        a.s(b.x);
+        a.s(b.y);
+        b = this.oa;
+        a.s(b.x);
+        a.s(b.y);
+        a.s(this.Z);
+        a.s(this.m);
+        a.s(this.aa);
+        a.s(this.Ca);
+        a.tb(this.R);
+        a.O(this.h);
+        a.O(this.v);
+      },
+      ja: function (a) {
+        var b = this.a;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.D;
+        b.x = a.u();
+        b.y = a.u();
+        b = this.oa;
+        b.x = a.u();
+        b.y = a.u();
+        this.Z = a.u();
+        this.m = a.u();
+        this.aa = a.u();
+        this.Ca = a.u();
+        this.R = a.hb();
+        this.h = a.M();
+        this.v = a.M();
+      },
+      sc: function () {
+        var a = yazc,
+          b = this.gc;
+        this.hc != a &&
+          (null == b && (this.gc = b = new ca()), (this.hc = a), ca.qd(b, this));
+        return b;
+      },
+      f: ca,
+    });
+
+    function Fa() {
+      this.hc = -1;
+      this.gc = null;
+      PhysicsEngine.World.apply(this);
+    }
+    Fa.b = !0;
+    Fa.dmc = 1/Math.sqrt(2); // diagonal movement coefficient, Math.SQRT1_2 is causing desync because noob basro did not use it...
+    Fa.qd = function (a, b) {
+      if (null == b.F) a.F = null;
+      else {
+        null == a.F && (a.F = []);
+        for (var c = a.F, d = b.F, e = d.length; c.length > e; ) c.pop();
+        for (var e = 0, f = d.length; e < f; ) {
+          var g = e++;
+          c[g] = d[g].sc();
+        }
+      }
+      a.J = b.J;
+      a.U = b.U;
+      a.qa = b.qa;
+      a.pb = b.pb;
+    };
+    Fa.prototype = C(PhysicsEngine.World.prototype, {
+      ga: function (a) {
+        a.l(this.F.length);
+        for (var b = 0, c = this.F.length; b < c; ) {
+          var d = b++,
+            e = this.F[d];
+          e.jl = d;
+          e.ga(a);
+        }
+      },
+      ja: function (a) {
+        this.F = [];
+        for (var b = a.B(), c = 0; c < b; ) {
+          ++c;
+          var d = new ca();
+          d.ja(a);
+          this.F.push(d);
+        }
+      },
+      sc: function () {
+        var a = yazc,
+          b = this.gc;
+        this.hc != a &&
+          (null == b && (this.gc = b = new Fa()), (this.hc = a), Fa.qd(b, this));
+        return b;
+      },
+      kB: function (pDisc, bDisc, pp) { // kickBall()
+        var t = bDisc.a, h = pDisc.a, m = t.x - h.x, t = t.y - h.y, h = Math.sqrt(m * m + t * t);
+        if (h - bDisc.Z - pDisc.Z >= 4)
+          return false;
+        var f = m / h, // dist_x/dist
+          m = t / h; // dist_y/dist
+        bDisc.applyForce(pp.Re, f, m); // kickStrength
+        pDisc.applyForce(-pp.Se, f, m); // kickback
+        return true;
+      },
+      mP: function (pObj, pp) { // movePlayer(playerObj, playerPhysics)
+        var f = pObj.ob;
+        // pObj.Wb = (f&16)>0; (this was assigned before coming here.)
+        var g = ((f&8)>0)-((f&4)>0), g0 = g==0;
+        var k = ((f&2)>0)-((f&1)>0), k0 = k==0;
+        if (!g0 && !k0){
+          g *= Fa.dmc;
+          k *= Fa.dmc;
+        }
+        f = pObj.Wb;
+        if (!g0 || !k0){
+          k0 = f ? pp.Te : pp.Ce;
+          pObj.H.addVelocity(g*k0, k*k0);
+        }
+        pObj.H.Ca = f ? pp.Ue : pp.Ca;
+      },
+      rP: function (pObj, cb) { // removePlayer(playerObj, callback)
+        if (!pObj.H)
+          return;
+        this.rMCO(pObj.H);
+        cb?.(pObj);
+        pObj.H = null;
+      },
+      aP: function (pObj, stadium, cb1, cb2) { // addPlayer(playerObj)
+        this.rP(pObj, cb2);
+        pObj.ob = 0;
+        var b = new ca();
+        b.playerId = pObj.V;
+        pObj.H = b;
+        this.aMCO(b);
+        cb1?.(pObj);
+        var c = stadium.ge;
+        b.R = 0;
+        b.Z = c.Z;
+        b.aa = c.aa;
+        b.Ca = c.Ca;
+        b.m = c.m;
+        b.h = 39;
+        b.v = pObj.ea.v | c.v;
+        var d = pObj.ea == p.fa ? stadium.Dd : stadium.md;
+        0 == d.length ? ((b.a.x = pObj.ea.Ch * stadium.$b), (b.a.y = 0)) : ((cb1 = b.a), (d = d[d.length - 1]), (cb1.x = d.x), (cb1.y = d.y));
+        d = b.D;
+        d.x = 0;
+        d.y = 0;
+        b = b.oa;
+        c = c.oa;
+        b.x = c.x;
+        b.y = c.y;
+      },
+      /*
+      addVertex: function(a){ // data: { x: number, y: number, bCoef: number, cMask: array of string, cGroup: array of string }
+        var b = new B();
+        b.a.x = a.x;
+        b.a.y = a.y;
+        var c = a.bCoef; null != c && (b.m = c);
+        c = a.cMask; null != c && (b.h = c);
+        a = a.cGroup; null != a && (b.v = a);
+        this.J.push(b);
+        return b;
+      },
+  
+      addSegment: function(data) { // data: { vertex0: Vertex, vertex1: Vertex, v0: number (if vertex0 is not provided), v1: number (if vertex1 is not provided), color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
+        var c = new E();
+        c.W = data.vertex0 || this.J[data.v0];
+        c.ca = data.vertex1 || this.J[data.v1];
+        var d = data.bias,
+          e = data.bCoef,
+          f = data.curve,
+          g = data.curveF,
+          k = data.vis,
+          l = data.cMask,
+          t = data.cGroup,
+          m = data.color;
+        null != d && (c.Cc = d);
+        null != e && (c.m = e);
+        null != g ? (c.vb = g) : null != f && c.Oc(f);
+        null != k && (c.Za = k);
+        null != l && (c.h = l);
+        null != t && (c.v = t);
+        null != m && (c.R = m);
+        c.he();
+        this.U.push(c);
+        return c;
+      },
+  
+      addGoal: function(data) { // data: { p0: [x: number, y: number], p1: [x: number, y: number], team: Team }
+        var b = new sb(),
+          c = data.p0,
+          d = data.p1,
+          e = b.W;
+        e.x = c[0];
+        e.y = c[1];
+        c = b.ca;
+        c.x = d[0];
+        c.y = d[1];
+        b.qe = data.team;
+        this.tc.push(b);
+        return b;
+      },
+  
+      addPlane: function(data) { // data: { normal: [x: number, y: number], dist: number, bCoef: number, cMask: array of string, cGroup: array of string }
+        var b = new L(),
+          c = data.normal,
+          d = c[0],
+          c = c[1],
+          e = b.wa,
+          f = Math.sqrt(d * d + c * c);
+        e.x = d / f;
+        e.y = c / f;
+        b.Ua = data.dist;
+        d = data.bCoef;
+        c = data.cMask;
+        data = data.cGroup;
+        null != d && (b.m = d);
+        null != c && (b.h = c);
+        null != data && (b.v = data);
+        this.qa.push(b);
+        return b;
+      },
+  
+      addDisc: function(data) { // data: { pos: [x: number, y: number], speed: [x: number, y: number], gravity: [x: number, y: number], radius: number, invMass: number, damping: number, color: ("transparent" || string || [r: number, g: number, b: number]), bCoef: number, cMask: array of string, cGroup: array of string }
+        var disc = new ua();
+        var c = data.pos,
+          d = data.speed,
+          e = data.gravity,
+          f = data.radius,
+          g = data.bCoef,
+          k = data.invMass,
+          l = data.damping,
+          t = data.color,
+          m = data.cMask,
+          n = data.cGroup;
+        if (null != c) {
+          var p = disc.a;
+          p.x = c[0];
+          p.y = c[1];
+        }
+        null != d && ((c = disc.D), (c.x = d[0]), (c.y = d[1]));
+        null != e && ((d = disc.oa), (d.x = e[0]), (d.y = e[1]));
+        null != f && (disc.Z = f);
+        null != g && (disc.m = g);
+        null != k && (disc.aa = k);
+        null != l && (disc.Ca = l);
+        null != t && (disc.R = t);
+        null != m && (disc.h = m);
+        null != n && (disc.v = n);
+        disc = disc.rp(); // convert to movable disc.
+        this.F.push(disc);
+        return disc;
+      },
+  
+      addJoint: function(data) { // data: { d0: number, d1: number, color: ("transparent" || string || [r: number, g: number, b: number]), strength: "rigid" || number, length: null || number || [min: number, max: number] }
+        var c = new nb(),
+          d = vvt(data.d0, Integer),
+          e = vvt(data.d1, Integer),
+          f = data.color,
+          g = data.strength,
+          k = data.length;
+        if (d >= this.F.length || 0 > d) throw new q(null);
+        if (e >= this.F.length || 0 > e) throw new q(null);
+        c.Yd = d;
+        c.Zd = e;
+        null == k
+          ? ((d = this.F[d]),
+            (k = this.F[e]),
+            null == d || null == k
+              ? (c.ec = c.Hb = 100)
+              : ((e = d.pos),
+                (k = k.pos),
+                (d = e.x - k.x),
+                (e = e.y - k.y),
+                (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
+          : k instanceof Array
+          ? ((c.Hb = k[0]), (c.ec = k[1]))
+          : (c.ec = c.Hb = k);
+        c.ne = null == g || "rigid" == g ? 1 / 0 : g;
+        null != f && (c.R = f);
+        this.pb.push(c);
+        return c;
+      },
+      */
+      f: Fa,
+    });
+  
+    Fa.fromStadium = (stadium) => {
+      var fa = new Fa();
+      fa.J = stadium.J;
+      fa.U = stadium.U;
+      fa.tc = stadium.tc;
+      fa.qa = stadium.qa;
+      fa.pb = stadium.pb;
+      stadium.F.forEach((f)=>{
+        var disc = new ca();
+        disc.a.x = f.a.x;
+        disc.a.y = f.a.y;
+        disc.D.x = f.D.x;
+        disc.D.y = f.D.y;
+        disc.oa.x = f.oa.x;
+        disc.oa.y = f.oa.y;
+        disc.Z = f.Z;
+        disc.m = f.m;
+        disc.aa = f.aa;
+        disc.Ca = f.Ca;
+        disc.R = f.R;
+        disc.h = f.h;
+        disc.v = f.v;
+        fa.F.push(disc);
+        return disc;
+      });
+      return fa;
+    };
+
+    return {B, E, L, sb, ua, nb, ca, Fa};
+  })();
+/*
+  var { 
+    World: Fa, 
+    DotObject: B, 
+    FiniteLinearObject: E,
+    InfiniteLinearObject: L,
+    FiniteLinearSensor: sb,
+    CircularObject: ua,
+    DistanceConstraint: nb,
+    MoveableCircularObject: ca
+  } = PhysicsEngine;
+*/
   function O() {
     this.hc = -1;
     this.gc = null;
@@ -625,7 +1977,8 @@ function abcHaxballAPI(window, config){
   }
   function fa() {
     this.hc = -1;
-    this.S = this.gc = null;
+    this.gc = null;
+    this.S = null;
     this.yd = 2;
     this.Zc = 0;
     this.ce = 1;
@@ -643,172 +1996,6 @@ function abcHaxballAPI(window, config){
   }
 
   //////////////////////////////////////////////////////////
-
-  dc.b = !0;
-  dc.prototype = {
-    Yr: function (a) {
-      for (var b = 0, c = a.length; b < c; )
-        (this.hash += a[b++]),
-          (this.hash += this.hash << 10),
-          (this.hash ^= this.hash >>> 6);
-    },
-    f: dc,
-  };
-
-  U.b = !0;
-  U.Qc = function (a, b) {
-    return a.length <= b ? a : D.substr(a, 0, b);
-  };
-  U.Ur = function (b) {
-    for (var a = "", l = 0; l < b.length; ) a += J.Wg(b.charAt(l++), b.charAt(l++));
-    return a;
-  };
-  U.Zr = function (a) { // calculating hash for conn
-    for (var b = "", c = 0, d = a.byteLength; c < d; ) b += String.fromCharCode(a[c++]);
-    return b;
-  };
-
-  r.b = !0;
-  r.Nm = function (a) {
-    if (a instanceof Array && null == a.eb) return Array;
-    var b = a.f;
-    if (null != b) return b;
-    a = r.wj(a);
-    return null != a ? r.rn(a) : null;
-  };
-  r.Be = function (a, b) {
-    if (null == a) return "null";
-    if (5 <= b.length) return "<...>";
-    var c = typeof a;
-    "function" == c && (a.b || a.Gf) && (c = "object");
-    switch (c) {
-      case "function":
-        return "<function>";
-      case "object":
-        if (a.eb) {
-          var d = Ab[a.eb],
-            c = d.nh[a.nb],
-            e = d[c];
-          if (e.Ae) {
-            b += "\t";
-            for (var c = c + "(", d = [], f = 0, e = e.Ae; f < e.length; ) {
-              var g = e[f];
-              ++f;
-              d.push(r.Be(a[g], b));
-            }
-            return c + d.join(",") + ")";
-          }
-          return c;
-        }
-        if (a instanceof Array) {
-          c = a.length;
-          d = "[";
-          b += "\t";
-          for (f = 0; f < c; )
-            (e = f++), (d += (0 < e ? "," : "") + r.Be(a[e], b));
-          return d + "]";
-        }
-        try {
-          d = a.toString;
-        } catch (k) {
-          return "???";
-        }
-        if (
-          null != d &&
-          d != Object.toString &&
-          "function" == typeof d &&
-          ((c = a.toString()), "[object Object]" != c)
-        )
-          return c;
-        c = null;
-        d = "{\n";
-        b += "\t";
-        f = null != a.hasOwnProperty;
-        for (c in a)
-          (f && !a.hasOwnProperty(c)) ||
-            "prototype" == c ||
-            "__class__" == c ||
-            "__super__" == c ||
-            "__interfaces__" == c ||
-            "__properties__" == c ||
-            (2 != d.length && (d += ", \n"),
-            (d += b + c + " : " + r.Be(a[c], b)));
-        b = b.substring(1);
-        return d + ("\n" + b + "}");
-      case "string":
-        return a;
-      default:
-        return String(a);
-    }
-  };
-  r.ph = function (a, b) {
-    if (null == a) return !1;
-    if (a == b) return !0;
-    var c = a.Rd;
-    if (null != c)
-      for (var d = 0, e = c.length; d < e; ) {
-        var f = c[d++];
-        if (f == b || r.ph(f, b)) return !0;
-      }
-    return r.ph(a.ma, b);
-  };
-  r.pn = function (a, b) {
-    if (null == b) return !1;
-    switch (b) {
-      case Array:
-        return a instanceof Array ? null == a.eb : !1;
-      case oc:
-        return "boolean" == typeof a;
-      case sc:
-        return !0;
-      case z:
-        return "number" == typeof a;
-      case Pb:
-        return "number" == typeof a ? (a | 0) === a : !1;
-      case String:
-        return "string" == typeof a;
-      default:
-        if (null != a)
-          if ("function" == typeof b) {
-            if (a instanceof b || r.ph(r.Nm(a), b)) return !0;
-          } else {
-            if ("object" == typeof b && r.qn(b) && a instanceof b) return !0;
-          }
-        else return !1;
-        return (b == tc && null != a.b) || (b == uc && null != a.Gf)
-          ? !0
-          : Ab[a.eb] == b;
-    }
-  };
-  r.G = function (a, b) {
-    if (r.pn(a, b)) return a;
-    throw new q(createError(ErrorCodes.ObjectCastError, K.ye(a), K.ye(b))); // "Cannot cast " + a + " to " + b
-  };
-  r.wj = function (a) {
-    a = r.sn.call(a).slice(8, -1);
-    return "Object" == a || "Function" == a || "Math" == a || "JSON" == a
-      ? null
-      : a;
-  };
-  r.qn = function (a) {
-    return null != r.wj(a);
-  };
-  r.rn = function (a) {
-    return qc[a]; // qc does not exist??!! will use window/global, but the code never ever reaches here. ever!
-  };
-  r.sn = {}.toString;
-
-  ec.b = !0;
-  ec.Mm = function (a) {
-    var b = [];
-    if (null != a) {
-      var c = Object.prototype.hasOwnProperty,
-        d;
-      for (d in a)
-        "__id__" != d && "hx__closures__" != d && c.call(a, d) && b.push(d);
-    }
-    return b;
-  };
 
   ka.b = !0;
   ka.prototype = {
@@ -838,12 +2025,9 @@ function abcHaxballAPI(window, config){
 
   p.b = !0;
   p.prototype = { f: p };
-  p.spec = p.Ia = new p(0, 16777215, 0, -1, "Spectators", 0);
-  p.red = p.fa = new p(1, 15035990, -1, 8, "Red", 2);
-  p.blue = p.xa = new p(2, 5671397, 1, 16, "Blue", 4);
-  p.Ia.pg = p.Ia;
-  p.fa.pg = p.xa;
-  p.xa.pg = p.fa;
+  p.spec = p.Ia = new p(0, 16777215, 0, -1, 0);
+  p.red = p.fa = new p(1, 15035990, -1, 8, 2);
+  p.blue = p.xa = new p(2, 5671397, 1, 16, 4);
   p.byId = [
     p.Ia,
     p.fa,
@@ -864,474 +2048,12 @@ function abcHaxballAPI(window, config){
     b.ub = a.code.toLowerCase();
     return b;
   };
-  T.Fo = function () {
-    return M.tk(n.Ee + "api/geo").then(function (a) {
-      return T.Rf(a);
-    });
-  };
+  T.Fo = () => M.tk(httpUrl + "api/geo").then(T.Rf);
   T.prototype = {
     se: function () {
       return JSON.stringify({ lat: this.Ec, lon: this.Gc, code: this.ub });
     },
     f: T,
-  };
-
-  B.b = !0;
-  B.prototype = {
-    ga: function (a) {
-      var b = this.a;
-      a.s(b.x);
-      a.s(b.y);
-      a.s(this.m);
-      a.O(this.h);
-      a.O(this.v);
-    },
-    ja: function (a) {
-      var b = this.a;
-      b.x = a.u();
-      b.y = a.u();
-      this.m = a.u();
-      this.h = a.M();
-      this.v = a.M();
-    },
-    f: B,
-  };
-  
-  E.b = !0;
-  E.mn = 0.17435839227423353;
-  E.ln = 5.934119456780721;
-  E.prototype = {
-    ga: function (a) {
-      var b = 0,
-        c = a.a;
-      a.l(0);
-      a.l(this.W.ud);
-      a.l(this.ca.ud);
-      0 != this.Cc && ((b = 1), a.s(this.Cc));
-      this.vb != 1 / 0 && ((b |= 2), a.s(this.vb));
-      0 != this.R && ((b |= 4), a.O(this.R));
-      this.Za && (b |= 8);
-      a.o.setUint8(c, b);
-      a.s(this.m);
-      a.O(this.h);
-      a.O(this.v);
-    },
-    ja: function (a, b) {
-      var c = a.B();
-      this.W = b[a.B()];
-      this.ca = b[a.B()];
-      this.Cc = 0 != (c & 1) ? a.u() : 0;
-      this.vb = 0 != (c & 2) ? a.u() : 1 / 0;
-      this.R = 0 != (c & 4) ? a.M() : 0;
-      this.Za = 0 != (c & 8);
-      this.m = a.u();
-      this.h = a.M();
-      this.v = a.M();
-    },
-    Oc: function (a) {
-      a *= 0.017453292519943295;
-      if (0 > a) {
-        a = -a;
-        var b = this.W;
-        this.W = this.ca;
-        this.ca = b;
-        this.Cc = -this.Cc;
-      }
-      a > E.mn && a < E.ln && (this.vb = 1 / Math.tan(a / 2));
-    },
-    Co: function () {
-      return 0 != 0 * this.vb ? 0 : 114.59155902616465 * Math.atan(1 / this.vb);
-    },
-    he: function () {
-      if (0 == 0 * this.vb) {
-        var a = this.ca.a,
-          b = this.W.a,
-          c = 0.5 * (a.x - b.x),
-          a = 0.5 * (a.y - b.y),
-          b = this.W.a,
-          d = this.vb;
-        this.Xd = new H(b.x + c + -a * d, b.y + a + c * d);
-        a = this.W.a;
-        b = this.Xd;
-        c = a.x - b.x;
-        a = a.y - b.y;
-        this.Yj = Math.sqrt(c * c + a * a);
-        c = this.W.a;
-        a = this.Xd;
-        this.Hg = new H(-(c.y - a.y), c.x - a.x);
-        c = this.Xd;
-        a = this.ca.a;
-        this.Ig = new H(-(c.y - a.y), c.x - a.x);
-        0 >= this.vb &&
-          ((a = c = this.Hg),
-          (c.x = -a.x),
-          (c.y = -a.y),
-          (a = c = this.Ig),
-          (c.x = -a.x),
-          (c.y = -a.y));
-      } else
-        (a = this.W.a),
-          (b = this.ca.a),
-          (c = a.x - b.x),
-          (a = -(a.y - b.y)),
-          (b = Math.sqrt(a * a + c * c)),
-          (this.wa = new H(a / b, c / b));
-    },
-    f: E,
-  };
-
-  L.b = !0;
-  L.prototype = {
-    ga: function (a) {
-      var b = this.wa;
-      a.s(b.x);
-      a.s(b.y);
-      a.s(this.Ua);
-      a.s(this.m);
-      a.O(this.h);
-      a.O(this.v);
-    },
-    ja: function (a) {
-      var b = this.wa;
-      b.x = a.u();
-      b.y = a.u();
-      this.Ua = a.u();
-      this.m = a.u();
-      this.h = a.M();
-      this.v = a.M();
-    },
-    f: L,
-  };
-
-  sb.b = !0;
-  sb.prototype = {
-    ga: function (a) {
-      var b = this.W;
-      a.s(b.x);
-      a.s(b.y);
-      b = this.ca;
-      a.s(b.x);
-      a.s(b.y);
-      a.l(this.qe.$);
-    },
-    ja: function (a) {
-      var b = this.W;
-      b.x = a.u();
-      b.y = a.u();
-      b = this.ca;
-      b.x = a.u();
-      b.y = a.u();
-      a = a.lf();
-      this.qe = 1 == a ? p.fa : 2 == a ? p.xa : p.Ia;
-    },
-    f: sb,
-  };
-
-  ca.b = !0;
-  ca.Rd = [Ta];
-  ca.qd = function (a, b) {
-    a.Z = b.Z;
-    a.m = b.m;
-    a.aa = b.aa;
-    a.Ca = b.Ca;
-    a.R = b.R;
-    a.Mj = b.Mj;
-    a.h = b.h;
-    a.v = b.v;
-    var c = a.a,
-      d = b.a;
-    c.x = d.x;
-    c.y = d.y;
-    c = a.D;
-    d = b.D;
-    c.x = d.x;
-    c.y = d.y;
-    c = a.oa;
-    d = b.oa;
-    c.x = d.x;
-    c.y = d.y;
-  };
-  ca.prototype = {
-    ga: function (a) {
-      var b = this.a;
-      a.s(b.x);
-      a.s(b.y);
-      b = this.D;
-      a.s(b.x);
-      a.s(b.y);
-      b = this.oa;
-      a.s(b.x);
-      a.s(b.y);
-      a.s(this.Z);
-      a.s(this.m);
-      a.s(this.aa);
-      a.s(this.Ca);
-      a.tb(this.R);
-      a.O(this.h);
-      a.O(this.v);
-    },
-    ja: function (a) {
-      var b = this.a;
-      b.x = a.u();
-      b.y = a.u();
-      b = this.D;
-      b.x = a.u();
-      b.y = a.u();
-      b = this.oa;
-      b.x = a.u();
-      b.y = a.u();
-      this.Z = a.u();
-      this.m = a.u();
-      this.aa = a.u();
-      this.Ca = a.u();
-      this.R = a.hb();
-      this.h = a.M();
-      this.v = a.M();
-    },
-    Pn: function (id1, id2, a, pObj) {
-      var b = this.a,
-        c = a.a,
-        d = b.x - c.x,
-        b = b.y - c.y,
-        e = a.Z + this.Z,
-        f = d * d + b * b;
-      if (0 < f && f <= e * e) {
-        var oldA = a; // oldA
-        var f = Math.sqrt(f),
-          d = d / f,
-          b = b / f,
-          c = this.aa / (this.aa + a.aa),
-          e = e - f,
-          f = e * c,
-          g = this.a,
-          k = this.a;
-        g.x = k.x + d * f;
-        g.y = k.y + b * f;
-        k = g = a.a;
-        e -= f;
-        g.x = k.x - d * e;
-        g.y = k.y - b * e;
-        e = this.D;
-        f = a.D;
-        e = d * (e.x - f.x) + b * (e.y - f.y);
-        0 > e &&
-          ((e *= this.m * a.m + 1),
-          (c *= e),
-          (g = f = this.D),
-          (f.x = g.x - d * c),
-          (f.y = g.y - b * c),
-          (a = f = a.D),
-          (c = e - c),
-          (f.x = a.x + d * c),
-          (f.y = a.y + b * c),
-          (pObj._CDD_ && pObj._CDD_(id1, this.playerId, id2, oldA.playerId)));
-      }
-    },
-    Qn: function (a, id1, id2, pObj) {
-      var b, c, d;
-      if (0 != 0 * a.vb) {
-        b = a.W.a;
-        var e = a.ca.a;
-        c = e.x - b.x;
-        var f = e.y - b.y,
-          g = this.a;
-        d = g.x - e.x;
-        e = g.y - e.y;
-        g = this.a;
-        if (0 >= (g.x - b.x) * c + (g.y - b.y) * f || 0 <= d * c + e * f)
-          return;
-        c = a.wa;
-        b = c.x;
-        c = c.y;
-        d = b * d + c * e;
-      } else {
-        c = a.Xd;
-        d = this.a;
-        b = d.x - c.x;
-        c = d.y - c.y;
-        d = a.Hg;
-        e = a.Ig;
-        if ((0 < d.x * b + d.y * c && 0 < e.x * b + e.y * c) == 0 >= a.vb)
-          return;
-        e = Math.sqrt(b * b + c * c);
-        if (0 == e) return;
-        d = e - a.Yj;
-        b /= e;
-        c /= e;
-      }
-      e = a.Cc;
-      if (0 == e) 0 > d && ((d = -d), (b = -b), (c = -c));
-      else if ((0 > e && ((e = -e), (d = -d), (b = -b), (c = -c)), d < -e))
-        return;
-      d >= this.Z ||
-        ((d = this.Z - d),
-        (f = e = this.a),
-        (e.x = f.x + b * d),
-        (e.y = f.y + c * d),
-        (d = this.D),
-        (d = b * d.x + c * d.y),
-        0 > d &&
-          ((d *= this.m * a.m + 1),
-          (e = a = this.D),
-          (a.x = e.x - b * d),
-          (a.y = e.y - c * d),
-          (pObj._CDS_ && pObj._CDS_(id1, this.playerId, id2-1)))); // discId, discPlayerId, segmentId
-    },
-    sc: function () {
-      var a = ya.zc,
-        b = this.gc;
-      this.hc != a &&
-        (null == b && (this.gc = b = new ca()), (this.hc = a), ca.qd(b, this));
-      return b;
-    },
-    f: ca,
-  };
-
-  ua.b = !0;
-  ua.prototype = {
-    ga: function (a) {
-      var b = this.a;
-      a.s(b.x);
-      a.s(b.y);
-      b = this.D;
-      a.s(b.x);
-      a.s(b.y);
-      b = this.oa;
-      a.s(b.x);
-      a.s(b.y);
-      a.s(this.Z);
-      a.s(this.m);
-      a.s(this.aa);
-      a.s(this.Ca);
-      a.tb(this.R);
-      a.O(this.h);
-      a.O(this.v);
-    },
-    ja: function (a) {
-      var b = this.a;
-      b.x = a.u();
-      b.y = a.u();
-      b = this.D;
-      b.x = a.u();
-      b.y = a.u();
-      b = this.oa;
-      b.x = a.u();
-      b.y = a.u();
-      this.Z = a.u();
-      this.m = a.u();
-      this.aa = a.u();
-      this.Ca = a.u();
-      this.R = a.hb();
-      this.h = a.M();
-      this.v = a.M();
-    },
-    rp: function () {
-      var a = new ca();
-      this.Bk(a);
-      return a;
-    },
-    Bk: function (a) {
-      var b = a.a,
-        c = this.a;
-      b.x = c.x;
-      b.y = c.y;
-      b = a.D;
-      c = this.D;
-      b.x = c.x;
-      b.y = c.y;
-      b = a.oa;
-      c = this.oa;
-      b.x = c.x;
-      b.y = c.y;
-      a.Z = this.Z;
-      a.m = this.m;
-      a.aa = this.aa;
-      a.Ca = this.Ca;
-      a.R = this.R;
-      a.h = this.h;
-      a.v = this.v;
-    },
-    f: ua,
-  };
-
-  nb.b = !0;
-  nb.Rd = [Ta];
-  nb.prototype = {
-    ga: function (a) {
-      a.l(this.Yd);
-      a.l(this.Zd);
-      a.s(this.Hb);
-      a.s(this.ec);
-      a.s(this.ne);
-      a.O(this.R);
-    },
-    ja: function (a) {
-      this.Yd = a.B();
-      this.Zd = a.B();
-      this.Hb = a.u();
-      this.ec = a.u();
-      this.ne = a.u();
-      this.R = a.M();
-    },
-    C: function (a) {
-      var b = a[this.Yd];
-      a = a[this.Zd];
-      if (null != b && null != a) {
-        var c = b.a,
-          d = a.a,
-          e = c.x - d.x,
-          c = c.y - d.y,
-          f = Math.sqrt(e * e + c * c);
-        if (!(0 >= f)) {
-          e /= f;
-          c /= f;
-          d = b.aa / (b.aa + a.aa);
-          d != d && (d = 0.5);
-          var g, k;
-          if (this.Hb >= this.ec) (g = this.Hb), (k = 0);
-          else if (f <= this.Hb) (g = this.Hb), (k = 1);
-          else if (f >= this.ec) (g = this.ec), (k = -1);
-          else return;
-          f = g - f;
-          if (0 == 0 * this.ne)
-            (d = this.ne * f * 0.5),
-              (e *= d),
-              (c *= d),
-              (k = d = b.D),
-              (b = b.aa),
-              (d.x = k.x + e * b),
-              (d.y = k.y + c * b),
-              (d = b = a.D),
-              (a = a.aa),
-              (b.x = d.x + -e * a),
-              (b.y = d.y + -c * a);
-          else {
-            g = f * d;
-            var l = b.a,
-              h = b.a;
-            l.x = h.x + e * g * 0.5;
-            l.y = h.y + c * g * 0.5;
-            h = l = a.a;
-            f -= g;
-            l.x = h.x - e * f * 0.5;
-            l.y = h.y - c * f * 0.5;
-            f = b.D;
-            g = a.D;
-            f = e * (f.x - g.x) + c * (f.y - g.y);
-            0 >= f * k &&
-              ((d *= f),
-              (b = k = b.D),
-              (k.x = b.x - e * d),
-              (k.y = b.y - c * d),
-              (a = b = a.D),
-              (d = f - d),
-              (b.x = a.x + e * d),
-              (b.y = a.y + c * d));
-          }
-        }
-      }
-    },
-    f: nb,
   };
 
   Eb.b = !0;
@@ -1370,7 +2092,6 @@ function abcHaxballAPI(window, config){
   };
 
   ea.b = !0;
-  ea.Rd = [Ta];
   ea.$r = function (a, b) {
     a.cb = b.cb;
     a.Jb = b.Jb;
@@ -1431,7 +2152,7 @@ function abcHaxballAPI(window, config){
         this.H.playerId = this.V;   // c = discId -> disc[discId].playerId = playerId
     },
     hs: function () {
-      var a = ya.zc,
+      var a = yazc,
         b = this.an;
       this.zc != a &&
         (null == b && (this.an = b = new ea()), (this.zc = a), ea.$r(b, this));
@@ -1440,140 +2161,7 @@ function abcHaxballAPI(window, config){
     f: ea,
   };
 
-  Fa.b = !0;
-  Fa.Rd = [Ta];
-  Fa.qd = function (a, b) {
-    if (null == b.F) a.F = null;
-    else {
-      null == a.F && (a.F = []);
-      for (var c = a.F, d = b.F, e = d.length; c.length > e; ) c.pop();
-      for (var e = 0, f = d.length; e < f; ) {
-        var g = e++;
-        c[g] = d[g].sc();
-      }
-    }
-    a.J = b.J;
-    a.U = b.U;
-    a.qa = b.qa;
-    a.pb = b.pb;
-  };
-  Fa.prototype = {
-    ga: function (a) {
-      a.l(this.F.length);
-      for (var b = 0, c = this.F.length; b < c; ) {
-        var d = b++,
-          e = this.F[d];
-        e.jl = d;
-        e.ga(a);
-      }
-    },
-    ja: function (a) {
-      this.F = [];
-      for (var b = a.B(), c = 0; c < b; ) {
-        ++c;
-        var d = new ca();
-        d.ja(a);
-        this.F.push(d);
-      }
-    },
-    C: function (a, pObj) {
-      for (var b = 0, c = this.F; b < c.length; ) {
-        var d = c[b];
-        ++b;
-        var e = d.a,
-          f = d.a,
-          g = d.D;
-        e.x = f.x + g.x * a;
-        e.y = f.y + g.y * a;
-        f = e = d.D;
-        g = d.oa;
-        d = d.Ca;
-        e.x = (f.x + g.x) * d;
-        e.y = (f.y + g.y) * d;
-      }
-      a = 0;
-      for (b = this.F.length; a < b; ) {
-        d = a++;
-        var id = d;
-        c = this.F[d];
-        d += 1;
-        for (e = this.F.length; d < e; )
-          (f = this.F[d++]), 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Pn(id, d-1, f, pObj);
-        if (0 != c.aa) {
-          d = 0;
-          for (e = this.qa; d < e.length; )
-            if (((f = e[d]), ++d, 0 != (f.h & c.v) && 0 != (f.v & c.h))) {
-              var g = f.wa,
-                k = c.a,
-                g = f.Ua - (g.x * k.x + g.y * k.y) + c.Z;
-              if (0 < g) {
-                var l = (k = c.a),
-                  h = f.wa;
-                k.x = l.x + h.x * g;
-                k.y = l.y + h.y * g;
-                g = c.D;
-                k = f.wa;
-                g = g.x * k.x + g.y * k.y;
-                0 > g &&
-                  ((g *= c.m * f.m + 1),
-                  (l = k = c.D),
-                  (f = f.wa),
-                  (k.x = l.x - f.x * g),
-                  (k.y = l.y - f.y * g),
-                  (pObj._CDP_ && pObj._CDP_(id, c.playerId, d-1))); // discId, discPlayerId, planeId
-              }
-            }
-          d = 0;
-          for (e = this.U; d < e.length; )
-            (f = e[d]), ++d, 0 != (f.h & c.v) && 0 != (f.v & c.h) && c.Qn(f, id, d, pObj);
-          d = 0;
-          for (e = this.J; d < e.length; )
-            if (
-              ((f = e[d]),
-              ++d,
-              0 != (f.h & c.v) &&
-                0 != (f.v & c.h) &&
-                ((k = c.a),
-                (l = f.a),
-                (g = k.x - l.x),
-                (k = k.y - l.y),
-                (l = g * g + k * k),
-                0 < l && l <= c.Z * c.Z))
-            ) {
-              var l = Math.sqrt(l),
-                g = g / l,
-                k = k / l,
-                l = c.Z - l,
-                m = (h = c.a);
-              h.x = m.x + g * l;
-              h.y = m.y + k * l;
-              l = c.D;
-              l = g * l.x + k * l.y;
-              0 > l &&
-                ((l *= c.m * f.m + 1),
-                (h = f = c.D),
-                (f.x = h.x - g * l),
-                (f.y = h.y - k * l));
-            }
-        }
-      }
-      for (a = 0; 2 > a; )
-        for (++a, b = 0, c = this.pb; b < c.length; ) c[b++].C(this.F);
-    },
-    sc: function () {
-      var a = ya.zc,
-        b = this.gc;
-      this.hc != a &&
-        (null == b && (this.gc = b = new Fa()), (this.hc = a), Fa.qd(b, this));
-      return b;
-    },
-    f: Fa,
-  };
-
   K.b = !0;
-  K.ye = function (a) {
-    return r.Be(a, "");
-  };
   K.parseInt = function (a) {
     a = parseInt(
       a,
@@ -1581,11 +2169,6 @@ function abcHaxballAPI(window, config){
     );
     return isNaN(a) ? null : a;
   };
-
-  n.b = !0;
-  n.Vr = (config.backend.secure?"wss":"ws")+"://"+config.backend.hostnameWs+"/";
-  n.Ee = (config.proxy?.HttpUrl ? config.proxy.HttpUrl : ((config.backend.secure?"https":"http")+"://"+config.backend.hostname+"/rs/"));
-  n.Vf = [{ urls: "stun:stun.l.google.com:19302" }];
 
   F.b = !0;
   F.jo = function (a, b) {
@@ -1983,8 +2566,8 @@ function abcHaxballAPI(window, config){
   Fb.b = !0;
   Fb.prototype = {
     Pj: function () {
-      this.w = U.Qc(this.w, 40);
-      this.ub = U.Qc(this.ub, 3);
+      this.w = tSil(this.w, 40);
+      this.ub = tSil(this.ub, 3);
     },
     ga: function (a) {
       this.Pj();
@@ -2063,50 +2646,6 @@ function abcHaxballAPI(window, config){
     });
   };
 
-  va.b = !0;
-  va.parse = function (a) {
-    a.B();
-    for (var b = []; 0 != a.o.byteLength - a.a; ) {
-      var c = a.ie(a.Ob()),
-        d = a.Cl(a.Ob());
-      try {
-        var e = new Fb();
-        e.ja(new F(new DataView(d), !1));
-        var f = new Wb();
-        f.vd = e;
-        f.$ = c;
-        b.push(f);
-      } catch (g) {}
-    }
-    return b;
-  };
-  va.js = function (a, b, c, d) {
-    return Math.acos(
-      Math.sin(a) * Math.sin(c) + Math.cos(a) * Math.cos(c) * Math.cos(b - d)
-    );
-  };
-  va.Hs = function (a, b) {
-    for (var c = a.Ec, d = a.Gc, e = 0; e < b.length; ) {
-      var f = b[e];
-      ++e;
-      var g = f.vd;
-      f.Le =
-        6378 *
-        va.js(
-          0.017453292519943295 * g.Ec,
-          0.017453292519943295 * g.Gc,
-          0.017453292519943295 * c,
-          0.017453292519943295 * d
-        );
-      isFinite(f.Le) || (f.Le = 22e3);
-    }
-  };
-  va.get = function () {
-    return M.L(n.Ee + "api/list", "arraybuffer").then(function (a) {
-      return va.parse(new F(new DataView(a), !1));
-    });
-  };
-
   h.b = !0;
   h.Fr = w.ha(1024);
   h.ja = function (a) {
@@ -2154,14 +2693,13 @@ function abcHaxballAPI(window, config){
     return h.wb;
   };
   h.wn = function (a, b) {
-    if (null != a.trait) {
-      var c = b[r.G(a.trait, String)];
-      if (null != c)
-        for (var d = 0, e = ec.Mm(c); d < e.length; ) {
-          var f = e[d];
-          ++d;
-          null == a[f] && (a[f] = c[f]);
-        }
+    var c = b[a.trait];
+    if (!c)
+      return;
+    for (var d = 0, e = Object.keys(c); d < e.length; d++) {
+      var f = e[d];
+      if (a[f]==null)
+        a[f] = c[f];
     }
   };
   h.Dn = function (a) {
@@ -2182,7 +2720,7 @@ function abcHaxballAPI(window, config){
     return b;
   };
   h.Fc = function (a) {
-    a = r.G(a, Array);
+    a = vvt(a, Array);
     for (var b = 0, c = 0; c < a.length; )
       switch (a[c++]) {
         case "all":
@@ -2238,8 +2776,8 @@ function abcHaxballAPI(window, config){
   };
   h.$f = function (a) {
     if ("transparent" == a) return -1;
-    if ("string" == typeof a) return K.parseInt("0x" + K.ye(a));
-    if (a instanceof Array && null == a.eb)
+    if ("string" == typeof a) return K.parseInt("0x" + a);
+    if (a instanceof Array)
       return ((a[0] | 0) << 16) + ((a[1] | 0) << 8) + (a[2] | 0);
     throw new q(createError(ErrorCodes.BadColorError)); // "Bad color"
   };
@@ -2252,10 +2790,10 @@ function abcHaxballAPI(window, config){
   };
   h.np = function (a) {
     var b = new B();
-    b.a.x = r.G(a.x, z);
-    b.a.y = r.G(a.y, z);
+    b.a.x = vvt(a.x, Number);
+    b.a.y = vvt(a.y, Number);
     var c = a.bCoef;
-    null != c && (b.m = r.G(c, z));
+    null != c && (b.m = vvt(c, Number));
     c = a.cMask;
     null != c && (b.h = h.Fc(c));
     a = a.cGroup;
@@ -2264,14 +2802,14 @@ function abcHaxballAPI(window, config){
   };
   h._np_ = function (a) {
     var b = new B();
-    b.a.x = r.G(a.x, z);
-    b.a.y = r.G(a.y, z);
+    b.a.x = vvt(a.x, Number);
+    b.a.y = vvt(a.y, Number);
     var c = a.bCoef;
-    null != c && (b.m = r.G(c, z));
+    null != c && (b.m = vvt(c, Number));
     c = a.cMask;
-    null != c && (b.h = r.G(c, Pb));
+    null != c && (b.h = vvt(c, Integer));
     a = a.cGroup;
-    null != a && (b.v = r.G(a, Pb));
+    null != a && (b.v = vvt(a, Integer));
     return b;
   };
   h.fr = function (a, b) {
@@ -2303,8 +2841,8 @@ function abcHaxballAPI(window, config){
   };
   h.mp = function (a, b) {
     var c = new E(),
-      d = r.G(a.v1, Pb);
-    c.W = b[r.G(a.v0, Pb)];
+      d = vvt(a.v1, Integer);
+    c.W = b[vvt(a.v0, Integer)];
     c.ca = b[d];
     var d = a.bias,
       e = a.bCoef,
@@ -2314,10 +2852,10 @@ function abcHaxballAPI(window, config){
       l = a.cMask,
       t = a.cGroup,
       m = a.color;
-    null != d && (c.Cc = r.G(d, z));
-    null != e && (c.m = r.G(e, z));
-    null != g ? (c.vb = r.G(g, z)) : null != f && c.Oc(r.G(f, z));
-    null != k && (c.Za = r.G(k, oc));
+    null != d && (c.Cc = vvt(d, Number));
+    null != e && (c.m = vvt(e, Number));
+    null != g ? (c.vb = vvt(g, Number)) : null != f && c.Oc(vvt(f, Number));
+    null != k && (c.Za = vvt(k, Boolean));
     null != l && (c.h = h.Fc(l));
     null != t && (c.v = h.Fc(t));
     null != m && (c.R = h.$f(m));
@@ -2325,8 +2863,8 @@ function abcHaxballAPI(window, config){
   };
   h._mp_ = function (a, b) {
     var c = new E(),
-      d = r.G(a.v1, Pb);
-    c.W = b[r.G(a.v0, Pb)];
+      d = vvt(a.v1, Integer);
+    c.W = b[vvt(a.v0, Integer)];
     c.ca = b[d];
     var d = a.bias,
       e = a.bCoef,
@@ -2336,13 +2874,13 @@ function abcHaxballAPI(window, config){
       l = a.cMask,
       t = a.cGroup,
       m = a.color;
-    null != d && (c.Cc = r.G(d, z));
-    null != e && (c.m = r.G(e, z));
-    null != g ? (c.vb = r.G(g, z)) : null != f && c.Oc(r.G(f, z));
-    null != k && (c.Za = r.G(k, oc));
-    null != l && (c.h = r.G(l, Pb));
-    null != t && (c.v = r.G(t, Pb));
-    null != m && (c.R = r.G(m, Pb));
+    null != d && (c.Cc = vvt(d, Number));
+    null != e && (c.m = vvt(e, Number));
+    null != g ? (c.vb = vvt(g, Number)) : null != f && c.Oc(vvt(f, Number));
+    null != k && (c.Za = vvt(k, Boolean));
+    null != l && (c.h = vvt(l, Integer));
+    null != t && (c.v = vvt(t, Integer));
+    null != m && (c.R = vvt(m, Integer));
     return c;
   };
   h.__mp__ = function (a, b) {
@@ -2358,13 +2896,13 @@ function abcHaxballAPI(window, config){
       l = a.cMask,
       t = a.cGroup,
       m = a.color;
-    null != d && (c.Cc = r.G(d, z));
-    null != e && (c.m = r.G(e, z));
-    null != g ? (c.vb = r.G(g, z)) : null != f && c.Oc(r.G(f, z));
-    null != k && (c.Za = r.G(k, oc));
-    null != l && (c.h = r.G(l, Pb));
-    null != t && (c.v = r.G(t, Pb));
-    null != m && (c.R = r.G(m, Pb));
+    null != d && (c.Cc = vvt(d, Number));
+    null != e && (c.m = vvt(e, Number));
+    null != g ? (c.vb = vvt(g, Number)) : null != f && c.Oc(vvt(f, Number));
+    null != k && (c.Za = vvt(k, Boolean));
+    null != l && (c.h = vvt(l, Integer));
+    null != t && (c.v = vvt(t, Integer));
+    null != m && (c.R = vvt(m, Integer));
     return c;
   };
   h.ap = function (a) {
@@ -2375,8 +2913,8 @@ function abcHaxballAPI(window, config){
   };
   h.jp = function (a, b) {
     var c = new nb(),
-      d = r.G(a.d0, Pb),
-      e = r.G(a.d1, Pb),
+      d = vvt(a.d0, Integer),
+      e = vvt(a.d1, Integer),
       f = a.color,
       g = a.strength,
       k = a.length;
@@ -2394,17 +2932,17 @@ function abcHaxballAPI(window, config){
             (d = e.x - k.x),
             (e = e.y - k.y),
             (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
-      : k instanceof Array && null == k.eb
-      ? ((c.Hb = r.G(k[0], z)), (c.ec = r.G(k[1], z)))
-      : (c.ec = c.Hb = r.G(k, z));
-    c.ne = null == g || "rigid" == g ? 1 / 0 : r.G(g, z);
+      : k instanceof Array
+      ? ((c.Hb = vvt(k[0], Number)), (c.ec = vvt(k[1], Number)))
+      : (c.ec = c.Hb = vvt(k, Number));
+    c.ne = null == g || "rigid" == g ? 1 / 0 : vvt(g, Number);
     null != f && (c.R = h.$f(f));
     return c;
   };
   h._jp_ = function (a, b) {
     var c = new nb(),
-      d = r.G(a.d0, Pb),
-      e = r.G(a.d1, Pb),
+      d = vvt(a.d0, Integer),
+      e = vvt(a.d1, Integer),
       f = a.color,
       g = a.strength,
       k = a.length;
@@ -2422,11 +2960,11 @@ function abcHaxballAPI(window, config){
             (d = e.x - k.x),
             (e = e.y - k.y),
             (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
-      : k instanceof Array && null == k.eb
-      ? ((c.Hb = r.G(k[0], z)), (c.ec = r.G(k[1], z)))
-      : (c.ec = c.Hb = r.G(k, z));
-    c.ne = null == g || "rigid" == g ? 1 / 0 : r.G(g, z);
-    null != f && (c.R = r.G(f, Pb));
+      : k instanceof Array
+      ? ((c.Hb = vvt(k[0], Number)), (c.ec = vvt(k[1], Number)))
+      : (c.ec = c.Hb = vvt(k, Number));
+    c.ne = null == g || "rigid" == g ? 1 / 0 : vvt(g, Number);
+    null != f && (c.R = vvt(f, Integer));
     return c;
   };
   h.__jp__ = function (a, b) {
@@ -2447,11 +2985,11 @@ function abcHaxballAPI(window, config){
             (d = e.x - k.x),
             (e = e.y - k.y),
             (c.ec = c.Hb = Math.sqrt(d * d + e * e))))
-      : k instanceof Array && null == k.eb
-      ? ((c.Hb = r.G(k[0], z)), (c.ec = r.G(k[1], z)))
-      : (c.ec = c.Hb = r.G(k, z));
-    c.ne = null == g || "rigid" == g ? 1 / 0 : r.G(g, z);
-    null != f && (c.R = r.G(f, Pb));
+      : k instanceof Array
+      ? ((c.Hb = vvt(k[0], Number)), (c.ec = vvt(k[1], Number)))
+      : (c.ec = c.Hb = vvt(k, Number));
+    c.ne = null == g || "rigid" == g ? 1 / 0 : vvt(g, Number);
+    null != f && (c.R = vvt(f, Integer));
     return c;
   };
   h.gq = function (a) {
@@ -2463,38 +3001,38 @@ function abcHaxballAPI(window, config){
   };
   h.kp = function (a) {
     var b = new L(),
-      c = r.G(a.normal, Array),
-      d = r.G(c[0], z),
-      c = r.G(c[1], z),
+      c = vvt(a.normal, Array),
+      d = vvt(c[0], Number),
+      c = vvt(c[1], Number),
       e = b.wa,
       f = Math.sqrt(d * d + c * c);
     e.x = d / f;
     e.y = c / f;
-    b.Ua = r.G(a.dist, z);
+    b.Ua = vvt(a.dist, Number);
     d = a.bCoef;
     c = a.cMask;
     a = a.cGroup;
-    null != d && (b.m = r.G(d, z));
+    null != d && (b.m = vvt(d, Number));
     null != c && (b.h = h.Fc(c));
     null != a && (b.v = h.Fc(a));
     return b;
   };
   h._kp_ = function (a) {
     var b = new L(),
-      c = r.G(a.normal, Array),
-      d = r.G(c[0], z),
-      c = r.G(c[1], z),
+      c = vvt(a.normal, Array),
+      d = vvt(c[0], Number),
+      c = vvt(c[1], Number),
       e = b.wa,
       f = Math.sqrt(d * d + c * c);
     e.x = d / f;
     e.y = c / f;
-    b.Ua = r.G(a.dist, z);
+    b.Ua = vvt(a.dist, Number);
     d = a.bCoef;
     c = a.cMask;
     a = a.cGroup;
-    null != d && (b.m = r.G(d, z));
-    null != c && (b.h = r.G(c, Pb));
-    null != a && (b.v = r.G(a, Pb));
+    null != d && (b.m = vvt(d, Number));
+    null != c && (b.h = vvt(c, Integer));
+    null != a && (b.v = vvt(a, Integer));
     return b;
   };
   h.Jo = function (a) {
@@ -2506,8 +3044,8 @@ function abcHaxballAPI(window, config){
   };
   h.ip = function (a) {
     var b = new sb(),
-      c = r.G(a.p0, Array),
-      d = r.G(a.p1, Array),
+      c = vvt(a.p0, Array),
+      d = vvt(a.p1, Array),
       e = b.W;
     e.x = c[0];
     e.y = c[1];
@@ -2555,18 +3093,18 @@ function abcHaxballAPI(window, config){
       m = a.cGroup,
       n = a.radius;
     a = a.kickback;
-    null != c && (b.m = r.G(c, z));
-    null != d && (b.aa = r.G(d, z));
-    null != e && (b.Ca = r.G(e, z));
-    null != f && (b.Ce = r.G(f, z));
-    null != g && (b.Te = r.G(g, z));
-    null != k && (b.Ue = r.G(k, z));
-    null != l && (b.Re = r.G(l, z));
+    null != c && (b.m = vvt(c, Number));
+    null != d && (b.aa = vvt(d, Number));
+    null != e && (b.Ca = vvt(e, Number));
+    null != f && (b.Ce = vvt(f, Number));
+    null != g && (b.Te = vvt(g, Number));
+    null != k && (b.Ue = vvt(k, Number));
+    null != l && (b.Re = vvt(l, Number));
     null != t &&
-      ((c = b.oa), (d = r.G(t[1], z)), (c.x = r.G(t[0], z)), (c.y = d));
+      ((c = b.oa), (d = vvt(t[1], Number)), (c.x = vvt(t[0], Number)), (c.y = d));
     null != m && (b.v = h.Fc(m));
-    null != n && (b.Z = r.G(n, z));
-    null != a && (b.Se = r.G(a, z));
+    null != n && (b.Z = vvt(n, Number));
+    null != a && (b.Se = vvt(a, Number));
     return b;
   };
   h.mo = function (a, b) {
@@ -2601,10 +3139,10 @@ function abcHaxballAPI(window, config){
     }
     null != d && ((c = b.D), (c.x = d[0]), (c.y = d[1]));
     null != e && ((d = b.oa), (d.x = e[0]), (d.y = e[1]));
-    null != f && (b.Z = r.G(f, z));
-    null != g && (b.m = r.G(g, z));
-    null != k && (b.aa = r.G(k, z));
-    null != l && (b.Ca = r.G(l, z));
+    null != f && (b.Z = vvt(f, Number));
+    null != g && (b.m = vvt(g, Number));
+    null != k && (b.aa = vvt(k, Number));
+    null != l && (b.Ca = vvt(l, Number));
     null != t && (b.R = h.$f(t));
     null != m && (b.h = h.Fc(m));
     null != n && (b.v = h.Fc(n));
@@ -2628,13 +3166,13 @@ function abcHaxballAPI(window, config){
     }
     null != d && ((c = b.D), (c.x = d[0]), (c.y = d[1]));
     null != e && ((d = b.oa), (d.x = e[0]), (d.y = e[1]));
-    null != f && (b.Z = r.G(f, z));
-    null != g && (b.m = r.G(g, z));
-    null != k && (b.aa = r.G(k, z));
-    null != l && (b.Ca = r.G(l, z));
-    null != t && (b.R = r.G(t, Pb));
-    null != m && (b.h = r.G(m, Pb));
-    null != n && (b.v = r.G(n, Pb));
+    null != f && (b.Z = vvt(f, Number));
+    null != g && (b.m = vvt(g, Number));
+    null != k && (b.aa = vvt(k, Number));
+    null != l && (b.Ca = vvt(l, Number));
+    null != t && (b.R = vvt(t, Integer));
+    null != m && (b.h = vvt(m, Integer));
+    null != n && (b.v = vvt(n, Integer));
     return b;
   };
   h.ka = function (a, b, c, d) {
@@ -2762,11 +3300,11 @@ function abcHaxballAPI(window, config){
     },
     be: function (a, b, c) {
       a = a[b];
-      return null != a ? r.G(a, z) : c;
+      return null != a ? vvt(a, Number) : c;
     },
     op: function (a, b, c) {
       a = a[b];
-      return null != a ? r.G(a, oc) : c;
+      return null != a ? vvt(a, Boolean) : c;
     },
     se: function () {
       return JSON.stringify(this.Hr());
@@ -2849,15 +3387,15 @@ function abcHaxballAPI(window, config){
     },
     Lk: function (a) {
       function b(a) {
-        var b = r.G(a[0], z);
-        a = r.G(a[1], z);
+        var b = vvt(a[0], Number);
+        a = vvt(a[1], Number);
         return new H(b, a);
       }
       function c(a, b, c, d) {
         null == d && (d = !1);
         var f = e[b];
         if (!d || null != f)
-          if (((d = r.G(f, Array)), null != d))
+          if (((d = vvt(f, Array)), null != d))
             for (f = 0; f < d.length; ) {
               var k = d[f];
               ++f;
@@ -2876,14 +3414,14 @@ function abcHaxballAPI(window, config){
       this.tc = [];
       this.F = [];
       this.pb = [];
-      this.w = r.G(e.name, String);
-      this.$b = r.G(e.width, z);
-      this.qc = r.G(e.height, z);
+      this.w = vvt(e.name, String);
+      this.$b = vvt(e.width, Number);
+      this.qc = vvt(e.height, Number);
       this.Ye = this.be(e, "maxViewWidth", 0) | 0;
       "player" == e.cameraFollow && (this.Ge = 1);
       this.kc = 200;
       a = e.spawnDistance;
-      null != a && (this.kc = r.G(a, z));
+      null != a && (this.kc = vvt(a, Number));
       a = e.bg;
       var f;
       switch (a.type) {
@@ -2906,7 +3444,7 @@ function abcHaxballAPI(window, config){
       this.Fe = this.be(a, "goalLine", 0);
       this.Lf = this.op(e, "canBeStored", !0);
       this.pf = "full" == e.kickOffReset;
-      var g = e.traits;
+      var g = e.traits || {};
       a = e.ballPhysics;
       "disc0" != a &&
         (null != a
@@ -2948,33 +3486,7 @@ function abcHaxballAPI(window, config){
       var a = h.Fr;
       a.a = 0;
       this.ga(a);
-      var b = new dc();
-      b.Yr(a.Sb());
-      b.hash = (b.hash += b.hash << 3) ^ (b.hash >>> 11);
-      b.hash += b.hash << 15;
-      return b.hash | 0;
-    },
-    Kn: function (a, b) {
-      for (var c = 0, d = this.tc; c < d.length; ) {
-        var e = d[c];
-        ++c;
-        var f = e.W,
-          g = e.ca,
-          k = b.x - a.x,
-          l = b.y - a.y;
-        0 < -(f.y - a.y) * k + (f.x - a.x) * l ==
-        0 < -(g.y - a.y) * k + (g.x - a.x) * l
-          ? (f = !1)
-          : ((k = g.x - f.x),
-            (g = g.y - f.y),
-            (f =
-              0 < -(a.y - f.y) * k + (a.x - f.x) * g ==
-              0 < -(b.y - f.y) * k + (b.x - f.x) * g
-                ? !1
-                : !0));
-        if (f) return e.qe;
-      }
-      return p.Ia;
+      return cH(a.Sb())
     },
     ad: function (a, b, c, d, e, f, g, k) {
       null == k && (k = 0);
@@ -3524,7 +4036,6 @@ function abcHaxballAPI(window, config){
   };
 
   O.b = !0;
-  O.Rd = [Ta];
   O.Yk = (function () {
     for (var a = [], b = 0; 256 > b; ) ++b, a.push(new H(0, 0));
     return a;
@@ -3553,20 +4064,24 @@ function abcHaxballAPI(window, config){
       this.ib = a.ib;
       this.Da = a.Da;
       this.S = a.S;
+      this.ta = Fa.fromStadium(a.S);
+      /*
       this.ta.J = this.S.J;
       this.ta.qa = this.S.qa;
       this.ta.U = this.S.U;
       this.ta.pb = this.S.pb;
       a = 0;
       for (var b = this.S.F; a < b.length; ) this.ta.F.push(b[a++].rp());
+      */
       this.Gk();
     },
+    /*
     Ck: function (a) {
-      if (a.ea == p.Ia) ((a.H && y.i(this.Ma._PDD_, a)), a.H = null);
+      if (a.ea == p.Ia) ((a.H && this.Ma._PDD_?.(a)), a.H = null);
       else {
         a.ob = 0;
         var b = a.H;
-        null == b && ((b = new ca()), (b.playerId = a.V), (a.H = b), this.ta.F.push(b), (y.i(this.Ma._PDC_, a))); // assign playerId to disc
+        null == b && ((b = new ca()), (b.playerId = a.V), (a.H = b), this.ta.F.push(b), (this.Ma._PDC_?.(a))); // assign playerId to disc
         var c = this.S.ge;
         b.R = 0;
         b.Z = c.Z;
@@ -3588,24 +4103,40 @@ function abcHaxballAPI(window, config){
         b.y = c.y;
       }
     },
+    */
+    Ck: function (a) {
+      if (a.ea == p.Ia) 
+        this.ta.rP(a, this.Ma._PDD_);
+      else
+        this.ta.aP(a, this.S, this.Ma._PDC_, this.Ma._PDD_);
+    },
+    Kn: function (a, b) {
+      for (var c = 0, d = this.S.tc; c < d.length; c++) {
+        var e = d[c];
+        if (e.C(a, b))
+          return e.qe;
+      }
+      return p.Ia;
+    },
     C: function (a) {
       if (0 < this.Oa) 120 > this.Oa && this.Oa--;
       else {
-        var b = this.Ma.Os;
-        null != b && b();
-        for (var b = this.Ma.I, c = 0; c < b.length; ) {
+        this.Ma.Os?.();
+        for (var b = this.Ma.I, c = 0; c < b.length; c++) {
           var d = b[c];
-          ++c;
-          if (null != d.H) {
+          if (d.H != null) {
             0 == (d.ob & 16) && (d.Wb = !1);
             var e = this.S.ge;
             0 < d.Sc && d.Sc--;
             d.yc < this.Ma.ce && d.yc++;
             if (d.Wb && 0 >= d.Sc && 0 <= d.yc) {
-              for (var f = !1, g = 0, k = this.ta.F; g < k.length; ) {
+              for (var f = false, g = 0, k = this.ta.F; g < k.length; ) {
                 var l = k[g];
                 ++g;
-                if (0 != (l.v & 64) && l != d.H) {
+                if (0 != (l.v & 64) && l != d.H)//{
+                  if (this.ta.kB(d.H, l, e))
+                    f = true;
+                  /*
                   var t = l.a,
                     h = d.H.a,
                     m = t.x - h.x,
@@ -3627,7 +4158,8 @@ function abcHaxballAPI(window, config){
                     t.y = h.y + m * l * n;
                     f = !0;
                   }
-                }
+                  */
+                //}
               }
               f &&
                 (null != this.Ma.ji && this.Ma.ji(d),
@@ -3635,6 +4167,8 @@ function abcHaxballAPI(window, config){
                 (d.Sc = this.Ma.yd),
                 (d.yc -= this.Ma.Zc));
             }
+            this.ta.mP(d, e);
+            /*
             f = d.ob;
             k = g = 0;
             0 != (f & 1) && --k;
@@ -3649,6 +4183,7 @@ function abcHaxballAPI(window, config){
             f.x += g * l;
             f.y += k * l;
             d.H.Ca = d.Wb ? e.Ue : e.Ca;
+            */
           }
         }
         c = 0;
@@ -3665,11 +4200,71 @@ function abcHaxballAPI(window, config){
               (f.y = k.y),
               ++c);
         this.ta.C(a, this.Ma);
+        switch(this.Bb){
+          case 0:{
+            for (a = 0; a < b.length; )
+              (c = b[a]), ++a, null != c.H && (c.H.h = 39 | this.ae.cp);
+            //b = this.ta.F[0].D;
+            if (this.ta.F[0].isMoving()/*b.x * b.x + b.y * b.y > 0*/){
+              this.Bb = 1;
+              null != this.Ma._KO_ && this.Ma._KO_();
+            }
+            break;
+          }
+          case 1:{
+            this.Hc += 0.016666666666666666;
+            for (a = 0; a < b.length; )
+              (d = b[a]), ++a, null != d.H && (d.H.h = 39);
+            d = p.Ia;
+            b = this.ta.F;
+            for (
+              a = 0;
+              a < c &&
+              ((d = a++), (d = this.Kn(b[O.dk[d]].a, O.Yk[d])), d == p.Ia);
+            );
+            d != p.Ia
+              ? (this.Bb = 2,
+                this.vc = 150,
+                this.ae = d,
+                d == p.fa ? this.Kb++ : this.Pb++,
+                null != this.Ma.Ni && this.Ma.Ni(d == p.fa ? p.xa : p.fa),
+                null != this.Ma.Ol && this.Ma.Ol(d.$))
+              : 0 < this.Da &&
+                this.Hc >= 60 * this.Da &&
+                this.Pb != this.Kb &&
+                (null != this.Ma.Pi && this.Ma.Pi(), this.um());
+            break;
+          }
+          case 2:{
+            this.vc--,
+            0 >= this.vc &&
+              (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) ||
+              0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb
+                ? this.um()
+                : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
+            break;
+          }
+          case 3:{
+            this.vc--;
+            if (this.vc<=0){
+              b = this.Ma;
+              if (b.K != null){
+                b.K = null;
+                a = 0;
+                for (c = b.I; a < c.length; )
+                  (d = c[a]), ++a, (d.H && this.Ma._PDD_?.(d)), (d.H = null), (d.Jb = 0);
+                null != b.vf && b.vf(null);
+              }
+            }
+            break;
+          }
+        }
+        /*
         if (0 == this.Bb) {
           for (a = 0; a < b.length; )
             (c = b[a]), ++a, null != c.H && (c.H.h = 39 | this.ae.cp);
           b = this.ta.F[0].D;
-          if (0 < b.x * b.x + b.y * b.y){
+          if (b.x * b.x + b.y * b.y > 0){
             this.Bb = 1;
             null != this.Ma._KO_ && this.Ma._KO_();
           }
@@ -3683,14 +4278,14 @@ function abcHaxballAPI(window, config){
           for (
             a = 0;
             a < c &&
-            ((d = a++), (d = this.S.Kn(b[O.dk[d]].a, O.Yk[d])), d == p.Ia);
+            ((d = a++), (d = this.Kn(b[O.dk[d]].a, O.Yk[d])), d == p.Ia);
           );
           d != p.Ia
             ? (this.Bb = 2,
               this.vc = 150,
               this.ae = d,
               d == p.fa ? this.Kb++ : this.Pb++,
-              null != this.Ma.Ni && this.Ma.Ni(d.pg),
+              null != this.Ma.Ni && this.Ma.Ni(d == p.fa ? p.xa : p.fa),
               null != this.Ma.Ol && this.Ma.Ol(d.$))
             : 0 < this.Da &&
               this.Hc >= 60 * this.Da &&
@@ -3710,9 +4305,10 @@ function abcHaxballAPI(window, config){
           b.K = null;
           a = 0;
           for (c = b.I; a < c.length; )
-            (d = c[a]), ++a, (d.H && y.i(this.Ma._PDD_, d)), (d.H = null), (d.Jb = 0);
+            (d = c[a]), ++a, (d.H && this.Ma._PDD_?.(d)), (d.H = null), (d.Jb = 0);
           null != b.vf && b.vf(null);
         }
+        */
       }
     },
     um: function () {
@@ -3783,7 +4379,7 @@ function abcHaxballAPI(window, config){
       this.ta.pb = this.S.pb;
     },
     sc: function () {
-      var a = ya.zc,
+      var a = yazc,
         b = this.gc;
       this.hc != a &&
         (null == b && (this.gc = b = new O()), (this.hc = a), O.qd(b, this));
@@ -3830,7 +4426,6 @@ function abcHaxballAPI(window, config){
   };
 
   fa.b = !0;
-  fa.Rd = [Ta, cc];
   fa.qd = function (a, b) {
     a.jc = b.jc;
     if (null == b.I) a.I = null;
@@ -3867,28 +4462,28 @@ function abcHaxballAPI(window, config){
       }
     },
     Mf: function (a, b, c) {
-      if (b.ea != c) {
-        b.ea = c;
-        D.remove(this.I, b);
-        this.I.push(b);
-        if (null != this.K) {
-          null != b.H && (D.remove(this.K.ta.F, b.H), (y.i(this._PDD_, b)), (b.H = null));
-          this.K.Ck(b);
-          for (var d = 0, e = !1; !e; ) {
-            ++d;
-            for (var e = !0, f = 0, g = this.I; f < g.length; ) {
-              var k = g[f];
-              ++f;
-              if (k != b && k.ea == b.ea && k.Jb == d) {
-                e = !1;
-                break;
-              }
-            }
+      if (b.ea==c)
+        return;
+      b.ea = c;
+      D.remove(this.I, b);
+      this.I.push(b);
+      if (!this.K)
+        return;
+      //null != b.H && (D.remove(this.K.ta.F, b.H), (this._PDD_?.(b)), (b.H = null));
+      this.K.ta.rP(b, this._PDD_);
+      this.K.Ck(b);
+      for (var d = 0, e = !1; !e; ) {
+        ++d;
+        for (var e = !0, f = 0, g = this.I; f < g.length; ) {
+          var k = g[f];
+          ++f;
+          if (k != b && k.ea == b.ea && k.Jb == d) {
+            e = !1;
+            break;
           }
-          b.Jb = d;
         }
-        //Cb.i(this.xl, a, b, c);
       }
+      b.Jb = d;
     },
     na: function (a) {
       for (var b = 0, c = this.I; b < c.length; ) {
@@ -3958,7 +4553,7 @@ function abcHaxballAPI(window, config){
     },
     Sn: function (a) {
       a = new F(new DataView(a)).M();
-      y.i(this.ko, this.uk() != a);
+      this.ko?.(this.uk() != a);
     },
     km: function (a) {
       this.Ol = a;
@@ -3973,10 +4568,10 @@ function abcHaxballAPI(window, config){
       this.Zc = 0 > c ? 0 : 255 < c ? 255 : c;
       d = 0 > d ? 0 : 100 < d ? 100 : d;
       this.ce = this.Zc * d;
-      vb.i(this.Hk, a, this.yd, this.Zc, d);
+      this.Hk?.(a, this.yd, this.Zc, d);
     },
     sc: function () {
-      var a = ya.zc,
+      var a = yazc,
         b = this.gc;
       this.hc != a &&
         (null == b && (this.gc = b = new fa()), (this.hc = a), fa.qd(b, this));
@@ -4009,8 +4604,6 @@ function abcHaxballAPI(window, config){
         q.Wb = p.Wb;
         q.yc = p.yc;
         q.Sc = p.Sc;
-        q.cb = p.cb;
-        q.cb = p.cb;
         q.ea = p.ea;
         q.auth = p.auth;
         q.conn = p.conn;
@@ -4452,15 +5045,15 @@ function abcHaxballAPI(window, config){
       if (data.hasOwnProperty("damping"))
         obj.Ca = d.Ca;
       if (data.hasOwnProperty("kickingDamping"))
-        obj.Ua = r.G(data.kickingDamping, z);
+        obj.Ua = vvt(data.kickingDamping, Number);
       if (data.hasOwnProperty("acceleration"))
-        obj.Ce = r.G(data.acceleration, z);
+        obj.Ce = vvt(data.acceleration, Number);
       if (data.hasOwnProperty("kickingAcceleration"))
-        obj.Te = r.G(data.kickingAcceleration, z);
+        obj.Te = vvt(data.kickingAcceleration, Number);
       if (data.hasOwnProperty("kickStrength"))
-        obj.Re = r.G(data.kickStrength, z);
+        obj.Re = vvt(data.kickStrength, Number);
       if (data.hasOwnProperty("kickback"))
-        obj.Se = r.G(data.kickback, z);
+        obj.Se = vvt(data.kickback, Number);
     },
 
     updateStadiumBg: function(data) { // data: { type: 0("none") || 1("grass") || 2("hockey"), width: number, height: number, kickOffRadius: number, cornerRadius: number, color: ("transparent" || string || [r: number, g: number, b: number]), goalLine: number }
@@ -4468,19 +5061,19 @@ function abcHaxballAPI(window, config){
       if (!obj)
         return;
       if (data.hasOwnProperty("type"))
-        obj.ld = r.G(data.type, Pb);
+        obj.ld = vvt(data.type, Integer);
       if (data.hasOwnProperty("width"))
-        obj.Td = r.G(data.width, z);
+        obj.Td = vvt(data.width, Number);
       if (data.hasOwnProperty("height"))
-        obj.Sd = r.G(data.height, z);
+        obj.Sd = vvt(data.height, Number);
       if (data.hasOwnProperty("kickOffRadius"))
-        obj.kd = r.G(data.kickOffRadius, z);
+        obj.kd = vvt(data.kickOffRadius, Number);
       if (data.hasOwnProperty("cornerRadius"))
-        obj.Uc = r.G(data.cornerRadius, z);
+        obj.Uc = vvt(data.cornerRadius, Number);
       if (data.hasOwnProperty("color"))
-        obj.jd = r.G(data.color, Pb);
+        obj.jd = vvt(data.color, Integer);
       if (data.hasOwnProperty("goalLine"))
-        obj.Fe = r.G(data.goalLine, z);
+        obj.Fe = vvt(data.goalLine, Number);
     },
 
     updateStadiumGeneral: function(data) { // data: { name: string, width: number, height: number, maxViewWidth: number, cameraFollow: 0("") || 1("player"), spawnDistance: number, kickOffReset: true("full") || false("partial"), canBeStored: boolean }
@@ -4488,21 +5081,21 @@ function abcHaxballAPI(window, config){
       if (!obj)
         return;
       if (data.hasOwnProperty("name"))
-        obj.w = r.G(data.name, String);
+        obj.w = vvt(data.name, String);
       if (data.hasOwnProperty("width"))
-        obj.$b = r.G(data.width, z);
+        obj.$b = vvt(data.width, Number);
       if (data.hasOwnProperty("height"))
-        obj.qc = r.G(data.height, z);
+        obj.qc = vvt(data.height, Number);
       if (data.hasOwnProperty("maxViewWidth"))
-        obj.Ye = r.G(data.maxViewWidth, z);
+        obj.Ye = vvt(data.maxViewWidth, Number);
       if (data.hasOwnProperty("cameraFollow"))
-        obj.Ge = r.G(data.cameraFollow, Pb);
+        obj.Ge = vvt(data.cameraFollow, Integer);
       if (data.hasOwnProperty("spawnDistance"))
-        obj.kc = r.G(data.spawnDistance, z);
+        obj.kc = vvt(data.spawnDistance, Number);
       if (data.hasOwnProperty("kickOffReset"))
-        obj.pf = r.G(data.kickOffReset, oc);
+        obj.pf = vvt(data.kickOffReset, Boolean);
       if (data.hasOwnProperty("canBeStored"))
-        obj.Lf = r.G(data.canBeStored, oc);
+        obj.Lf = vvt(data.canBeStored, Boolean);
     },
 
     runSteps: function(count){
@@ -4532,8 +5125,8 @@ function abcHaxballAPI(window, config){
     m.Qz.set(a.prototype.eventType, a);
     m.yf++;
   };
-  m.lj = function (a, b) {
-    var c = (null == a ? null : r.Nm(a)).on;
+  m.lj = function (a, b) { // serialize(pack) event message
+    var c = a?.f?.on;
     if (null == c) throw new q(createError(ErrorCodes.UnregisteredActionError)); // "Tried to pack unregistered action"
     b.l(c);
     a.ua(b);
@@ -4630,7 +5223,7 @@ function abcHaxballAPI(window, config){
   ta.prototype = C(m.prototype, {
     apply: function (a) {
       var b = a.na(this.P);
-      null != b && this.Yg != b.Ld && ((b.Ld = this.Yg), y.i(a.sl, b));
+      null != b && this.Yg != b.Ld && ((b.Ld = this.Yg), a.sl?.(b));
     },
     ua: function (a) {
       a.l(this.Yg ? 1 : 0);
@@ -4670,10 +5263,10 @@ function abcHaxballAPI(window, config){
   rb.ma = m;
   rb.prototype = C(m.prototype, {
     apply: function (a) {
-      0 == this.P && vb.i(a.Vl, this.Tc, this.color, this.style, this.fn);
+      0 == this.P && a.Vl?.(this.Tc, this.color, this.style, this.fn);
     },
     ua: function (a) {
-      a.mc(U.Qc(this.Tc, 1e3));
+      a.mc(tSil(this.Tc, 1e3));
       a.O(this.color);
       a.l(this.style);
       a.l(this.fn);
@@ -4852,7 +5445,7 @@ function abcHaxballAPI(window, config){
     },
     va: function (a) {
       this.Zb = a.zb();
-      null != this.Zb && (this.Zb = U.Qc(this.Zb, 2));
+      null != this.Zb && (this.Zb = tSil(this.Zb, 2));
     },
     copy: function () {
       return mCopy(ra.la(this.Zb), this);
@@ -5055,8 +5648,8 @@ function abcHaxballAPI(window, config){
         b.conn = this.conn;
         b.auth = this.auth; // store auth
         a.I.push(b);
-        y.i(a.tl, b);
-        y.i(haxball?.room?._onPlayerObjectCreated, b);
+        a.tl?.(b);
+        haxball?.room?._onPlayerObjectCreated?.(b);
       }
     },
     ua: function (a) {
@@ -5090,7 +5683,7 @@ function abcHaxballAPI(window, config){
   }
   qb.la = function(a, b) {
     var c = new qb();
-    c.Zb = null != b ? U.Qc(b, 2) : null;
+    c.Zb = null != b ? tSil(b, 2) : null;
     c.ze = a;
     return c;
   };
@@ -5108,7 +5701,7 @@ function abcHaxballAPI(window, config){
     va: function (a) {
       this.Zb = a.zb();
       this.ze = a.M();
-      null != this.Zb && (this.Zb = U.Qc(this.Zb, 2));
+      null != this.Zb && (this.Zb = tSil(this.Zb, 2));
     },
     copy: function () {
       return mCopy(qb.la(this.ze, this.Zb), this);
@@ -5141,7 +5734,7 @@ function abcHaxballAPI(window, config){
           d = 120 == b.Oa,
           e = 0 < b.Oa;
         this.Bf ? (b.Oa = 120) : 120 == b.Oa && (b.Oa = 119);
-        d != this.Bf && (Cb.i(a.ml, c, this.Bf, e));
+        (this.Bf!=d) && a.ml?.(c, this.Bf, e);
       }
     },
     ua: function (a) {
@@ -5184,10 +5777,10 @@ function abcHaxballAPI(window, config){
     },
     apply: function (a) {
       var b = a.na(this.P);
-      null != b && (ia.i(a.rl, b, this.Tc));
+      (b!=null) && a.rl?.(b, this.Tc);
     },
     ua: function (a) {
-      a.mc(U.Qc(this.Tc, 140));
+      a.mc(tSil(this.Tc, 140));
     },
     va: function (a) {
       this.Tc = a.ic();
@@ -5267,7 +5860,7 @@ function abcHaxballAPI(window, config){
           a._CCI_ && a._CCI_(b, this.id, this.mode);
           return;
         }
-        ia.i(a.wl, b, this.sj);
+        a.wl?.(b, this.sj);
       }
     },
     ua: function (a) {
@@ -5448,12 +6041,12 @@ function abcHaxballAPI(window, config){
           var c = a.na(this.P);
           D.remove(a.I, b);
           null != a.K && D.remove(a.K.ta.F, b.H);
-          vb.i(a.ul, b, this.fd, this.Qg, c);
+          a.ul?.(b, this.fd, this.Qg, c);
         }
       }
     },
     ua: function (a) {
-      null != this.fd && (this.fd = U.Qc(this.fd, 100));
+      null != this.fd && (this.fd = tSil(this.fd, 100));
       a.O(this.V);
       a.Db(this.fd);
       a.l(this.Qg ? 1 : 0);
@@ -5800,7 +6393,7 @@ function abcHaxballAPI(window, config){
           for (var c = 0, d = a.I; c < d.length; ) {
             var e = d[c];
             ++c;
-            e.H && y.i(a._PDD_, e);
+            e.H && a._PDD_?.(e);
             e.H = null;
             e.Jb = 0;
           }
@@ -5885,19 +6478,10 @@ function abcHaxballAPI(window, config){
     this.ba = b;
   }
   ub.__cq__ = function (teamId, angle, ...colors) {
-    var c = new ka(), d;
-    switch (teamId) {
-      case 1:
-        c.fb = [p.fa.R];
-        d = p.fa;
-        break;
-      case 2:
-        c.fb = [p.xa.R];
-        d = p.xa;
-        break;
-      default:
-        throw new q(createError(ErrorCodes.ChangeTeamColorsInvalidTeamIdError)); // "Invalid team id"
-    }
+    var c = new ka(), d = p.byId[teamId];
+    if (!d)
+      throw new q(createError(ErrorCodes.ChangeTeamColorsInvalidTeamIdError)); // "Invalid team id"
+    c.fb = [d.R];
     var b = Pa.la(d, c);
     var l = colors.length;
     if (l < 1)
@@ -6005,7 +6589,7 @@ function abcHaxballAPI(window, config){
       }
       b >= this.rs
         ? ((b = this.$a[c]), (this.Qd -= b.weight), this.$a.splice(c, 1))
-        : (b = new bc());
+        : (b = {});
       b.value = a;
       b.weight = 1;
       b.index = 0;
@@ -6095,7 +6679,7 @@ function abcHaxballAPI(window, config){
     wk: function (a, b) {
       if (0 >= a) return this.T;
       a > this.Ff && (a = this.Ff);
-      ya.zc++;
+      yazc++;
       var c = this.T.sc(/*this.haxball*/), d;
       null != b ? (this.Ri.as(this.le, b), (d = this.Ri)) : (d = this.le);
       d = d.list;
@@ -6161,79 +6745,6 @@ function abcHaxballAPI(window, config){
     },
     f: tb,
   };
-  
-  function G(a, b) {
-    if (null == b) return null;
-    null == b.oh && (b.oh = rc++);
-    var c;
-    null == a.ej ? (a.ej = {}) : (c = a.ej[b.oh]);
-    null == c && ((c = b.bind(a)), (a.ej[b.oh] = c));
-    return c;
-  }
-  
-  var Ab = {};
-  var Ob = (Ab["bas.basnet.FailReason"] = {
-    Gf: !0,
-    nh: ["PeerFailed", "Rejected", "Cancelled", "Error"],
-    jh: { nb: 0, eb: "bas.basnet.FailReason", toString: ga },
-    lh: (()=>{
-          var X = function (a) {
-            return { nb: 1, code: a, eb: "bas.basnet.FailReason", toString: ga };
-          };
-          X.Ae = ["code"];
-          return X;
-        })(),
-    hh: { nb: 2, eb: "bas.basnet.FailReason", toString: ga },
-    Error: { nb: 3, eb: "bas.basnet.FailReason", toString: ga },
-  });
-  var gc = (Ab["bas.basnet.ConnectionRequestResponse"] = {
-    Gf: !0,
-    nh: ["Accept", "Reject"],
-    hn: { nb: 0, eb: "bas.basnet.ConnectionRequestResponse", toString: ga },
-    kh: (()=>{
-          var X = function (a) {
-            return {
-              nb: 1,
-              reason: a,
-              eb: "bas.basnet.ConnectionRequestResponse",
-              toString: ga,
-            };
-          };
-          X.Ae = ["reason"];
-          return X;
-        })(),
-  });
-  var xb = (Ab["bas.marf.net.ConnFailReason"] = {
-    Gf: !0,
-    nh: ["Cancelled", "PeerFailed", "Rejected", "Other"],
-    hh: { nb: 0, eb: "bas.marf.net.ConnFailReason", toString: ga },
-    jh: { nb: 1, eb: "bas.marf.net.ConnFailReason", toString: ga },
-    lh: (()=>{
-          var X = function (a) {
-            return {
-              nb: 2,
-              reason: a,
-              eb: "bas.marf.net.ConnFailReason",
-              toString: ga,
-            };
-          };
-          X.Ae = ["reason"];
-          return X;
-        })(),
-    ih: (()=>{
-          var X = function (a) {
-            return {
-              nb: 3,
-              description: a,
-              eb: "bas.marf.net.ConnFailReason",
-              toString: ga,
-            };
-          };
-          X.Ae = ["description"];
-          return X;
-        })(),
-  });
-
   function Va(a, b, c) {
     this.gd = this.re = null;
     this.oe = [];
@@ -6263,7 +6774,7 @@ function abcHaxballAPI(window, config){
     Mi: function (a) {
       null == a && (a = 1e4);
       clearTimeout(this.re);
-      this.re = setTimeout(G(this, this.To), a);
+      this.re = setTimeout(this.To.bind(this), a);
     },
     bo: function (a, b) {
       var c = this;
@@ -6290,7 +6801,7 @@ function abcHaxballAPI(window, config){
             return a;
           }
           for (var g = 0; g < b.length; ) d.yj(b[g++]);
-          return lc.Dr(d.Sh, c).then(e, e);
+          return pWT(d.Sh, c).then(e, e);
         })
         .then(function (a) {
           d.di(a); // d.di is not a function???
@@ -6416,27 +6927,30 @@ function abcHaxballAPI(window, config){
     },
     f: Nb,
   };
-  
-  var pc = {
-    b: !0,
-    description: function (a) {
-      switch(a){
-        case 4001:
-          return createError(ErrorCodes.RoomClosed); // "The room was closed."
-        case 4100:
-          return createError(ErrorCodes.RoomFull); // "The room is full."
-        case 4101:
-          return createError(ErrorCodes.WrongPassword); // "Wrong password."
-        case 4102:
-          return createError(ErrorCodes.BannedBefore); // "You are banned from this room."
-        case 4103:
-          return createError(ErrorCodes.IncompatibleVersion); // "Incompatible game version."
-        default:
-          return createError(ErrorCodes.ConnectionClosed, a); // "Connection closed (" + a + ")"
-      }
-    },
+
+  // constant error generators...
+  function specialError(code){
+    switch(code){
+      case 4001:
+        return createError(ErrorCodes.RoomClosed); // "The room was closed."
+      case 4100:
+        return createError(ErrorCodes.RoomFull); // "The room is full."
+      case 4101:
+        return createError(ErrorCodes.WrongPassword); // "Wrong password."
+      case 4102:
+        return createError(ErrorCodes.BannedBefore); // "You are banned from this room."
+      case 4103:
+        return createError(ErrorCodes.IncompatibleVersion); // "Incompatible game version."
+    }
+    return createError(ErrorCodes.ConnectionClosed, code); // "Connection closed (" + a + ")"
+  }
+  var Ob = {
+    Error: ()=>([createError(ErrorCodes.MasterConnectionError), createError(ErrorCodes.MasterConnectionError)]),
+    jh: ()=>([createError(ErrorCodes.FailedHost), createError(ErrorCodes.Failed)]),
+    hh: ()=>([createError(ErrorCodes.Cancelled), createError(ErrorCodes.Empty)]),
+    lh: (code)=>([specialError(code)])
   };
-  
+
   function wb(a, b, c, d, e, f, proxyAgent, identityToken) {
     this.rh = this.yh = !1;
     this.proxyAgent = proxyAgent;
@@ -6448,7 +6962,7 @@ function abcHaxballAPI(window, config){
     var g = this;
     this.pa = new Va(0, b, d);
     this.pa.bd = function () {
-      g.Oe(Ob.jh);
+      g.Oe(Ob.jh());
     };
     this.pa.zd = function () {
       null != g.zd && g.zd(new Nb(g.pa));
@@ -6477,14 +6991,14 @@ function abcHaxballAPI(window, config){
         g.yh || g.Oe(Ob.lh(a.code));
       };
       g.X.onerror = function () {
-        g.yh || g.Oe(Ob.Error);
+        g.yh || g.Oe(Ob.Error());
       };
-      g.X.onmessage = G(g, g.Ph);
+      g.X.onmessage = g.Ph.bind(g);
       g.X.onopen = function () {
         null != g.gl && g.gl();
         g.pa.Mi();
         g.Bi(g.jr, g.pa.Uf, e);
-        g.pa.jg = G(g, g.yi);
+        g.pa.jg = g.yi.bind(g);
         g.pa.Sh.then(function () {
           g.Nc(0, null);
         });
@@ -6493,21 +7007,9 @@ function abcHaxballAPI(window, config){
     this.pa.eo();
   }
   wb.b = !0;
-  wb.Do = function (a) {
-    switch (a.nb) {
-      case 0:
-        return createError(ErrorCodes.Failed); // "Failed"
-      case 1:
-        return pc.description(a.code);
-      case 2:
-        return createError(ErrorCodes.Empty); // ""
-      case 3:
-        return createError(ErrorCodes.MasterConnectionError); // "Master connection error"
-    }
-  };
   wb.prototype = {
     Gn: function () {
-      this.Oe(Ob.hh);
+      this.Oe(Ob.hh());
     },
     Uj: function () {
       try{
@@ -6551,7 +7053,7 @@ function abcHaxballAPI(window, config){
           for (var a = 0; a < b.length; ) c.pa.Ra.addIceCandidate(b[a++]);
         },
         function () {
-          c.Oe(Ob.Error);
+          c.Oe(Ob.Error());
         }
       );
     },
@@ -6613,11 +7115,11 @@ function abcHaxballAPI(window, config){
             c.uq(a);
           };
           a.cf = function () {
-            3 != c.pd && y.i(c.df, xb.ih(createError(ErrorCodes.ConnectionClosed))); // "Connection closed"
+            3 != c.pd && c.df?.(createError(ErrorCodes.ConnectionClosed)); // "Connection closed"
             c.ia();
           };
           a = setTimeout(function () {
-            y.i(c.df, xb.ih(createError(ErrorCodes.GameStateTimeout))); // "Game state timeout"
+            c.df?.(createError(ErrorCodes.GameStateTimeout)); // "Game state timeout"
             c.ia();
           }, 1e4);
           c.re = a;
@@ -6631,54 +7133,28 @@ function abcHaxballAPI(window, config){
           return (g = !0);
         };
         c.pc.bd = function (a) {
-          if (!e && 1 == c.pd && g) A.i(c.Sp), d(!0);
+          if (!e && 1 == c.pd && g) c.Sp?.(), d(!0);
           else {
-            var b = wb.Do(a);
-            switch (a.nb) {
-              case 0:
-                a = xb.jh;
-                break;
-              case 1:
-                a = xb.lh(a.code);
-                break;
-              case 2:
-                a = xb.hh;
-                break;
-              default:
-                a = xb.ih(b);
-            }
-            y.i(c.df, a);
-            c.ia(b);
+            c.df?.(a[0]);
+            c.ia(a[1] || a[0]);
           }
         };
       };
     d(null != b.cn && b.cn);
   }
   xa.b = !0;
-  xa.xh = function (a) {
-    switch (a.nb) {
-      case 0:
-        return createError(ErrorCodes.Cancelled); // "Cancelled"
-      case 1:
-        return createError(ErrorCodes.FailedPeer); // "Failed to connect to peer."
-      case 2:
-        return pc.description(a.reason);
-      case 3:
-        return a.description; // ?????
-    }
-  };
   xa.ma = V;
   xa.prototype = C(V.prototype, {
     ia: function (a) {
       null != this.pc && ((this.pc.bd = null), this.pc.Gn(), (this.pc = null));
       clearTimeout(this.re);
       null != this.pa && ((this.pa.cf = null), this.pa.ia(), (this.pa = null));
-      this.ek = null == a ? createError(ErrorCodes.ConnectionClosed)/*"Connection closed"*/ : a;
+      this.ek = null == a ? createError(ErrorCodes.ConnectionClosed) : a; // "Connection closed"
       this.tf(4);
-      y.i(this.haxball._onRoomLeave, this.ek);
+      this.haxball._onRoomLeave?.(this.ek);
     },
     tf: function (a, b) {
-      this.pd != a && ((this.pd = a), (ia.i(this.haxball._onConnectionStateChange, a, b)), null != this.Ad && this.Ad(a));
+      this.pd != a && ((this.pd = a), this.haxball._onConnectionStateChange?.(a, b), null != this.Ad && this.Ad(a));
     },
     wd: function () {
       return 3 == this.pd;
@@ -6818,15 +7294,7 @@ function abcHaxballAPI(window, config){
         c = a.ic(),
         d = "";
       0 < a.o.byteLength - a.a && (d = a.ic());
-      //ErrorCodes.KickedNow
-      //c, b, d // reason, ban, byId
-      /*
-      a = b ? "You were banned" : "You were kicked";
-      "" != d && (a += " by " + d);
-      "" != c && (a += " (" + c + ")");
-      this.ia(a);
-      */
-      this.ia(createError(ErrorCodes.KickedNow, c, b, d));
+      this.ia(createError(ErrorCodes.KickedNow, c, b, d)); // "You were banned" : "You were kicked" ...
     },
     tq: function (a) {
       var b = a.u();
@@ -6838,8 +7306,7 @@ function abcHaxballAPI(window, config){
         var f = e[d];
         ++d;
         if (f > a) break;
-        //not used anymore:
-        //f < a ? y.i(this.dl, -1) : y.i(this.dl, c);
+        this.dl?.((f<a)?-1:c);
         ++b;
       }
       this.Di.splice(0, b);
@@ -6907,7 +7374,7 @@ function abcHaxballAPI(window, config){
         return;
       var ips = [];
       if (e.gd)
-        ips.push(U.Ur(e.gd));
+        ips.push(hStn(e.gd));
       e.oe.forEach((ip)=>{
         if (!ips.includes(ip))
           ips.push(ip);
@@ -7091,8 +7558,9 @@ function abcHaxballAPI(window, config){
   Sa.b = !0;
   Sa.vk = function (a) {
     try {
-      var b = nc.gf(a.candidate);
-      if ("srflx" == b.Jr) return b.Xo;
+      var a = a.candidate.split(" "); // port: parseInt(a[5])
+      if (a[6]!="typ") throw new q(null);
+      if (a[7]=="srflx") return a[4];
     } catch (c) {}
     return null;
   };
@@ -7213,7 +7681,7 @@ function abcHaxballAPI(window, config){
         d.X.onerror = function () {
           d.Mh(!0);
         };
-        d.X.onmessage = G(d, d.Ph);
+        d.X.onmessage = d.Ph.bind(d);
       }
       //null == a && (a = "");
       var d = this;
@@ -7276,7 +7744,7 @@ function abcHaxballAPI(window, config){
     },
     Oh: function (a) {
       var b = a.hb(),
-        c = U.Zr(a.sb(a.B())),
+        c = bAti(a.sb(a.B())),
         d,
         e,
         f;
@@ -7310,9 +7778,9 @@ function abcHaxballAPI(window, config){
         }
         if (
           null != this.Vj &&
-          ((l = new F(e.o)), (l.a = e.a), (e = this.Vj(l)), 1 == e.nb)
+          ((l = new F(e.o)), (l.a = e.a), (e = this.Vj(l)), e!=null)
         ) {
-          this.sf(a, e.reason);
+          this.sf(a, e);
           return;
         }
         var h = new Va(a, this.Vf, this.In);
@@ -7405,7 +7873,7 @@ function abcHaxballAPI(window, config){
       a.l(this.nf ? 1 : 0);
       this.X.send(a.Hd());
       this.dm = this.nf;
-      y.i(this.haxball.room._onRoomRecaptchaModeChange, this.nf);
+      this.haxball.room._onRoomRecaptchaModeChange?.(this.nf);
     },
     Bi: function (a, b, c, d) {
       var e = w.ha(32, !1);
@@ -7614,12 +8082,12 @@ function abcHaxballAPI(window, config){
     this.Li = performance.now();
     this.Ic = new Sa(haxball, this.tp, a.iceServers, Zb.Km, a.gn);
     this.Ic.banList = new BanList(this);
-    this.Ic.Vj = G(this, this.Oo);
+    this.Ic.Vj = this.Oo.bind(this);
     this.Ic.bl = function (a) {
       b.Lp(a);
     };
     this.Ic.kg = function (a) {
-      y.i(b.kg, a);
+      b.kg?.(a);
     };
   }
   Lb.b = !0;
@@ -7651,11 +8119,11 @@ function abcHaxballAPI(window, config){
     },
     Ud: function () {
       if (this.Ic.banList.clear())
-        A.i(this.haxball.room._onBansClear);
+        this.haxball.room._onBansClear?.();
     },
     td: function(a) {
       if (this.Ic.banList.removePlayer(a))
-        y.i(this.haxball.room._onBanClear, a);
+        this.haxball.room._onBanClear?.(a);
     },
     xd1: function(playerObject) {
       return this.Ic.banList.addPlayer(playerObject);
@@ -7749,19 +8217,18 @@ function abcHaxballAPI(window, config){
       return this.wk((performance.now() - this.Li) * this.Ac - this.Y + this.wi + this.bc + this.rd);
     },
     Oo: function (b) {
-      if (!this.upc && this.ac.length >= this.fg) return gc.kh(4100);
+      if (!this.upc && this.ac.length >= this.fg) return 4100;
       try {
         if (b.Ob() != this.Sr) throw new q(null);
       } catch (d) {
-        return gc.kh(4103);
+        return 4103;
       }
       try {
         var c = b.zb();
         if (null != this.Ib && c != this.Ib) throw new q(null);
       } catch (d) {
-        return gc.kh(4101);
+        return 4101;
       }
-      return gc.hn;
     },
     Lp: function (a) {
       var b = this;
@@ -7776,7 +8243,7 @@ function abcHaxballAPI(window, config){
         a.cf = function () {
           D.remove(b.ac, c);
           b.Ie["delete"](c.$);
-          y.i(b.Ip, c.$);
+          b.Ip?.(c.$);
         };
         a = w.ha(1 + c.He.byteLength);
         a.l(0);
@@ -7827,7 +8294,7 @@ function abcHaxballAPI(window, config){
         e.yg && this.haxball.__internalData.customClientIds.has(e.$) && e.Rb(f, 0);
       }
     },
-    hr: function (a) { // sends an info packet regarding current room status to backend
+    hr: function (a) { // sends an info packet regarding current room status to a client player at the initialization stage
       var b = w.ha();
       b.l(1);
       var c = w.ha();
@@ -7840,6 +8307,16 @@ function abcHaxballAPI(window, config){
         this.il(d[e++], c);
       b.Vb(pako.deflateRaw(c.Sb()));
       a.Rb(b);
+    },
+    _hr: function (a) { // sends an info packet regarding current room status to a client player at the initialization stage
+      a.tb(this.Y);
+      a.tb(this.te);
+      a.lb(this.cc);
+      this.T.ga(a);
+      var that = this;
+      this.le.list.forEach((b)=>{
+        that.il(b, a);
+      });
     },
     _r: function (a) {
       setTimeout(()=>{
@@ -7879,13 +8356,7 @@ function abcHaxballAPI(window, config){
               var d = c.up++;
               b.$ = d;
               c.Ie.set(d, b);
-              vb.i(
-                c.Hp,
-                d,
-                new F(new DataView(e.buffer, e.byteOffset, e.byteLength), !1),
-                b.pa.gd,       // send conn (fallback should be b.pa.oe)
-                a              // send auth
-              );
+              c.Hp?.(d, new F(new DataView(e.buffer, e.byteOffset, e.byteLength), !1), b.pa.gd, a);
               b.yg = !0;
               c.hr(b);
               c._r(b);
@@ -7919,7 +8390,7 @@ function abcHaxballAPI(window, config){
       }
     },
     xk: function (a, b) {
-      ia.i(this.haxball.onHostError, b, a.$);
+      this.haxball.onHostError?.(b, a.$);
       //console.log(b);
       this.Ie["delete"](a.$);
       D.remove(this.ac, a);
@@ -8005,73 +8476,73 @@ function abcHaxballAPI(window, config){
     // all other engine updates run K.C(x), and not T.C(x).
     
     a.T.iq = (b)=>{
-      ia.i(haxball.room._onPlayerInputChange, b.V, b.ob);
+      haxball.room._onPlayerInputChange?.(b.V, b.ob);
     };
     a.T.tl = (b)=>{
-      y.i(haxball.room._onPlayerJoin, b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+      haxball.room._onPlayerJoin?.(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
     };
     a.T.ji = (d)=>{
-      y.i(haxball.room._onPlayerBallKick, d?.V);
+      haxball.room._onPlayerBallKick?.(d?.V);
     };
     a.T.Ni = (team)=>{
-      y.i(haxball.room._onTeamGoal, team?.$);
+      haxball.room._onTeamGoal?.(team?.$);
     };
     a.T.Oi = (team)=>{
-      y.i(haxball.room._onGameEnd, team.$); // winningTeamId
+      haxball.room._onGameEnd?.(team.$); // winningTeamId
     };
     a.T.ml = (c, Bf, e)=>{
-      (!e) && ia.i(haxball.room._onGamePauseChange, Bf, c?.V); // paused, byId
+      (!e) && haxball.room._onGamePauseChange?.(Bf, c?.V); // paused, byId
     };
     a.T.Ki = function(a){
-      y.i(haxball.room._onGameStart, a?.V); // byId
+      haxball.room._onGameStart?.(a?.V); // byId
     }
     a.T.Os = ()=>{
-      A.i(haxball.room._onGameTick);
+      haxball.room._onGameTick?.();
     };
     a.T._KO_ = ()=>{
-      A.i(haxball.room._onKickOff);
+      haxball.room._onKickOff?.();
     };
     a.T._CDD_ = (a, b, c, d)=>{
-      vb.i(haxball.room._onCollisionDiscVsDisc, a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+      haxball.room._onCollisionDiscVsDisc?.(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
     };
     a.T._CDP_ = (a, b, c)=>{
-      Cb.i(haxball.room._onCollisionDiscVsPlane, a, b, c); // discId, discPlayerId, planeId
+      haxball.room._onCollisionDiscVsPlane?.(a, b, c); // discId, discPlayerId, planeId
     };
     a.T._CDS_ = (a, b, c)=>{
-      Cb.i(haxball.room._onCollisionDiscVsSegment, a, b, c); // discId, discPlayerId, segmentId
+      haxball.room._onCollisionDiscVsSegment?.(a, b, c); // discId, discPlayerId, segmentId
     };
     a.T._AT_ = (a, b, c, d, e) => {
-      Zz.i(haxball.room._onAutoTeams, a, b, c, d, e);
+      haxball.room._onAutoTeams?.(a, b, c, d, e);
     };
     a.T._TLC_ = (a, b) => {
-      ia.i(haxball.room._onTimeLimitChange, a, b);
+      haxball.room._onTimeLimitChange?.(a, b);
     };
     a.T._SLC_ = (a, b) => {
-      ia.i(haxball.room._onScoreLimitChange, a, b);
+      haxball.room._onScoreLimitChange?.(a, b);
     };
     a.T._PDC_ = (a)=>{
-      y.i(haxball.room._onPlayerDiscCreated, a);
+      haxball.room._onPlayerDiscCreated?.(a);
     };
     a.T._PDD_ = (a)=>{
-      y.i(haxball.room._onPlayerDiscDestroyed, a);
+      haxball.room._onPlayerDiscDestroyed?.(a);
     };
     a.T._PAC_ = (a, b) => {
-      ia.i(haxball.room._onPlayerAvatarChange, a, b);
+      haxball.room._onPlayerAvatarChange?.(a, b);
     };
     a.T._PHAC_ = (a, b) => {
-      ia.i(haxball.room._onPlayerHeadlessAvatarChange, a, b);
+      haxball.room._onPlayerHeadlessAvatarChange?.(a, b);
     };
     a.T._RP_ = (a, b) => {
-      ia.i(haxball.room._onPlayersOrderChange, a, b);
+      haxball.room._onPlayersOrderChange?.(a, b);
     };
     a.T._PTC_ = (a, b, c) => {
-      Cb.i(haxball.room._onPlayerTeamChange, a, b, c);
+      haxball.room._onPlayerTeamChange?.(a, b, c);
     };
     a.T._TCC_ = (a, b, c) => {
-      Cb.i(haxball.room._onTeamColorsChange, a, b, c);
+      haxball.room._onTeamColorsChange?.(a, b, c);
     };
     a.T._TLC2_ = (a, b) => {
-      ia.i(haxball.room._onTeamsLockChange, a, b);
+      haxball.room._onTeamsLockChange?.(a, b);
     };
     a.T._CCI_ = (x, y, z) => {
       if (haxball.__internalData.isHost){
@@ -8091,73 +8562,69 @@ function abcHaxballAPI(window, config){
       }
     };
     a.T._CE_ = (a, b, c)=>{
-      Cb.i(haxball.room._onCustomEvent, a, b, c); // type, data, byUser
+      haxball.room._onCustomEvent?.(a, b, c); // type, data, byUser
     };
     a.T._BCE_ = (a, b, c)=>{
-      Cb.i(haxball.room._onBinaryCustomEvent, a, b, c); // type, data, byUser
+      haxball.room._onBinaryCustomEvent?.(a, b, c); // type, data, byUser
     };
     a.T._IE_ = (a, b, c)=>{
-      Cb.i(haxball.room._onIdentityEvent, a, b, c); // id, data, byUser
+      haxball.room._onIdentityEvent?.(a, b, c); // id, data, byUser
     };
     a.T._SDP_ = (a, b, c, d)=>{
-      vb.i(haxball.room._onSetDiscProperties, a, b, c, d); // id, type, data1, data2
+      haxball.room._onSetDiscProperties?.(a, b, c, d); // id, type, data1, data2
     };
     a.T._PD_ = (a)=>{
-      y.i(haxball.room._onPingData, a); // ping array
+      haxball.room._onPingData?.(a); // ping array
     };
-    a.T._HP_ = ()=>{
-      return haxball?.room?.hostPing || 0
-    };
+    a.T._HP_ = ()=>(haxball?.room?.hostPing || 0);
     a.T._RI_ = ()=>{
       b.ob.al();
     };
     a.T._HC_ = (a)=>{
-      y.i(haxball.room._onHandicapChange, a);
+      haxball.room._onHandicapChange?.(a);
     };
     a.T._EC_ = (a)=>{ // FIX ME: extrapolation change events will not be triggered at the exact time that we joined a room.
-      y.i(haxball.room?._onExtrapolationChange, a);
+      haxball.room?._onExtrapolationChange?.(a);
     };
     a.T.Pi = ()=>{ 
-      A.i(haxball.room._onTimeIsUp);
+      haxball.room._onTimeIsUp?.();
     };
     a.T.lq = ()=>{
-      A.i(haxball.room._onPositionsReset);
+      haxball.room._onPositionsReset?.();
     };
     a.T.ko = function (c) { // set sync
       b.am != c && ((b.am = c), (c = ta.la(c)), (haxball.__internalData.execOperationReceivedOnHost(c)!=false && a.ra(c)));
     };
     a.T.rl = function(b, Tc){
-      ia.i(haxball.room._onPlayerChat, b.V, Tc); // id, message
+      haxball.room._onPlayerChat?.(b.V, Tc); // id, message
     };
     a.T.Vl = function(msg, color, style, sound){
-      vb.i(haxball.room._onAnnouncement, msg, color, style, sound); // msg, color, style, sound
+      haxball.room._onAnnouncement?.(msg, color, style, sound); // msg, color, style, sound
     };
     a.T.vf = function(b){
-      y.i(haxball.room._onGameStop, b?.V);  //byId
+      haxball.room._onGameStop?.(b?.V);  //byId
     };
     a.T.Ii = function(a, e){
-      ia.i(haxball.room._onStadiumChange, e, a?.V); // map, byId
+      haxball.room._onStadiumChange?.(e, a?.V); // map, byId
     };
     a.T.sl = function(b){
-      ia.i(haxball.room._onPlayerSyncChange, b?.V, b?.Ld);// id, sync
+      haxball.room._onPlayerSyncChange?.(b?.V, b?.Ld);// id, sync
     };
     a.T.ii = function(b, c){
-      Cb.i(haxball.room._onPlayerAdminChange, c?.V, c?.cb, b?.V)// id, isAdmin, byId
+      haxball.room._onPlayerAdminChange?.(c?.V, c?.cb, b?.V)// id, isAdmin, byId
     };
     a.T.Hk = function(a, b, c, d){
-      vb.i(haxball.room._onKickRateLimitChange, b, c, d, a?.V); // min, rate, burst, byId
+      haxball.room._onKickRateLimitChange?.(b, c, d, a?.V); // min, rate, burst, byId
     };
     a.T.ul = function (d, e, f, g) {
-      d.H && (y.i(haxball.room._onPlayerDiscDestroyed, d));
-      y.i(b.Op, d.V);
-      null != e && (
-        vb.i(b.Np, d, e, null != g ? g.w : null, f)
-      );
-      vb.i(haxball.room._onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
+      d.H && (haxball.room._onPlayerDiscDestroyed?.(d));
+      b.Op?.(d.V);
+      (e!=null) && b.Np?.(d, e, null != g ? g.w : null, f);
+      haxball.room._onPlayerLeave?.(d, e, f, g?.V); // playerObj, reason, isBanned, byId
       haxball.__internalData.customClientIds.delete(d.V);
     };
     a.T.wl = function(a, b){
-      ia.i(haxball.room._onPlayerChatIndicatorChange, a?.V, !b); // id, value
+      haxball.room._onPlayerChatIndicatorChange?.(a?.V, !b); // id, value
     };
 
     this.ob.ng = function (b) {
@@ -8190,7 +8657,7 @@ function abcHaxballAPI(window, config){
       var d = S.la(b, c);
       haxball.__internalData.execOperationReceivedOnHost(d)!=false && a.ra(d);
     };
-    this.ee = this.Wq.bind(this); // G(this, this.Wq);
+    this.ee = this.Wq.bind(this);
     this.Dp = function () {
       var msg = Qa.la();
       haxball.__internalData.execOperationReceivedOnHost(msg)!=false && a.ra(msg);
@@ -8207,7 +8674,7 @@ function abcHaxballAPI(window, config){
         if (null != b.Ed)
           return false;
         b.zr();
-        y.i(haxball.room._onRoomRecordingChange, true);
+        haxball.room._onRoomRecordingChange?.(true);
         return true;
       }
       else {
@@ -8215,11 +8682,12 @@ function abcHaxballAPI(window, config){
           return null;
         var a = b.Ed.stop();
         b.Ed = null;
-        y.i(haxball.room._onRoomRecordingChange, a);
+        haxball.room._onRoomRecordingChange?.(a);
         return a;
       }
     };
-    this.De = requestAnimationFrame(G(this, this.bf));
+    this.bbf = this.bf.bind(this);
+    this.De = requestAnimationFrame(this.bbf);
     this.Qr = setInterval(function () {
       a.C();
     }, 50);
@@ -8273,7 +8741,7 @@ function abcHaxballAPI(window, config){
       }
     },
     bf: function () {
-      this.De = requestAnimationFrame(G(this, this.bf));
+      this.De = requestAnimationFrame(this.bbf);
       this.ob.C();
       this.ya.C();
       this.Kc();
@@ -8413,7 +8881,7 @@ function abcHaxballAPI(window, config){
     },
     Sf: function () {
       this.C();
-      ya.zc++;
+      yazc++;
       var a = this.T.sc();
       a.C(this.sk);
       return a
@@ -8543,128 +9011,128 @@ function abcHaxballAPI(window, config){
       if (ya.T.iq!=null)
         return;
       ya.T.iq = (b)=>{
-        ia.i(callbacks.onPlayerInputChange, b.V, b.ob);
+        callbacks.onPlayerInputChange?.(b.V, b.ob);
       };
       ya.T.tl = (b)=>{
-        y.i(callbacks.onPlayerJoin, b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+        callbacks.onPlayerJoin?.(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
       };
       ya.T.ji = (d)=>{
-        y.i(callbacks.onPlayerBallKick, d?.V);
+        callbacks.onPlayerBallKick?.(d?.V);
       };
       ya.T.Ni = (team)=>{
-        y.i(callbacks.onTeamGoal, team?.$);
+        callbacks.onTeamGoal?.(team?.$);
       };
       ya.T.Oi = (team)=>{
-        y.i(callbacks.onGameEnd, team.$); // winningTeamId
+        callbacks.onGameEnd?.(team.$); // winningTeamId
       };
       ya.T.ml = (c, Bf, e)=>{
-        (!e) && ia.i(callbacks.onGamePauseChange, Bf, c?.V) // paused, byId
+        (!e) && callbacks.onGamePauseChange?.(Bf, c?.V) // paused, byId
       };
       ya.T.Ki = function(a){
-        y.i(callbacks.onGameStart, a?.V); // byId
+        callbacks.onGameStart?.(a?.V); // byId
       }
       ya.T.Os = ()=>{
-        A.i(callbacks.onGameTick);
+        callbacks.onGameTick?.();
       };
       ya.T._KO_ = ()=>{
-        A.i(callbacks.onKickOff);
+        callbacks.onKickOff?.();
       };
       ya.T._CDD_ = (a, b, c, d)=>{
-        vb.i(callbacks.onCollisionDiscVsDisc, a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+        callbacks.onCollisionDiscVsDisc?.(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
       };
       ya.T._CDP_ = (a, b, c)=>{
-        Cb.i(callbacks.onCollisionDiscVsPlane, a, b, c); // discId, discPlayerId, planeId
+        callbacks.onCollisionDiscVsPlane?.(a, b, c); // discId, discPlayerId, planeId
       };
       ya.T._CDS_ = (a, b, c)=>{
-        Cb.i(callbacks.onCollisionDiscVsSegment, a, b, c); // discId, discPlayerId, segmentId
+        callbacks.onCollisionDiscVsSegment?.(a, b, c); // discId, discPlayerId, segmentId
       };
       ya.T._AT_ = (a, b, c, d, e) => {
-        Zz.i(callbacks.onAutoTeams, a, b, c, d, e);
+        callbacks.onAutoTeams?.(a, b, c, d, e);
       };
       ya.T._TLC_ = (a, b) => {
-        ia.i(callbacks.onTimeLimitChange, a, b);
+        callbacks.onTimeLimitChange?.(a, b);
       };
       ya.T._SLC_ = (a, b) => {
-        ia.i(callbacks.onScoreLimitChange, a, b);
+        callbacks.onScoreLimitChange?.(a, b);
       };
       ya.T._PDC_ = (a)=>{
-        y.i(callbacks.onPlayerDiscCreated, a);
+        callbacks.onPlayerDiscCreated?.(a);
       };
       ya.T._PDD_ = (a)=>{
-        y.i(callbacks.onPlayerDiscDestroyed, a);
+        callbacks.onPlayerDiscDestroyed?.(a);
       };
       ya.T._PAC_ = (a, b) => {
-        ia.i(callbacks.onPlayerAvatarChange, a, b);
+        callbacks.onPlayerAvatarChange?.(a, b);
       };
       ya.T._PHAC_ = (a, b) => {
-        ia.i(callbacks.onPlayerHeadlessAvatarChange, a, b);
+        callbacks.onPlayerHeadlessAvatarChange?.(a, b);
       };
       ya.T._RP_ = (a, b) => {
-        ia.i(callbacks.onPlayersOrderChange, a, b);
+        callbacks.onPlayersOrderChange?.(a, b);
       };
       ya.T._PTC_ = (a, b, c) => {
-        Cb.i(callbacks.onPlayerTeamChange, a, b, c);
+        callbacks.onPlayerTeamChange?.(a, b, c);
       };
       ya.T._TCC_ = (a, b, c) => {
-        Cb.i(callbacks.onTeamColorsChange, a, b, c);
+        callbacks.onTeamColorsChange?.(a, b, c);
       };
       ya.T._TLC2_ = (a, b) => {
-        ia.i(callbacks.onTeamsLockChange, a, b);
+        callbacks.onTeamsLockChange?.(a, b);
       };
       ya.T._CE_ = (a, b, c)=>{
-        Cb.i(callbacks.onCustomEvent, a, b, c); // type, data, byUser
+        callbacks.onCustomEvent?.(a, b, c); // type, data, byUser
       };
       ya.T._BCE_ = (a, b, c)=>{
-        Cb.i(callbacks.onBinaryCustomEvent, a, b, c); // type, data, byUser
+        callbacks.onBinaryCustomEvent?.(a, b, c); // type, data, byUser
       };
       ya.T._IE_ = (a, b, c)=>{
-        Cb.i(callbacks.onIdentityEvent, a, b, c); // id, data, byUser
+        callbacks.onIdentityEvent?.(a, b, c); // id, data, byUser
       };
       ya.T._SDP_ = (a, b, c, d)=>{
-        vb.i(callbacks.onSetDiscProperties, a, b, c, d); // id, type, data1, data2
+        callbacks.onSetDiscProperties?.(a, b, c, d); // id, type, data1, data2
       };
       ya.T._PD_ = (a)=>{
-        y.i(callbacks.onPingData, a); // ping array
+        callbacks.onPingData?.(a); // ping array
       };
       ya.T._HC_ = (a)=>{
-        y.i(callbacks.onHandicapChange, a);
+        callbacks.onHandicapChange?.(a);
       };
       ya.T._EC_ = (a)=>{
-        y.i(callbacks.onExtrapolationChange, a);
+        callbacks.onExtrapolationChange?.(a);
       };
       ya.T.Pi = ()=>{
-        A.i(callbacks.onTimeIsUp);
+        callbacks.onTimeIsUp?.();
       };
       ya.T.lq = ()=>{
-        A.i(callbacks.onPositionsReset);
+        callbacks.onPositionsReset?.();
       };
       ya.T.rl = function(b, Tc){
-        ia.i(callbacks.onPlayerChat, b.V, Tc); // id, message
+        callbacks.onPlayerChat?.(b.V, Tc); // id, message
       };
       ya.T.Vl = function(msg, color, style, sound){
-        vb.i(callbacks.onAnnouncement, msg, color, style, sound); // msg, color, style, sound
+        callbacks.onAnnouncement?.(msg, color, style, sound); // msg, color, style, sound
       };
       ya.T.vf = function(b){
-        y.i(callbacks.onGameStop, b?.V);  //byId
+        callbacks.onGameStop?.(b?.V);  //byId
       };
       ya.T.Ii = function(a, e){
-        ia.i(callbacks.onStadiumChange, e, a?.V); // map, byId
+        callbacks.onStadiumChange?.(e, a?.V); // map, byId
       };
       ya.T.sl = function(b){
-        ia.i(callbacks.onPlayerSyncChange, b?.V, b?.Ld);// id, sync
+        callbacks.onPlayerSyncChange?.(b?.V, b?.Ld);// id, sync
       };
       ya.T.ii = function(b, c){
-        Cb.i(callbacks.onPlayerAdminChange, c?.V, c?.cb, b?.V)// id, isAdmin, byId
+        callbacks.onPlayerAdminChange?.(c?.V, c?.cb, b?.V)// id, isAdmin, byId
       };
       ya.T.Hk = function(a, b, c, d){
-        vb.i(callbacks.onKickRateLimitChange, b, c, d, a?.V); // min, rate, burst, byId
+        callbacks.onKickRateLimitChange?.(b, c, d, a?.V); // min, rate, burst, byId
       };
       ya.T.ul = function (d, e, f, g) {
-        d.H && (y.i(callbacks.onPlayerDiscDestroyed, d));
-        vb.i(callbacks.onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
+        d.H && (callbacks.onPlayerDiscDestroyed?.(d));
+        callbacks.onPlayerLeave?.(d, e, f, g?.V); // playerObj, reason, isBanned, byId
       };
       ya.T.wl = function(a, b){
-        ia.i(callbacks.onPlayerChatIndicatorChange, a?.V, !b); // id, value
+        callbacks.onPlayerChatIndicatorChange?.(a?.V, !b); // id, value
       };
     };
 
@@ -8752,128 +9220,128 @@ function abcHaxballAPI(window, config){
     function initialize(){
       De = raf(bf);
       ya.T.iq = (b)=>{
-        ia.i(callbacks.onPlayerInputChange, b.V, b.ob);
+        callbacks.onPlayerInputChange?.(b.V, b.ob);
       };
       ya.T.tl = (b)=>{ // +
-        y.i(callbacks.onPlayerJoin, b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
+        callbacks.onPlayerJoin?.(b); // V=id, w=name, Kd=flag, Xb=avatar, conn, auth
       };
       ya.T.ji = (d)=>{ // +
-        y.i(callbacks.onPlayerBallKick, d?.V);
+        callbacks.onPlayerBallKick?.(d?.V);
       };
       ya.T.Ni = (team)=>{ // +
-        y.i(callbacks.onTeamGoal, team?.$);
+        callbacks.onTeamGoal?.(team?.$);
       };
       ya.T.Oi = (team)=>{ // +
-        y.i(callbacks.onGameEnd, team.$); // winningTeamId
+        callbacks.onGameEnd?.(team.$); // winningTeamId
       };
       ya.T.ml = (c, Bf, e)=>{ // +
-        (!e) && ia.i(callbacks.onGamePauseChange, Bf, c?.V) // paused, byId
+        (!e) && callbacks.onGamePauseChange?.(Bf, c?.V) // paused, byId
       };
       ya.T.Ki = function(a){ // +
-        y.i(callbacks.onGameStart, a?.V); // byId
+        callbacks.onGameStart?.(a?.V); // byId
       }
       ya.T.Os = ()=>{
-        A.i(callbacks.onGameTick);
+        callbacks.onGameTick?.();
       };
       ya.T._KO_ = ()=>{
-        A.i(callbacks.onKickOff);
+        callbacks.onKickOff?.();
       };
       ya.T._CDD_ = (a, b, c, d)=>{
-        vb.i(callbacks.onCollisionDiscVsDisc, a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
+        callbacks.onCollisionDiscVsDisc?.(a, b, c, d); // discId1, discPlayerId1, discId2, discPlayerId2
       };
       ya.T._CDP_ = (a, b, c)=>{
-        Cb.i(callbacks.onCollisionDiscVsPlane, a, b, c); // discId, discPlayerId, planeId
+        callbacks.onCollisionDiscVsPlane?.(a, b, c); // discId, discPlayerId, planeId
       };
       ya.T._CDS_ = (a, b, c)=>{
-        Cb.i(callbacks.onCollisionDiscVsSegment, a, b, c); // discId, discPlayerId, segmentId
+        callbacks.onCollisionDiscVsSegment?.(a, b, c); // discId, discPlayerId, segmentId
       };
       ya.T._AT_ = (a, b, c, d, e) => {
-        Zz.i(callbacks.onAutoTeams, a, b, c, d, e);
+        callbacks.onAutoTeams?.(a, b, c, d, e);
       };
       ya.T._TLC_ = (a, b) => {
-        ia.i(callbacks.onTimeLimitChange, a, b);
+        callbacks.onTimeLimitChange?.(a, b);
       };
       ya.T._SLC_ = (a, b) => {
-        ia.i(callbacks.onScoreLimitChange, a, b);
+        callbacks.onScoreLimitChange?.(a, b);
       };
       ya.T._PDC_ = (a)=>{
-        y.i(callbacks.onPlayerDiscCreated, a);
+        callbacks.onPlayerDiscCreated?.(a);
       };
       ya.T._PDD_ = (a)=>{
-        y.i(callbacks.onPlayerDiscDestroyed, a);
+        callbacks.onPlayerDiscDestroyed?.(a);
       };
       ya.T._PAC_ = (a, b) => {
-        ia.i(callbacks.onPlayerAvatarChange, a, b);
+        callbacks.onPlayerAvatarChange?.(a, b);
       };
       ya.T._PHAC_ = (a, b) => {
-        ia.i(callbacks.onPlayerHeadlessAvatarChange, a, b);
+        callbacks.onPlayerHeadlessAvatarChange?.(a, b);
       };
       ya.T._RP_ = (a, b) => {
-        ia.i(callbacks.onPlayersOrderChange, a, b);
+        callbacks.onPlayersOrderChange?.(a, b);
       };
       ya.T._PTC_ = (a, b, c) => { // + (xl)
-        Cb.i(callbacks.onPlayerTeamChange, a, b, c);
+        callbacks.onPlayerTeamChange?.(a, b, c);
       };
       ya.T._TCC_ = (a, b, c) => {
-        Cb.i(callbacks.onTeamColorsChange, a, b, c);
+        callbacks.onTeamColorsChange?.(a, b, c);
       };
       ya.T._TLC2_ = (a, b) => {
-        ia.i(callbacks.onTeamsLockChange, a, b);
+        callbacks.onTeamsLockChange?.(a, b);
       };
       ya.T._CE_ = (a, b, c)=>{
-        Cb.i(callbacks.onCustomEvent, a, b, c); // type, data, byUser
+        callbacks.onCustomEvent?.(a, b, c); // type, data, byUser
       };
       ya.T._BCE_ = (a, b, c)=>{
-        Cb.i(callbacks.onBinaryCustomEvent, a, b, c); // type, data, byUser
+        callbacks.onBinaryCustomEvent?.(a, b, c); // type, data, byUser
       };
       ya.T._IE_ = (a, b, c)=>{
-        Cb.i(callbacks.onIdentityEvent, a, b, c); // id, data, byUser
+        callbacks.onIdentityEvent?.(a, b, c); // id, data, byUser
       };
       ya.T._SDP_ = (a, b, c, d)=>{
-        vb.i(callbacks.onSetDiscProperties, a, b, c, d); // id, type, data1, data2
+        callbacks.onSetDiscProperties?.(a, b, c, d); // id, type, data1, data2
       };
       ya.T._PD_ = (a)=>{
-        y.i(callbacks.onPingData, a); // ping array
+        callbacks.onPingData?.(a); // ping array
       };
       ya.T._HC_ = (a)=>{
-        y.i(callbacks.onHandicapChange, a);
+        callbacks.onHandicapChange?.(a);
       };
       ya.T._EC_ = (a)=>{
-        y.i(callbacks.onExtrapolationChange, a);
+        callbacks.onExtrapolationChange?.(a);
       };
       ya.T.Pi = ()=>{ // +
-        A.i(callbacks.onTimeIsUp);
+        callbacks.onTimeIsUp?.();
       };
       ya.T.lq = ()=>{
-        A.i(callbacks.onPositionsReset);
+        callbacks.onPositionsReset?.();
       };
       ya.T.rl = function(b, Tc){ // +
-        ia.i(callbacks.onPlayerChat, b.V, Tc); // id, message
+        callbacks.onPlayerChat?.(b.V, Tc); // id, message
       };
       ya.T.Vl = function(msg, color, style, sound){ // +
-        vb.i(callbacks.onAnnouncement, msg, color, style, sound); // msg, color, style, sound
+        callbacks.onAnnouncement?.(msg, color, style, sound); // msg, color, style, sound
       };
       ya.T.vf = function(b){ // +
-        y.i(callbacks.onGameStop, b?.V);  //byId
+        callbacks.onGameStop?.(b?.V);  //byId
       };
       ya.T.Ii = function(a, e){ // +
-        ia.i(callbacks.onStadiumChange, e, a?.V); // map, byId
+        callbacks.onStadiumChange?.(e, a?.V); // map, byId
       };
       ya.T.sl = function(b){ // +
-        ia.i(callbacks.onPlayerSyncChange, b?.V, b?.Ld);// id, sync
+        callbacks.onPlayerSyncChange?.(b?.V, b?.Ld);// id, sync
       };
       ya.T.ii = function(b, c){ // +
-        Cb.i(callbacks.onPlayerAdminChange, c?.V, c?.cb, b?.V)// id, isAdmin, byId
+        callbacks.onPlayerAdminChange?.(c?.V, c?.cb, b?.V)// id, isAdmin, byId
       };
       ya.T.Hk = function(a, b, c, d){ // +
-        vb.i(callbacks.onKickRateLimitChange, b, c, d, a?.V); // min, rate, burst, byId
+        callbacks.onKickRateLimitChange?.(b, c, d, a?.V); // min, rate, burst, byId
       };
       ya.T.ul = function (d, e, f, g) { // +
-        d.H && (y.i(callbacks.onPlayerDiscDestroyed, d));
-        vb.i(callbacks.onPlayerLeave, d, e, f, g?.V); // playerObj, reason, isBanned, byId
+        d.H && (callbacks.onPlayerDiscDestroyed?.(d));
+        callbacks.onPlayerLeave?.(d, e, f, g?.V); // playerObj, reason, isBanned, byId
       };
       ya.T.wl = function(a, b){ // +
-        ia.i(callbacks.onPlayerChatIndicatorChange, a?.V, !b); // id, value
+        callbacks.onPlayerChatIndicatorChange?.(a?.V, !b); // id, value
       };
     };
     function finalize(){
@@ -8996,7 +9464,7 @@ function abcHaxballAPI(window, config){
           room.receiveEvent(b);
         } catch (k) {
           b = k instanceof q ? k.Ta : k,
-          b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
+          b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + b.lineNumber
           b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError, b)); // "Error loading stadium file."
         }
       },
@@ -9341,7 +9809,7 @@ function abcHaxballAPI(window, config){
     (!storage) && (storage = options.storage = {});
     storage.setValue = (key, value)=>{
       storage[key] = value;
-      ia.i(storage["onValueSet"], key, value);
+      storage["onValueSet"]?.(key, value);
     };
     var newVal = storage.crappy_router||false;
     if (newVal!=storage.crappy_router)
@@ -9428,17 +9896,17 @@ function abcHaxballAPI(window, config){
       haxball._onConnectionStateChange = null;
       fLeaveRoom = null;
       haxball.plugins && (haxball.plugins.forEach((p)=>{
-        A.i(p.finalize);
+        p.finalize?.();
         p.room = null;
       }));
       if (haxball.renderer){
-        A.i(haxball.renderer.finalize);
+        haxball.renderer.finalize?.();
         haxball.renderer.room = null;
       }
-      A.i(haxball.config.finalize);
+      haxball.config.finalize?.();
       haxball.config.room = null;
       haxball.libraries.forEach((l)=>{
-        A.i(l.finalize);
+        l.finalize?.();
         l.room = null;
       });
       haxball._onRoomLeave = null;
@@ -9447,19 +9915,19 @@ function abcHaxballAPI(window, config){
       internalData.extrapolatedRoomState = null;
       internalData = null;
       haxball.room = null;
-      y.i(haxball.onLeave, x);
+      haxball.onLeave?.(x);
     };
     var fJoinRoomSucceeded = function(){
       console.log("internal event: JoinRoomSucceeded");
       //haxball._onRoomLeave = null;
       haxball._onConnectionStateChange = null;
       fJoinRoomSucceeded = null;
-      haxball.room = new Room(internalData, haxball.libraries, haxball.config, haxball.plugins);
+      haxball.room = new Room(haxball.preInit, internalData, haxball.libraries, haxball.config, haxball.plugins);
       allRooms.push(haxball.room);
       haxball.room.client = haxball;
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
       //haxball.emit("roomJoin", haxball.room);
-      y.i(haxball.onSuccess, haxball.room);
+      haxball.onSuccess?.(haxball.room);
       var poc = haxball.room?._onPlayerObjectCreated;
       if (poc)
         internalData.roomObj?.ya.T.I.forEach(poc);
@@ -9469,7 +9937,7 @@ function abcHaxballAPI(window, config){
     };
     haxball._onConnectionStateChange = function(state, param){
       console.log("internal event: ConnectionStateChange");
-      ia.i(haxball.onConnectionStateChange, state, param);
+      haxball.onConnectionStateChange?.(state, param);
       if (state==4){
         //haxball._onRoomLeave = null;
         haxball._onConnectionStateChange = null;
@@ -9485,8 +9953,8 @@ function abcHaxballAPI(window, config){
       f.mc(haxball.storage.player_name);//n_A.fe.L()
       f.mc(haxball.storage.geo.flag);//n_A.Lh().ub
       f.Db(haxball.storage.avatar);//n_A.sh.L()
-      var g = n.Vf,
-        k = n.Vr,
+      var g = stunServers,
+        k = backendUrl,
         l = f.Kg(),
         t = new xa(haxball, id, {
           iceServers: g,
@@ -9509,12 +9977,15 @@ function abcHaxballAPI(window, config){
       var m = function (a) {
         removeRoomFromList(haxball.room);
         haxball.cancel = null;
-        y.i(haxball.onFailure, a);
+        haxball.onFailure?.(a);
       };
       var r = function () {
         haxball.cancel = null;
         var b = new ba(haxball, t);
         b.Bg = roomLink(id, false);
+        t.dl = function (a) {
+          haxball.room._onPingChange?.(a, t.sg.$g(0.5), t.sg.max());
+        };
         b.de = function () {
           t.Ad = null;
           t.ia();
@@ -9530,7 +10001,7 @@ function abcHaxballAPI(window, config){
         internalData.isHost = false;
         internalData.roomObj = b;
         internalData.roomState = e;
-        A.i(fJoinRoomSucceeded);
+        fJoinRoomSucceeded?.();
       };
       t.df = function (c) {
         t.df = null;
@@ -9548,8 +10019,8 @@ function abcHaxballAPI(window, config){
                   //u.Pf(id, password, c); // Also, u.Pf now returns Promise, so what to do with the return value?
                 //};
                 //haxball.once("RecaptchaToken", fR);
-                A.i(haxball.onRequestRecaptcha);
-                m(xa.xh(c)); // <----- added for now to quit and rejoin room (to avoid some memory leaks & other problems.)
+                haxball.onRequestRecaptcha?.();
+                m(c); // <----- added for now to quit and rejoin room (to avoid some memory leaks & other problems.)
                 //u.no(a, function (c) {
                   //u.Pf(a, password, c);
                 //});
@@ -9559,14 +10030,14 @@ function abcHaxballAPI(window, config){
                 //null == password ? 
                   //u.Dh(a) 
                 //:
-                  m(xa.xh(c)); // send "connection closed" for now. (maybe a PasswordRequired signal?)
+                  m(c); // send "connection closed" for now. (maybe a PasswordRequired signal?)
                 break;
               default:
-                m(xa.xh(c));
+                m(c);
             }
             break;
           default:
-            m(xa.xh(c));
+            m(c);
         }
       };
       t.Ad = function (a) {
@@ -9583,13 +10054,13 @@ function abcHaxballAPI(window, config){
       };
       t.Sp = function () {
         console.log("Trying reverse connection...");
-        A.i(haxball.onReverseConnection);
+        haxball.onReverseConnection?.();
       };
     } catch (ic) {
       console.log(ic instanceof q ? ic.Ta : ic);
       removeRoomFromList(haxball.room);
       haxball.cancel = null;
-      y.i(haxball.onFailure, createError(ErrorCodes.Unknown, ic instanceof q ? ic.Ta : ic)/*ic*//* instanceof q ? ic.Ta : ic*/);
+      haxball.onFailure?.(createError(ErrorCodes.Unknown, ic instanceof q ? ic.Ta : ic)/*ic*//* instanceof q ? ic.Ta : ic*/);
       //console.log(ic instanceof q ? ic.Ta : ic),
         //(c = new P("Unexpected Error", "", [])),
         //(c.Vd.innerHTML =
@@ -9613,17 +10084,17 @@ function abcHaxballAPI(window, config){
       fLeaveRoom = null;
       fCreateRoomSucceeded = null;
       haxball.plugins && (haxball.plugins.forEach((p)=>{
-        A.i(p.finalize);
+        p.finalize?.();
         p.room = null;
       }));
       if (haxball.renderer){
-        A.i(haxball.renderer.finalize);
+        haxball.renderer.finalize?.();
         haxball.renderer.room = null;
       }
-      A.i(haxball.config.finalize);
+      haxball.config.finalize?.();
       haxball.config.room = null;
       haxball.libraries.forEach((l)=>{
-        A.i(l.finalize);
+        l.finalize?.();
         l.room = null;
       });
       fLeaveRoom = null;
@@ -9632,18 +10103,18 @@ function abcHaxballAPI(window, config){
       internalData.extrapolatedRoomState = null;
       internalData = null;
       haxball.room = null;
-      A.i(haxball.onLeave);
+      haxball.onLeave?.();
     };
     var fCreateRoomSucceeded = function(){
       console.log("internal event: CreateRoomSucceeded");
       //fLeaveRoom = null;
       fCreateRoomSucceeded = null;
-      haxball.room = new Room(internalData, haxball.libraries, haxball.config, haxball.plugins);
+      haxball.room = new Room(haxball.preInit, internalData, haxball.libraries, haxball.config, haxball.plugins);
       allRooms.push(haxball.room);
       haxball.room.client = haxball;
       haxball.room.kickTimeout = haxball.kickTimeout || -1;
       haxball.room.hostPing = 0;
-      y.i(haxball.onSuccess, haxball.room);
+      haxball.onSuccess?.(haxball.room);
       var poc = haxball.room._onPlayerObjectCreated;
       if (poc)
         internalData.roomObj?.ya.T.I.forEach(poc);
@@ -9677,15 +10148,16 @@ function abcHaxballAPI(window, config){
     var e = null, g = new fa();
     g.jc = roomParams.name;
     var l = new Lb(haxball, {
-      iceServers: n.Vf,
-      ij: n.Ee + "api/host",
+      iceServers: stunServers,
+      ij: httpUrl + "api/host",
       state: g,
       version: haxball.version,
       gn: roomParams.token
     });
     l.geo = parseGeo(roomParams.geo); // n_A.Lh(),
+    var k;
     if (!roomParams.noPlayer){
-      var k = new ea();
+      k = new ea();
       k.w = storage.player_name; // n_A.fe.L();
       k.cb = true;
       k.Kd = l.geo.ub;
@@ -9737,7 +10209,7 @@ function abcHaxballAPI(window, config){
     l.kg = function (a) {
       e = a;
       t.Bg = roomLink(a, null != l.Ib);
-      y.i(haxball.room._onRoomLink, t.Bg);
+      haxball.room._onRoomLink?.(t.Bg);
     };
     t.Np = function (a, b, c, d) {
       l.to(a, b, c, d);
@@ -9756,17 +10228,14 @@ function abcHaxballAPI(window, config){
       l.Ib = a;
       c();
       null != e && (t.Bg = roomLink(e, null != l.Ib));
-      y.i(haxball.room._onRoomPropertiesChange, {password: a});
+      haxball.room._onRoomPropertiesChange?.({password: a});
     };
-    t.Of.jm = function (a) {
-      l.Ei(a);
-    };
-    t.Of.Ud = G(l, l.Ud);
-    t.Of.td = G(l, l.td);
-    t.Of.xd1 = G(l, l.xd1);
-    t.Of.xd2 = G(l, l.xd2);
-    t.Of.xd3 = G(l, l.xd3);
-    t.Of.xd4 = G(l, l.xd4);
+    t.Of.Ud = l.Ud.bind(l);
+    t.Of.td = l.td.bind(l);
+    t.Of.xd1 = l.xd1.bind(l);
+    t.Of.xd2 = l.xd2.bind(l);
+    t.Of.xd3 = l.xd3.bind(l);
+    t.Of.xd4 = l.xd4.bind(l);
     t.Of.__srp__ = function (a) {
       if (!a)
         return;
@@ -9779,8 +10248,9 @@ function abcHaxballAPI(window, config){
         props.fakePassword = l.fPwd = a.fakePassword;
       if (a.hasOwnProperty("geo")){
         props.geo = a.geo;
-        f = parseGeo(a.geo);
-        k.Kd = f.ub;
+        var f = parseGeo(a.geo);
+        if (k)
+          k.Kd = f.ub;
       }
       if (a.hasOwnProperty("unlimitedPlayerCount"))
         props.unlimitedPlayerCount = l.upc = !!a.unlimitedPlayerCount;
@@ -9793,7 +10263,7 @@ function abcHaxballAPI(window, config){
       c();
       if (a.hasOwnProperty("password"))
         null != e && (t.Bg = roomLink(e, null != l.Ib));
-      y.i(haxball.room._onRoomPropertiesChange, props);
+      haxball.room._onRoomPropertiesChange?.(props);
     };
     t.Of.__supc__ = function (a) {
       l.upc = a;
@@ -9974,12 +10444,33 @@ function abcHaxballAPI(window, config){
     };
   }
 
-  function getRoomList() {
-    return va.get();
-  }
+  var getRoomList = () => M.L(httpUrl + "api/list", "arraybuffer").then((a)=>{
+    a = new F(new DataView(a), !1);
+    a.B();
+    var b = [];
+    while (a.o.byteLength - a.a != 0) {
+      var c = a.ie(a.Ob()), d = a.Cl(a.Ob());
+      try {
+        var e = new Fb();
+        e.ja(new F(new DataView(d), !1));
+        var f = new Wb();
+        f.vd = e;
+        f.$ = c;
+        b.push(f);
+      } catch (g) {}
+    }
+    return b;
+  });
 
   function calculateAllRoomDistances(geo, roomList) {
-    va.Hs(geo, roomList);
+    const dtR = Math.PI/180;
+    for (var c = geo.Ec, d = geo.Gc, e = 0; e < roomList.length; e++) {
+      var f = roomList[e];
+      var {Ec, Gc} = f.vd;
+      var c1 = Math.cos(dtR*(Ec-c)), c2 = Math.cos(dtR*(Ec+c));
+      f.Le = 6378 * Math.acos((c1-c2+(c1+c2)*Math.cos(dtR*(Gc-d)))/2);
+      isFinite(f.Le) || (f.Le = 22e3);
+    }
   }
 
   function getGeo() {
@@ -10005,7 +10496,7 @@ function abcHaxballAPI(window, config){
       return stadium;
     } catch (k) {
       b = k instanceof q ? k.Ta : k,
-      b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
+      b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + b.lineNumber
       b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError, b)); // "Error loading stadium file."
     }
   }
@@ -10128,7 +10619,7 @@ function abcHaxballAPI(window, config){
 
   var eventCallbacks = [];
 
-  function Room(internalData, libraries, config, plugins){
+  function Room(preInit, internalData, libraries, config, plugins){
     var renderer = internalData.renderer, cfg = config;
     Object.defineProperty(this, "config", {
       get(){
@@ -10199,7 +10690,7 @@ function abcHaxballAPI(window, config){
         internalData.roomObj.Bg = "";
         v.Ul = setTimeout(()=>{
           v.Ji();
-          y.i(this._onRoomTokenChange, v.Dg);
+          this._onRoomTokenChange?.(v.Dg);
         }, 2*v.Zq);
       }
     });
@@ -10331,14 +10822,14 @@ function abcHaxballAPI(window, config){
 
       this.setConfig = function(newCfg){
         var oldCfg = cfg;
-        A.i(oldCfg.finalize);
+        oldCfg.finalize?.();
         oldCfg.room = null;
         newCfg = newCfg || {};
         newCfg.room = that;
-        y.i(newCfg.initialize);
+        newCfg.initialize?.();
         that.client.config = newCfg;
         cfg = newCfg;
-        ia.i(that._onConfigUpdate, oldCfg, newCfg);
+        that._onConfigUpdate?.(oldCfg, newCfg);
       };
 
       this.mixConfig = function(newCfg){
@@ -10360,19 +10851,19 @@ function abcHaxballAPI(window, config){
 
       this.setRenderer = function(newRenderer){
         if (renderer){
-          A.i(renderer.finalize);
+          renderer.finalize?.();
           renderer.room = null;
         }
         if (newRenderer){
           newRenderer.room = that;
-          y.i(newRenderer.initialize);
+          newRenderer.initialize?.();
         }
         var oldRenderer = renderer;
         that.renderer = newRenderer;
         that.client.renderer = newRenderer;
         internalData.renderer = newRenderer;
         renderer = newRenderer;
-        ia.i(that._onRendererUpdate, oldRenderer, newRenderer);
+        that._onRendererUpdate?.(oldRenderer, newRenderer);
       };
 
       this.setPluginActive = function(name, active){
@@ -10383,6 +10874,8 @@ function abcHaxballAPI(window, config){
           var idx = that.activePlugins.findIndex((x)=>x.name==name);
           if (idx<0)
             return;
+          p.active = active;
+          that._onPluginActiveChange?.(p);
           that.activePlugins.splice(idx, 1);
         }
         else{
@@ -10391,9 +10884,9 @@ function abcHaxballAPI(window, config){
             return;
           //that.activePlugins.splice(oIdx, 0, p); // might change the order of plugins, therefore we have to implement addInOrder.
           addInOrder(that.plugins, that.activePlugins, p); // insert plugin to its old index. 
+          p.active = active;
+          that._onPluginActiveChange?.(p);
         }
-        p.active = active;
-        y.i(that._onPluginActiveChange, p);
       };
 
       function defineCfgProperty(name){
@@ -10513,11 +11006,6 @@ function abcHaxballAPI(window, config){
       if (!internalData.isHost)
         return;
       internalData.roomObj?.Of.__srp__(properties);
-    };
-
-    // this will be removed on the next release.
-    this.setRecaptcha = function(on) { // on: true | false
-      internalData.roomObj?.ya.Ic.Ei(on);
     };
 
     this.setKickRateLimit = function(min, rate, burst) {
@@ -10818,7 +11306,7 @@ function abcHaxballAPI(window, config){
         internalData.roomObj?.og(stadium);
       } catch (k) {
         b = k instanceof q ? k.Ta : k,
-        b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + r.Be(b.lineNumber, "")
+        b instanceof SyntaxError ? onError(createError(ErrorCodes.StadiumParseSyntaxError, b.lineNumber)) :  // "SyntaxError in line: " + b.lineNumber
         b instanceof Bb ? onError(b.xp) : onError(createError(ErrorCodes.StadiumParseUnknownError, b)); // "Error loading stadium file."
       }
     };
@@ -11324,13 +11812,13 @@ function abcHaxballAPI(window, config){
         throw createError(ErrorCodes.PluginNameChangeNotAllowedError); // "Plugin name should not change"
       if (active)
         that.setPluginActive(name, false);
-      A.i(oldPluginObj.finalize);
+      oldPluginObj.finalize?.();
       oldPluginObj.room = null;
       that.plugins[pluginIndex] = newPluginObj;
       that.pluginsMap[name] = newPluginObj;
       newPluginObj.room = that;
-      y.i(newPluginObj.initialize);
-      ia.i(that._onPluginUpdate, oldPluginObj, newPluginObj);
+      newPluginObj.initialize?.();
+      that._onPluginUpdate?.(oldPluginObj, newPluginObj);
       if (active){
         newPluginObj.active = false; // to force-trigger plugin activation event
         that.setPluginActive(name, true);
@@ -11344,38 +11832,420 @@ function abcHaxballAPI(window, config){
       var {name} = oldLibraryObj;
       if (name != newLibraryObj.name) // library name should not change, otherwise some bugs are possible.
         throw createError(ErrorCodes.LibraryNameChangeNotAllowedError); // "Library name should not change"
-      A.i(oldLibraryObj.finalize);
+      oldLibraryObj.finalize?.();
       oldLibraryObj.room = null;
       that.libraries[libraryIndex] = newLibraryObj;
       that.librariesMap[name] = newLibraryObj;
       newLibraryObj.room = that;
-      y.i(newLibraryObj.initialize);
-      ia.i(that._onLibraryUpdate, oldLibraryObj, newLibraryObj);
+      newLibraryObj.initialize?.();
+      that._onLibraryUpdate?.(oldLibraryObj, newLibraryObj);
     };
+
+    preInit?.(this);
 
     if (internalData.pluginMechanismActive){
       this.libraries.forEach((l)=>{
         l.room = that;
-        y.i(l.initialize);
+        l.initialize?.();
       });
       
       cfg.room = that;
-      y.i(cfg.initialize);
+      cfg.initialize?.();
       if (renderer){
         renderer.room = that;
-        y.i(renderer.initialize);
+        renderer.initialize?.();
       }
 
       this.plugins.forEach((p)=>{
         p.room = that;
-        y.i(p.initialize);
+        p.initialize?.();
       });
 
       this.activePlugins.forEach((p)=>{
-        y.i(that._onPluginActiveChange, p);
+        that._onPluginActiveChange?.(p);
       });
     }
+
+    this.startStreaming = ({immediate=true, onClientCount, emitData})=>{ // needs some optimization... hopefully later...
+      var a = internalData.roomObj?.ya;
+      if (!internalData.isHost || that.isRecording() || !a || a.fc)
+        return;
+
+      var Df = new Map(), Dfc = w.ha(16384), nc = 0;/*, sd = {}*/
+      /*
+      function preInsertValues(value, value2, buffer){
+        var newData = new Uint8Array(buffer.byteLength + 5);
+        var dv = new DataView(newData.buffer, newData.byteOffset, newData.byteLength);
+        dv.setUint8(0, value);
+        dv.setUint32(1, value2);
+        newData.set(buffer, 5);
+        return newData;
+      }
+      function getInitialStreamingData(clientId){
+        if (!internalData.roomObj || !internalData.isHost)
+          return;
+        var c = w.ha();
+        c.l(1);
+        c.Ub(clientId);
+        var d = w.ha();
+        internalData.roomObj.ya._hr(d);
+        c.Vb(pako.deflateRaw(d.Sb()));
+        return c.Sb();
+      }
+      function createSocket(url){
+        sd.socket = new WebSocket(url);
+        sd.socket.onmessage = ({data})=>{
+          data = new DataView(data.buffer, data.byteOffset, data.byteLength);
+          var t = data.getUint8(0);
+          var d = data.getUint16(1);
+          switch(t){
+            case 0:
+              nc = d;
+              console.log("set number of clients = "+nc);
+              break;
+            case 1:
+              sd.socket.send(that.getInitialStreamingData(d));
+              break;
+          }
+        };
+      }
+      that.streamingData = sd;
+      createSocket(streamUrl);
+      sd.setStreamUrl = (url)=>{
+        try{
+          sd.socket?.close();
+        }catch(x){}
+        createSocket(url);
+      };
+      sd.setCollectTimeMs = (time)=>{
+        clearInterval(sd.interval);
+        sd.interval = setInterval(fInt, time);
+      };
+      sd.interval = setInterval(fInt, collectTimeMs);
+      */
+      return {
+        onSuccess: ()=>{
+          a.fc = function (b) {
+             // we need to find a better way to synchronize the frame no without sending the current frame no inside each message, and even that is not what we are currently doing.
+            if (immediate){
+              Dfc.l(2);
+              Dfc.tb(a.Y);
+              Dfc.Ub(b.P);
+              m.lj(b, Dfc);
+              emitData?.(Dfc.Sb());
+              Dfc.a = 0;
+              return;
+            }
+            var v = Df.get(a.Y);
+            if (!v){
+              v = [];
+              Df.set(a.Y, v);
+            }
+            v.push(b);
+            /*
+            Df.tb(a.Y);
+            Df.Ub(b.P);
+            m.lj(b, Df);
+            */
+          };
+        },
+        onDataReceived: (data)=>{
+          data = new DataView(data.buffer, data.byteOffset, data.byteLength);
+          var t = data.getUint8(0);
+          var d = data.getUint16(1);
+          switch(t){
+            case 0:{
+              nc = d;
+              onClientCount?.(d);
+              break;
+            }
+            case 1:{
+              t = w.ha();
+              t.l(1);
+              t.Ub(d);
+              d = w.ha();
+              internalData.roomObj.ya._hr(d);
+              t.Vb(pako.deflateRaw(d.Sb()));
+              emitData?.(t.Sb());
+              break;
+            }
+          }
+        },
+        interval: ()=>{
+          var k = Df.keys(), n = k.next(), YY = a.Y;
+          while(!n.done){
+            var Y = n.value, b = Df.get(Y);
+            Dfc.Ub(YY-Y);
+            Dfc.Ub(b.length);
+            b.forEach((c)=>{
+              Dfc.Ub(c.P);
+              m.lj(c, Dfc);
+            });
+            n = k.next();
+          }
+          Df.clear();
+          var v = Dfc.Sb();
+          Dfc.a = 0;
+          if (nc==0)
+            return;
+          /*
+          try{
+            sd.socket.send(preInsertValues(0, YY, pako.deflateRaw(v)));
+          }catch(x){}
+          */
+          v = pako.deflateRaw(v);
+          var newData = new Uint8Array(v.byteLength + 5);
+          var dv = new DataView(newData.buffer, newData.byteOffset, newData.byteLength);
+          dv.setUint8(0, 0);
+          dv.setUint32(1, YY);
+          newData.set(v, 5);
+          emitData?.(newData);
+        }
+      };
+    };
+
+    this.stopStreaming = ()=>{
+      var a = internalData.roomObj?.ya;
+      if (!internalData.isHost || that.isRecording() || !a?.fc/* || !that.streamingData*/)
+        return;
+      a.fc = null;
+      /*
+      clearInterval(that.streamingData.interval);
+      try{
+        that.streamingData.socket?.close();
+      }catch(x){}
+      that.streamingData.socket = sd = that.streamingData = that.streamingData.interval = null;
+      */
+      Df = Dfc = null;
+    };
   }
+
+  // streamWatcher mode section:
+
+  function StreamWatcherRoom(roomState) {
+    V.call(this, roomState);
+    this.speed = 1;
+    this.Li = 0;
+    this.Y0 = 0;
+    this.frozen = false;
+    this.oldEvents = [];
+    this.newEvents = [];
+    this.maxFrameNo = 0;
+    //this.xyz = null;
+  }
+  StreamWatcherRoom.prototype = C(V.prototype, {
+    ra: function () {},
+    Sf: function () {
+      return this.T;
+    },
+    C: function () {
+      /*
+      var targetFrameNo = Math.min((((performance.now()-this.Li)*this.Ac)|0)+this.Y0, this.maxFrameNo)-1;
+      if (this.xyz==null && this.newEvents[0]!=null){
+        this.xyz = this.Y-this.newEvents[0].mb;
+        //this.oldEvents.forEach((x)=>x.mb+=this.xyz);
+        //this.newEvents.forEach((x)=>x.mb+=this.xyz);
+      }
+      //targetFrameNo -= this.xyz|0;
+      if (this.Y>=targetFrameNo)
+        return;
+      //console.log(this.Y, targetFrameNo, this.newEvents.length);
+      */
+      var targetFrameNo = this.maxFrameNo;
+      if (this.Y>=targetFrameNo)
+        return;
+      do{
+        var i = 0, e = this.newEvents[0];
+        /*
+        //console.log("test", this.Y, e?.mb);
+        if (!e || this.Y>e.mb+this.xyz)
+          break;
+        //console.log("test2");
+        while(e?.mb+this.xyz==this.Y){
+        */
+        if (!e || this.Y>e.mb)
+          break;
+        while(e?.mb==this.Y){
+          e.apply(this.T);
+          this.oldEvents.push(e);
+          e = this.newEvents[++i];
+        }
+        this.T.C(1);
+        this.Y++;
+        this.newEvents.splice(0, i);
+      } while (this.Y<targetFrameNo);
+      /*
+      var targetFrameNo = (((performance.now() - this.Li) * this.Ac) | 0) + this.Y0;
+      if (targetFrameNo>this.maxFrameNo)
+        targetFrameNo = this.maxFrameNo;
+      var a = targetFrameNo - this.Y;
+      if (a<=0)
+        return;
+      //console.log(targetFrameNo, this.maxFrameNo, this.Y, a);
+      var b=this.newEvents, c=0, d=b.length;
+      console.log(b[0]?.mb, this.Y);
+      for (var e=0; e<a; e++) {
+        while (c<d){
+          var f = b[c++];
+          if (f.mb!=this.Y)
+            break;
+          f.apply(this.T);
+          this.oldEvents.push(f);
+        }
+        this.T.C(1);
+        this.Y++;
+      }
+      b.splice(0, c);
+      */
+      /*
+      var i = 0;
+      do{
+        var e = this.newEvents[0];
+        if (!e || this.Y>e.mb)
+          break;
+        while(e?.mb==this.Y){
+          e.apply(this.T);
+          this.oldEvents.push(e);
+          e = this.newEvents[++i];
+        }
+        this.T.C(1);
+        this.Y++;
+      } while (this.Y<this.maxFrameNo);
+      this.newEvents.splice(0, i);
+      */
+      /*
+      var T = this.T, nE = this.newEvents, i = nE.findIndex((x)=>x.mb==Y);
+      if (i>-1){
+        var e = nE[i], k = i, j = 0, oE = this.oldEvents;
+        while(Y==e?.mb){
+          e.apply(T);
+          oE.push(e);
+          e = nE[++i];
+          ++j;
+        }
+        nE.splice(k, j);
+      }
+      T.C(1);
+      this.Y++;
+      */
+    },
+    setSpeed: function(speedCoeff){
+      if (speedCoeff<0)
+        return;
+      if (speedCoeff==0){
+        this.frozen = true;
+        return;
+      }
+      this.Y = (this.Y * speedCoeff / this.speed) | 0;
+      this.speed = speedCoeff;
+      this.frozen = false;
+    },
+    runSteps: function(count){
+      if (!this.frozen)
+        return;
+      this.T.C(count);
+    }
+  });
+
+  function createStreamWatcher(a, callbacks={}, options){
+    var roomState = new fa(), room = new StreamWatcherRoom(roomState), sandbox = new Sandbox(room, callbacks, options), obj;
+    function Gm(a){
+      var b = a.hb(),
+        c = a.Ab(),
+        d = a.Ob(),
+        e = a.hb();
+      a = m.fh(a);
+      a.P = d;
+      a.ue = e;
+      a.mb = b;
+      a.da = c;
+      return a;
+    }
+    function Cg(a) {
+      if (a.mb == room.Y && a.da <= room.cc){
+        a.da = room.cc++;
+        room.receiveEvent(a);
+      }
+      else
+        room.le.Rm(a);
+    }
+    a = new F(new DataView(a.buffer, a.byteOffset, a.byteLength));
+    room.uc = 0;
+    room.Li = performance.now();
+    room.Y0 = room.Y = a.hb();
+    room.te = a.hb();
+    room.cc = a.Ab();
+    roomState.ja(a);
+    while (a.a<a.o.byteLength)
+      Cg(Gm(a));
+    a = null;
+    obj = {
+      state: roomState,
+      readStream: (reader)=>{
+        room.maxFrameNo = reader.hb();
+        if (reader.o.byteLength==reader.o.byteOffset+reader.a)
+          return;
+        var d = pako.inflateRaw(new Uint8Array(reader.o.buffer, reader.a)), l, P, event, f, i;
+        reader = new F(new DataView(d.buffer, d.byteOffset, d.byteLength));
+        while(reader.a<d.byteLength){
+          f = room.maxFrameNo - reader.Ob();
+          l = reader.Ob();
+          for (i=0;i<l;i++){
+            P = reader.Ob();
+            event = m.fh(reader, true);
+            event.P = P;
+            event.mb = f;
+            room.newEvents.push(event);
+          }
+        }
+      },
+      readImmediateStream: (reader)=>{
+        var f = room.maxFrameNo = reader.hb();
+        var P = reader.Ob();
+        var event = m.fh(reader, true);
+        event.P = P;
+        event.mb = f;
+        room.newEvents.push(event);
+      },
+      takeSnapshot: function(){
+        return roomState.copy();
+      },
+      useSnapshot: function(newRoomState){
+        var state = newRoomState.copy();
+        sandbox.setRoomStateObj(state);
+        roomState = state;
+        obj.state = state;
+      },
+      setSimulationSpeed: function(speedCoeff){
+        room.setSpeed(speedCoeff);
+      },
+      runSteps: function(count){
+        room.runSteps(count);
+      },
+      destroy: sandbox.ia
+    };
+    Object.defineProperty(obj, "gameState", {
+      get(){
+        return obj.state.K;
+      }
+    });
+    Object.defineProperty(obj, "currentPlayerId", {
+      get(){
+        return 0;
+      }
+    });
+    Object.defineProperty(obj, "currentFrameNo", {
+      get(){
+        return room.Y;
+      }
+    });
+    Object.defineProperty(obj, "maxFrameNo", {
+      get(){
+        return room.maxFrameNo;
+      }
+    });
+    return obj;
+  };
 
   function runAfterGameTick(callback, ticks=1){
     if (ticks<=0){
@@ -11441,6 +12311,7 @@ function abcHaxballAPI(window, config){
         }
       });
   };
+  Library.prototype.setVariableGUIProps = function(varName, ...vals){}; // vals=[{name: propName, value: propValue}, ...], example: {name: "visible", value: false}
 
   function RoomConfig(metadata=null){
     this.defineMetadata(metadata);
@@ -11466,6 +12337,7 @@ function abcHaxballAPI(window, config){
         }
       });
   };
+  RoomConfig.prototype.setVariableGUIProps = function(varName, ...vals){}; // vals=[{name: propName, value: propValue}, ...], example: {name: "visible", value: false}
 
   function Renderer(metadata=null){
     this.defineMetadata(metadata);
@@ -11491,6 +12363,7 @@ function abcHaxballAPI(window, config){
         }
       });
   };
+  Renderer.prototype.setVariableGUIProps = function(varName, ...vals){}; // vals=[{name: propName, value: propValue}, ...], example: {name: "visible", value: false}
 
   function Plugin(name, active=false, metadata=null){ // name is important, we activate/deactivate plugins by their names. if active=true, plugin is activated just after initialization.
     this.name = name;
@@ -11523,6 +12396,7 @@ function abcHaxballAPI(window, config){
         }
       });
   };
+  Plugin.prototype.setVariableGUIProps = function(varName, ...vals){}; // vals=[{name: propName, value: propValue}, ...], example: {name: "visible", value: false}
 
   const AllowFlags = {
     JoinRoom: 1,
@@ -11573,6 +12447,7 @@ function abcHaxballAPI(window, config){
   createEventCallback("GameStart", { params: ["id of the player that triggered this event"] });
   createEventCallback("GameStop", { params: ["id of the player that triggered this event"] });
   createEventCallback("PingData", { params: ["all ping values of the current room as an array"] });
+  createEventCallback("PingChange", { params: ["instant ping value of the current player", "averange ping value of the current player", "max ping value of the current player"] });
   createEventCallback("CollisionDiscVsDisc", { params: ["id of the collided 1st disc", "player id(if exists) of the collided 1st disc", "id of the collided 2nd disc", "player id(if exists) of the collided 2nd disc"] });
   createEventCallback("CollisionDiscVsSegment", { params: ["id of the collided disc", "player id(if exists) of the collided disc", "id of the collided segment"] });
   createEventCallback("CollisionDiscVsPlane", { params: ["id of the collided disc", "player id(if exists) of the collided disc", "id of the collided plane"] });
@@ -11616,7 +12491,7 @@ function abcHaxballAPI(window, config){
       });
     }
     _fixNames(ea, [null, "ext", "team", "disc", "kickRateMinTickCounter", "kickRateMaxTickCounter", "isKicking", "id", "input", "name", "ping", null, "flag", "sync", "headlessAvatar", "avatar", "avatarNumber", "isAdmin", null, null, null]);
-    _fixNames(p, ["rival", "id", "color", "defenseDir", "cMask", "name", "cGroup", "colors"]);
+    _fixNames(p, ["id", "color", "defenseDir", "cMask", "cGroup"]);
     _fixNames(ka, ["angle", "text", "inner"]);
     _fixNames(T, ["flag", "lon", "lat"]);
     _fixNames(B, ["id", "cGroup", "cMask", "bCoef", "pos"]);
@@ -11625,10 +12500,10 @@ function abcHaxballAPI(window, config){
     _fixNames(sb, ["team", "p1", "p0"]);
     _fixNames(ua, ["cGroup", "cMask", "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
     _fixNames(nb, ["color", "strength", "maxLength", "minLength", "d1", "d0"]);
+    _fixNames(ca, [null, null, "ext", null, "cGroup", "cMask", "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
+    _fixNames(Fa, [null, "ext", "discs", "vertices", "planes", "segments", "joints", "goals"]);
     _fixNames(Eb, ["kickback", "radius", "cGroup", "gravity", "bCoef", "invMass", "damping", "acceleration", "kickingAcceleration", "kickingDamping", "kickStrength"]);
-    _fixNames(ca, [null, null, "ext", null, "cGroup", "cMask", null, "color", "damping", "invMass", "bCoef", "radius", "gravity", "speed", "pos"]);
     _fixNames(h, ["vertices", "segments", "planes", "goals", "discs", "joints", "redSpawnPoints", "blueSpawnPoints", "playerPhysics", "defaultStadiumId", "maxViewWidth", "cameraFollow", "canBeStored", "fullKickOffReset", "name", "width", "height", "bgType", "bgColor", "bgWidth", "bgHeight", "bgKickOffRadius", "bgCornerRadius", "spawnDistance", "bgGoalLine"]);
-    _fixNames(Fa, [null, "ext", "discs", "vertices", "planes", "segments", "joints"]);
     _fixNames(O, [null, "ext", "pauseGameTickCounter", "timeElapsed", "blueScore", "redScore", null, "state", "goalTickCounter", "physicsState", "timeLimit", "scoreLimit", "stadium", null]);
     _fixNames(fa, [null, "ext", "stadium", "kickRate_min", "kickRate_rate", null, "timeLimit", "scoreLimit", "teamsLocked", "gameState", "players", "name", "teamColors"]);
     _fixNames(Ua, [null, "data"]);
@@ -11678,6 +12553,7 @@ function abcHaxballAPI(window, config){
     BackgroundType, 
     GamePlayState,
     BanEntryType,
+    PlayerPositionInGame,
     Callback: {
       add: createEventCallback,
       remove: destroyEventCallback
@@ -11703,7 +12579,11 @@ function abcHaxballAPI(window, config){
       stadiumChecksum,
       parseStadium,
       exportStadium,
-      getDefaultStadiums
+      getDefaultStadiums,
+      promiseWithTimeout: pWT,
+      trimStringIfLonger: tSil,
+      hexStrToNumber: hStn,
+      byteArrayToIp: bAti
     },
     EventFactory: {
       create: (type) => {
@@ -11718,6 +12598,7 @@ function abcHaxballAPI(window, config){
           b.rj = 1;
         return b;
       },
+      createFromStream: (reader) => m.fh(reader, true),
       checkConsistency: (data)=>{
         return Ua.la(data);
       },
@@ -11815,7 +12696,8 @@ function abcHaxballAPI(window, config){
     Room: {
       join: joinRoom,
       create: createRoom,
-      sandbox: createSandbox
+      sandbox: createSandbox,
+      streamWatcher: createStreamWatcher,
     },
     Replay: {
       ReplayData: ReplayData,
@@ -11862,14 +12744,10 @@ function abcHaxballAPI(window, config){
         w, // StreamWriter
       },
       Utils: {
-        U, // string operations 1
-        D, // string operations 2
-        J, // string operations 3
-        K, // string operations 4
-        r, // mostly used for object casting
+        D, // string operations 1
+        J, // string operations 2
+        K, // string operations 3
         M, // api operations
-        n, // connection constants
-        va, // RoomList operations
         q, // global error class
       }
     }

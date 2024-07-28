@@ -52,7 +52,7 @@ function readCreateRoomParameters(q){
     throw "aimbot must be either true or false. (aimbot)";
   aimbot = (aimbot=="true");
   return {
-    createRoom: true,
+    action: "create",
     r_name,
     r_pass,
     r_mpc,
@@ -103,7 +103,7 @@ function readJoinRoomParameters(q){
     throw "aimbot must be either true or false. (aimbot)";
   aimbot = (aimbot=="true");
   return {
-    createRoom: false,
+    action: "join",
     r_id,
     r_pass,
     p_ak,
@@ -115,5 +115,11 @@ function readJoinRoomParameters(q){
     token,
     autoPlay,
     aimbot
+  };
+}
+
+function readWatchStreamParameters(q){
+  return {
+    action: "watch"
   };
 }

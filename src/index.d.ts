@@ -329,7 +329,13 @@ declare namespace MainReturnType {
      * A progress indicator. Its value should be an integer between 0 and 100, and
      * null should disable the progressbar component inside a GUI environment.
      */
-    Progress = 17
+    Progress = 17,
+
+    /**
+     * The player position type. Its possible values are the common player positions
+     * in most football manager games. (Check the PlayerPositionInGame enum)
+     */
+    PlayerPositionInGame = 18
   }
 
   /**
@@ -940,6 +946,117 @@ declare namespace MainReturnType {
      */
     Ending = 3
   }
+
+  /**
+   * These are the common player positions in most football manager games.
+   */
+  export enum PlayerPositionInGame {
+
+    /**
+     * No position. Unfortunately specific to Haxball. :)
+     */
+    None = 0,
+
+    /**
+     * Goalkeeper
+     */
+    GK = 1,
+
+    /**
+     * Sweeper
+     */
+    SW = 2,
+
+    /**
+     * Wing Back Left
+     */
+    WBL = 3,
+
+    /**
+     * Defender Left
+     */
+    DL = 4,
+
+    /**
+     * Defender Centre
+     */
+    DC = 5,
+
+    /**
+     * Defender Right
+     */
+    DR = 6,
+
+    /**
+     * Wing Back Right
+     */
+    WBR = 7,
+
+    /**
+     * Defensive Midfielder Left
+     */
+    DML = 8,
+
+    /**
+     * Defensive Midfielder Centre
+     */
+    DMC = 9,
+
+    /**
+     * Defensive Midfielder Right
+     */
+    DMR = 10,
+
+    /**
+     * Midfielder Left
+     */
+    ML = 11,
+
+    /**
+     * Midfielder Centre
+     */
+    MC = 12,
+
+    /**
+     * Midfielder Right
+     */
+    MR = 13,
+
+    /**
+     * Attacking Midfielder Left
+     */
+    AML = 14,
+
+    /**
+     * Attacking Midfielder Centre
+     */
+    AMC = 15,
+
+    /**
+     * Attacking Midfielder Right
+     */
+    AMR = 16,
+
+    /**
+     * Left Forward
+     */
+    FL = 17,
+
+    /**
+     * Centre Forward
+     */
+    FC = 18,
+
+    /**
+     * Right Forward
+     */
+    FR = 19,
+
+    /**
+     * Striker
+     */
+    ST = 20,
+  };
 
   /**
    * The base class for all Haxball events.
@@ -2009,11 +2126,6 @@ declare namespace MainReturnType {
   declare type Team = {
 
     /**
-     * The rival of this Team.
-     */
-    rival: Team;
-
-    /**
      * The id of this Team.
      */
     id: number;
@@ -2040,16 +2152,6 @@ declare namespace MainReturnType {
      * The default cGroup of this Team's player objects.
      */
     cGroup: int;
-
-    /**
-     * The name of this Team.
-     */
-    name: string;
-
-    /**
-     * The customized colors of this Team.
-     */
-    colors: TeamColors;
   };
 
   declare namespace Team {
@@ -2617,6 +2719,25 @@ declare namespace MainReturnType {
     * @returns void or a custom data to pass to the next callback.
     */
     onRoomPropertiesChange?: (props: object, customData?: object)=>object|undefined
+  }
+
+  /**
+   * These events can only be triggered by a room client.
+   */
+  declare interface ClientTriggeredCallbacks {
+    
+    /**
+     * 
+     * Called just after the ping value of the current player has been calculated.
+     * 
+     * @param instantPing the instant ping value at that moment
+     * @param averagePing the calculated average ping value in a period of time
+     * @param maxPing the calculated maximum ping value in a period of time
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onPingChange?: (instantPing: number, averagePing: number, maxPing: number, customData?: object)=>object|undefined
   }
 
   declare interface GameCallbacks {
@@ -3476,13 +3597,40 @@ declare namespace MainReturnType {
     onAfterRoomPropertiesChange?: (props: object, customData?: object)=>void
   }
 
+  declare interface ClientTriggeredRoomConfigCallbacks {
+    
+    /**
+     * 
+     * Called just after the ping value of the current player has been calculated.
+     * 
+     * @param instantPing the instant ping value at that moment
+     * @param averagePing the calculated average ping value in a period of time
+     * @param maxPing the calculated maximum ping value in a period of time
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforePingChange?: (instantPing: number, averagePing: number, maxPing: number)=>object|undefined
+    
+    /**
+     * 
+     * Called just after the ping value of the current player has been calculated.
+     * 
+     * @param instantPing the instant ping value at that moment
+     * @param averagePing the calculated average ping value in a period of time
+     * @param maxPing the calculated maximum ping value in a period of time
+     * @param customData the custom data that was returned from the previous callback.
+     * 
+     * @returns void.
+     */
+    onAfterPingChange?: (instantPing: number, averagePing: number, maxPing: number, customData?: object)=>void
+  }
+
   declare interface GameRoomConfigCallbacks {
 
     /**
      * Called just after the ball has been kicked.
      * 
      * @param playerId Id of the player who kicked the ball.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -3502,7 +3650,6 @@ declare namespace MainReturnType {
      * Called just after a goal has been scored.
      * 
      * @param teamId Id of the team who scored the goal.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -3522,7 +3669,6 @@ declare namespace MainReturnType {
      * Called just after the game has ended.
      * 
      * @param winningTeamId Id of the team who won the game.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -3541,11 +3687,9 @@ declare namespace MainReturnType {
     /**
      * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
      * 
-     * @param customData the custom data that was returned from the previous callback.
-     * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameTick?: (customData?: object)=>object|undefined,
+    onBeforeGameTick?: ()=>object|undefined,
 
     /**
      * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
@@ -3561,10 +3705,12 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeKickOff?: (customData?: object)=>object|undefined,
+    onBeforeKickOff?: ()=>object|undefined,
 
     /**
      * Called just after a kick off event has occurred.
+     * 
+     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void.
      */
@@ -3573,11 +3719,9 @@ declare namespace MainReturnType {
     /**
      * Called just after the game has ended by timeout.
      * 
-     * @param customData the custom data that was returned from the previous callback.
-     * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTimeIsUp?: (customData?: object)=>object|undefined,
+    onBeforeTimeIsUp?: ()=>object|undefined,
 
     /**
      * Called just after the game has ended by timeout.
@@ -3591,11 +3735,9 @@ declare namespace MainReturnType {
     /**
      * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
      * 
-     * @param customData the custom data that was returned from the previous callback.
-     * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePositionsReset?: (customData?: object)=>object|undefined,
+    onBeforePositionsReset?: ()=>object|undefined,
 
     /**
      * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
@@ -3613,7 +3755,6 @@ declare namespace MainReturnType {
      * @param discPlayerId1 The player's id that the first disc belongs to. If the disc is not a player's disc, this value will be null.
      * @param discId2 Id of the second collided disc.
      * @param discPlayerId2 The player's id that the second disc belongs to. If the disc is not a player's disc, this value will be null.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -3638,7 +3779,6 @@ declare namespace MainReturnType {
      * @param discId Id of the collided disc.
      * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
      * @param segmentId Id of the collided segment.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -3662,7 +3802,6 @@ declare namespace MainReturnType {
      * @param discId Id of the collided disc.
      * @param discPlayerId The player's id that the disc belongs to. If the disc is not a player's disc, this value will be null.
      * @param planeId Id of the collided plane.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -3690,7 +3829,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeExtrapolationChange?: (value: int, customData?: object)=>object|undefined,
+    onBeforeExtrapolationChange?: (value: int)=>object|undefined,
 
     /**
      * Called just after the local extrapolation value has been changed.
@@ -3709,7 +3848,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeHandicapChange?: (value: int, customData?: object)=>object|undefined,
+    onBeforeHandicapChange?: (value: int)=>object|undefined,
 
     /**
      * Called just after the local ping handicap value has been changed.
@@ -3730,7 +3869,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeRoomRecordingChange?: (value: true | ArrayBuffer, customData?: object)=>object|undefined,
+    onBeforeRoomRecordingChange?: (value: true | ArrayBuffer)=>object|undefined,
 
     /**
      * Called just after room recording has been started or stopped.
@@ -4121,11 +4260,10 @@ declare namespace MainReturnType {
      * Called just after a disc object has been assigned to a player object.
      * 
      * @param playerObj The new Player object that has just been assigned a disc object.
-     * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerDiscCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+    onBeforePlayerDiscCreated?: (playerObj: Player)=>object|undefined,
 
     /**
      * Called just after a disc object has been assigned to a player object.
@@ -4135,7 +4273,16 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onAfterPlayerDiscCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+    onAfterPlayerDiscCreated?: (playerObj: Player, customData?: object)=>void,
+
+    /**
+     * Called just after a disc object has been removed from a player object.
+     * 
+     * @param playerObj The Player object whose disc object has just been removed.
+     * 
+     * @returns void or a custom data to pass to the next callback.
+     */
+    onBeforePlayerDiscDestroyed?: (playerObj: Player)=>object|undefined,
 
     /**
      * Called just after a disc object has been removed from a player object.
@@ -4145,17 +4292,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>object|undefined,
-
-    /**
-     * Called just after a disc object has been removed from a player object.
-     * 
-     * @param playerObj The Player object whose disc object has just been removed.
-     * @param customData the custom data that was returned from the previous callback.
-     * 
-     * @returns void or a custom data to pass to the next callback.
-     */
-    onAfterPlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>object|undefined,
+    onAfterPlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>void,
 
     /**
      * Called just after a player has joined the room.
@@ -4531,7 +4668,6 @@ declare namespace MainReturnType {
      * @param type Any integer value to hold the type of the custom event.
      * @param data Any Uint8Array to store the properties of the custom event. This object is directly sent/received by Haxball's original event mechanism.
      * @param byId Id of the player who has triggered this custom event.
-     * @param customData Any custom data that might be returned from the previous addon's calback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -4545,7 +4681,7 @@ declare namespace MainReturnType {
      * @param byId Id of the player who has triggered this custom event.
      * @param customData Any custom data that might be returned from the previous addon's calback.
      * 
-     * @returns void or a custom data to pass to the next callback.
+     * @returns void.
      */
     onAfterBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: object)=>void
 
@@ -4555,7 +4691,6 @@ declare namespace MainReturnType {
      * @param id Id of the player whose identity data is desired to be changed.
      * @param data The identity data that should be received from the backend. It can be any JSON object.
      * @param byId Id of the player who has triggered this custom event.
-     * @param customData Any custom data that might be returned from the previous addon's calback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
@@ -4569,7 +4704,7 @@ declare namespace MainReturnType {
      * @param byId Id of the player who has triggered this custom event.
      * @param customData Any custom data that might be returned from the previous addon's calback.
      * 
-     * @returns void or a custom data to pass to the next callback.
+     * @returns void.
      */
     onAfterIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: object)=>void
   }
@@ -4587,9 +4722,9 @@ declare namespace MainReturnType {
   }
 
   declare interface CommonlyUsedCallbacks extends HostTriggeredCallbacks, GameCallbacks, CommonCallbacks, RendererCallbacks {}
-  declare interface AllPluginCallbacks extends HostOnlyCallbacks, HostTriggeredCallbacks, IndividuallyTriggeredCallbacks, CommonCallbacks, ModifierCallbacks, CustomCallbacks {}
-  declare interface AllRendererCallbacks extends HostOnlyCallbacks, HostTriggeredCallbacks, IndividuallyTriggeredCallbacks, CommonCallbacks, CustomCallbacks, RendererCallbacks {}
-  declare interface AllRoomConfigCallbacks extends HostOnlyRoomConfigCallbacks, HostTriggeredRoomConfigCallbacks, IndividuallyTriggeredRoomConfigCallbacks, CommonRoomConfigCallbacks, ModifierRoomConfigCallbacks, CustomRoomConfigCallbacks, AllPluginCallbacks {}
+  declare interface AllPluginCallbacks extends HostOnlyCallbacks, HostTriggeredCallbacks, ClientTriggeredCallbacks, IndividuallyTriggeredCallbacks, CommonCallbacks, ModifierCallbacks, CustomCallbacks {}
+  declare interface AllRendererCallbacks extends HostOnlyCallbacks, HostTriggeredCallbacks, ClientTriggeredCallbacks, IndividuallyTriggeredCallbacks, CommonCallbacks, CustomCallbacks, RendererCallbacks {}
+  declare interface AllRoomConfigCallbacks extends HostOnlyRoomConfigCallbacks, HostTriggeredRoomConfigCallbacks, ClientTriggeredRoomConfigCallbacks, IndividuallyTriggeredRoomConfigCallbacks, CommonRoomConfigCallbacks, ModifierRoomConfigCallbacks, CustomRoomConfigCallbacks, AllPluginCallbacks {}
 
   /**
    * This object consists of functions regarding event callbacks. Here is a detailed documentation of the default event callbacks for this API: https://github.com/wxyz-abcd/node-haxball/wiki/uncategorized-commonEventCallbacks.
@@ -4834,6 +4969,44 @@ declare namespace MainReturnType {
      * @returns All of the default stadiums as an array.
      */
     export function getDefaultStadiums(): Stadium[];
+
+    /**
+     * Returns a new promise that executes the given `promise` until `msec` milliseconds have passed. If timeout is reached, the promise is rejected.
+     * 
+     * @param promise A Promise that has to be executed with a time limit
+     * @param msec The time limit
+     * 
+     * @returns The new promise with time limit.
+     */
+    export function promiseWithTimeout(promise: Promise, msec: int32): Promise;
+
+    /**
+     * Trims a string to ensure that it cannot be longer than a given `length`.
+     * 
+     * @param str The string to be trimmed
+     * @param length The maximum length
+     * 
+     * @returns The trimmed string.
+     */
+    export function trimStringIfLonger(str: string, length: int32): string;
+
+    /**
+     * Converts the `playerObject.conn` values to readable ip address string.
+     * 
+     * @param str The string to be converted
+     * 
+     * @returns The converted ip address string.
+     */
+    export function hexStrToNumber(str: string): string;
+
+    /**
+     * Converts a Uint8Array that was read from basro's backend into a readable ip address string.
+     * 
+     * @param data The data to be converted
+     * 
+     * @returns The recovered ip address string.
+     */
+    export function byteArrayToIp(data: Uint8Array): string;
   }
 
   declare type CreateRoomParams = {
@@ -4980,6 +5153,15 @@ declare namespace MainReturnType {
     readonly room?: Room;
 
     /**
+     * Called just after the `room` object is created, and before the initialization of the addons. This is where you can initialize/add your custom GUI functions to the room object to be used inside the addons.
+     * 
+     * @param room The room object that was just created.
+     * 
+     * @returns void.
+     */
+    preInit?: (room: Room)=>void;
+
+    /**
      * Called when joining or creating a room was successful.
      * 
      * @param room The room that succeeded in being created/joined.
@@ -5075,7 +5257,7 @@ declare namespace MainReturnType {
     fps_limit?: int;
   }
 
-  declare interface SandboxRoom {
+  declare interface SandboxRoomBase {
 
     /**
      * An object containing all information about the current room state.
@@ -5115,16 +5297,6 @@ declare namespace MainReturnType {
     runSteps(count: int): void;
 
     /**
-     * Applies an event to the current room state. For example; the event object may come from a `ReplayData` structure, 
-     * or from a `onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)` callback.
-     * 
-     * @param eventMsg The event message to apply.
-     * 
-     * @returns void.
-     */
-    executeEvent(eventMsg: HaxballEvent): void;
-
-    /**
      * Returns a complete snapshot of the current room state.
      * 
      * @returns The snapshot copy of the current RoomState object.
@@ -5139,6 +5311,53 @@ declare namespace MainReturnType {
      * @returns void.
      */
     useSnapshot(newRoomState: RoomState): void;
+
+    /**
+     * Frees the resources that are used by this object.
+     * 
+     * @returns void.
+     */
+    destroy(): void;
+  }
+
+  declare interface StreamWatcherRoom extends SandboxRoomBase {
+
+    /**
+     * The current frame number of the room state that you are currently observing.
+     */
+    readonly currentFrameNo: int;
+
+    /**
+     * The original current frame number of the room where the game is actually being played.
+     */
+    readonly maxFrameNo: int;
+
+    /**
+     * A callback that reads the data stream for "interval" streaming mode.
+     * 
+     * @param reader The stream reader instance.
+     */
+    readStream(reader: Impl.Stream.F): void;
+
+    /**
+     * A callback that reads the data stream for "immediate" streaming mode.
+     * 
+     * @param reader The stream reader instance.
+     */
+    readImmediateStream(reader: Impl.Stream.F): void;
+  }
+
+  declare interface SandboxRoom extends SandboxRoomBase {
+
+    /**
+     * Applies an event to the current room state. For example; the event object may come from a `ReplayData` structure, 
+     * or from a `onOperationReceived(type, msg, globalFrameNo, clientFrameNo, customData)` callback.
+     * 
+     * @param eventMsg The event message to apply.
+     * 
+     * @returns void.
+     */
+    executeEvent(eventMsg: HaxballEvent): void;
 
     /**
      * Adds a new player to the room.
@@ -5459,13 +5678,6 @@ declare namespace MainReturnType {
      * @returns void.
      */
     setPlayerIdentity(id: uint16, data: object, byId: uint16): void;
-
-    /**
-     * Frees the resources that are used by this object.
-     * 
-     * @returns void.
-     */
-    destroy(): void;
   }
 
   declare interface SetRoomPropertiesParams {
@@ -7447,7 +7659,60 @@ declare namespace MainReturnType {
     fakeKickPlayer(playerId: uint16, reason: string | null, ban: boolean, byId: uint16): void;
   }
 
+  declare interface StartStreamingParams {
+
+    /**
+     * Whether immediate streaming is active or not. If immediate mode is not active, streaming will fall back to interval mode.
+     */
+    immediate: boolean = true;
+
+    /**
+     * Called when a new visitor starts watching the stream.
+     * 
+     * @param count The number of clients that are currently watching the stream.
+     * 
+     * @returns void.
+     */
+    onClientCount: (count: int32)=>void;
+
+    /**
+     * Called when data is ready to be streamed. All streaming logic should be done inside this callback.
+     * 
+     * @param data The data to be streamed.
+     * 
+     * @returns void.
+     */
+    emitData: (data: Uint8Array)=>void;
+  }
+
+  declare interface StartStreamingReturnValue {
+
+    /**
+     * Called when the streaming is successfully started.
+     * 
+     * @returns void.
+     */
+    onSuccess: ()=>void;
+
+    /**
+     * Called when data is received from the streaming backend. 
+     * 
+     * @param data The data that has been received.
+     * 
+     * @returns void.
+     */
+    onDataReceived: (data: Uint8Array)=>void;
+
+    /**
+     * This callback should be called within an interval if the immediate mode is not active.
+     * 
+     * @returns void.
+     */
+    interval: ()=>void;
+  }
+
   declare interface RoomBase {
+
     /**
      * `true` for a host room, `false` for a client room.
      */
@@ -7657,17 +7922,6 @@ declare namespace MainReturnType {
      * @returns void.
      */
     setProperties(properties: SetRoomPropertiesParams): void;
-
-    /**
-     * Enables or disables recaptcha-solving to join this room. host-only.
-     * 
-     * @deprecated Will be removed soon. Use `room.requireRecaptcha` property instead.
-     * 
-     * @param on The desired activation status of room's recaptcha mode.
-     * 
-     * @returns void.
-     */
-    setRecaptcha(on: boolean): void;
 
     /**
      * Sets the kick rate limit of the current room. admins-only.
@@ -8197,6 +8451,22 @@ declare namespace MainReturnType {
     stopRecording(): Uint8Array | null;
 
     /**
+     * Start streaming the game. Streaming and recording should be stopped before calling this. (Currently, recording and streaming cannot be run simultaneously)
+     * 
+     * @param params The parameters required for the streaming to work.
+     * 
+     * @returns A StartStreamingReturnValue structure if succeeded, or `null` otherwise.
+     */
+    startStreaming(params: StartStreamingParams): StartStreamingReturnValue | null;
+
+    /**
+     * Stop streaming the game. Streaming should be started before calling this.
+     * 
+     * @returns void.
+     */
+    stopStreaming(): void;
+
+    /**
      * Returns whether the replay recorder is active or not.
      * 
      * @returns `true` if replay recording is active; `false` otherwise.
@@ -8312,6 +8582,20 @@ declare namespace MainReturnType {
      * @returns An instance of the SandboxRoom structure.
      */
     static sandbox(callbacks: CommonlyUsedCallbacks & CustomCallbacks, options: SandboxOptions): SandboxRoom;
+
+    /**
+     * Creates a stream watcher room object.
+     * 
+     * @param initialStreamData The initial `Uint8Array` data that is received just after connecting to a streaming room.
+     * @param callbacks An object that may have all callbacks defined in sections `2`, `3.1`, `4` and `6` of our event callbacks documentation. In addition, it is possible to use a render callback that has the same signature as defined in section `3` of our `Renderer` documentation.
+     * @param options An object that might have the following keys:
+     *   - `requestAnimationFrame: ((callback: function, ...args: any[])=>number) | null`: Override function for `requestAnimationFrame`. Omit to use library's default `requestAnimationFrame`.
+     *   - `cancelAnimationFrame: ((handle: number)=>void) | null`: Override function for `cancelAnimationFrame`. Omit to use library's default `cancelAnimationFrame`.
+     *   - `fps_limit: int | null`: Any positive number that will be used as the fps limit. (`null` = no limit)
+     * 
+     * @returns An instance of the StreamWatcherRoom structure.
+     */
+    static streamWatcher(initialStreamData: Uint8Array, callbacks: CommonlyUsedCallbacks & CustomCallbacks, options: SandboxOptions): StreamWatcherRoom;
   }
 
   /***
@@ -8330,6 +8614,15 @@ declare namespace MainReturnType {
      * @returns An instance of HaxballEvent, or undefined if the given type is not a recognized value.
      */
     export function create(type: OperationType): HaxballEvent|undefined;
+
+    /**
+     * Reads bytes from a stream to create a HaxballEvent object.
+     * 
+     * @param reader The stream reader to be used.
+     * 
+     * @returns An instance of HaxballEvent.
+     */
+    export function createFromStream(reader: Impl.Stream.F): HaxballEvent;
 
     /**
      * Creates a ConsistencyCheckEvent object that can be used to trigger a consistency check. 
@@ -9200,6 +9493,22 @@ declare namespace MainReturnType {
     defineVariable: (variable: Variable)=>any;
 
     /**
+     * This function might be used to modify some GUI properties regarding a specific variable 
+     * called `varName`. The function body is empty by default, since we do not have a GUI in a
+     * non-GUI node.js environment. All other parameters after the first parameter should 
+     * be structured as `{name: propName, value: propValue}`. Here, each property named `propName` 
+     * is requested to set its new value to `propValue`. For example; in a GUI environment, 
+     * `setVariableGUIProps("testVariable", {name: "visible", value: false})` could make the 
+     * `testVariable` disappear from the GUI.
+     * 
+     * @param varName The name of the variable whose GUI properties are desired to be modified.
+     * @param vals The property name/value pairs.
+     * 
+     * @returns void.
+     */
+    setVariableGUIProps: (varName: string, ...vals: ({name: string, value: any})[])=>void;
+
+    /**
      * If defined, called while creating or joining a room, or during a call to `Room.updateLibrary`, `Room.updatePlugin`, `Room.setConfig` or `Room.setRenderer`. You should write all custom initialization logic inside this callback function.
      * 
      * @returns void.
@@ -9533,42 +9842,22 @@ declare namespace MainReturnType {
       /**
        * String operations 1
        */
-      export const U: any;
+      export const D: any;
 
       /**
        * String operations 2
        */
-      export const D: any;
+      export const J: any;
 
       /**
        * String operations 3
        */
-      export const J: any;
-
-      /**
-       * String operations 4
-       */
       export const K: any;
-
-      /**
-       * Mostly used for object casting
-       */
-      export const r: any;
 
       /**
        * Webserver api operations
        */
       export const M: any;
-
-      /**
-       * Connection constants
-       */
-      export const n: any;
-
-      /**
-       * RoomList operations
-       */
-      export const va: any;
 
       /**
        * Haxball's original global error class
@@ -9735,6 +10024,11 @@ declare class LibConfig {
    * If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
    */
   noWebRTC?: boolean;
+
+  /**
+   * The url address of an external stun server that is required for the communication via WebRTC to work correctly. Defaults to: `stun:stun.l.google.com:19302`.
+   */
+  stunServer?: string;
 
   /**
    * A token that represents a user data in a database of a custom proxy/backend server.

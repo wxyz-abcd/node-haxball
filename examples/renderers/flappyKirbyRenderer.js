@@ -29,7 +29,6 @@ module.exports = function(API, params){
     }
   });
 
-
   this.defineVariable({
     name: "sizeCoeff",
     description: "Character Size Coefficient", 
@@ -711,13 +710,13 @@ module.exports = function(API, params){
     thisRenderer.followPlayerId = thisRenderer.room.currentPlayerId;
     rendererObj = new HaxballRenderer();
     imgs = [
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427041081884692/frame-1.png", 
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427041371303997/frame-2.png",
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427041673289848/frame-3.png",
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427041945911326/frame-4.png",
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427042147250246/frame-5.png",
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427042398904380/frame-6.png",
-      "https://media.discordapp.net/attachments/1152375238844239974/1153427042633777244/frame-7.png"
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-1.png",
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-2.png",
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-3.png",
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-4.png",
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-5.png",
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-6.png",
+      "https://cdn.jsdelivr.net/gh/0x00214131812049/nh-storage@latest/flappyKirby/frame-7.png",
     ].map((x)=>{
       var img = document.createElement("img");
       img.src = x;
