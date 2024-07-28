@@ -1,6 +1,6 @@
 {
   "name": "node-haxball",
-  "version": "1.3",
+  "version": "1.3.0",
   "description": "The most powerful and lightweight API that allows you to develop your original Haxball(www.haxball.com) host, client, and standalone applications both on node.js and browser environments and also includes every possible hack and functionality that you can imagine.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
