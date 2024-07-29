@@ -1,0 +1,14 @@
+{
+  "name": "streaming_server",
+  "version": "1.0.0",
+  "description": "A streaming server example for use with the node-haxball package.",
+  "main": "src/index.js",
+  "private": false,
+  "author": "wxyz-abcd <mail.api.test.1.1.1@gmail.com>",
+  "dependencies": {
+    "ws": "^8.9.0"
+  },
+  "engines": {
+    "node": ">=16.9.0"
+  }
+}

@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <script src="./htmlQueryHelper.js"></script>
+    <script src="./htmlParamsReader.js"></script>
+    <script src="./addonImporter.js"></script>
+    <script src="./vendor/json5.min.js"></script>
+    <script src="./vendor/pako-jszip.min.js"></script>
+    <script src="./vendor/api.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script-->
+    <script src="./init.js"></script>
+    <link rel="stylesheet" href="./scrollbar.css" />
+    <link rel="stylesheet" href="./button.css" />
+    <link rel="stylesheet" href="./canvas.css" />
+    <link rel="stylesheet" href="./flags.css" />
+    <link rel="stylesheet" href="./game.css" />
+    <style>
+      .top-section {
+        position:relative;
+        flex-grow:1;
+        min-height:0
+      }
+      .bottom-section {
+        flex-shrink:0;
+        display:flex;
+        justify-content:center;
+        background-color:#1A2125
+      }
+      .scrollBar {
+        position:relative;
+        background-color:rgb(150,150,150);
+      }
+      .scrollBarContents {
+        position:relative;
+        margin:6px 15px;
+        padding:8px 8px;
+        border:1px solid rgb(30,80,130);
+        background-color:rgb(60,120,150);
+        border-radius: 6px;
+      }
+      .scrollPositionContainer {
+        position:absolute;
+        top:-3px;
+        left:-5px;
+        width:100%;
+        height:100%;
+      }
+      .scrollPositionIndicator {
+        position:relative;
+        left:0;
+        width:10px;
+        height:22px;
+        background-color:rgb(140,40,80);
+        border-radius:5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="canvasContainer">
+      <iframe src="room.html" class="canvasSubContainer"></iframe>
+      <div class="canvasSubContainer">
+        <canvas></canvas>
+        <div class="gameStateContainer">
+          <div class="scoreBoard">
+            <div class="teamicon red"></div>
+            <div class="score">0</div>
+            <div>-</div>
+            <div class="score">0</div>
+            <div class="teamicon blue"></div>
+          </div>
+          <div class="gameTime">
+            <span class="overtime">OVERTIME!</span>
+            <span class="digit">0</span>
+            <span class="digit">0</span>
+            <span>:</span>
+            <span class="digit">0</span>
+            <span class="digit">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chatContainer">
+      <div class="chatBox">
+        <div class="chatLog"></div>
+        <div class="chatInput">
+          <input class="customInput" type="text" maxLength=140 />
+          <button class="button">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="scrollBar">
+      <div class="scrollBarContents">
+        <div class="scrollPositionContainer">
+          <div class="scrollPositionIndicator"></div>
+        </div>
+      </div>
+    </div>
+    <script src="./streamWatcher.js"></script>
+  </body>
+</html>
