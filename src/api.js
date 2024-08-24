@@ -546,7 +546,7 @@ function abcHaxballAPI(window, config){
     };
     */
     
-    function FiniteLinearObject() { // E
+    function ArcObject() { // E
       this.Hg = this.Ig = this.wa = null;
       this.Yj = 0;
       this.ca = this.W = this.Xd = null;
@@ -559,9 +559,9 @@ function abcHaxballAPI(window, config){
       //this.R = 0;
     }
 
-    //FiniteLinearObject.b = !0;
+    //ArcObject.b = !0;
     const mn = 0.17435839227423353, ln = 5.934119456780721, dtR = 0.017453292519943295;
-    FiniteLinearObject.prototype = {
+    ArcObject.prototype = {
       /*
       ga: function (a) {
         var b = 0,
@@ -640,7 +640,7 @@ function abcHaxballAPI(window, config){
             (b = Math.sqrt(a * a + c * c)),
             (this.wa = new H(a / b, c / b));
       },
-      //f: FiniteLinearObject,
+      //f: ArcObject,
     };
   
     function InfiniteLinearObject() { // L
@@ -1246,7 +1246,7 @@ function abcHaxballAPI(window, config){
       },
   
       addSegment: function(data) { // data: { vertex0: Vertex, vertex1: Vertex, v0: number (if vertex0 is not provided), v1: number (if vertex1 is not provided), color: ("transparent" || string || [r: number, g: number, b: number]), bias: number, (curve: number || curveF: number), vis: boolean, bCoef: number, cMask: array of string, cGroup: array of string }
-        var c = new FiniteLinearObject();
+        var c = new ArcObject();
         c.W = data.vertex0 || this.J[data.v0];
         c.ca = data.vertex1 || this.J[data.v1];
         var d = data.bias,
@@ -1365,7 +1365,7 @@ function abcHaxballAPI(window, config){
     return {
       World,
       DotObject,
-      FiniteLinearObject,
+      ArcObject,
       InfiniteLinearObject,
       FiniteLinearSensor,
       CircularObject,
@@ -1406,12 +1406,12 @@ function abcHaxballAPI(window, config){
     // E
 
     function E() {
-      PhysicsEngine.FiniteLinearObject.apply(this);
+      PhysicsEngine.ArcObject.apply(this);
       this.Za = true;
       this.R = 0;
     }
     E.b = !0;
-    E.prototype = C(PhysicsEngine.FiniteLinearObject.prototype, {
+    E.prototype = C(PhysicsEngine.ArcObject.prototype, {
       ga: function (a) {
         var b = 0,
           c = a.a;
@@ -1955,7 +1955,7 @@ function abcHaxballAPI(window, config){
   var { 
     World: Fa, 
     DotObject: B, 
-    FiniteLinearObject: E,
+    ArcObject: E,
     InfiniteLinearObject: L,
     FiniteLinearSensor: sb,
     CircularObject: ua,
