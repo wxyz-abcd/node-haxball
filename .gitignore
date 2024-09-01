@@ -109,10 +109,8 @@ dist
 # Custom
 test/
 backup/
-src_2/
-api_fixednames.js
-package_git.json
-examples/*_halfMinified
-examples/renderers/*_halfMinified.js
-examples_web/*_halfMinified
+engine/
+index_debug.js
+jsconfig.json
+eslint.config.mjs
 examples_web/src/vendor/api.js

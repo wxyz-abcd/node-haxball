@@ -1,4 +1,6 @@
-require("./test.js")(require("../src/index.js")(), "thr1.AAAAAGakUXmNwAGgf5h2bg.8c1QWvFknV0", {
+const API = (process.argv[2]=="debug") ? require("../src/index_debug")() : require("../src/index")();
+
+require("./test.js")(API, process.argv[3], process.argv[4]==1, {
   log: (...a)=>{
     process.stderr.write(a.join(""));
   },

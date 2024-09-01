@@ -24,14 +24,17 @@ var loadScript = (url, isModule) => new Promise((resolve, reject)=>{
   document.body.appendChild(s);
 });
 
-loadScript("https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js", false).then(()=>{
-  loadScript("https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/examples/languages/englishLanguage.js", true).then((l)=>{ // if you want to use error.toString()
-    EnglishLanguage = l;
-    if (token.length>0)
-      start();
-    else
-      showRecaptcha();
-  });
+Promise.all([
+  loadScript("https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/examples_web/src/vendor/json5.min.js", false),
+  loadScript("https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/examples_web/src/vendor/pako-jszip.min.js", false),
+  loadScript("https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js", false), 
+  loadScript("https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/examples/languages/englishLanguage.js", true) // if you want to use error.toString()
+]).then(([i, j, k, l])=>{
+  EnglishLanguage = l;
+  if (token.length>0)
+    start();
+  else
+    showRecaptcha();
 });
 
 function showRecaptcha(){

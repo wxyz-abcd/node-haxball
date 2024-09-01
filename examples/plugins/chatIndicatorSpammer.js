@@ -32,7 +32,7 @@ module.exports = function(API){
   
   function swapIndicator(){
     active = !active;
-    that.room?.setChatIndicatorActive(active);
+    that.room?.setChatIndicatorActive?.(active);
     timeout = setTimeout(swapIndicator, that.intervalMsec);
   }
   

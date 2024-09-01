@@ -261,8 +261,7 @@ Room.create({
   - `reverseKeyState(state)`: returns the `dirX`, `dirY`, `kick` parameters that were used to generate the given integer `state` with `Utils.keyState` function.
   - `runAfterGameTick(callback, ticks)`: runs a `callback` function after `ticks` game ticks. if omitted, `ticks` defaults to `1`.
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
-  - `geoFromJSON(json)`: creates and returns a GeoLocation object from a json object that should have `lat`, `lon` and `flag` keys.
-  - `geoFromString(jsonStr)`: creates and returns a GeoLocation object from a stringified json object that should have `lat`, `lon` and `flag` keys.
+  - `parseGeo(geoStr, fallback, retNull)`: Parses the given string or json object(`geoStr`) as a `GeoLocation` object that should have `lat`, `lon` and `flag` keys and returns it.
   - `getDefaultStadiums()`: get default stadium array.
   - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
@@ -1007,10 +1006,9 @@ Room.create({
 - `Impl`: Implementation of Haxball's inner classes. All important classes are exported and more detailed explanations will hopefully be available soon. Names might be fixed later. These classes are enough to run your own Haxball website.
 
   - `Core`: Most important core classes used inside Haxball.
-    - `H`: Point class
-    - `ka`: TeamColors class
-    - `p`: Team class
-    - `T`: GeoLocation class
+    - `Point`: The Point class that is used internally inside the game's physics engine.
+    - `TeamColors`: The class that defines the colors of a team.
+    - `Team`: The class that defines the properties of a team.
 
   - `Stream`: These classes are used to read/write data from/to replay files and/or network/WebRTC stream.
     - `F`: StreamReader class
@@ -1055,6 +1053,7 @@ Room.create({
 
 <div> - Initial testing environment by <a href="https://github.com/mertushka">mertushka <img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
 <div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - Headless script example fixed by <a href="https://github.com/iAmLuks">Luks <img width="20" src="https://avatars.githubusercontent.com/u/43921069?v=4"/></a></div>
 <div> - Lots of testing and various plugins by <a href="https://github.com/0x00214131812049">0x00 <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
 <div> - Lots of testing and various plugins by <a href="https://github.com/jerryoldson">JerryOldson <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a></div>
 <div> - Lots of testing and Portuguese language translation by <a href="https://github.com/guguxh">Juze <img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>

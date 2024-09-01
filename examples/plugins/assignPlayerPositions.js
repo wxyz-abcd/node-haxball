@@ -51,6 +51,6 @@ module.exports = function (API) {
   };
 
   this.finalize = function(){
-    that.room?.unregisterPlayerGUIProperties("assignPlayerPositions");
+    that.room?.unregisterPlayerGUIProperties?.("assignPlayerPositions");
   };
 }

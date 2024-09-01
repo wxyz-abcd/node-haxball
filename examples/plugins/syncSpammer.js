@@ -32,7 +32,7 @@ module.exports = function(API){
   
   function swapSync(){
     sync = !sync;
-    that.room?.setSync(sync);
+    that.room?.setSync?.(sync);
     timeout = setTimeout(swapSync, that.intervalMsec);
   }
   

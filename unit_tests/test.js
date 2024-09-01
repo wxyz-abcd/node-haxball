@@ -4,14 +4,13 @@
     - in-game physics tests (onPlayerBallKick, onTeamGoal, collisions, etc.)
     - some current tests need to be applied also while the game is active (like changing teams.)
     - change room properties
-    - noPlayer=true mode (for all room-related functions)
     - fake event functions
     - replay mode functions
     - sandbox mode functions
     - plugins, renderers, etc. (they probably need seperate tests. I will probably not automate their tests, because it will cause tests to become too many.)
 */
 
-module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green, red, magenta, blue}, exit})=>{
+module.exports = ({ Room, Utils, Impl }, roomToken, noPlayer, {log, colors: {yellow, green, red, magenta, blue}, exit})=>{
   const roomPassword = "test123";
   const ratings = [
     {t: 0.50, c: red, n: "TERRIBLE"}, 
@@ -310,13 +309,13 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var setPlayerTeam = (room, playerId, value, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
+    var ret = 0;
     room.onPlayerTeamChange = (pId, val)=>{
-      ret[0][pId]=room.getPlayer(pId)?.team.id==val && val==value;
+      room.getPlayer(pId)?.team.id==val && val==value && (ret++);
       room.onPlayerTeamChange = null;
     };
     room.other.onPlayerTeamChange = (pId, val)=>{
-      ret[1][pId]=room.other.getPlayer(pId)?.team.id==val && val==value;
+      room.other.getPlayer(pId)?.team.id==val && val==value && (ret++);
       room.other.onPlayerTeamChange = null;
     };
     room.setPlayerTeam(playerId, value);
@@ -328,13 +327,13 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var setSync = (room, value, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
+    var ret = 0;
     room.onPlayerSyncChange = (pId, val)=>{
-      ret[0][pId]=room.getPlayer(pId)?.sync==val && val==value && room.currentPlayer.id==pId;
+      room.getPlayer(pId)?.sync==val && val==value && room.currentPlayer.id==pId && (ret++);
       room.onPlayerSyncChange = null;
     };
     room.other.onPlayerSyncChange = (pId, val)=>{
-      ret[1][pId]=room.other.getPlayer(pId)?.sync==val && val==value && room.currentPlayer.id==pId;
+      room.other.getPlayer(pId)?.sync==val && val==value && room.currentPlayer.id==pId && (ret++);
       room.other.onPlayerSyncChange = null;
     };
     room.setSync(value);
@@ -346,13 +345,13 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var setAvatar = (room, value, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
+    var ret = 0;
     room.onPlayerAvatarChange = (pId, val)=>{
-      ret[0][pId]=room.getPlayer(pId)?.avatar==val && val==value && room.currentPlayer.id==pId;
+      room.getPlayer(pId)?.avatar==val && val==value && room.currentPlayer.id==pId && (ret++);
       room.onPlayerAvatarChange = null;
     };
     room.other.onPlayerAvatarChange = (pId, val)=>{
-      ret[1][pId]=room.other.getPlayer(pId)?.avatar==val && val==value && room.currentPlayer.id==pId;
+      room.other.getPlayer(pId)?.avatar==val && val==value && room.currentPlayer.id==pId && (ret++);
       room.other.onPlayerAvatarChange = null;
     };
     room.setAvatar(value);
@@ -489,7 +488,6 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     };
     room.sendCustomEvent(type, data);
     setTimeout(()=>{
-      cRoom.onOperationReceived = null;
       room.onCustomEvent = null;
       room.other.onCustomEvent = null;
       expectedFunc(ret) ? resolve() : reject();
@@ -497,16 +495,16 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var resetTeam = (room, teamId, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
-    room.setPlayerTeam(cRoom.currentPlayerId, 2);
-    room.setPlayerTeam(jRoom.currentPlayerId, 1);
+    var ret = 0;
+    cRoom.setPlayerTeam(cRoom.currentPlayerId, 1);
+    cRoom.setPlayerTeam(jRoom.currentPlayerId, 2);
     setTimeout(()=>{
       room.onPlayerTeamChange = (pId, val)=>{
-        ret[0][pId]=val==0;
+        val==0 && (ret++);
         room.onPlayerTeamChange = null;
       };
       room.other.onPlayerTeamChange = (pId, val)=>{
-        ret[1][pId]=val==0;
+        val==0 && (ret++);
         room.other.onPlayerTeamChange = null;
       };
       room.resetTeam(teamId);
@@ -519,17 +517,15 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var resetTeams = (room, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
-    room.setPlayerTeam(cRoom.currentPlayerId, 2);
-    room.setPlayerTeam(jRoom.currentPlayerId, 1);
+    var ret = 0;
+    cRoom.setPlayerTeam(cRoom.currentPlayerId, 2);
+    cRoom.setPlayerTeam(jRoom.currentPlayerId, 1);
     setTimeout(()=>{
       room.onPlayerTeamChange = (pId, val)=>{
-        ret[0][pId]=val==0;
-        room.onPlayerTeamChange = null;
+        (val==0) && (ret++);
       };
       room.other.onPlayerTeamChange = (pId, val)=>{
-        ret[1][pId]=val==0;
-        room.other.onPlayerTeamChange = null;
+        (val==0) && (ret++);
       };
       room.resetTeams();
       setTimeout(()=>{
@@ -582,11 +578,11 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     var ret = [];
     cRoom.stopGame();
     room.onStadiumChange = (val)=>{
-      ret[0]=val?.se?.()==value?.se?.();
+      ret[0]=Utils.exportStadium(val)==Utils.exportStadium(value);
       room.onStadiumChange = null;
     };
     room.other.onStadiumChange = (val)=>{
-      ret[1]=val?.se?.()==value?.se?.();
+      ret[1]=Utils.exportStadium(val)==Utils.exportStadium(value);
       room.other.onStadiumChange = null;
     };
     room.setCurrentStadium(value);
@@ -598,31 +594,34 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var changeTeam = (room, value, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
-    room.onPlayerTeamChange = (pId, val)=>{
-      ret[0][pId]=room.getPlayer(pId)?.team.id==val && val==value && room.currentPlayer.id==pId;
-      room.onPlayerTeamChange = null;
-    };
-    room.other.onPlayerTeamChange = (pId, val)=>{
-      ret[1][pId]=room.other.getPlayer(pId)?.team.id==val && val==value && room.currentPlayer.id==pId;
-      room.other.onPlayerTeamChange = null;
-    };
-    room.changeTeam(value);
+    cRoom.resetTeams();
     setTimeout(()=>{
-      room.onPlayerTeamChange = null;
-      room.other.onPlayerTeamChange = null;
-      expectedFunc(ret) ? resolve() : reject();
-    }, 1000);
+      var ret = 0;
+      room.onPlayerTeamChange = (pId, val)=>{
+        room.getPlayer(pId)?.team.id==val && val==value && room.currentPlayer.id==pId && (ret++);
+        room.onPlayerTeamChange = null;
+      };
+      room.other.onPlayerTeamChange = (pId, val)=>{
+        room.other.getPlayer(pId)?.team.id==val && val==value && room.currentPlayer.id==pId && (ret++);
+        room.other.onPlayerTeamChange = null;
+      };
+      room.changeTeam(value);
+      setTimeout(()=>{
+        room.onPlayerTeamChange = null;
+        room.other.onPlayerTeamChange = null;
+        expectedFunc(ret) ? resolve() : reject();
+      }, 1000);
+    }, 200);
   });
 
   var setKeyState = (room, value, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [{}, {}];
+    var ret = 0;
     room.onPlayerInputChange = (pId, val)=>{
-      ret[0][pId]=room.getPlayer(pId)?.input==val && val==value && room.currentPlayer.id==pId;
+      room.getPlayer(pId)?.input==val && val==value && room.currentPlayer.id==pId && (ret++);
       room.onPlayerInputChange = null;
     };
     room.other.onPlayerInputChange = (pId, val)=>{
-      ret[1][pId]=room.other.getPlayer(pId)?.input==val && val==value && room.currentPlayer.id==pId;
+      room.other.getPlayer(pId)?.input==val && val==value && room.currentPlayer.id==pId && (ret++);
       room.other.onPlayerInputChange = null;
     };
     room.setKeyState(value);
@@ -674,11 +673,11 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   var setKickRateLimit = (room, min, rate, burst, expectedFunc) => new Promise((resolve, reject)=>{
     var ret = [{}, {}];
     room.onKickRateLimitChange = (_min, _rate, _burst)=>{
-      ret[0] = _min==min && rate==_rate && burst==_burst && room.state.yd==min && room.state.Zc==rate && room.state.Zc*burst==room.state.ce;
+      ret[0] = _min==min && rate==_rate && burst==_burst && room.state.kickRate_min==min && room.state.kickRate_rate==rate && room.state.kickRate_rate*burst==room.state.kickRate_max;
       room.onPlayerTeamChange = null;
     };
     room.other.onKickRateLimitChange = (_min, _rate, _burst)=>{
-      ret[1] = _min==min && rate==_rate && burst==_burst && room.other.state.yd==min && room.other.state.Zc==rate && room.other.state.Zc*burst==room.other.state.ce;
+      ret[1] = _min==min && rate==_rate && burst==_burst && room.other.state.kickRate_min==min && room.other.state.kickRate_rate==rate && room.other.state.kickRate_rate*burst==room.other.state.kickRate_max;
       room.other.onKickRateLimitChange = null;
     };
     room.setKickRateLimit(min, rate, burst);
@@ -686,7 +685,9 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
       room.onKickRateLimitChange = null;
       room.other.onKickRateLimitChange = null;
       room.setKickRateLimit(2, 0, 1);
-      expectedFunc(ret) ? resolve() : reject();
+      setTimeout(()=>{
+        expectedFunc(ret) ? resolve() : reject();
+      }, 200);
     }, 1000);
   });
 
@@ -778,14 +779,14 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var autoTeams = (room, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [];
+    var ret = 0;
     cRoom.resetTeams();
     room.onAutoTeams = ()=>{
-      ret[0] = true;
+      ret++;
       room.onAutoTeams = null;
     };
     room.other.onAutoTeams = ()=>{
-      ret[1] = true;
+      ret++;
       room.other.onAutoTeams = null;
     };
     room.autoTeams();
@@ -815,14 +816,14 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   });
 
   var randTeams = (room, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [0, 0];
+    var ret = 0;
     cRoom.resetTeams();
     setTimeout(()=>{
       room.onPlayerTeamChange = ()=>{
-        ret[0]++;
+        ret++;
       };
       room.other.onPlayerTeamChange = ()=>{
-        ret[1]++;
+        ret++;
       };
       room.randTeams();
       setTimeout(()=>{
@@ -1011,22 +1012,22 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     promise: ()=>leave(jRoom, (ret)=>(ret))
   }, {
     name: "byHost_setAvatar",
-    promise: ()=>setAvatar(cRoom, "AA", (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>setAvatar(cRoom, "AA", (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byClient_setAvatar",
-    promise: ()=>setAvatar(jRoom, "BB", (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>setAvatar(jRoom, "BB", (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byHost_setSync_true",
-    promise: ()=>setSync(cRoom, true, (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>setSync(cRoom, true, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byClient_setSync_true",
-    promise: ()=>setSync(jRoom, true, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>setSync(jRoom, true, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byHost_setSync_false",
-    promise: ()=>setSync(cRoom, false, (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>setSync(cRoom, false, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byClient_setSync_false",
-    promise: ()=>setSync(jRoom, false, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>setSync(jRoom, false, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byHost_setTeamColors",
     promise: ()=>setTeamColors(cRoom, 1, 60, ["ff0000", "ffff00", "ff00ff", "ffff00"], (ret)=>(ret[0] && ret[1]))
@@ -1038,16 +1039,16 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     promise: ()=>setPlayerAdmin(jRoom, jRoom.currentPlayerId, true, (ret)=>(Object.keys(ret[0]).length==0 && Object.keys(ret[1]).length==0))
   }, {
     name: "byNonAdminClient_setPlayerTeam_1",
-    promise: ()=>setPlayerTeam(jRoom, cRoom.currentPlayerId, 1, (ret)=>(Object.keys(ret[0]).length==0 && Object.keys(ret[1]).length==0))
+    promise: ()=>setPlayerTeam(jRoom, cRoom.currentPlayerId, 1, (ret)=>(ret==0))
   }, {
     name: "byNonAdminClient_setPlayerAvatar",
     promise: ()=>setPlayerAvatar(jRoom, cRoom.currentPlayerId, "aa", (ret)=>(Object.keys(ret[0]).length==0 && Object.keys(ret[1]).length==0))
   }, {
-    name: "byNonAdminClient_resetTeams",
-    promise: ()=>resetTeams(jRoom, (ret)=>(Object.keys(ret[0]).length==0 && Object.keys(ret[1]).length==0))
+    name: "byNonAdminClient_resetTeams", // +
+    promise: ()=>resetTeams(jRoom, (ret)=>(ret==2))
   }, {
-    name: "byNonAdminClient_resetTeam",
-    promise: ()=>resetTeam(jRoom, 1, (ret)=>(Object.keys(ret[0]).length==0 && Object.keys(ret[1]).length==0))
+    name: "byNonAdminClient_resetTeam", // +
+    promise: ()=>resetTeam(jRoom, 1, (ret)=>(ret==0))
   }, {
     name: "byNonAdminClient_setTimeLimit",
     promise: ()=>setTimeLimit(jRoom, 1, (ret)=>(ret.length==0))
@@ -1058,8 +1059,8 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     name: "byNonAdminClient_setCurrentStadium",
     promise: ()=>setCurrentStadium(jRoom, stadium1, (ret)=>(ret.length==0))
   }, {
-    name: "byNonAdminClient_changeTeam",
-    promise: ()=>changeTeam(jRoom, 2, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    name: "byNonAdminClient_changeTeam", // +
+    promise: ()=>changeTeam(jRoom, 2, (ret)=>(ret==2))
   }, {
     name: "byNonAdminClient_setKickRateLimit",
     promise: ()=>setKickRateLimit(jRoom, 20, 20, 20, (ret)=>(ret[0] && ret[1]))
@@ -1074,10 +1075,10 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     promise: ()=>pauseGame(jRoom, (ret)=>(!ret[0] && !ret[1] && !ret[2] && !ret[3]))
   }, {
     name: "byNonAdminClient_autoTeams",
-    promise: ()=>autoTeams(jRoom, (ret)=>(!ret[0] && !ret[1]))
+    promise: ()=>autoTeams(jRoom, (ret)=>(ret==0))
   }, {
     name: "byNonAdminClient_randTeams",
-    promise: ()=>randTeams(jRoom, (ret)=>(ret[0]==0 && ret[1]==0))
+    promise: ()=>randTeams(jRoom, (ret)=>(ret==0))
   }, {
     name: "byNonAdminClient_lockTeams",
     promise: ()=>lockTeams(jRoom, (ret)=>(!ret[0] && !ret[1]))
@@ -1126,22 +1127,22 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
   }, {
     name: "byHost_setPlayerTeam_1",
     pre: ()=>new Promise((resolve)=>(cRoom.setPlayerTeam(jRoom.currentPlayerId, 0), setTimeout(resolve, 200))),
-    promise: ()=>setPlayerTeam(cRoom, jRoom.currentPlayerId, 1, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>setPlayerTeam(cRoom, jRoom.currentPlayerId, 1, (ret)=>(ret==2))
   }, {
     name: "byAdminClient_setPlayerTeam_2",
-    promise: ()=>setPlayerTeam(jRoom, cRoom.currentPlayerId, 2, (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>setPlayerTeam(jRoom, cRoom.currentPlayerId, 2, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byHost_resetTeam",
-    promise: ()=>resetTeam(cRoom, 2, (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>resetTeam(cRoom, 2, (ret)=>(ret==2))
   }, {
-    name: "byAdminClient_resetTeam",
-    promise: ()=>resetTeam(jRoom, 1, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    name: "byAdminClient_resetTeam", // +
+    promise: ()=>resetTeam(jRoom, 1, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byHost_resetTeams",
-    promise: ()=>resetTeams(cRoom, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>resetTeams(cRoom, (ret)=>(ret==noPlayer?2:4))
   }, {
     name: "byAdminClient_resetTeams",
-    promise: ()=>resetTeams(jRoom, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>resetTeams(jRoom, (ret)=>(ret==noPlayer?2:4))
   }, {
     name: "byHost_setTimeLimit",
     promise: ()=>setTimeLimit(cRoom, 1, (ret)=>(ret[0] && ret[1]))
@@ -1168,16 +1169,16 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     promise: ()=>setCurrentStadium(jRoom, stadium1, (ret)=>(ret[0] && ret[1]))
   }, {
     name: "byHost_changeTeam",
-    promise: ()=>changeTeam(cRoom, 1, (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>changeTeam(cRoom, 1, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byAdminClient_changeTeam",
-    promise: ()=>changeTeam(jRoom, 2, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>changeTeam(jRoom, 2, (ret)=>(ret==2))
   }, {
     name: "byHost_setKeyState",
-    promise: ()=>setKeyState(cRoom, 26, (ret)=>(ret[0][cRoom.currentPlayerId] && ret[1][cRoom.currentPlayerId]))
+    promise: ()=>setKeyState(cRoom, 26, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byClient_setKeyState",
-    promise: ()=>setKeyState(jRoom, 26, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+    promise: ()=>setKeyState(jRoom, 26, (ret)=>(ret==2))
   }, {
     name: "setHandicap",
     promise: ()=>setHandicap(jRoom, 100, (ret)=>(ret[0] && !ret[1]))
@@ -1216,19 +1217,19 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     promise: ()=>setPlayerDiscProperties(jRoom, cRoom.currentPlayerId, {radius: 20}, (ret)=>(!ret[0] && !ret[1]))
   }, {
     name: "byHost_autoTeams",
-    promise: ()=>autoTeams(cRoom, (ret)=>(ret[0] && ret[1]))
+    promise: ()=>autoTeams(cRoom, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byHost_randTeams",
-    promise: ()=>randTeams(cRoom, (ret)=>(ret[0]==2 && ret[1]==2))
+    promise: ()=>randTeams(cRoom, (ret)=>(ret==noPlayer?2:4))
   }, {
     name: "byHost_lockTeams",
     promise: ()=>lockTeams(cRoom, (ret)=>(ret[0] && ret[1]))
   }, {
     name: "byAdminClient_autoTeams",
-    promise: ()=>autoTeams(jRoom, (ret)=>(ret[0] && ret[1]))
+    promise: ()=>autoTeams(jRoom, (ret)=>(ret==noPlayer?0:2))
   }, {
     name: "byAdminClient_randTeams",
-    promise: ()=>randTeams(jRoom, (ret)=>(ret[0]==2 && ret[1]==2))
+    promise: ()=>randTeams(jRoom, (ret)=>(ret==noPlayer?2:4))
   }, {
     name: "byAdminClient_lockTeams",
     promise: ()=>lockTeams(jRoom, (ret)=>(ret[0] && ret[1]))
@@ -1267,22 +1268,33 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     name: "byHost_setPlayerAdmin_true",
     promise: ()=>setPlayerAdmin(cRoom, jRoom.currentPlayerId, true, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
   }, {
-    name: "setRecaptcha",
+    name: "setRecaptcha", // +
     promise: ()=>setRecaptcha((ret)=>(ret[0]==true && ret[1]==false))
   }];
 
   /*
   // add special tests here to fix bugs:
   var tests = [{
-    name: "byHost_sendCustomEvent",
-    pre: ()=>new Promise((resolve)=>(setTimeout(resolve, 2000))),
-    promise: ()=>sendCustomEvent(cRoom, 0, "ctestData", (ret)=>(ret[0] && ret[1]))
+    name: "byHost_setTeamColors",
+    promise: ()=>setTeamColors(cRoom, 1, 60, ["ff0000", "ffff00", "ff00ff", "ffff00"], (ret)=>(ret[0] && ret[1]))
   }, {
-    name: "byClient_sendCustomEvent",
-    promise: ()=>sendCustomEvent(jRoom, 1, "jtestData", (ret)=>(ret[0] && ret[1]))
+    name: "byNonAdminClient_setTeamColors",
+    promise: ()=>setTeamColors(jRoom, 2, 60, ["0000ff", "00ffff", "00ff00", "ff00ff"], (ret)=>(ret.length==0))
+  }, {
+    name: "byHost_setPlayerAdmin_true",
+    promise: ()=>setPlayerAdmin(cRoom, jRoom.currentPlayerId, true, (ret)=>(ret[0][jRoom.currentPlayerId] && ret[1][jRoom.currentPlayerId]))
+  }, {
+    name: "byHost_setKickRateLimit",
+    promise: ()=>setKickRateLimit(cRoom, 20, 20, 20, (ret)=>(ret[0] && ret[1]))
+  }, {
+    name: "byAdminClient_setKickRateLimit",
+    promise: ()=>setKickRateLimit(jRoom, 20, 20, 20, (ret)=>(ret[0] && ret[1]))
+  }, {
+    name: "byAdminClient_setTeamColors",
+    promise: ()=>setTeamColors(jRoom, 2, 60, ["0000ff", "00ffff", "00ff00", "ff00ff"], (ret)=>(ret[0] && ret[1]))
   }];
   */
-  
+
   var n = 0, ns = 0, roomId, authObj;
 
   var nextTest = function(){
@@ -1420,6 +1432,7 @@ module.exports = ({ Room, Utils, Impl }, roomToken, {log, colors: {yellow, green
     maxPlayerCount: 30,
     showInRoomList: false,
     token: roomToken,
+    noPlayer: noPlayer,
     onError: (error, playerId)=>{
       if (error.code==56)
         return;

@@ -84,20 +84,20 @@ module.exports = function(API){
     return Math.abs(sl) <= 0.00000001;
   }
   
-  function inteceptCircleLineSeg(circle, line){
+  function interceptCircleLineSeg(circle, line){
     var b, c, d, u1, u2, ret, v1, v2;
     var v1 = {
       x: line.p2.x - line.p1.x,
       y: line.p2.y - line.p1.y
     };
     var v2 = {
-      x: line.p1.x - circle.Xd.x,
-      y: line.p1.y - circle.Xd.y
+      x: line.p1.x - circle.arcCenter.x,
+      y: line.p1.y - circle.arcCenter.y
     };
     b = (v1.x * v2.x + v1.y * v2.y);
     c = 2 * (v1.x * v1.x + v1.y * v1.y);
     b *= -2;
-    d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - circle.Yj * circle.Yj));
+    d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - circle.arcRadius * circle.arcRadius));
     if(isNaN(d)) // no intercept
       return;
     u1 = (b - d) / c;  // these represent the unit distance of point one and two on the line
@@ -127,13 +127,13 @@ module.exports = function(API){
       return;
     if (thisLibrary.mode==1){
       var mapObjects = gameState.physicsState;
-      var ball = mapObjects.F[0], fpId = thisLibrary.followPlayerId;
+      var ball = mapObjects.discs[0], fpId = thisLibrary.followPlayerId;
       if (fpId>=0){
         var d = thisLibrary.room.players.find((x)=>x.id==fpId)?.disc;
         d && (followDisc = d);
       }
       if (ball && followDisc){
-        var coord = ball.a, baseCoord = followDisc.a, remainingDist = thisLibrary.distThreshold;
+        var coord = ball.pos, baseCoord = followDisc.pos, remainingDist = thisLibrary.distThreshold;
         var xb = coord.x, yb = coord.y;
         var dx = xb-baseCoord.x, dy = yb-baseCoord.y, dd = Math.sqrt(dx*dx+dy*dy);
         if (dd<ball.radius+followDisc.radius+thisLibrary.minDistToBall){
@@ -141,28 +141,28 @@ module.exports = function(API){
           while(remainingDist>0 && iter<thisLibrary.maxIter){
             dx/=dd, dy/=dd;
             var f = null, coll = null, N = null, minSqrDist = Infinity;
-            for (var i = 0, e = mapObjects.U; i < e.length; i++)
-              if (((f = e[i]), 0 != (f.h & ball.v) && 0 != (f.v & ball.h))) {
-                if (0*f.vb!=0){ // line
-                  var Ua = f.wa.x*f.W.a.x+f.wa.y*f.W.a.y;
-                  var k = (Ua-f.wa.y*yb-f.wa.x*xb)/(f.wa.y*dy+f.wa.x*dx);
+            for (var i = 0, e = mapObjects.segments; i < e.length; i++)
+              if (((f = e[i]), 0 != (f.cMask & ball.cGroup) && 0 != (f.cGroup & ball.cMask))) {
+                if (0*f.curveF!=0){ // line
+                  var Ua = f.normal.x*f.v0.pos.x+f.normal.y*f.v0.pos.y;
+                  var k = (Ua-f.normal.y*yb-f.normal.x*xb)/(f.normal.y*dy+f.normal.x*dx);
                   if (k>0){
                     var x = xb+k*dx, y = yb+k*dy;
-                    if (onSegment(f.W.a, f.ca.a, x, y)){
+                    if (onSegment(f.v0.pos, f.v1.pos, x, y)){
                       var p = {x:x,y:y};
                       var sqrDist = (p.x-xb)*(p.x-xb)+(p.y-yb)*(p.y-yb);
                       if (sqrDist<minSqrDist){
                         coll = p;
                         minSqrDist = sqrDist;
-                        N = f.wa;
+                        N = f.normal;
                       }
                     }
                   }
                 }
                 else{ // arc
-                  var pts = inteceptCircleLineSeg(f, {p1: baseCoord, p2: coord});
+                  var pts = interceptCircleLineSeg(f, {p1: baseCoord, p2: coord});
                   if (pts){
-                    var pos1 = f.W.a, pos2 = f.ca.a, center = f.Xd;
+                    var pos1 = f.v0.pos, pos2 = f.v1.pos, center = f.arcCenter;
                     var a1 = Math.atan2(pos1.y-center.y, pos1.x-center.x)*180/Math.PI;
                     if (a1<0)
                       a1+=360;
@@ -190,10 +190,10 @@ module.exports = function(API){
                   }
                 }
               }
-            for (var i = 0, e = mapObjects.qa; i < e.length; i++)
-              if (((f = e[i]), 0 != (f.h & ball.v) && 0 != (f.v & ball.h))) {
+            for (var i = 0, e = mapObjects.planes; i < e.length; i++)
+              if (((f = e[i]), 0 != (f.cMask & ball.cGroup) && 0 != (f.cGroup & ball.cMask))) {
                 /*
-                plane: px+qy=r (p = f.wa.x, q = f.wa.y, r = f.Ua)
+                plane: px+qy=r (p = f.normal.x, q = f.normal.y, r = f.dist)
                 ray: direction: c, s; point: x', y' (c = dx, s = dy, x' = xb, y' = yb)
   
                 y=y'+k.s
@@ -203,7 +203,7 @@ module.exports = function(API){
                 k=(r-p.y'-q.x')/(p.s+q.c)
                 */
   
-                var k = (f.Ua-f.wa.y*yb-f.wa.x*xb)/(f.wa.y*dy+f.wa.x*dx);
+                var k = (f.dist-f.normal.y*yb-f.normal.x*xb)/(f.normal.y*dy+f.normal.x*dx);
                 if (k>0){
                   var p = {
                     x: xb+k*dx, 
@@ -213,7 +213,7 @@ module.exports = function(API){
                   if (sqrDist<minSqrDist){
                     coll = p;
                     minSqrDist = sqrDist;
-                    N = f.wa;
+                    N = f.normal;
                   }
                 }
               }
@@ -251,23 +251,23 @@ module.exports = function(API){
       }
     }
     else{
-      var ball = gameState.physicsState.F[0], fpId = thisLibrary.followPlayerId;
+      var ball = gameState.physicsState.discs[0], fpId = thisLibrary.followPlayerId;
       if (!ball || !(fpId>=0))
         return;
-      var newState = gameState.sc();
-      var followDisc = newState.ta.F.find((x)=>x.playerId==fpId);
+      var newState = gameState.copy(); // gameState.sc()
+      var followDisc = newState.physicsState.discs.find((x)=>x.playerId==fpId);
       if (!followDisc)
         return;
-      ball = newState.ta.F[0];
+      ball = newState.physicsState.discs[0];
       if (thisLibrary.advancedVirtualKick)
-        newState.ta.kB(followDisc, ball, newState.S.ge);
+        newState.physicsState.kickBall(followDisc, ball, newState.stadium.playerPhysics);
       ctx.save();
       ctx.strokeStyle = thisLibrary.color;
       ctx.beginPath();
-      var p = ball.a;
+      var p = ball.pos;
       ctx.moveTo(p.x, p.y);
       for (var i=1;i<=thisLibrary.advancedEngineFrameNum;i++){
-        newState.C(1);
+        newState.advance(1); // newState.C(1)
         p = ball.pos;
         ctx.lineTo(p.x, p.y);
       }

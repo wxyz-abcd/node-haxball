@@ -2006,7 +2006,7 @@ module.exports = function(API){
     }
   	gameState = chess;
   	if (stopgame)
-      that.room?.stopGame();
+      that.room?.stopGame?.();
     var offsetX = -4*boxSize, offsetY = -4*boxSize, playerTeams = {};
     that.room.players.forEach((p)=>{
       if (p.id>=48000 && p.id<48064)
@@ -2145,11 +2145,11 @@ module.exports = function(API){
         nextPlayer();
         if (sendChessNotifications())
           setTimeout(()=>{
-            that.room?.stopGame();
+            that.room?.stopGame?.();
           }, 5000);
         Utils.runAfterGameTick(()=>{
           var n = 0;
-          var a = that.room?.players.filter((x, i)=>{
+          var a = that.room?.players?.filter?.((x, i)=>{
             if ((x.id<48000 || x.id>=48064)&&i<(n+32)){
               n++;
               return true;
@@ -2158,7 +2158,7 @@ module.exports = function(API){
           }).map((x)=>x.id);
           if (a.length>0){
             autoReorder = true;
-            that.room?.reorderPlayers(a, false);
+            that.room?.reorderPlayers?.(a, false);
             autoReorder = false;
           }
         }, 4);
@@ -2295,7 +2295,7 @@ module.exports = function(API){
           return;
         announceInfo((gameState.turn()=="w"?"WHITE":"BLACK")+" RESIGNED!");
         setTimeout(()=>{
-          that.room?.stopGame();
+          that.room?.stopGame?.();
         }, 5000);
       }
     });
@@ -2324,7 +2324,7 @@ module.exports = function(API){
           return;
         announceInfo("DRAW: MUTUAL AGREEMENT!");
         setTimeout(()=>{
-          that.room?.stopGame();
+          that.room?.stopGame?.();
         }, 5000);
       }
     });
@@ -2357,7 +2357,7 @@ module.exports = function(API){
         drawOffered = false;
         if (sendChessNotifications())
           setTimeout(()=>{
-            that.room?.stopGame();
+            that.room?.stopGame?.();
           }, 5000);
       }
     });
@@ -2540,7 +2540,7 @@ module.exports = function(API){
               //that.room.setPlayerTeam(0, (turn=="b") ? 1 : 2);
               if (sendChessNotifications())
                 setTimeout(()=>{
-                  that.room?.stopGame();
+                  that.room?.stopGame?.();
                 }, 5000);
             }
             else

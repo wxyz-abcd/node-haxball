@@ -1,6 +1,11 @@
 declare namespace MainReturnType {
 
   /**
+   * The current version number of the API.
+   */
+  export const version: string;
+
+  /**
    * This object binds event (operation) names to numbers that are 
    * obtained during Haxball's event mechanism, to let us understand 
    * what kind of message is received from the client. By nature, 
@@ -1658,14 +1663,29 @@ declare namespace MainReturnType {
     cMask: int;
 
     /**
-     * The calculated normal vector for this Segment.
+     * The calculated normal vector of this Segment. Only applies to non-curved Segments.
      */
     normal: Point;
 
     /**
-     * The calculated center point for this Segment. Only applies to curved Segments.
+     * The calculated normal direction of the object's tangent line at `v0`. Only applies to curved Segments.
      */
-    center: Point;
+    v0Normal: Point;
+
+    /**
+     * The calculated normal direction of the object's tangent line at `v1`. Only applies to curved Segments.
+     */
+    v1Normal: Point;
+    
+    /**
+     * The calculated radius of this Segment. Only applies to curved Segments.
+     */
+    arcRadius: Point;
+
+    /**
+     * The calculated center point of this Segment. Only applies to curved Segments.
+     */
+    arcCenter: Point;
   };
 
   /**
@@ -2310,37 +2330,48 @@ declare namespace MainReturnType {
   /**
    * A class that has all the objects that are related to the physics simulation.
    */
-  declare type PhysicsState = {
+  declare type World = {
 
     /**
-     * All vertices of this PhysicsState.
+     * All vertices of this World.
      */
     vertices: Vertex[];
 
     /**
-     * All segments of this PhysicsState.
+     * All segments of this World.
      */
     segments: Segment[];
 
     /**
-     * All planes of this PhysicsState.
+     * All planes of this World.
      */
     planes: Plane[];
 
     /**
-     * All moving discs of this PhysicsState.
+     * All moving discs of this World.
      */
     discs: MovableDisc[];
 
     /**
-     * All joints of this PhysicsState.
+     * All joints of this World.
      */
     joints: Joint[];
 
     /**
-     * The extrapolated version of this PhysicsState, or `null` if the data is not available.
+     * The extrapolated version of this World, or `null` if the data is not available.
      */
-    ext: PhysicsState | null;
+    ext: World | null;
+
+    /**
+     * Creates the physical ball kicking effect. No kicking will happen if the distance between ball and player is >= 4 map units.
+     * 
+     * @param pDisc The actual disc of the player that is kicking the ball.
+     * @param bDisc The actual disc of the ball that is being kicked.
+     * @param pp The current physical attributes of the players.
+     * 
+     * @returns Whether the ball was kicked or not.
+     */
+    kickBall: (pDisc: MovableDisc, bDisc: MovableDisc, pp: PlayerPhysics) => boolean;
   };
 
   /**
@@ -2383,7 +2414,7 @@ declare namespace MainReturnType {
     /**
      * The physical state of the objects inside the game.
      */
-    physicsState: PhysicsState;
+    physicsState: World;
 
     /**
      * The time limit of the game in minutes. 0 = no limit.
@@ -2409,6 +2440,15 @@ declare namespace MainReturnType {
      * Creates a copy of this GameState object.
      */
     copy: ()=>GameState;
+
+    /**
+     * Advances the game time `steps` number of frames. Called automatically by the game itself.
+     * 
+     * @param steps The number of game ticks to execute.
+     * 
+     * @returns void.
+     */
+    advance: (steps)=>void;
   };
 
   declare interface RoomStateBase {
@@ -2427,6 +2467,11 @@ declare namespace MainReturnType {
      * The rate value of kick rate limit.
      */
     kickRate_rate: int;
+
+    /**
+     * The max value of kick rate limit.
+     */
+    kickRate_max: int;
 
     /**
      * The time limit of this current RoomState in minutes. 0 = no limit.
@@ -4914,28 +4959,20 @@ declare namespace MainReturnType {
     export function getGeo(): Promise<GeoLocation>;
 
     /**
-     * Creates and returns a `GeoLocation` object from a json object.
+     * Parses the given string or json object as a `GeoLocation` object and returns it.
      * 
-     * @param json An object that has the following keys:
+     * @param geoStr An (optionally stringified) object that may have the following keys:
      *   - `lat`: Latitude value.
      *   - `lon`: Longitude value.
      *   - `flag`: Country code.
      * 
-     * @returns A `GeoLocation` object.
-     */
-    export function geoFromJSON(json: object): GeoLocation;
-    
-    /**
-     * Creates and returns a `GeoLocation` object from a stringified json object.
+     * @param fallback An object whose keys will be used as fallback if the first parameter does not have any of the requested key(s). It should have `lat`, `lon`, `flag` as well.
      * 
-     * @param jsonStr _Stringified version_ of an object that has the following keys:
-     *   - `lat`: Latitude value.
-     *   - `lon`: Longitude value.
-     *   - `flag`: Country code.
+     * @param retNull Whether to return null if `geoStr` is `null`. Defaults to `true`.
      * 
      * @returns A `GeoLocation` object.
      */
-    export function geoFromString(jsonStr: string): GeoLocation;
+    export function parseGeo(geoStr?: object|string, fallback?: object, retNull?: boolean): GeoLocation;
 
     /**
      * Returns the checksum for the given stadium.
@@ -5273,6 +5310,11 @@ declare namespace MainReturnType {
      * This is a read-only property that always returns 0. It is only added for compatibility with renderers. (And it is only used in the initialization code of renderers.)
      */
     readonly currentPlayerId: int;
+
+    /**
+     * The current speed of the simulation.
+     */
+    readonly speed: number;
 
     /**
      * Changes the speed of the simulation. 
@@ -9670,7 +9712,7 @@ declare namespace MainReturnType {
       /** 
        * The error code that has been thrown. 
        * */
-      errorCode: ErrorCodes;
+      code: ErrorCodes;
 
       /** 
        * Parameters for the error. 
@@ -9704,9 +9746,9 @@ declare namespace MainReturnType {
     export namespace Core {
 
       /**
-       * Point class.
+       * The Point class that is used internally inside the game's physics engine.
        */
-      export class H {
+      export class Point {
 
         /**
          * The x coordinate of the point.
@@ -9720,9 +9762,9 @@ declare namespace MainReturnType {
       }
 
       /**
-       * TeamColors class.
+       * The class that defines the colors of a team.
        */
-      export class ka {
+      export class TeamColors {
 
         /**
          * The angle of stripes rendered inside a player.
@@ -9741,37 +9783,37 @@ declare namespace MainReturnType {
       }
 
       /**
-       * Team class
+       * The class that defines the properties of a team.
        */
-      export namespace p {
+      export namespace Team {
 
         /**
          * The static spectators team.
          */
-        const spec: p;
+        const spec: Team;
 
         /**
          * The static red team.
          */
-        const red: p;
+        const red: Team;
 
         /**
          * The static blue team.
          */
-        const blue: p;
+        const blue: Team;
 
         /**
          * A static array to get all teams using their ids. Its definition is `Team.byId = [Team.spec, Team.red, Team.blue]`.
          */
-        const byId: p[];
+        const byId: Team[];
       }
 
-      export interface p {
+      export interface Team {
 
         /**
          * The rival of current Team object.
          */
-        rival: p;
+        rival: Team;
 
         /**
          * The id of current Team object.
@@ -9792,27 +9834,6 @@ declare namespace MainReturnType {
          * Object that stores custom color values to render striped team colors.
          */
         colors: ka;
-      }
-
-      /**
-       * GeoLocation class
-       */
-      export class T {
-
-        /**
-         * Two-letter country code.
-         */
-        flag: string;
-
-        /**
-         * Longitude
-         */
-        lon: number;
-
-        /**
-         * Latitude
-         */
-        lat: number;
       }
     }
 

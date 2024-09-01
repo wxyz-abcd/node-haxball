@@ -219,6 +219,8 @@ module.exports = function(API){
     if (!that.room.stateExt.gameState.physicsState.discs[that.discId])
       return;
     function parseValue(str, float=true){
+      if (typeof str=="number")
+        return str;
       var v = float ? parseFloat(str.trim()) : parseInt(str.trim());
       if (isNaN(v))
         v = null;

@@ -190,6 +190,6 @@ module.exports = function(API){
   this.Expression = Expression;
   
   this.isInteger = function(value){
-    return isFinite(value) ? (value === Math.round(value)) : false;
+    return isFinite(value) && (value === Math.round(value));
   };
 };

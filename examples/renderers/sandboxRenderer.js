@@ -193,7 +193,7 @@ module.exports = function(API, params){
     value: false
   });
 
-  var thisRenderer = this, { H: Point, p: Team, ka: TeamColors } = Impl.Core, roomLibrariesMap = null;;
+  var thisRenderer = this, { Point, Team, TeamColors } = Impl.Core, roomLibrariesMap = null;;
   var selectedObj = null;
 
   // language-related stuff
@@ -987,7 +987,7 @@ module.exports = function(API, params){
         this.ctx.lineTo(pos2.x, pos2.y);
       }
       else{ // arc
-        var center = segment.center, deltaX = pos1.x-center.x, deltaY = pos1.y-center.y;
+        var center = segment.arcCenter, deltaX = pos1.x-center.x, deltaY = pos1.y-center.y;
         this.ctx.arc(center.x, center.y, Math.sqrt(deltaX*deltaX+deltaY*deltaY), Math.atan2(deltaY, deltaX), Math.atan2(pos2.y-center.y, pos2.x-center.x));
       }
       this.ctx.stroke();

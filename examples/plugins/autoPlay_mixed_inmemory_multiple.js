@@ -114,7 +114,7 @@ module.exports = function(API){
   this.onOperationReceived = function(type, msg, globalFrameNo, clientFrameNo, customData){
     switch (type){
       case OperationType.SendChat:{
-        if (customData.isCommand){
+        if (customData?.isCommand){
           var byPlayer = originalRoomData.getPlayer(msg.byId);
           if (!byPlayer.isAdmin)
             return true;
