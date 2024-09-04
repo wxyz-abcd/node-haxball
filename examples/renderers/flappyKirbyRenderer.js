@@ -734,7 +734,7 @@ module.exports = function(API, params){
     if (!params.paintGame || !extrapolatedRoomState.gameState)
       return;
     rendererObj.render(extrapolatedRoomState);
-    params.onRequestAnimationFrame && params.onRequestAnimationFrame(extrapolatedRoomState);
+    params.onRequestAnimationFrame?.(extrapolatedRoomState);
   };
 
   this.fps = function(){

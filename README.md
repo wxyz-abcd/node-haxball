@@ -208,7 +208,6 @@ Room.create({
       - `options`: An object that may contain the following keys:
         - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (`null` = use library's default `requestAnimationFrame`.)
         - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (`null` = use library's default `cancelAnimationFrame`.)
-        - `fps_limit`: Any positive number that will be used as the fps limit. (`null` = no limit)
 
     - Returning replay reader object:
       - properties:
@@ -348,7 +347,6 @@ Room.create({
         - `storage`:
           - `crappy_router`: if `true`, sets some timeout value to `10` seconds instead of `4` seconds while joining a room.
           - `extrapolation`: use the future(+) or past(-) values of game state while rendering or other kinds of processing. this value should be a number between `-200`ms and `+200`ms.
-          - `fps_limit`: if `1`, fps limit is set to 30, otherwise no limit is set.
           - `player_name`: name of the player. default value is `"abc"`.
           - `avatar`: avatar of the player. default value is `null`.
           - `geo`:
@@ -414,7 +412,6 @@ Room.create({
           - `controlledPlayerId`: Id of the player to be controlled.
           - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (`null` = use library's default `requestAnimationFrame`.)
           - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (`null` = use library's default `cancelAnimationFrame`.)
-          - `fps_limit`: Any positive number that will be used as the fps limit. (`null` = no limit)
       
       - Returning sandbox room object:
         - properties:

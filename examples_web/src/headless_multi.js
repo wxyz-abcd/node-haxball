@@ -58,7 +58,6 @@ function Bot(id, pass, name, avatar, lat, lon, flag, autoPlay){
         player_name: name,
         player_auth_key: playerAuthKey,
         avatar: avatar,
-        fps_limit: 0,
         geo: {
           lat: lat,
           lon: lon,

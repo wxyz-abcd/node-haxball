@@ -881,7 +881,7 @@ module.exports = function(API){
   };
 
   function onOperationReceivedCommon(type){
-    if (blockChanges && (type==OperationType.SetTimeLimit || type==OperationType.SetScoreLimit || type==OperationType.SetStadium))
+    if (blockChanges && (type==OperationType.SetGamePlayLimit || type==OperationType.SetStadium))
       return false;
     if (type==OperationType.AutoTeams){
       var p0 = that.room.players.filter((x)=>(x.team.id==0));

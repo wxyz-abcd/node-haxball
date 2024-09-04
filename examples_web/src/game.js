@@ -161,8 +161,8 @@ function analyzeChatCommand(msg){
     return false;
   if (msg.length==1)
     return true;
-  var {D, J, K, q} = API.Impl.Utils;
-  msg = J.Gs(D.substr(msg, 1, null)).split(" ");
+  var {K, q} = API.Impl.Utils;
+  msg = msg.substring(1).split(" ");
   switch (msg[0]) {
     case "avatar":
       if (msg.length==2){

@@ -100,14 +100,9 @@ module.exports = function(API){
           return false;
         }
         break;
-      case OperationType.SetScoreLimit:
-        if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.SetScoreLimit)){
-          that.room.librariesMap.commands?.announcePermissionDenied(byId);
-          return false;
-        }
-        break;
-      case OperationType.SetTimeLimit:
-        if (byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.SetTimeLimit)){
+      case OperationType.SetGamePlayLimit:
+        if ((msg.type==0 && byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.SetScoreLimit)) ||
+            (msg.type==1 && byId!=0 && !permissionCtx?.checkPlayerPermission(byId, permissionIds.SetTimeLimit))){
           that.room.librariesMap.commands?.announcePermissionDenied(byId);
           return false;
         }

@@ -15,43 +15,46 @@ declare namespace MainReturnType {
   export enum OperationType {
     
     /**
-     * The operation to set your own avatar.
+     * The operation to send announcement text. This requires 
+     * the sender to be the host of the current room.
      */
-    SetAvatar = 0,
-    
-    /**
-     * The operation to set a player's headless avatar. This 
-     * requires the sender to be the host of the current room.
-     */
-    SetHeadlessAvatar = 1,
-    
-    /**
-     * The operation to send chat text.
-     */
-    SendChat = 2,
+    SendAnnouncement = 0,
     
     /**
      * The operation to set a player's chat indicator status.
      */
-    SendChatIndicator = 3,
+    SendChatIndicator = 1,
     
     /**
-     * The operation to send announcement text. This requires 
-     * the sender to be the host of the current room.
+     * The operation to check whether the client is in sync 
+     * with the host. This requires the sender to be a client 
+     * of the current room.
      */
-    SendAnnouncement = 4,
+    CheckConsistency = 2,
     
     /**
      * The operation to set your own input. (key state)
      */
-    SendInput = 5,
+    SendInput = 3,
     
     /**
-     * The operation to set the room's current stadium. This
-     * requires the sender to be an admin in the current room.
-     * Also, the game must not be active.
+     * The operation to send chat text.
      */
-    SetStadium = 6,
+    SendChat = 4,
+    
+    /**
+     * The operation to add a player to the current room. This 
+     * requires the sender to be the host of the current room.
+     */
+    JoinRoom = 5,
+    
+    /**
+     * The operation to leave the room, or kick/ban a player. 
+     * (This is decided by the `reason` property being `null`.)
+     * The kick/ban operation requires the sender to be an admin 
+     * in the current room. 
+     */
+    KickBanPlayer = 6,
     
     /**
      * The operation to start the game. This requires the sender 
@@ -75,32 +78,18 @@ declare namespace MainReturnType {
     PauseResumeGame = 9,
     
     /**
-     * The operation to set the score limit of the room. This
+     * The operation to set the score/time limit of the room. 
+     * This requires the sender to be an admin in the current 
+     * room. Also, the game must not be active.
+     */
+    SetGamePlayLimit = 10, // SetScoreLimit + SetTimeLimit
+    
+    /**
+     * The operation to set the room's current stadium. This
      * requires the sender to be an admin in the current room.
      * Also, the game must not be active.
      */
-    SetScoreLimit = 10,
-    
-    /**
-     * The operation to set the time limit of the room. This
-     * requires the sender to be an admin in the current room.
-     * Also, the game must not be active.
-     */
-    SetTimeLimit = 11,
-    
-    /**
-     * The operation to automatically move one player from the 
-     * spectators team to the red team, and one player to the 
-     * blue team. This requires the sender to be an admin in the 
-     * current room.
-     */
-    AutoTeams = 12,
-    
-    /**
-     * The operation to lock/unlock the room's teams. This
-     * requires the sender to be an admin in the current room.
-     */
-    SetTeamsLock = 13,
+    SetStadium = 11,
     
     /**
      * The operation to move a player to a team. This requires
@@ -109,71 +98,75 @@ declare namespace MainReturnType {
      * players are also allowed to use this event only to 
      * change their own teams.
      */
-    SetPlayerTeam = 14,
+    SetPlayerTeam = 12,
     
     /**
-     * The operation to set the room's current stadium. This
+     * The operation to lock/unlock the room's teams. This
      * requires the sender to be an admin in the current room.
      */
-    SetKickRateLimit = 15,
-    
-    /**
-     * The operation to set a team's colors. This requires the
-     * sender to be an admin in the current room.
-     */
-    SetTeamColors = 16,
+    SetTeamsLock = 13,
     
     /**
      * The operation to grant/take away a player's admin rights. 
      * This requires the sender to be an admin in the current room.
      */
-    SetPlayerAdmin = 17,
+    SetPlayerAdmin = 14,
     
     /**
-     * The operation to leave the room, or kick/ban a player. 
-     * (This is decided by the `reason` property being `null`.)
-     * The kick/ban operation requires the sender to be an admin 
-     * in the current room. 
+     * The operation to automatically move one player from the 
+     * spectators team to the red team, and one player to the 
+     * blue team. This requires the sender to be an admin in the 
+     * current room.
      */
-    KickBanPlayer = 18,
+    AutoTeams = 15,
     
     /**
      * The operation to set your own synchronization status.
      */
-    SetPlayerSync = 19,
+    SetPlayerSync = 16,
     
     /**
      * The operation to inform players of the ping values of 
      * each player. This requires the sender to be the host 
      * of the current room.
      */
-    Ping = 20,
+    Ping = 17,
+
+    /**
+     * The operation to set your own avatar.
+     */
+    SetAvatar = 18,
     
     /**
-     * The operation to set a disc's properties. This requires 
-     * the sender to be the host of the current room.
+     * The operation to set a team's colors. This requires the
+     * sender to be an admin in the current room.
      */
-    SetDiscProperties = 21,
-    
-    /**
-     * The operation to add a player to the current room. This 
-     * requires the sender to be the host of the current room.
-     */
-    JoinRoom = 22,
+    SetTeamColors = 19,
     
     /**
      * The operation to change the ordering of the players 
      * in the room. This requires the sender to be the host 
      * of the current room.
      */
-    ReorderPlayers = 23,
+    ReorderPlayers = 20,
     
     /**
-     * The operation to check whether the client is in sync 
-     * with the host. This requires the sender to be a client 
-     * of the current room.
+     * The operation to set the room's current stadium. This
+     * requires the sender to be an admin in the current room.
      */
-    CheckConsistency = 24,
+    SetKickRateLimit = 21,
+    
+    /**
+     * The operation to set a player's headless avatar. This 
+     * requires the sender to be the host of the current room.
+     */
+    SetHeadlessAvatar = 22,
+    
+    /**
+     * The operation to set a disc's properties. This requires 
+     * the sender to be the host of the current room.
+     */
+    SetDiscProperties = 23,
     
     /**
      * The operation to trigger a custom event. This requires 
@@ -183,7 +176,7 @@ declare namespace MainReturnType {
      * custom event includes important changes such as 
      * stadium objects, names, etc.
      */
-    CustomEvent = 25,
+    CustomEvent = 24,
 
     /**
      * The operation to trigger a binary custom event. This 
@@ -193,14 +186,14 @@ declare namespace MainReturnType {
      * if the custom event includes important changes such as 
      * stadium objects, names, etc.
      */
-    BinaryCustomEvent = 26,
+    BinaryCustomEvent = 25,
 
     /**
      * The operation to set a player's backend identity. This 
      * requires the receiver to use this API, otherwise the 
      * operation will not be sent to that client.
      */
-    SetPlayerIdentity = 27
+    SetPlayerIdentity = 26
   }
 
   /**
@@ -5287,11 +5280,6 @@ declare namespace MainReturnType {
      * Override function for `cancelAnimationFrame`. Omit to use library's default `cancelAnimationFrame`.
      */
     cancelAnimationFrame?: CAF;
-
-    /**
-     * Any positive number that will be used as the fps limit. (Omitting means no limit)
-     */
-    fps_limit?: int;
   }
 
   declare interface SandboxRoomBase {
@@ -8619,7 +8607,6 @@ declare namespace MainReturnType {
      *   - `controlledPlayerId: int | null`: Id of the player to be controlled.
      *   - `requestAnimationFrame: ((callback: function, ...args: any[])=>number) | null`: Override function for `requestAnimationFrame`. Omit to use library's default `requestAnimationFrame`.
      *   - `cancelAnimationFrame: ((handle: number)=>void) | null`: Override function for `cancelAnimationFrame`. Omit to use library's default `cancelAnimationFrame`.
-     *   - `fps_limit: int | null`: Any positive number that will be used as the fps limit. (`null` = no limit)
      * 
      * @returns An instance of the SandboxRoom structure.
      */
@@ -8633,7 +8620,6 @@ declare namespace MainReturnType {
      * @param options An object that might have the following keys:
      *   - `requestAnimationFrame: ((callback: function, ...args: any[])=>number) | null`: Override function for `requestAnimationFrame`. Omit to use library's default `requestAnimationFrame`.
      *   - `cancelAnimationFrame: ((handle: number)=>void) | null`: Override function for `cancelAnimationFrame`. Omit to use library's default `cancelAnimationFrame`.
-     *   - `fps_limit: int | null`: Any positive number that will be used as the fps limit. (`null` = no limit)
      * 
      * @returns An instance of the StreamWatcherRoom structure.
      */
@@ -9130,11 +9116,6 @@ declare namespace MainReturnType {
      * Override function for `cancelAnimationFrame`. (`null` = use library's default `cancelAnimationFrame`.)
      */
     cancelAnimationFrame?: CAF;
-    
-    /**
-     * Any positive number that will be used as the fps limit. (`null` = no limit)
-     */
-    fps_limit?: number;
   }
 
   /**
@@ -9153,7 +9134,6 @@ declare namespace MainReturnType {
      * @param options An object that may contain the following keys:
      *   - `requestAnimationFrame`: Override function for `requestAnimationFrame`. (`null` = use library's default `requestAnimationFrame`.)
      *   - `cancelAnimationFrame`: Override function for `cancelAnimationFrame`. (`null` = use library's default `cancelAnimationFrame`.)
-     *   - `fps_limit`: Any positive number that will be used as the fps limit. (`null` = no limit)
      * 
      * @returns An instance of the `ReplayReader` structure.
      */

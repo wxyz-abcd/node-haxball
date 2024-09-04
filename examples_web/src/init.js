@@ -60,7 +60,6 @@ function init(headless, roomCallback){
             crappy_router: false,
             player_name: params.p_name,
             avatar: params.p_avatar,
-            fps_limit: 0,
             geo: {
               lat: params.p_lat,
               lon: params.p_lon,
@@ -110,7 +109,7 @@ function init(headless, roomCallback){
               player_name: params.p_name,
               player_auth_key: params.p_ak,
               avatar: params.p_avatar,
-              fps_limit: 0,
+              //fps_limit: 0,
               geo: {
                 lat: params.p_lat,
                 lon: params.p_lon,
