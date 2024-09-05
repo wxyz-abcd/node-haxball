@@ -471,7 +471,7 @@ window.onload = ()=>{
     roomState = room.state;
     keyHandler = new GameKeysHandler();
     sound = new Sound();
-    var {p: Team} = API.Impl.Core;
+    var { Team } = API.Impl.Core;
     document.addEventListener("keydown", window.onKeyDown);
     document.addEventListener("keyup", window.onKeyUp);
     document.addEventListener("focusout", keyHandler.reset);
@@ -627,7 +627,8 @@ window.onload = ()=>{
         }
       };
       room.setRenderer(new renderers.defaultRenderer(API, rendererParams));
-      room.librariesMap.aimbot.active = !!_params.aimbot;
+      if (room.librariesMap.aimbot)
+        room.librariesMap.aimbot.active = !!_params.aimbot;
       updateGUI();
     }, (err)=>{
       console.log(err);

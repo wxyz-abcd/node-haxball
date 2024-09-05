@@ -4777,7 +4777,7 @@ function onload(){
 
   keyHandler = new GameKeysHandler();
   sound = new Sound();
-  var {p: Team} = API.Impl.Core;
+  var { Team } = API.Impl.Core;
   document.addEventListener("keydown", window.onKeyDown);
   document.addEventListener("keyup", window.onKeyUp);
   document.addEventListener("focusout", keyHandler.reset);

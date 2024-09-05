@@ -1,3 +1,4 @@
+const teamNames = ["Spectators", "Red Team", "Blue Team"];
 var API = null, room = null, roomState = null, Team = null;
 var eRoomView = document.getElementsByClassName("room-view").item(0);
 var eContainer = eRoomView.children.item(0);
@@ -140,7 +141,7 @@ function makeTeamContainer(elem, team){
   bDiv.className = "buttons";
   var b1 = document.createElement("button"), b2;
   b1.className = "button center join-btn";
-  b1.innerText = team.name;
+  b1.innerText = teamNames[team.id];
   b1.onclick = ()=>{
     room?.setPlayerTeam(room?.currentPlayerId, team.id);
   };
@@ -267,7 +268,7 @@ function make2Digits(a) {
 
 window.update = function(_API, _room, _roomState){
   if (API==null){ // if running for the first time
-    Team = _API.Impl.Core.p;
+    Team = _API.Impl.Core.Team;
     makeTeamContainer(eTeams.children.item(1), Team.red);
     makeTeamContainer(eTeams.children.item(2), Team.spec);
     makeTeamContainer(eTeams.children.item(3), Team.blue);

@@ -365,7 +365,7 @@ function onload(){
         },
         onGameEnd: (winningTeamId)=>{
           renderer.onGameEnd(winningTeamId);
-          receiveNotice(API.Impl.p.byId[winningTeamId].name+" team won the match");
+          receiveNotice(API.Impl.Team.byId[winningTeamId].name+" team won the match");
         },
         onGameStop: (byId)=>{
           var byPlayerObj = replayReader.state.getPlayer(byId);

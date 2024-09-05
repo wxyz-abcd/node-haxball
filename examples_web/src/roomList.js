@@ -67,7 +67,7 @@ window.onload = ()=>{
   e_name.oninput = debounce(onNameChange, 400);
   e_lat.oninput = debounce(onGeoLocationChange, 400);
   e_lon.oninput = debounce(onGeoLocationChange, 400);
-  Impl.Core.T.Fo().then((value)=>{ // Get GeoLocation from basro's REST api
+  Utils.getGeo().then((value)=>{ // Get GeoLocation from basro's REST api
     geo = value;
     e_lat.value = geo.lat;
     e_lon.value = geo.lon;

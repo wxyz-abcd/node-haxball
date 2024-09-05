@@ -235,7 +235,7 @@ window.onload = ()=>{
         }
       };
       var renderer = new renderers.defaultRenderer(API, rendererParams);
-      var {p: Team} = API.Impl.Core, {F: Reader} = API.Impl.Stream;
+      var { Team } = API.Impl.Core, {F: Reader} = API.Impl.Stream;
       function by(playerObj){
         return (null == playerObj ? "" : " by [" + playerObj.id + "]" + playerObj.name);
       }
