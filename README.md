@@ -346,7 +346,6 @@ Room.create({
         --- properties section ---
         - `storage`:
           - `crappy_router`: if `true`, sets some timeout value to `10` seconds instead of `4` seconds while joining a room.
-          - `extrapolation`: use the future(+) or past(-) values of game state while rendering or other kinds of processing. this value should be a number between `-200`ms and `+200`ms.
           - `player_name`: name of the player. default value is `"abc"`.
           - `avatar`: avatar of the player. default value is `null`.
           - `geo`:
@@ -500,7 +499,7 @@ Room.create({
     - `setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword, unlimitedPlayerCount, showInRoomList })`: sets the room's properties.
     - `setKickRateLimit(min, rate, burst)`: sets the room's kick rate limit.
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
-    - `setExtrapolation(extrapolation)`: sets the client's `extrapolation` value in msecs.
+    - `extrapolate(milliseconds)`: extrapolates the current room state for `milliseconds` milliseconds and stores the results in each object's `ext` key.
     - `clearBans()`: clears all bans. host-only.
     - `clearBan(id)`: clears the ban of a player(`id`). host-only.
     - `executeEvent(event, byId)`: executes any event inside this room. host-only.
@@ -783,9 +782,6 @@ Room.create({
       - `customData = onBeforePingChange(instantPing, averagePing, maxPing)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `onAfterPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
-      - `customData = onBeforeExtrapolationChange(value)`: extrapolation was set to (`value`). triggered individually.
-      - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
-      - `onAfterExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `customData = onBeforeHandicapChange(value)`: handicap was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onAfterHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
@@ -904,7 +900,6 @@ Room.create({
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
-      - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
@@ -978,7 +973,6 @@ Room.create({
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
-      - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
