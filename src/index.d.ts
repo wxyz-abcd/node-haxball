@@ -384,6 +384,32 @@ declare namespace MainReturnType {
   }
 
   /**
+   * These values help understand the type of addon object we are dealing with. One of these is assigned to the "addonType" property of every Addon constructor.
+   */
+  export enum AddonType {
+
+    /**
+     * The "RoomConfig" addon type
+     */
+    RoomConfig = 0,
+
+    /**
+     * The "Plugin" addon type
+     */
+    Plugin = 1,
+
+    /**
+     * The "Renderer" addon type
+     */
+    Renderer = 2,
+
+    /**
+     * The "Library" addon type
+     */
+    Library = 3
+  }
+
+  /**
    * These flags are used internally in Haxball's physics engine. They are designed to act like flags and be used in bitwise operations. Most types of stadium objects have collisionMask and collisionGroup properties that directly uses these flags to decide whether collision check should happen or not.
    * 
    * Let's say discA seemingly collided with discB. The physics engine will just skip the collision without doing any further calculation if the below condition is not satisfied:
@@ -9552,6 +9578,11 @@ declare namespace MainReturnType {
   export abstract class RoomConfig implements Addon, AllRoomConfigCallbacks {
 
     /**
+     * The type of this Addon class.
+     */
+    static readonly addonType: AddonType;
+
+    /**
      * Creates a new `RoomConfig` instance. 
      * 
      * @param metadata Any information that we would want to show/update inside a GUI application about this RoomConfig. This is not used by the API by default, but we can reprogram the RoomConfig's prototype to make use of this value if we want.
@@ -9566,6 +9597,11 @@ declare namespace MainReturnType {
    */
   export interface Plugin extends Addon, AllPluginCallbacks {}
   export abstract class Plugin implements Addon, AllPluginCallbacks {
+
+    /**
+     * The type of this Addon class.
+     */
+    static readonly addonType: AddonType;
 
     /**
      * Creates a new `Plugin` instance. 
@@ -9586,6 +9622,11 @@ declare namespace MainReturnType {
   export abstract class Renderer implements Addon, AllRendererCallbacks {
 
     /**
+     * The type of this Addon class.
+     */
+    static readonly addonType: AddonType;
+
+    /**
      * Creates a new `Renderer` instance. 
      * 
      * @param metadata Any information that we would want to show/update inside a GUI application about this Renderer. This is not used by the API by default, but we can reprogram the Renderer's prototype to make use of this value if we want.
@@ -9600,6 +9641,11 @@ declare namespace MainReturnType {
    */
   export interface Library extends Addon {}
   export abstract class Library implements Addon {
+
+    /**
+     * The type of this Addon class.
+     */
+    static readonly addonType: AddonType;
 
     /**
      * Creates a new `Library` instance. 
