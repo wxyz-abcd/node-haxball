@@ -651,25 +651,6 @@ module.exports = ({ Room, Utils, Impl }, roomToken, noPlayer, {log, colors: {yel
     }, 1000);
   });
 
-  var setExtrapolation = (room, value, expectedFunc) => new Promise((resolve, reject)=>{
-    var ret = [];
-    room.onExtrapolationChange = (val)=>{
-      ret[0]=val==value;
-      room.onExtrapolationChange = null;
-    };
-    room.other.onExtrapolationChange = (val)=>{
-      ret[1]=val==value;
-      room.other.onExtrapolationChange = null;
-    };
-    room.setExtrapolation(value);
-    setTimeout(()=>{
-      room.onExtrapolationChange = null;
-      room.other.onExtrapolationChange = null;
-      room.setExtrapolation(0);
-      expectedFunc(ret) ? resolve() : reject();
-    }, 1000);
-  });
-
   var setKickRateLimit = (room, min, rate, burst, expectedFunc) => new Promise((resolve, reject)=>{
     var ret = [{}, {}];
     room.onKickRateLimitChange = (_min, _rate, _burst)=>{
@@ -1182,9 +1163,6 @@ module.exports = ({ Room, Utils, Impl }, roomToken, noPlayer, {log, colors: {yel
   }, {
     name: "setHandicap",
     promise: ()=>setHandicap(jRoom, 100, (ret)=>(ret[0] && !ret[1]))
-  }, {
-    name: "setExtrapolation",
-    promise: ()=>setExtrapolation(jRoom, 100, (ret)=>(ret[0] && !ret[1]))
   }, {
     name: "byHost_reorderPlayers",
     promise: ()=>reorderPlayers(cRoom, [jRoom.currentPlayerId, cRoom.currentPlayerId], true, (ret)=>(ret[0] && ret[1]))

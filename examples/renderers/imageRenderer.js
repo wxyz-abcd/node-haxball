@@ -10,6 +10,18 @@ module.exports = function(API, params){
   });
 
   // parameters are exported so that they can be edited outside this class.
+  this.defineVariable({
+    name: "extrapolation",
+    description: "The desired extrapolation value in milliseconds", 
+    type: VariableType.Integer,
+    value: 0,
+    range: {
+      min: -1000,
+      max: 10000,
+      step: 5
+    }
+  });
+
   this.defineVariable({ // team_colors
     name: "showTeamColors",
     description: "Show team colors?", 
@@ -167,6 +179,9 @@ module.exports = function(API, params){
   });
 
   var thisRenderer = this, { Point, Team, TeamColors } = Impl.Core, roomLibrariesMap = null, imagesUpdated;
+  var defaultTeamColors = [ new TeamColors(), new TeamColors(), new TeamColors() ];
+  defaultTeamColors[1].inner.push(15035990);
+  defaultTeamColors[2].inner.push(5671397);
 
   // language-related stuff
 
@@ -370,7 +385,7 @@ module.exports = function(API, params){
     },
     update: function(playerObj, roomState){ // C
       if (playerObj.disc) {
-        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.teamColors[playerObj.team.id] : playerObj.team.colors; // "team_colors"
+        var teamColors = thisRenderer.showTeamColors/*localStorageObj.xm.L()*/ ? roomState.teamColors[playerObj.team.id] : defaultTeamColors[playerObj.team.id]; // "team_colors"
         var avatarText = (playerObj.headlessAvatar!=null) ? playerObj.headlessAvatar : playerObj.avatar;
         var showAvatar = thisRenderer.showAvatars/*localStorageObj.lm.L()*/ && (avatarText!=null); // "show_avatars"
         if (imagesUpdated || !/*PlayerDecorator.*/compareTeamColors(this.teamColors, teamColors) || (!showAvatar && (playerObj.avatarNumber!=this.avatarNumber)) || (showAvatar && (this.avatarText!=avatarText))){
@@ -919,7 +934,8 @@ module.exports = function(API, params){
     imgs = null;
   };
 
-  this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
+  this.render = function(){ // render logic here. called inside requestAnimationFrame callback
+    var extrapolatedRoomState = thisRenderer.room.extrapolate(thisRenderer.extrapolation);
     if (!params.paintGame || !extrapolatedRoomState.gameState)
       return;
     rendererObj.render(extrapolatedRoomState);

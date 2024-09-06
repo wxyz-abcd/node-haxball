@@ -2911,16 +2911,6 @@ declare namespace MainReturnType {
   declare interface LocalCallbacks {
 
     /**
-     * Called just after the local extrapolation value has been changed.
-     * 
-     * @param value The new extrapolation value in milliseconds. Range: `-200 <= value <= 200`.
-     * @param customData the custom data that was returned from the previous callback.
-     * 
-     * @returns void or a custom data to pass to the next callback.
-     */
-    onExtrapolationChange?: (value: int, customData?: object)=>object|undefined,
-
-    /**
      * Called just after the local ping handicap value has been changed.
      * 
      * @param value The new ping handicap value in milliseconds. Range: `0 <= value <= 300`.
@@ -3885,25 +3875,6 @@ declare namespace MainReturnType {
   }
 
   declare interface LocalRoomConfigCallbacks {
-
-    /**
-     * Called just after the local extrapolation value has been changed.
-     * 
-     * @param value The new extrapolation value in milliseconds. Range: `-200 <= value <= 200`.
-     * 
-     * @returns void or a custom data to pass to the next callback.
-     */
-    onBeforeExtrapolationChange?: (value: int)=>object|undefined,
-
-    /**
-     * Called just after the local extrapolation value has been changed.
-     * 
-     * @param value The new extrapolation value in milliseconds. Range: `-200 <= value <= 200`.
-     * @param customData the custom data that was returned from the previous callback.
-     * 
-     * @returns void.
-     */
-    onAfterExtrapolationChange?: (value: int, customData?: object)=>void,
 
     /**
      * Called just after the local ping handicap value has been changed.
@@ -5329,6 +5300,17 @@ declare namespace MainReturnType {
      * The current speed of the simulation.
      */
     readonly speed: number;
+
+    /**
+     * Extrapolates the current room state and sets the `ext` variables inside
+     * original objects to their newly calculated extrapolated states. Normally
+     * designed to be used in renderers.
+     * 
+     * @param milliseconds The time to extrapolate the state for in milliseconds.
+     * 
+     * @returns void.
+     */
+    extrapolate(milliseconds): void;
 
     /**
      * Changes the speed of the simulation. 
@@ -8000,15 +7982,6 @@ declare namespace MainReturnType {
     setHandicap(handicap: int): void;
 
     /**
-     * Sets the current player's `extrapolation` value.
-     * 
-     * @param extrapolation The desired extrapolation value in msecs. -`200` <= `extrapolation` <= `200`.
-     * 
-     * @returns void.
-     */
-    setExtrapolation(extrapolation: int): void;
-
-    /**
      * Bans a player from joining the room. host-only.
      * 
      * @param playerId Id of the player to ban.
@@ -8530,6 +8503,17 @@ declare namespace MainReturnType {
     isRecording(): boolean;
 
     /**
+     * Extrapolates the current room state and sets the `ext` variables inside
+     * original objects to their newly calculated extrapolated states. Normally
+     * designed to be used in renderers.
+     * 
+     * @param milliseconds The time to extrapolate the state for in milliseconds.
+     * 
+     * @returns void.
+     */
+    extrapolate(milliseconds): void;
+
+    /**
      * Sets the `RoomConfig` object that contains all the main callbacks of this room.
      * 
      * @param roomConfig The new `RoomConfig` instance to be replaced with the room's current one.
@@ -9044,6 +9028,17 @@ declare namespace MainReturnType {
      * This is a read-only property that always returns -1. It is only added for compatibility with renderers. (And it is only used in the initialization code of renderers.)
      */
     readonly currentPlayerId: int;
+
+    /**
+     * Extrapolates the current room state and sets the `ext` variables inside
+     * original objects to their newly calculated extrapolated states. Normally
+     * designed to be used in renderers.
+     * 
+     * @param milliseconds The time to extrapolate the state for in milliseconds.
+     * 
+     * @returns void.
+     */
+    declare extrapolate: (milliseconds)=>void;
 
     /**
      * Returns the current speed coefficient of this replay reader object.
