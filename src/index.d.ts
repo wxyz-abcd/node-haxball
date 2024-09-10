@@ -1256,12 +1256,12 @@ declare namespace MainReturnType {
   };
 
   /**
-   * The event message structure that is created when the team colors are changed.
+   * The event message structure that is created when the team colors are being changed.
    */
   declare class SetTeamColorsEvent extends HaxballEvent {
 
     /**
-     * The team which has colors are changed.
+     * The team whose colors are being changed.
      */
     public team: Team;
 
@@ -2633,13 +2633,13 @@ declare namespace MainReturnType {
     dist: number;
   };
 
-  declare type updatedRoomProps = {
-    name: string | null,
-    password: string | null,
-    fakePassword: boolean | null,
-    geo: GeoLocation | null,
-    playerCount: int | null,
-    maxPlayerCount: int | null
+  declare type UpdatedRoomProps = {
+    name?: string | null,
+    password?: string | null,
+    fakePassword?: boolean | null,
+    geo?: GeoLocation | null,
+    playerCount?: int | null,
+    maxPlayerCount?: int | null
   }
 
   /**
@@ -2791,7 +2791,7 @@ declare namespace MainReturnType {
 
     * @returns void or a custom data to pass to the next callback.
     */
-    onRoomPropertiesChange?: (props: updatedRoomProps, customData?: any)=>any
+    onRoomPropertiesChange?: (props: UpdatedRoomProps, customData?: any)=>any
   }
 
   /**
@@ -3635,7 +3635,7 @@ declare namespace MainReturnType {
     *
     * @returns void or a custom data to pass to the next callback.
     */
-    onBeforeRoomPropertiesChange?: (props: updatedRoomProps)=>any,
+    onBeforeRoomPropertiesChange?: (props: UpdatedRoomProps)=>any,
     
     /**
      * Called just after the room's properties have been changed.
@@ -3656,7 +3656,7 @@ declare namespace MainReturnType {
       *
       * @returns void.
       */
-    onAfterRoomPropertiesChange?: (props: updatedRoomProps, customData?: any)=>void
+    onAfterRoomPropertiesChange?: (props: UpdatedRoomProps, customData?: any)=>void
   }
 
   declare interface ClientTriggeredRoomConfigCallbacks {
