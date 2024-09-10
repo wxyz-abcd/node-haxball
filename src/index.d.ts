@@ -2103,12 +2103,12 @@ declare namespace MainReturnType {
     bgKickOffRadius: number;
 
     /**
-     * The radius of the corners' for the background of this Stadium.
+     * The radius of the corners for the background of this Stadium.
      */
     bgCornerRadius: number;
 
     /**
-     * The spawn distance of players' for this Stadium.
+     * The spawn distance of players for this Stadium.
      */
     spawnDistance: number;
 
