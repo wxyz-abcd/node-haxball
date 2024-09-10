@@ -235,7 +235,7 @@ declare namespace MainReturnType {
 
     /**
      * The color type. This is in fact currently an integer in 
-     * the range [-1, 16777216]. Specialized only to be edited 
+     * the range [-1, 16777216). Specialized only to be edited 
      * with a color picker component inside a GUI environment.
      */
     Color = 5,
@@ -292,8 +292,8 @@ declare namespace MainReturnType {
 
     /**
      * The kickOffReset type. Currently, the only accepted values for 
-     * this type is `true` and `false` where `true` means "full" kick off 
-     * reset and `1` means "partial" kick off reset. Specialized to be edited 
+     * this type is `true` and `false` where `true` means "full" kickoff 
+     * reset and `1` means "partial" kickoff reset. Specialized to be edited 
      * with a camera follow selector component inside a GUI environment.
      */
     KickOffReset = 12,
@@ -436,12 +436,12 @@ declare namespace MainReturnType {
     blue = 2,
 
     /**
-     * If defined, the object will accept collisions with other "red"s only until the kick off event happens. 
+     * If defined, the object will accept collisions with other "red"s only until the kickoff event happens. 
      */
     redKO = 3,
 
     /**
-     * If defined, the object will accept collisions with other "blue"s only until the kick off event happens. 
+     * If defined, the object will accept collisions with other "blue"s only until the kickoff event happens. 
      */
     blueKO = 4,
 
@@ -944,13 +944,13 @@ declare namespace MainReturnType {
 
     /**
      * This is the state of the game when the game has started, 
-     * but kick off has not happened yet.
+     * but kickoff has not happened yet.
      */
     BeforeKickOff = 0,
 
     /**
      * This is the state of the game when the game is active and 
-     * kick off has already happened.
+     * kickoff has already happened.
      */
     Playing = 1,
 
@@ -1256,12 +1256,12 @@ declare namespace MainReturnType {
   };
 
   /**
-   * The event message structure that is created when the team colors are changed.
+   * The event message structure that is created when the team colors are being changed.
    */
   declare class SetTeamColorsEvent extends HaxballEvent {
 
     /**
-     * The team whose colors are changed.
+     * The team whose colors are being changed.
      */
     public team: Team;
 
@@ -1929,7 +1929,7 @@ declare namespace MainReturnType {
   declare type PlayerPhysics = {
 
     /**
-     * A value to determine how much each player is pushed back when he/she kicks the ball.
+     * A value to determine how much each player is pushed back when a player kicks the ball.
      */
     kickback: number;
 
@@ -2093,22 +2093,22 @@ declare namespace MainReturnType {
     bgWidth: number;
 
     /**
-     * The heightt for the background of this Stadium.
+     * The height for the background of this Stadium.
      */
     bgHeight: number;
 
     /**
-     * The kick off circle's radius for the background of this Stadium.
+     * The kickoff circle's radius for the background of this Stadium.
      */
     bgKickOffRadius: number;
 
     /**
-     * The radius of the corners for the background of this Stadium.
+     * The radius of the corners' for the background of this Stadium.
      */
     bgCornerRadius: number;
 
     /**
-     * The spawn distance of players for this Stadium.
+     * The spawn distance of players' for this Stadium.
      */
     spawnDistance: number;
 
@@ -2316,7 +2316,7 @@ declare namespace MainReturnType {
     kickRateMinTickCounter: int;
 
     /**
-     * Min tick counter for kick rate of this Player.
+     * Max tick counter for kick rate of this Player.
      */
     kickRateMaxTickCounter: int;
 
@@ -2367,7 +2367,7 @@ declare namespace MainReturnType {
     planes: Plane[];
 
     /**
-     * All moving discs of this World.
+     * All movable discs of this World.
      */
     discs: MovableDisc[];
 
@@ -2420,7 +2420,7 @@ declare namespace MainReturnType {
     redScore: int;
 
     /**
-     * The current state of the actual game-play.
+     * The current state of the actual gameplay.
      */
     state: GamePlayState;
 
@@ -2465,9 +2465,9 @@ declare namespace MainReturnType {
      * 
      * @param steps The number of game ticks to execute.
      * 
-     * @returns void.
+     * @returns {void}
      */
-    advance: (steps)=>void;
+    advance: (steps:int)=>void;
   };
 
   declare interface RoomStateBase {
@@ -2548,7 +2548,7 @@ declare namespace MainReturnType {
      * 
      * @returns The Player object, or `null` if the player is not found.
      */
-    getPlayer: (id)=>(Player | null);
+    getPlayer: (id:uint16)=>(Player | null);
 
     /**
      * Runs the simulation `count` steps. Use with extreme caution, especially on network rooms.
@@ -2606,7 +2606,7 @@ declare namespace MainReturnType {
     maxPlayers: number;
 
     /**
-     * Current number of players in this room.
+     * Current player count in this room.
      */
     players: number;
   };
@@ -2633,6 +2633,15 @@ declare namespace MainReturnType {
     dist: number;
   };
 
+  declare type UpdatedRoomProps = {
+    name?: string | null,
+    password?: string | null,
+    fakePassword?: boolean | null,
+    geo?: GeoLocation | null,
+    playerCount?: int | null,
+    maxPlayerCount?: int | null
+  }
+
   /**
    * These events can only be received by a host room.
    */
@@ -2644,16 +2653,16 @@ declare namespace MainReturnType {
      * @param {string} link The room link that was just received.
      * @param {any} customData the custom data that was returned from the previous callback.
      * 
-     * @returns void or a custom data to pass to the next callback.
+     * @returns {any} void or a custom data to pass to the next callback.
      */
-    onRoomLink?: (link: string, customData?: object)=>object|undefined;
+    onRoomLink?: (link: string, customData?: any)=>any;
 
     /**
      * Called just after all bans have been cleared using `room.clearBans()`.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBansClear?: (customData?: object)=>object|undefined;
+    onBansClear?: (customData?: any)=>any;
 
     /**
      * Called just after the ban of a player has been cleared using `room.clearBan(id)`.
@@ -2663,7 +2672,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBanClear?: (id: uint16, customData?: object)=>object|undefined;
+    onBanClear?: (id: uint16, customData?: any)=>any;
 
     /**
      * Called just after the room's recaptcha mode was changed using `room.requireRecaptcha = on`.
@@ -2673,7 +2682,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>object|undefined;
+    onRoomRecaptchaModeChange?: (on: boolean, customData?: any)=>any;
 
     /**
      * Called just a little after the room's token was changed using `room.token = value`.
@@ -2683,7 +2692,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onRoomTokenChange?: (token: string, customData?: object)=>object|undefined;
+    onRoomTokenChange?: (token: string, customData?: any)=>any;
   }
 
   /**
@@ -2713,7 +2722,7 @@ declare namespace MainReturnType {
      *
      * @returns void or a custom data to pass to the next callback.
      */
-    onAnnouncement?: (msg: string, color: int, style: int, sound: int, customData?: object)=>object|undefined,
+    onAnnouncement?: (msg: string, color: int, style: int, sound: int, customData?: any)=>any,
     
     /**
      * Called just after a player has changed his/her headless avatar.
@@ -2724,7 +2733,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerHeadlessAvatarChange?: (id: int, value: string, customData?: object)=>object|undefined,
+    onPlayerHeadlessAvatarChange?: (id: int, value: string, customData?: any)=>any,
 
     /**
      * Called just after the order of players have been changed.
@@ -2736,7 +2745,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayersOrderChange?: (idList: int[], moveToTop: boolean, customData?: object)=>object|undefined,
+    onPlayersOrderChange?: (idList: int[], moveToTop: boolean, customData?: any)=>any,
 
     /**
      * Called just after a disc's properties have been modified.
@@ -2751,7 +2760,7 @@ declare namespace MainReturnType {
     * 
     * @returns void or a custom data to pass to the next callback.
     */
-    onSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[], customData?: object)=>object|undefined,
+    onSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[], customData?: any)=>any,
 
     /**
      * Called just after the ping values for all players have been updated.
@@ -2761,7 +2770,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPingData?: (array: int[], customData?: object)=>object|undefined,
+    onPingData?: (array: int[], customData?: any)=>any,
 
     /**
      * Called just after the room's properties have been changed.
@@ -2782,7 +2791,7 @@ declare namespace MainReturnType {
 
     * @returns void or a custom data to pass to the next callback.
     */
-    onRoomPropertiesChange?: (props: object, customData?: object)=>object|undefined
+    onRoomPropertiesChange?: (props: UpdatedRoomProps, customData?: any)=>any
   }
 
   /**
@@ -2801,7 +2810,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPingChange?: (instantPing: number, averagePing: number, maxPing: number, customData?: object)=>object|undefined
+    onPingChange?: (instantPing: number, averagePing: number, maxPing: number, customData?: any)=>any
   }
 
   declare interface GameCallbacks {
@@ -2814,27 +2823,27 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerBallKick?: (playerId: uint16, customData?: object)=>object|undefined,
+    onPlayerBallKick?: (playerId: uint16, customData?: any)=>any,
 
     /**
      * Called just after a goal has been scored.
      * 
-     * @param teamId Id of the team who scored the goal.
+     * @param teamId Id of the team that scored the goal.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTeamGoal?: (teamId: int, customData?: object)=>object|undefined,
+    onTeamGoal?: (teamId: int, customData?: any)=>any,
 
     /**
      * Called just after the game has ended.
      * 
-     * @param winningTeamId Id of the team who won the game.
+     * @param winningTeamId Id of the team that won the game.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGameEnd?: (winningTeamId: int, customData?: object)=>object|undefined,
+    onGameEnd?: (winningTeamId: int, customData?: any)=>any,
 
     /**
      * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
@@ -2843,14 +2852,14 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGameTick?: (customData?: object)=>object|undefined,
+    onGameTick?: (customData?: any)=>any,
 
     /**
-     * Called just after a kick off event has occurred.
+     * Called just after a kickoff event has occurred.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onKickOff?: (customData?: object)=>object|undefined,
+    onKickOff?: (customData?: any)=>any,
 
     /**
      * Called just after the game has ended by timeout.
@@ -2859,7 +2868,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTimeIsUp?: (customData?: object)=>object|undefined,
+    onTimeIsUp?: (customData?: any)=>any,
 
     /**
      * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
@@ -2868,7 +2877,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPositionsReset?: (customData?: object)=>object|undefined,
+    onPositionsReset?: (customData?: any)=>any,
 
     /**
      * Called just after a collision has happened between two discs.
@@ -2881,7 +2890,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int, customData?: object)=>object|undefined,
+    onCollisionDiscVsDisc?: (discId1: int, discPlayerId1: int, discId2: int, discPlayerId2: int, customData?: any)=>any,
 
     /**
      * Called just after a collision has happened between a disc and a segment.
@@ -2893,7 +2902,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int, customData?: object)=>object|undefined,
+    onCollisionDiscVsSegment?: (discId: int, discPlayerId: int, segmentId: int, customData?: any)=>any,
 
     /**
      * Called just after a collision has happened between a disc and a plane.
@@ -2905,7 +2914,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int, customData?: object)=>object|undefined
+    onCollisionDiscVsPlane?: (discId: int, discPlayerId: int, planeId: int, customData?: any)=>any
   }
 
   declare interface LocalCallbacks {
@@ -2918,7 +2927,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onHandicapChange?: (value: int, customData?: object)=>object|undefined,
+    onHandicapChange?: (value: int, customData?: any)=>any,
 
     /**
      * Called just after room recording has been started or stopped.
@@ -2930,7 +2939,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onRoomRecordingChange?: (value: true | ArrayBuffer, customData?: object)=>object|undefined
+    onRoomRecordingChange?: (value: true | ArrayBuffer, customData?: any)=>any
   }
 
   declare interface APICallbacks {
@@ -2943,7 +2952,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPluginActiveChange?: (plugin: Plugin, customData?: object)=>object|undefined,
+    onPluginActiveChange?: (plugin: Plugin, customData?: any)=>any,
 
     /**
      * Called just after the room's config object has been replaced by a new one.
@@ -2954,7 +2963,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig, customData?: object)=>object|undefined,
+    onConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig, customData?: any)=>any,
 
     /**
      * Called just after the room's renderer object has been replaced by a new one.
@@ -2965,7 +2974,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer, customData?: object)=>object|undefined,
+    onRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer, customData?: any)=>any,
 
     /**
      * Called just after an old plugin object has been replaced by a new one.
@@ -2976,7 +2985,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin, customData?: object)=>object|undefined,
+    onPluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin, customData?: any)=>any,
 
     /**
      * Called just after an old library object has been replaced by a new one.
@@ -2987,7 +2996,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library, customData?: object)=>object|undefined,
+    onLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library, customData?: any)=>any,
 
     /**
      * Called just after the API's language has been changed.
@@ -2997,7 +3006,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onLanguageChange?: (abbr: string, customData?: object)=>object|undefined,
+    onLanguageChange?: (abbr: string, customData?: any)=>any,
 
     /**
      * Called just after the value of a variable has been changed.
@@ -3010,7 +3019,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any, customData?: object)=>object|undefined
+    onVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any, customData?: any)=>any
   }
 
   declare type IndividuallyTriggeredCallbacks = GameCallbacks & LocalCallbacks & APICallbacks;
@@ -3026,7 +3035,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerSyncChange?: (playerId: uint16, value: boolean, customData?: object)=>object|undefined,
+    onPlayerSyncChange?: (playerId: uint16, value: boolean, customData?: any)=>any,
 
     /**
      * Called just after an "auto" event has been triggered to automatically move at least one, at most two players from spectators to teams.
@@ -3040,7 +3049,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16, customData?: object)=>object|undefined,
+    onAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the score limit has been changed.
@@ -3051,7 +3060,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onScoreLimitChange?: (value: int, byId: uint16, customData?: object)=>object|undefined,
+    onScoreLimitChange?: (value: int, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the time limit has been changed.
@@ -3062,7 +3071,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTimeLimitChange?: (value: int, byId: uint16, customData?: object)=>object|undefined,
+    onTimeLimitChange?: (value: int, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after a player's admin rights have been given/taken.
@@ -3074,7 +3083,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16, customData?: object)=>object|undefined,
+    onPlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after a player has changed his/her avatar.
@@ -3085,7 +3094,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerAvatarChange?: (id: uint16, value: string, customData?: object)=>object|undefined,
+    onPlayerAvatarChange?: (id: uint16, value: string, customData?: any)=>any,
 
     /**
      * Called just after a player has been moved to a different team.
@@ -3097,7 +3106,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerTeamChange?: (id: uint16, teamId: int, byId: uint16, customData?: object)=>object|undefined,
+    onPlayerTeamChange?: (id: uint16, teamId: int, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the room's current stadium has been changed.
@@ -3108,7 +3117,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onStadiumChange?: (stadium: Stadium, byId: uint16, customData?: object)=>object|undefined,
+    onStadiumChange?: (stadium: Stadium, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the room's teams have been locked/unlocked.
@@ -3119,7 +3128,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTeamsLockChange?: (value: boolean, byId: uint16, customData?: object)=>object|undefined,
+    onTeamsLockChange?: (value: boolean, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after a player object has been created. This callback can be used to define custom properties inside all player objects.
@@ -3129,7 +3138,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerObjectCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+    onPlayerObjectCreated?: (playerObj: Player, customData?: any)=>any,
 
     /**
      * Called just after a disc object has been assigned to a player object.
@@ -3139,7 +3148,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerDiscCreated?: (playerObj: Player, customData?: object)=>object|undefined,
+    onPlayerDiscCreated?: (playerObj: Player, customData?: any)=>any,
 
     /**
      * Called just after a disc object has been removed from a player object.
@@ -3149,7 +3158,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>object|undefined,
+    onPlayerDiscDestroyed?: (playerObj: Player, customData?: any)=>any,
 
     /**
      * Called just after a player has joined the room.
@@ -3159,7 +3168,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerJoin?: (playerObj: Player, customData?: object)=>object|undefined,
+    onPlayerJoin?: (playerObj: Player, customData?: any)=>any,
 
     /**
      * Called just after the game has been paused or resumed.
@@ -3170,7 +3179,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGamePauseChange?: (isPaused: boolean, byId: uint16, customData?: object)=>object|undefined,
+    onGamePauseChange?: (isPaused: boolean, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after a chat message has been received.
@@ -3181,7 +3190,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerChat?: (id: uint16, message: string, customData?: object)=>object|undefined,
+    onPlayerChat?: (id: uint16, message: string, customData?: any)=>any,
 
     /**
      * Called just after a player's input has been changed.
@@ -3192,7 +3201,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerInputChange?: (id: uint16, value: int, customData?: object)=>object|undefined,
+    onPlayerInputChange?: (id: uint16, value: int, customData?: any)=>any,
 
     /**
      * Called just after a player has activated or deactivated his/her chat indicator. This happens when a player focuses/loses focus on the chat input component in the website.
@@ -3203,7 +3212,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerChatIndicatorChange?: (id: uint16, value: boolean, customData?: object)=>object|undefined,
+    onPlayerChatIndicatorChange?: (id: uint16, value: boolean, customData?: any)=>any,
 
     /**
      * Called just after a player has left the room.
@@ -3216,19 +3225,19 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16, customData?: object)=>object|undefined,
+    onPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after a team's colors have been changed.
      * 
-     * @param teamId The team whose colors have been changed.
+     * @param teamId The team that colors have been changed.
      * @param value The new team colors value.
      * @param byId Id of the player who has changed the team colors.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16, customData?: object)=>object|undefined,
+    onTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the room's kick rate limit has been changed.
@@ -3241,7 +3250,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16, customData?: object)=>object|undefined,
+    onKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the game has been started.
@@ -3251,7 +3260,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGameStart?: (byId: uint16, customData?: object)=>object|undefined,
+    onGameStart?: (byId: uint16, customData?: any)=>any,
 
     /**
      * Called just after the game has been stopped.
@@ -3261,7 +3270,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onGameStop?: (byId: uint16, customData?: object)=>object|undefined
+    onGameStop?: (byId: uint16, customData?: any)=>any
   }
 
   /**
@@ -3283,7 +3292,7 @@ declare namespace MainReturnType {
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
      */
-    modifyPlayerData?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: object)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerData?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: any)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -3294,7 +3303,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyPlayerPing?: (playerId: uint16, ping: int, customData?: object)=>number,
+    modifyPlayerPing?: (playerId: uint16, ping: int, customData?: any)=>number,
 
     /**
      * If defined, runs only for the current player in a client room and modifies its `ping` value.
@@ -3303,7 +3312,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyClientPing?: (ping: int, customData?: object)=>number,
+    modifyClientPing?: (ping: int, customData?: any)=>number,
 
     /**
      * If defined, expects us to return the physics engine's new current `frameNo` value, which tells the physics engine that it is currently on a different frame than expected, which causes your player to look laggy to your opponents, especially on extrapolated clients.
@@ -3312,7 +3321,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new frameNo value of the physics engine.
      */
-    modifyFrameNo?: (frameNo: int, customData?: object)=>int,
+    modifyFrameNo?: (frameNo: int, customData?: any)=>int,
 
     /**
      * If defined, runs for each message received from all clients in a host room, before they are processed and sent to all clients. This is the most important callback inside a host room; all permission logic should reside here. You are also allowed to freely modify the contents of all messages here.
@@ -3327,7 +3336,7 @@ declare namespace MainReturnType {
      *   - `false`: block message from being processed. 
      *   - `throw exception`: break the connection of the sender of this message.
      */
-    onOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int, customData?: object)=>boolean
+    onOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int, customData?: any)=>boolean
   }
 
   declare interface CustomCallbacks {
@@ -3342,7 +3351,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onCustomEvent?: (type: uint32, data: object, byId: uint16, customData?: object)=>object|undefined
+    onCustomEvent?: (type: uint32, data: object, byId: uint16, customData?: any)=>any
 
     /**
      * Called just after a binary custom event has been triggered.
@@ -3354,7 +3363,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: object)=>object|undefined
+    onBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: any)=>any
 
     /**
      * Called just after an identity event has been triggered.
@@ -3366,7 +3375,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: object)=>object|undefined
+    onIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: any)=>any
   }
 
   declare interface HostOnlyRoomConfigCallbacks {
@@ -3378,7 +3387,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeRoomLink?: (link: string)=>object|undefined,
+    onBeforeRoomLink?: (link: string)=>any,
 
     /**
      * The room link was received from Haxball's backend server. Called some time after a room is created successfully. Also called when your room stops sending signal to Haxball's backend server, and starts it again after some time. This can happen if your connection gets interrupted or the room somehow becomes unstable due to bugs.
@@ -3388,21 +3397,21 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterRoomLink?: (link: string, customData?: object)=>void,
+    onAfterRoomLink?: (link: string, customData?: any)=>void,
 
     /**
      * Called just after all bans have been cleared using `room.clearBans()`.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeBansClear?: ()=>object|undefined,
+    onBeforeBansClear?: ()=>any,
 
     /**
      * Called just after all bans have been cleared using `room.clearBans()`.
      * 
      * @returns void.
      */
-    onAfterBansClear?: (customData?: object)=>void,
+    onAfterBansClear?: (customData?: any)=>void,
 
     /**
      * Called just after the ban of a player has been cleared using `room.clearBan(id)`.
@@ -3411,7 +3420,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeBanClear?: (id: int)=>object|undefined;
+    onBeforeBanClear?: (id: int)=>any;
 
     /**
      * Called just after the ban of a player has been cleared using `room.clearBan(id)`.
@@ -3421,7 +3430,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterBanClear?: (id: int, customData?: object)=>void;
+    onAfterBanClear?: (id: int, customData?: any)=>void;
 
     /**
      * Called just after the room's recaptcha mode was changed using `room.requireRecaptcha = value`.
@@ -3430,7 +3439,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeRoomRecaptchaModeChange?: (on: boolean)=>object|undefined,
+    onBeforeRoomRecaptchaModeChange?: (on: boolean)=>any,
 
     /**
      * Called just after the room's recaptcha mode was changed using `room.requireRecaptcha = value`.
@@ -3440,7 +3449,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterRoomRecaptchaModeChange?: (on: boolean, customData?: object)=>void
+    onAfterRoomRecaptchaModeChange?: (on: boolean, customData?: any)=>void
 
     /**
      * Called just a little after the room's token was changed using `room.token = value`.
@@ -3449,7 +3458,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeRoomTokenChange?: (token: string)=>object|undefined;
+    onBeforeRoomTokenChange?: (token: string)=>any;
 
     /**
      * Called just a little after the room's token was changed using `room.token = value`.
@@ -3459,7 +3468,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterRoomTokenChange?: (token: string, customData?: object)=>void;
+    onAfterRoomTokenChange?: (token: string, customData?: any)=>void;
   }
 
   declare interface HostTriggeredRoomConfigCallbacks {
@@ -3486,7 +3495,7 @@ declare namespace MainReturnType {
 
     * @returns void or a custom data to pass to the next callback.
     */
-    onBeforeAnnouncement?: (msg: string, color: int, style: int, sound: int)=>object|undefined,
+    onBeforeAnnouncement?: (msg: string, color: int, style: int, sound: int)=>any,
 
     /**
      * Called just after an announcement was made by the room host.
@@ -3510,7 +3519,7 @@ declare namespace MainReturnType {
 
     * @returns void.
     */
-    onAfterAnnouncement?: (msg: string, color: int, style: int, sound: int, customData?: object)=>void,
+    onAfterAnnouncement?: (msg: string, color: int, style: int, sound: int, customData?: any)=>void,
     
     /**
      * Called just after a player has changed his/her headless avatar.
@@ -3521,7 +3530,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerHeadlessAvatarChange?: (id: int, value: string)=>object|undefined,
+    onBeforePlayerHeadlessAvatarChange?: (id: int, value: string)=>any,
     
     /**
      * Called just after a player has changed his/her headless avatar.
@@ -3532,7 +3541,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerHeadlessAvatarChange?: (id: int, value: string, customData?: object)=>void,
+    onAfterPlayerHeadlessAvatarChange?: (id: int, value: string, customData?: any)=>void,
 
     /**
      * Called just after the order of players have been changed.
@@ -3544,7 +3553,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayersOrderChange?: (idList: int[], moveToTop: boolean)=>object|undefined,
+    onBeforePlayersOrderChange?: (idList: int[], moveToTop: boolean)=>any,
 
     /**
      * Called just after the order of players have been changed.
@@ -3556,7 +3565,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayersOrderChange?: (idList: int[], moveToTop: boolean, customData?: object)=>void,
+    onAfterPlayersOrderChange?: (idList: int[], moveToTop: boolean, customData?: any)=>void,
 
     /**
      * Called just after a disc's properties have been modified.
@@ -3571,7 +3580,7 @@ declare namespace MainReturnType {
     * 
     * @returns void or a custom data to pass to the next callback.
     */
-    onBeforeSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[])=>object|undefined,
+    onBeforeSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[])=>any,
 
     /**
      * Called just after a disc's properties have been modified.
@@ -3586,7 +3595,7 @@ declare namespace MainReturnType {
     * 
     * @returns void.
     */
-    onAfterSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[], customData?: object)=>void,
+    onAfterSetDiscProperties?: (id: int, type: int, data1: number[], data2: int[], customData?: any)=>void,
 
     /**
      * Called just after the ping values for all players have been updated.
@@ -3596,7 +3605,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePingData?: (array: int[])=>object|undefined,
+    onBeforePingData?: (array: int[])=>any,
 
     /**
      * Called just after the ping values for all players have been updated.
@@ -3606,10 +3615,10 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPingData?: (array: int[], customData?: object)=>void,
+    onAfterPingData?: (array: int[], customData?: any)=>void,
 
     /**
-     * Called just after the room's properties have been changed.
+     * Called just after the room's properties have been changed, and just before any other callback has been called.
      * 
      * @param props The properties that were changed. The current structure of this object is as follows: 
       ```ts
@@ -3623,11 +3632,10 @@ declare namespace MainReturnType {
       }
       ```
       Note that only the changed keys will show up in `props`.
-    * @param customData the custom data that was returned from the previous callback.
     *
     * @returns void or a custom data to pass to the next callback.
     */
-    onBeforeRoomPropertiesChange?: (props: object)=>object|undefined,
+    onBeforeRoomPropertiesChange?: (props: UpdatedRoomProps)=>any,
     
     /**
      * Called just after the room's properties have been changed.
@@ -3648,7 +3656,7 @@ declare namespace MainReturnType {
       *
       * @returns void.
       */
-    onAfterRoomPropertiesChange?: (props: object, customData?: object)=>void
+    onAfterRoomPropertiesChange?: (props: UpdatedRoomProps, customData?: any)=>void
   }
 
   declare interface ClientTriggeredRoomConfigCallbacks {
@@ -3663,7 +3671,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePingChange?: (instantPing: number, averagePing: number, maxPing: number)=>object|undefined
+    onBeforePingChange?: (instantPing: number, averagePing: number, maxPing: number)=>any
     
     /**
      * 
@@ -3676,7 +3684,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPingChange?: (instantPing: number, averagePing: number, maxPing: number, customData?: object)=>void
+    onAfterPingChange?: (instantPing: number, averagePing: number, maxPing: number, customData?: any)=>void
   }
 
   declare interface GameRoomConfigCallbacks {
@@ -3688,7 +3696,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerBallKick?: (playerId: uint16)=>object|undefined,
+    onBeforePlayerBallKick?: (playerId: uint16)=>any,
 
     /**
      * Called just after the ball has been kicked.
@@ -3698,52 +3706,52 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerBallKick?: (playerId: uint16, customData?: object)=>void,
+    onAfterPlayerBallKick?: (playerId: uint16, customData?: any)=>void,
 
     /**
      * Called just after a goal has been scored.
      * 
-     * @param teamId Id of the team who scored the goal.
+     * @param teamId Id of the team that scored the goal.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTeamGoal?: (teamId: int)=>object|undefined,
+    onBeforeTeamGoal?: (teamId: int)=>any,
 
     /**
      * Called just after a goal has been scored.
      * 
-     * @param teamId Id of the team who scored the goal.
+     * @param teamId Id of the team that scored the goal.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void.
      */
-    onAfterTeamGoal?: (teamId: int, customData?: object)=>void,
+    onAfterTeamGoal?: (teamId: int, customData?: any)=>void,
 
     /**
      * Called just after the game has ended.
      * 
-     * @param winningTeamId Id of the team who won the game.
+     * @param winningTeamId Id of the team which has won the game.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameEnd?: (winningTeamId: int)=>object|undefined,
+    onBeforeGameEnd?: (winningTeamId: int)=>any,
 
     /**
      * Called just after the game has ended.
      * 
-     * @param winningTeamId Id of the team who won the game.
+     * @param winningTeamId Id of the team which has won the game.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void.
      */
-    onAfterGameEnd?: (winningTeamId: int, customData?: object)=>void,
+    onAfterGameEnd?: (winningTeamId: int, customData?: any)=>void,
 
     /**
      * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameTick?: ()=>object|undefined,
+    onBeforeGameTick?: ()=>any,
 
     /**
      * Called just after a game tick has occurred. This will run a lot of times per second. Be careful not to make too many calculations here, otherwise the game might slow down.
@@ -3752,30 +3760,30 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGameTick?: (customData?: object)=>void,
+    onAfterGameTick?: (customData?: any)=>void,
 
     /**
-     * Called just after a kick off event has occurred.
+     * Called just after a kickoff event has occurred.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeKickOff?: ()=>object|undefined,
+    onBeforeKickOff?: ()=>any,
 
     /**
-     * Called just after a kick off event has occurred.
+     * Called just after a kickoff event has occurred.
      * 
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void.
      */
-    onAfterKickOff?: (customData?: object)=>void,
+    onAfterKickOff?: (customData?: any)=>void,
 
     /**
      * Called just after the game has ended by timeout.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTimeIsUp?: ()=>object|undefined,
+    onBeforeTimeIsUp?: ()=>any,
 
     /**
      * Called just after the game has ended by timeout.
@@ -3784,14 +3792,14 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterTimeIsUp?: (customData?: object)=>void,
+    onAfterTimeIsUp?: (customData?: any)=>void,
 
     /**
      * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePositionsReset?: ()=>object|undefined,
+    onBeforePositionsReset?: ()=>any,
 
     /**
      * Called just after the player positions have been reset. This event happens just after a new game has been started or a goal has been scored. The player positions are reset to their corresponding spawn points defined in the current room's Stadium object.
@@ -3800,7 +3808,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPositionsReset?: (customData?: object)=>void,
+    onAfterPositionsReset?: (customData?: any)=>void,
 
     /**
      * Called just after a collision has happened between two discs.
@@ -3812,7 +3820,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCollisionDiscVsDisc?: (discId1: int, discPlayerId1: uint16, discId2: int, discPlayerId2: uint16)=>object|undefined,
+    onBeforeCollisionDiscVsDisc?: (discId1: int, discPlayerId1: uint16, discId2: int, discPlayerId2: uint16)=>any,
 
     /**
      * Called just after a collision has happened between two discs.
@@ -3825,7 +3833,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCollisionDiscVsDisc?: (discId1: int, discPlayerId1: uint16, discId2: int, discPlayerId2: uint16, customData?: object)=>void,
+    onAfterCollisionDiscVsDisc?: (discId1: int, discPlayerId1: uint16, discId2: int, discPlayerId2: uint16, customData?: any)=>void,
 
     /**
      * Called just after a collision has happened between a disc and a segment.
@@ -3836,7 +3844,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCollisionDiscVsSegment?: (discId: int, discPlayerId: uint16, segmentId: int)=>object|undefined,
+    onBeforeCollisionDiscVsSegment?: (discId: int, discPlayerId: uint16, segmentId: int)=>any,
 
     /**
      * Called just after a collision has happened between a disc and a segment.
@@ -3848,7 +3856,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCollisionDiscVsSegment?: (discId: int, discPlayerId: uint16, segmentId: int, customData?: object)=>void,
+    onAfterCollisionDiscVsSegment?: (discId: int, discPlayerId: uint16, segmentId: int, customData?: any)=>void,
 
     /**
      * Called just after a collision has happened between a disc and a plane.
@@ -3859,7 +3867,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCollisionDiscVsPlane?: (discId: int, discPlayerId: uint16, planeId: int)=>object|undefined,
+    onBeforeCollisionDiscVsPlane?: (discId: int, discPlayerId: uint16, planeId: int)=>any,
 
     /**
      * Called just after a collision has happened between a disc and a plane.
@@ -3871,7 +3879,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCollisionDiscVsPlane?: (discId: int, discPlayerId: uint16, planeId: int, customData?: object)=>void
+    onAfterCollisionDiscVsPlane?: (discId: int, discPlayerId: uint16, planeId: int, customData?: any)=>void
   }
 
   declare interface LocalRoomConfigCallbacks {
@@ -3883,7 +3891,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeHandicapChange?: (value: int)=>object|undefined,
+    onBeforeHandicapChange?: (value: int)=>any,
 
     /**
      * Called just after the local ping handicap value has been changed.
@@ -3893,7 +3901,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterHandicapChange?: (value: int, customData?: object)=>void,
+    onAfterHandicapChange?: (value: int, customData?: any)=>void,
 
     /**
      * Called just after room recording has been started or stopped.
@@ -3904,7 +3912,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeRoomRecordingChange?: (value: true | ArrayBuffer)=>object|undefined,
+    onBeforeRoomRecordingChange?: (value: true | ArrayBuffer)=>any,
 
     /**
      * Called just after room recording has been started or stopped.
@@ -3916,7 +3924,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterRoomRecordingChange?: (value: true | ArrayBuffer, customData?: object)=>void
+    onAfterRoomRecordingChange?: (value: true | ArrayBuffer, customData?: any)=>void
   }
 
   declare interface APIRoomConfigCallbacks {
@@ -3928,7 +3936,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePluginActiveChange?: (plugin: Plugin)=>object|undefined,
+    onBeforePluginActiveChange?: (plugin: Plugin)=>any,
 
     /**
      * Called just after a plugin has been activated or deactivated.
@@ -3938,7 +3946,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPluginActiveChange?: (plugin: Plugin, customData?: object)=>void,
+    onAfterPluginActiveChange?: (plugin: Plugin, customData?: any)=>void,
 
     /**
      * Called just after the room's config object has been replaced by a new one.
@@ -3948,7 +3956,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig)=>object|undefined,
+    onBeforeConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig)=>any,
 
     /**
      * Called just after the room's config object has been replaced by a new one.
@@ -3959,7 +3967,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig, customData?: object)=>void,
+    onAfterConfigUpdate?: (oldRoomConfigObj: RoomConfig, newRoomConfigObj: RoomConfig, customData?: any)=>void,
 
     /**
      * Called just after the room's renderer object has been replaced by a new one.
@@ -3969,7 +3977,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer)=>object|undefined,
+    onBeforeRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer)=>any,
 
     /**
      * Called just after the room's renderer object has been replaced by a new one.
@@ -3980,7 +3988,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer, customData?: object)=>void,
+    onAfterRendererUpdate?: (oldRendererObj: Renderer, newRendererObj: Renderer, customData?: any)=>void,
 
     /**
      * Called just after an old plugin object has been replaced by a new one.
@@ -3990,7 +3998,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin)=>object|undefined,
+    onBeforePluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin)=>any,
 
     /**
      * Called just after an old plugin object has been replaced by a new one.
@@ -4001,7 +4009,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin, customData?: object)=>void,
+    onAfterPluginUpdate?: (oldPluginObj: Plugin, newPluginObj: Plugin, customData?: any)=>void,
 
     /**
      * Called just after an old library object has been replaced by a new one.
@@ -4011,7 +4019,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library)=>object|undefined,
+    onBeforeLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library)=>any,
 
     /**
      * Called just after an old library object has been replaced by a new one.
@@ -4022,7 +4030,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library, customData?: object)=>void,
+    onAfterLibraryUpdate?: (oldLibraryObj: Library, newLibraryObj: Library, customData?: any)=>void,
 
     /**
      * Called just after the API's language has been changed.
@@ -4031,7 +4039,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeLanguageChange?: (abbr: string)=>object|undefined,
+    onBeforeLanguageChange?: (abbr: string)=>any,
 
     /**
      * Called just after the API's language has been changed.
@@ -4041,32 +4049,32 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterLanguageChange?: (abbr: string, customData?: object)=>void
+    onAfterLanguageChange?: (abbr: string, customData?: any)=>void
 
     /**
      * Called just after the value of a variable has been changed.
      * 
      * @param addonObject The Addon object that the variable belongs to.
-     * @param variableName The name of the variable whose value has been changeed.
+     * @param variableName The name of the variable that value has been changeed.
      * @param oldValue The old value of the variable.
      * @param newValue The new value of the variable.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any)=>object|undefined
+    onBeforeVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any)=>any
 
     /**
      * Called just after the value of a variable has been changed.
      * 
      * @param addonObject The Addon object that the variable belongs to.
-     * @param variableName The name of the variable whose value has been changeed.
+     * @param variableName The name of the variable that value has been changeed.
      * @param oldValue The old value of the variable.
      * @param newValue The new value of the variable.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void.
      */
-    onAfterVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any, customData?: object)=>void
+    onAfterVariableValueChange?: (addonObject: Addon, variableName: string, oldValue: any, newValue: any, customData?: any)=>void
   }
 
   declare type IndividuallyTriggeredRoomConfigCallbacks = GameRoomConfigCallbacks & LocalRoomConfigCallbacks & APIRoomConfigCallbacks;
@@ -4081,7 +4089,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerSyncChange?: (playerId: uint16, value: boolean)=>object|undefined,
+    onBeforePlayerSyncChange?: (playerId: uint16, value: boolean)=>any,
 
     /**
      * Called just after a player's synchronization status has changed.
@@ -4092,7 +4100,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerSyncChange?: (playerId: uint16, value: boolean, customData?: object)=>void,
+    onAfterPlayerSyncChange?: (playerId: uint16, value: boolean, customData?: any)=>void,
 
     /**
      * Called just after an "auto" event has been triggered to automatically move at least one, at most two players from spectators to teams.
@@ -4105,7 +4113,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16)=>object|undefined,
+    onBeforeAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16)=>any,
 
     /**
      * Called just after an "auto" event has been triggered to automatically move at least one, at most two players from spectators to teams.
@@ -4119,7 +4127,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16, customData?: object)=>void,
+    onAfterAutoTeams?: (playerId1: uint16, teamId1: int, playerId2: uint16 | null, teamId2: int | null, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the score limit has been changed.
@@ -4129,7 +4137,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeScoreLimitChange?: (value: int, byId: uint16)=>object|undefined,
+    onBeforeScoreLimitChange?: (value: int, byId: uint16)=>any,
 
     /**
      * Called just after the score limit has been changed.
@@ -4140,7 +4148,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterScoreLimitChange?: (value: int, byId: uint16, customData?: object)=>void,
+    onAfterScoreLimitChange?: (value: int, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the time limit has been changed.
@@ -4150,7 +4158,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTimeLimitChange?: (value: int, byId: uint16)=>object|undefined,
+    onBeforeTimeLimitChange?: (value: int, byId: uint16)=>any,
 
     /**
      * Called just after the time limit has been changed.
@@ -4161,7 +4169,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterTimeLimitChange?: (value: int, byId: uint16, customData?: object)=>void,
+    onAfterTimeLimitChange?: (value: int, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after a player's admin rights have been given/taken.
@@ -4172,7 +4180,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16)=>object|undefined,
+    onBeforePlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16)=>any,
 
     /**
      * Called just after a player's admin rights have been given/taken.
@@ -4184,7 +4192,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16, customData?: object)=>void,
+    onAfterPlayerAdminChange?: (id: uint16, isAdmin: boolean, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after a player has changed his/her avatar.
@@ -4194,7 +4202,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerAvatarChange?: (id: uint16, value: string)=>object|undefined,
+    onBeforePlayerAvatarChange?: (id: uint16, value: string)=>any,
 
     /**
      * Called just after a player has changed his/her avatar.
@@ -4205,7 +4213,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerAvatarChange?: (id: uint16, value: string, customData?: object)=>void,
+    onAfterPlayerAvatarChange?: (id: uint16, value: string, customData?: any)=>void,
 
     /**
      * Called just after a player has been moved to a different team.
@@ -4216,7 +4224,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerTeamChange?: (id: uint16, teamId: int, byId: uint16)=>object|undefined,
+    onBeforePlayerTeamChange?: (id: uint16, teamId: int, byId: uint16)=>any,
 
     /**
      * Called just after a player has been moved to a different team.
@@ -4228,7 +4236,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerTeamChange?: (id: uint16, teamId: int, byId: uint16, customData?: object)=>void,
+    onAfterPlayerTeamChange?: (id: uint16, teamId: int, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the room's current stadium has been changed.
@@ -4238,7 +4246,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeStadiumChange?: (stadium: Stadium, byId: uint16)=>object|undefined,
+    onBeforeStadiumChange?: (stadium: Stadium, byId: uint16)=>any,
 
     /**
      * Called just after the room's current stadium has been changed.
@@ -4249,7 +4257,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterStadiumChange?: (stadium: Stadium, byId: uint16, customData?: object)=>void,
+    onAfterStadiumChange?: (stadium: Stadium, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the room's teams have been locked/unlocked.
@@ -4259,7 +4267,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTeamsLockChange?: (value: boolean, byId: int)=>object|undefined,
+    onBeforeTeamsLockChange?: (value: boolean, byId: uint16)=>any,
 
     /**
      * Called just after the room's teams have been locked/unlocked.
@@ -4270,7 +4278,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterTeamsLockChange?: (value: boolean, byId: uint16, customData?: object)=>void,
+    onAfterTeamsLockChange?: (value: boolean, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after a player object has been created. This callback can be used to define custom properties inside all player objects.
@@ -4279,7 +4287,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerObjectCreated?: (playerObj: Player)=>object|undefined,
+    onBeforePlayerObjectCreated?: (playerObj: Player)=>any,
 
     /**
      * Called just after a player object has been created. This callback can be used to define custom properties inside all player objects.
@@ -4289,7 +4297,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerObjectCreated?: (playerObj: Player, customData?: object)=>void,
+    onAfterPlayerObjectCreated?: (playerObj: Player, customData?: any)=>void,
 
     /**
      * Called just after a disc object has been assigned to a player object.
@@ -4298,7 +4306,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerDiscCreated?: (playerObj: Player)=>object|undefined,
+    onBeforePlayerDiscCreated?: (playerObj: Player)=>any,
 
     /**
      * Called just after a disc object has been assigned to a player object.
@@ -4306,9 +4314,9 @@ declare namespace MainReturnType {
      * @param playerObj The new Player object that has just been assigned a disc object.
      * @param customData the custom data that was returned from the previous callback.
      * 
-     * @returns void or a custom data to pass to the next callback.
+     * @returns void.
      */
-    onAfterPlayerDiscCreated?: (playerObj: Player, customData?: object)=>void,
+    onAfterPlayerDiscCreated?: (playerObj: Player, customData?: any)=>void,
 
     /**
      * Called just after a disc object has been removed from a player object.
@@ -4317,7 +4325,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerDiscDestroyed?: (playerObj: Player)=>object|undefined,
+    onBeforePlayerDiscDestroyed?: (playerObj: Player)=>any,
 
     /**
      * Called just after a disc object has been removed from a player object.
@@ -4325,9 +4333,9 @@ declare namespace MainReturnType {
      * @param playerObj The Player object whose disc object has just been removed.
      * @param customData the custom data that was returned from the previous callback.
      * 
-     * @returns void or a custom data to pass to the next callback.
+     * @returns void.
      */
-    onAfterPlayerDiscDestroyed?: (playerObj: Player, customData?: object)=>void,
+    onAfterPlayerDiscDestroyed?: (playerObj: Player, customData?: any)=>void,
 
     /**
      * Called just after a player has joined the room.
@@ -4336,7 +4344,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerJoin?: (playerObj: Player)=>object|undefined,
+    onBeforePlayerJoin?: (playerObj: Player)=>any,
 
     /**
      * Called just after a player has joined the room.
@@ -4346,7 +4354,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerJoin?: (playerObj: Player, customData?: object)=>void,
+    onAfterPlayerJoin?: (playerObj: Player, customData?: any)=>void,
 
     /**
      * Called just after the game has been paused or resumed.
@@ -4356,7 +4364,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGamePauseChange?: (isPaused: boolean, byId: uint16)=>object|undefined,
+    onBeforeGamePauseChange?: (isPaused: boolean, byId: uint16)=>any,
 
     /**
      * Called just after the game has been paused or resumed.
@@ -4367,7 +4375,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGamePauseChange?: (isPaused: boolean, byId: uint16, customData?: object)=>void,
+    onAfterGamePauseChange?: (isPaused: boolean, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after a chat message has been received.
@@ -4377,7 +4385,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerChat?: (id: uint16, message: string)=>object|undefined,
+    onBeforePlayerChat?: (id: uint16, message: string)=>any,
 
     /**
      * Called just after a chat message has been received.
@@ -4388,7 +4396,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerChat?: (id: uint16, message: string, customData?: object)=>void,
+    onAfterPlayerChat?: (id: uint16, message: string, customData?: any)=>void,
 
     /**
      * Called just after a player's input has been changed.
@@ -4398,7 +4406,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerInputChange?: (id: uint16, value: int)=>object|undefined,
+    onBeforePlayerInputChange?: (id: uint16, value: int)=>any,
 
     /**
      * Called just after a player's input has been changed.
@@ -4409,7 +4417,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerInputChange?: (id: uint16, value: int, customData?: object)=>void,
+    onAfterPlayerInputChange?: (id: uint16, value: int, customData?: any)=>void,
 
     /**
      * Called just after a player has activated or deactivated his/her chat indicator. This happens when a player focuses/loses focus on the chat input component in the website.
@@ -4419,7 +4427,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerChatIndicatorChange?: (id: uint16, value: boolean)=>object|undefined,
+    onBeforePlayerChatIndicatorChange?: (id: uint16, value: boolean)=>any,
 
     /**
      * Called just after a player has activated or deactivated his/her chat indicator. This happens when a player focuses/loses focus on the chat input component in the website.
@@ -4430,7 +4438,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerChatIndicatorChange?: (id: uint16, value: boolean, customData?: object)=>void,
+    onAfterPlayerChatIndicatorChange?: (id: uint16, value: boolean, customData?: any)=>void,
 
     /**
      * Called just after a player has left the room.
@@ -4442,7 +4450,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforePlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16)=>object|undefined,
+    onBeforePlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16)=>any,
 
     /**
      * Called just after a player has left the room.
@@ -4455,30 +4463,30 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16, customData?: object)=>void,
+    onAfterPlayerLeave?: (playerObj: Player, reason: string | null, isBanned: boolean, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after a team's colors have been changed.
      * 
-     * @param teamId The team whose colors have been changed.
+     * @param teamId The team which colors have been changed.
      * @param value The new team colors value.
      * @param byId Id of the player who has changed the team colors.
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16)=>object|undefined,
+    onBeforeTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16)=>any,
 
     /**
      * Called just after a team's colors have been changed.
      * 
-     * @param teamId The team whose colors have been changed.
+     * @param teamId The team which colors have been changed.
      * @param value The new team colors value.
      * @param byId Id of the player who has changed the team colors.
      * @param customData the custom data that was returned from the previous callback.
      * 
      * @returns void.
      */
-    onAfterTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16, customData?: object)=>void,
+    onAfterTeamColorsChange?: (teamId: int, value: TeamColors, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the room's kick rate limit has been changed.
@@ -4490,7 +4498,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16)=>object|undefined,
+    onBeforeKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16)=>any,
 
     /**
      * Called just after the room's kick rate limit has been changed.
@@ -4503,7 +4511,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16, customData?: object)=>void,
+    onAfterKickRateLimitChange?: (min: int, rate: int, burst: int, byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the game has been started.
@@ -4512,7 +4520,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameStart?: (byId: uint16)=>object|undefined,
+    onBeforeGameStart?: (byId: uint16)=>any,
 
     /**
      * Called just after the game has been started.
@@ -4522,7 +4530,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGameStart?: (byId: uint16, customData?: object)=>void,
+    onAfterGameStart?: (byId: uint16, customData?: any)=>void,
 
     /**
      * Called just after the game has been stopped.
@@ -4531,7 +4539,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeGameStop?: (byId: uint16)=>object|undefined,
+    onBeforeGameStop?: (byId: uint16)=>any,
 
     /**
      * Called just after the game has been stopped.
@@ -4541,7 +4549,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterGameStop?: (byId: uint16, customData?: object)=>void
+    onAfterGameStop?: (byId: uint16, customData?: any)=>void
   }
 
   declare interface ModifierRoomConfigCallbacks {
@@ -4577,7 +4585,7 @@ declare namespace MainReturnType {
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
      */
-    modifyPlayerDataAfter?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: object)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerDataAfter?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: any)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -4600,7 +4608,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyPlayerPingAfter?: (playerId: uint16, ping: int, customData?: object)=>number,
+    modifyPlayerPingAfter?: (playerId: uint16, ping: int, customData?: any)=>number,
 
     /**
      * If defined, runs only for the current player in a client room and modifies its `ping` value.
@@ -4619,7 +4627,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new ping value of the current player.
      */
-    modifyClientPingAfter?: (ping: int, customData?: object)=>number,
+    modifyClientPingAfter?: (ping: int, customData?: any)=>number,
 
     /**
      * If defined, expects us to return the physics engine's new current `frameNo` value, which tells the physics engine that it is currently on a different frame than expected, which causes your player to look laggy to your opponents, especially on extrapolated clients.
@@ -4638,7 +4646,7 @@ declare namespace MainReturnType {
      * 
      * @returns The new frameNo value of the physics engine.
      */
-    modifyFrameNoAfter?: (frameNo: int, customData?: object)=>int,
+    modifyFrameNoAfter?: (frameNo: int, customData?: any)=>int,
 
     /**
      * If defined, runs for each message received from all clients in a host room, before they are processed and sent to all clients. This is the most important callback inside a host room; all permission logic should reside here. You are also allowed to freely modify the contents of all messages here.
@@ -4669,7 +4677,7 @@ declare namespace MainReturnType {
      *   - `false`: block message from being processed. 
      *   - `throw exception`: break the connection of the sender of this message.
      */
-    onAfterOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int, customData?: object)=>boolean
+    onAfterOperationReceived?: (type: OperationType, msg: HaxballEvent, globalFrameNo: int, clientFrameNo: int, customData?: any)=>boolean
   }
 
   declare interface CustomRoomConfigCallbacks {
@@ -4683,7 +4691,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeCustomEvent?: (type: int, data: object, byId: uint16)=>object|undefined,
+    onBeforeCustomEvent?: (type: int, data: object, byId: uint16)=>any,
 
     /**
      * Called just after a custom event has been triggered.
@@ -4695,7 +4703,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterCustomEvent?: (type: int, data: object, byId: uint16, customData?: object)=>void
+    onAfterCustomEvent?: (type: int, data: object, byId: uint16, customData?: any)=>void
 
     /**
      * Called just after a binary custom event has been triggered.
@@ -4706,7 +4714,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16)=>object|undefined
+    onBeforeBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16)=>any
 
     /**
      * Called just after a binary custom event has been triggered.
@@ -4718,7 +4726,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: object)=>void
+    onAfterBinaryCustomEvent?: (type: uint32, data: Uint8Array, byId: uint16, customData?: any)=>void
 
     /**
      * Called just after an identity event has been triggered.
@@ -4729,7 +4737,7 @@ declare namespace MainReturnType {
      * 
      * @returns void or a custom data to pass to the next callback.
      */
-    onBeforeIdentityEvent?: (id: uint16, data: object, byId: uint16)=>object|undefined
+    onBeforeIdentityEvent?: (id: uint16, data: object, byId: uint16)=>any
 
     /**
      * Called just after an identity event has been triggered.
@@ -4741,7 +4749,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onAfterIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: object)=>void
+    onAfterIdentityEvent?: (id: uint16, data: object, byId: uint16, customData?: any)=>void
   }
 
   declare interface RendererCallbacks {
@@ -4795,7 +4803,7 @@ declare namespace MainReturnType {
   export namespace Utils {
 
     /**
-     * Generates a new `player_auth_key` along with its companion auth object(`auhObj`) to be used as parameters to the function `Room.join`. We should store the auth key and use it later if we want to be recognized in Haxball rooms. Any internal error will result in a _rejected_ promise.
+     * Generates a new `player_auth_key` along with its companion auth object(`authObj`) to be used as parameters to the function `Room.join`. We should store the auth key and use it later if we want to be recognized in Haxball rooms. Any internal error will result in a _rejected_ promise.
      * 
      * @returns A new auth key and auth object.
      */
@@ -4813,7 +4821,7 @@ declare namespace MainReturnType {
     /**
      * Connects to Haxball's backend server, retrieves the current room list and returns it.
      * 
-     * @returns A promise that returns the current list of open rooms returned from the Haxball's backend server.
+     * @returns A promise that returns the current list of open public rooms returned from the Haxball's backend server.
      */
     export function getRoomList(): Promise<RoomData[]>;
 
@@ -4849,7 +4857,7 @@ declare namespace MainReturnType {
 
     /**
      * Returns the numeric representation of the given ip address. Returns null if 
-     * the input string is ill-formatted.
+     * the input string is in wrong format.
      * 
      * @param ip The ip address to be converted.
      * 
@@ -4981,7 +4989,7 @@ declare namespace MainReturnType {
      * 
      * @returns The generated `Stadium` object, or `undefined` if an error occurs.
      */
-    export function parseStadium(textDataFromHbsFile: string, onError?: ErrorCallback): Stadium;
+    export function parseStadium(textDataFromHbsFile: string, onError?: ErrorCallback): Stadium|undefined;
 
     /**
      * Generate and return text content from a `stadium` object that can be directly written in a .hbs file.
@@ -5177,7 +5185,7 @@ declare namespace MainReturnType {
     /**
      * Do not modify this value. This value is `null` until joinRoom or createRoom operation is successful. After that, a pointer to the created/joined room object is auto-assigned to this variable.
      */
-    readonly room?: Room;
+    readonly room: Room|null;
 
     /**
      * Called just after the `room` object is created, and before the initialization of the addons. This is where you can initialize/add your custom GUI functions to the room object to be used inside the addons.
@@ -5223,7 +5231,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onConnectionStateChange?: (state: ConnectionState, sdp: string|undefined)=>void;
+    onConnectionStateChange?: (state: ConnectionState, sdp?: string)=>void;
     
     /**
      * Triggered while starting to try the reverse connection method while joining a room.
@@ -5310,7 +5318,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    extrapolate(milliseconds): void;
+    extrapolate(milliseconds:number): void;
 
     /**
      * Changes the speed of the simulation. 
@@ -5622,7 +5630,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    setPlayerAdmin(playerId: int, value: boolean, byId: uint16): void;
+    setPlayerAdmin(playerId: uint16, value: boolean, byId: uint16): void;
 
     /**
      * Kicks/bans a player using a fake identity.
@@ -5660,7 +5668,7 @@ declare namespace MainReturnType {
     /**
      * Sets the properties of a disc.
      * 
-     * @param discId Id of the object whose properties are desired to be set.
+     * @param discId Id of the disc whose properties are desired to be set.
      * @param type The type of this operation.
      *   - `0`: discId is actually the id of a disc.
      *   - `1`: discId is actually the id of a player.
@@ -6099,7 +6107,7 @@ declare namespace MainReturnType {
     color?: UnparsedColor,
 
     /**
-     * The strengh of the new joint.
+     * The strength of the new joint.
      */
     strength?: "rigid" | number,
 
@@ -6859,7 +6867,7 @@ declare namespace MainReturnType {
     height?: number,
 
     /**
-     * The new kick off radius of the current stadium.
+     * The new kickoff radius of the current stadium.
      */
     kickOffRadius?: number,
 
@@ -6912,7 +6920,7 @@ declare namespace MainReturnType {
     spawnDistance?: number,
 
     /**
-     * The new kick off reset value of the current stadium. `true`: "full", `false`: "partial"
+     * The new kickoff reset value of the current stadium. `true`: "full", `false`: "partial"
      */
     kickOffReset?: boolean,
 
@@ -7199,7 +7207,7 @@ declare namespace MainReturnType {
      * 
      * @returns An array in this format: `[index1: int, index2: int]`. `index1` and `index2` are the indices of the 1st and 2nd vertices of the queried segment. Returns `null` if the segment does not exist.
      */
-    findVertexIndicesOfSegment(idx: int): int[];
+    findVertexIndicesOfSegment(idx: int): int[]|null;
 
     /**
      * Updates the `idx`th vertex's only the given values.
@@ -7418,7 +7426,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    removeSpawnPoint(idx: int, team: string): void;
+    removeSpawnPoint(idx: int, team: UnparsedTeam2): void;
 
     /**
      * Removes a player from the current room.
@@ -7456,7 +7464,7 @@ declare namespace MainReturnType {
      *   - `type: 0 | 1 | 2 | null`: The new background type of the current stadium. (`0`: "none", `1`: "grass", `2`: "hockey")
      *   - `width: number | null`: The new background width of the current stadium.
      *   - `height: number | null`: The new background height of the current stadium.
-     *   - `kickOffRadius: number | null`: The new kick off radius of the current stadium.
+     *   - `kickOffRadius: number | null`: The new kickoff radius of the current stadium.
      *   - `cornerRadius: number | null`: The new background corner radius of the current stadium.
      *   - `color: "transparent" | string | [r: number, g: number, b: number] | null`: The new background color of the current stadium.
      *   - `goalLine: number | null`: The new goal line distance of the current stadium.
@@ -7475,7 +7483,7 @@ declare namespace MainReturnType {
      *   - `maxViewWidth: number | null`: The new max view width of the current stadium.
      *   - `cameraFollow: 0 | 1 | null`: The new camera follow value of the current stadium. (`0`: "", `1`: "player")
      *   - `spawnDistance: number | null`: The new spawn distance value of the current stadium.
-     *   - `kickOffReset: boolean | null`: The new kick off reset value of the current stadium. `true`: "full", `false`: "partial"
+     *   - `kickOffReset: boolean | null`: The new kickoff reset value of the current stadium. `true`: "full", `false`: "partial"
      *   - `canBeStored: boolean | null`: The new can-be-stored value of the current stadium.
      * 
      * @returns void.
@@ -7705,7 +7713,7 @@ declare namespace MainReturnType {
     immediate: boolean = true;
 
     /**
-     * Called when a new visitor starts watching the stream.
+     * Called when a new visitor starts to watching the stream.
      * 
      * @param count The number of clients that are currently watching the stream.
      * 
@@ -7764,7 +7772,7 @@ declare namespace MainReturnType {
     /**
      * Current player's id.
      */
-    readonly currentPlayerId: int;
+    readonly currentPlayerId: uint16;
 
     /**
      * The current Player object.
@@ -8456,7 +8464,7 @@ declare namespace MainReturnType {
     getPlayerDisc_exp(playerId: uint16): Disc;
 
     /**
-     * Activate or deactivate the plugin whose name is `name`.
+     * Activate or deactivate the plugin that name is `name`.
      * 
      * @param name Name of the plugin that is desired to be activated/deactivated.
      * @param active Whether to activate(active = `true`) the plugin or to deactivate(active = `false`) it.
@@ -8475,7 +8483,7 @@ declare namespace MainReturnType {
     /**
      * Stop recording replay. Recording should be started before calling this.
      * 
-     * @returns The recorded `UInt8Array` replay data if succeeded, `null` otherwise.
+     * @returns The recorded `Uint8Array` replay data if succeeded, `null` otherwise.
      */
     stopRecording(): Uint8Array | null;
 
@@ -8511,7 +8519,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    extrapolate(milliseconds): void;
+    extrapolate(milliseconds:number): void;
 
     /**
      * Sets the `RoomConfig` object that contains all the main callbacks of this room.
@@ -9038,7 +9046,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    declare extrapolate: (milliseconds)=>void;
+    declare extrapolate: (milliseconds:number)=>void;
 
     /**
      * Returns the current speed coefficient of this replay reader object.
@@ -9058,7 +9066,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    declare setSpeed: (coefficient)=>void;
+    declare setSpeed: (coefficient:number)=>void;
 
     /**
      * Returns the current time.
@@ -9101,7 +9109,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    declare setCurrentFrameNo: (destinationFrameNo)=>void;
+    declare setCurrentFrameNo: (destinationFrameNo:number)=>void;
 
     /**
      * Releases the resources that are used by this object.
@@ -9854,7 +9862,7 @@ declare namespace MainReturnType {
         /**
          * Object that stores custom color values to render striped team colors.
          */
-        colors: ka;
+        colors: TeamColors;
       }
     }
 
