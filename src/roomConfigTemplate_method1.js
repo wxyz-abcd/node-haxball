@@ -161,10 +161,6 @@ function defineRoomCallbacks(room){
   room.onPingData = function(array, customData){};
   room.onAfterPingData = function(array, customData){};
 
-  room.onBeforeExtrapolationChange = function(value){/*return customData;*/};
-  room.onExtrapolationChange = function(value, customData){};
-  room.onAfterExtrapolationChange = function(value, customData){};
-
   room.onBeforeHandicapChange = function(value){/*return customData;*/};
   room.onHandicapChange = function(value, customData){};
   room.onAfterHandicapChange = function(value, customData){};

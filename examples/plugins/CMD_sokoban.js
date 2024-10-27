@@ -147,10 +147,13 @@ module.exports = function(API){
           });
         }
       }
-      var stadium = Utils.parseStadium(JSON.stringify(stadiumJson), console.log);
+      var stadium;
+      try{
+        stadium = Utils.parseStadium(JSON.stringify(stadiumJson));
+      }catch(e){}
       if (!stadium)
         return false;
-      that.room.setCurrentStadium(stadium, console.log);
+      that.room.setCurrentStadium(stadium);
       return true;
     });
   }

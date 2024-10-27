@@ -3,7 +3,7 @@ module.exports = function(API){
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "autoPlay_mixed_inmemory_multiple", true, { // "autoPlay_mixed_inmemory_multiple" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.4",
+    version: "0.5",
     author: "abc",
     description: `This is an auto-playing bot that has 2 different modes. 
     - followBall mode always follows the ball blindly, and kicks it whenever it is nearby without any direction checking. 
@@ -250,10 +250,10 @@ module.exports = function(API){
     gameState = gameStateExt || gameState;
 
     // get the original extrapolated data object of the ball
-    var ball = gameState.physicsState.discs[0];
+    var {pos, radius} = gameState.physicsState.discs[0] || {};
 
     // get the coordinates and radius of the ball
-    var {x, y, radius} = ball?.pos || {};
+    var {x, y} = pos || {};
 
     // if ball is not reachable, do nothing.
     if (x==null || isNaN(x) || !isFinite(x) || y==null || isNaN(y) || !isFinite(y)) // check 

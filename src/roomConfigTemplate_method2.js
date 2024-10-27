@@ -175,10 +175,6 @@ module.exports = function(API){
   this.onPingData = function(array, customData){};
   this.onAfterPingData = function(array, customData){};
 
-  this.onBeforeExtrapolationChange = function(value){/*return customData;*/};
-  this.onExtrapolationChange = function(value, customData){};
-  this.onAfterExtrapolationChange = function(value, customData){};
-
   this.onBeforeHandicapChange = function(value){/*return customData;*/};
   this.onHandicapChange = function(value, customData){};
   this.onAfterHandicapChange = function(value, customData){};

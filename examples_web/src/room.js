@@ -240,7 +240,10 @@ ePickStadium.onclick = function(event){
         return;
       var fr = new FileReader();
       fr.onload = function () {
-        var x = API.Utils.parseStadium(fr.result, console.warn);
+        var x;
+        try{
+          x = API.Utils.parseStadium(fr.result);
+        }catch(e){}
         if (!x)
           return;
         room?.setCurrentStadium(x);

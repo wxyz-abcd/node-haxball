@@ -34,7 +34,6 @@ module.exports = function(abcHaxballAPI, window, config){
       },
       backend: config?.backend,
       proxyAgent: config?.proxyAgent,
-      fixNames: config?.fixNames,
       stunServer: config?.stunServer,
       version: config?.version,
       noVariableValueChangeEvent: config?.noVariableValueChangeEvent,

@@ -150,7 +150,6 @@ Room.create({
       - `HttpUrl`: proxy http url address to use when trying to create or join a room. should end with a `/`. Is appended `host` or `client` at the end while being used. Defaults to: `https://www.haxball.com/rs/`.
     - `stunServer`: the url address of an external stun server that is required for the communication via WebRTC to work correctly. Defaults to: `stun:stun.l.google.com:19302`.
     - `proxyAgent`: a global custom proxy agent for this api object. This method does not work in browsers. Defaults to `null`.
-    - `fixNames`: fix some important variable names or not. Defaults to: `true`.
     - `version`: Haxball's expected version number. Defaults to: `9`.
     - `noVariableValueChangeEvent`: if `true`, disables the mechanism that enables variable value change event which in turn improves performance while reaching a variable's value that was defined by any `Addon.defineVariable` function. (Variable will have a directly accessable, actual value; instead of a property that points to the actual variable.) Defaults to: `false`.
     - `noWebRTC`: If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
@@ -262,13 +261,12 @@ Room.create({
   - `getGeo()`: connects to Haxball's geolocation API to get your location based on IP address. you can use it directly as `geo` key inside `storage` object. returns `Promise(geoLocationObject)`
   - `parseGeo(geoStr, fallback, retNull)`: Parses the given string or json object(`geoStr`) as a `GeoLocation` object that should have `lat`, `lon` and `flag` keys and returns it.
   - `getDefaultStadiums()`: get default stadium array.
-  - `parseStadium(textDataFromHbsFile, onError)`: parse text as a stadium object and return it.
+  - `parseStadium(textDataFromHbsFile)`: parse text as a stadium object and return it.
   - `exportStadium(stadium)`: generate and return text(.hbs) content from a `stadium` object.
-  - `stadiumChecksum(stadium)`: calculate checksum for given `stadium`. returns `null` for original maps.
   - `promiseWithTimeout(promise, msec)`: returns a new promise that executes the given `promise` until `msec` time has passed. if timeout is reached, the promise is rejected.
-  - `trimStringIfLonger(str, length)`: if the given `str` is longer than the `length`, it is trimmed and returned; otherwise it is directly returned.
   - `hexStrToNumber(str)`: converts the `playerObject.conn` values to readable ip address string.
   - `byteArrayToIp(uint8Array)`: converts a uint8array that was read from basro's backend into a readable ip address string.
+  - `refreshRoomToken({token="", rcr=""})`: generates a new room token from an old token OR a rcr(Google Recaptcha v2 response) value.
 
 - `EventFactory`: Contains static functions to create all kinds of event messages.
 
@@ -346,7 +344,6 @@ Room.create({
         --- properties section ---
         - `storage`:
           - `crappy_router`: if `true`, sets some timeout value to `10` seconds instead of `4` seconds while joining a room.
-          - `extrapolation`: use the future(+) or past(-) values of game state while rendering or other kinds of processing. this value should be a number between `-200`ms and `+200`ms.
           - `player_name`: name of the player. default value is `"abc"`.
           - `avatar`: avatar of the player. default value is `null`.
           - `geo`:
@@ -435,7 +432,7 @@ Room.create({
           - `setKeyState(state)`: set current key state to `state`. (added for compatibility with normal rooms.)
           - `setPlayerChatIndicator(value, byId)`: sets the chat indicator status of player(`byId`) to `value`.
           - `setPlayerAvatar(value, byId)`: sets the avatar of player(`byId`) to `value`.
-          - `setCurrentStadium(value, byId, onError)`: creates and applies a fake event by player(`byId`) to set the current stadium to `stadium`.
+          - `setCurrentStadium(value, byId)`: creates and applies a fake event by player(`byId`) to set the current stadium to `stadium`.
           - `sendAnnouncement(msg, color=-1, style=0, sound=1, targetId, byId)`: send announcement message(`msg`) to player(`targetId`) with properties(`color`, `style`, `sound`). `targetId` is `null` -> send to everyone. `byId` must be `0`.
           - `startGame(byId)`: creates and applies a fake event by player(`byId`) to start the game.
           - `stopGame(byId)`: creates and applies a fake event by player(`byId`) to stop the game.
@@ -500,7 +497,7 @@ Room.create({
     - `setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword, unlimitedPlayerCount, showInRoomList })`: sets the room's properties.
     - `setKickRateLimit(min, rate, burst)`: sets the room's kick rate limit.
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
-    - `setExtrapolation(extrapolation)`: sets the client's `extrapolation` value in msecs.
+    - `extrapolate(milliseconds)`: extrapolates the current room state for `milliseconds` milliseconds and stores the results in each object's `ext` key.
     - `clearBans()`: clears all bans. host-only.
     - `clearBan(id)`: clears the ban of a player(`id`). host-only.
     - `executeEvent(event, byId)`: executes any event inside this room. host-only.
@@ -531,7 +528,7 @@ Room.create({
     - `randTeams()`: remove random 2 players from spectators and add them to teams.
     - `resetTeam(teamId)`: move everyone on team(`teamId`) to spectators.
     - `setSync(value)`: set synchronized status to `value` which must be `true` or `false`. host-only.
-    - `setCurrentStadium(stadium, onError)`: set current map(`stadium`).
+    - `setCurrentStadium(stadium)`: set current map(`stadium`).
     - `setTimeLimit(value)`: set time limit(`value`).
     - `setScoreLimit(value)`: set score limit(`value`).
     - `changeTeam(teamId)`: set current player's team(`teamId`).
@@ -783,9 +780,6 @@ Room.create({
       - `customData = onBeforePingChange(instantPing, averagePing, maxPing)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
       - `onAfterPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
-      - `customData = onBeforeExtrapolationChange(value)`: extrapolation was set to (`value`). triggered individually.
-      - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
-      - `onAfterExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `customData = onBeforeHandicapChange(value)`: handicap was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onAfterHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
@@ -904,7 +898,6 @@ Room.create({
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
-      - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
@@ -978,7 +971,6 @@ Room.create({
       - `onGameStop(byId, customData)`: game was stopped by player(`byId`).
       - `onPingData(array, customData)`: ping values for all players was received. may only be triggered by host.
       - `onPingChange(instantPing, averagePing, maxPing, customData)`: instant/average/max ping values for the current player were just calculated. client-only.
-      - `onExtrapolationChange(value, customData)`: extrapolation was set to (`value`). triggered individually.
       - `onHandicapChange(value, customData)`: handicap was set to (`value`). triggered individually.
       - `onBansClear(customData)`: all bans were cleared. host-only.
       - `onBanClear(id, customData)`: the ban of a player(`id`) was cleared. host-only.
@@ -1008,15 +1000,8 @@ Room.create({
     - `Team`: The class that defines the properties of a team.
 
   - `Stream`: These classes are used to read/write data from/to replay files and/or network/WebRTC stream.
-    - `F`: StreamReader class
-    - `w`: StreamWriter class
-
-  - `Utils`: Some utility classes (all of them may not be necessarily useful but still, why not export them?)
-    - `D`: string operations 1
-    - `J`: string operations 2
-    - `K`: string operations 3
-    - `M`: webserver api operations
-    - `q`: global error class
+    - `Reader`: StreamReader class
+    - `Writer`: StreamWriter class
 
 
 [Back To The Top](#title)

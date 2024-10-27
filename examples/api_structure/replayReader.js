@@ -47,7 +47,6 @@ var replayReader = Replay.read(data, {
   onPositionsReset: function(){},
   onGameStop: function(byId){},
   onPingData: function(array){},
-  onExtrapolationChange: function(value){},
   onHandicapChange: function(value){},
   onBansClear: function(){},
   onRoomRecaptchaModeChange: function(on){},
@@ -56,8 +55,8 @@ var replayReader = Replay.read(data, {
   onCollisionDiscVsDisc: function(discId1, discPlayerId1, discId2, discPlayerId2){},
   onCollisionDiscVsSegment: function(discId, discPlayerId, segmentId){},
   onCollisionDiscVsPlane: function(discId, discPlayerId, planeId){},
-  render: function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
-    // use "extrapolatedRoomState" contents to get all information about the current extrapolated game state and draw whatever you want into the "canvas" object.
+  render: function(){ // render logic here. called inside requestAnimationFrame callback
+    // use "room.state" contents to get all information about the current game state and draw whatever you want into your "canvas".
   }
   */
 });

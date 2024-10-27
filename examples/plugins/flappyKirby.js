@@ -119,7 +119,10 @@ module.exports = function(API){
         map.segments.push({ "v0" : currentVertexIndex+3, "v1" : currentVertexIndex+1, "curve" : 0, "trait": "colliderWall" });
       }
     }
-    var s = Utils.parseStadium(JSON.stringify(map), onError);
+    var s;
+    try{
+      s = Utils.parseStadium(JSON.stringify(map));
+    }catch(e){}
     if (s)
       s.initialXVelocity = vx;
     return s;
@@ -188,7 +191,7 @@ module.exports = function(API){
       } while(!stadium);
       resetScores();
       that.room.stopGame();
-      that.room.setCurrentStadium(stadium, console.log);
+      that.room.setCurrentStadium(stadium);
       that.room.startGame();
       updatePlayerDiscs();
     }, 100);

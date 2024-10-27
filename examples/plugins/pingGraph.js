@@ -3,7 +3,7 @@ module.exports = function (API) {
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "pingGraph", true, {
-    version: "0.1",
+    version: "0.2",
     author: "abc",
     description: `This plugin shows your ping graph while you are in a room.`,
     allowFlags: AllowFlags.JoinRoom
@@ -51,6 +51,13 @@ module.exports = function (API) {
     value: "#c13535"
   });
 
+  this.defineVariable({
+    name: "modifiablePing",
+    description: "If true, the graph will be drawn using the ping value from the current player object.",
+    type: VariableType.Boolean,
+    value: false
+  });
+
   var that = this;
   var w, Qf, Eh, lp, lmp;
   var pings; // fq
@@ -90,7 +97,7 @@ module.exports = function (API) {
   };
 
   this.onPingChange = (a, pingRw, maxPing)=>{ // a = ping
-    pings.push(a);
+    pings.push(that.modifiablePing ? that.room.currentPlayer.ping : a);
     if (pings.length>that.width)
       pings.splice(0,1);
     lp.innerText = "Ping: "+(((10*pingRw)|0)/10);

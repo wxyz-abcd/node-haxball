@@ -127,10 +127,6 @@ function roomCallback(room){ // examples start from here.
     console.log("onPingData...", array, customData);
   };
 
-  room.onExtrapolationChange = function(value, customData){
-    console.log("onExtrapolationChange...", value, customData);
-  };
-
   room.onHandicapChange = function(value, customData){
     console.log("onHandicapChange...", value, customData);
   };

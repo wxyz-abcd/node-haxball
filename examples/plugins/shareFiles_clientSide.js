@@ -35,11 +35,11 @@ module.exports = function(API){
       }
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
-        var a = Impl.Stream.w.ha(name.length+size+12, true);
-        a.O(that.playerIdToSend);
-        a.mc(name);
-        a.Mg(e.target.result);
-        that.room.sendBinaryCustomEvent(1, a.Sb(), 0);
+        var writer = Impl.Stream.StreamWriter.create(name.length+size+12, true);
+        writer.writeInt32(that.playerIdToSend);
+        writer.writeString(name);
+        writer.writeArrayBuffer(e.target.result);
+        that.room.sendBinaryCustomEvent(1, writer.toUint8Array(), 0);
       });
       reader.readAsArrayBuffer(that.dataToSend);
     }
@@ -50,12 +50,12 @@ module.exports = function(API){
   this.onBinaryCustomEvent = function(type, data, byId){
     if (type!=0 || byId!=0)
       return;
-    var b = new Impl.Stream.F(new DataView(data.buffer, data.byteOffset, data.byteLength), true);
-    var sourceId = b.M();
+    var b = new Impl.Stream.StreamReader(new DataView(data.buffer, data.byteOffset, data.byteLength), true);
+    var sourceId = b.readInt32();
     if (!that.room.getPlayer(sourceId))
       return;
-    var name = b.ic();
-    var contents = b.sb();
+    var name = b.readString();
+    var contents = b.readUint8Array();
     console.log("received file from player "+sourceId);
     that.room.librariesMap.gui?.downloadFile(name, contents);
   };

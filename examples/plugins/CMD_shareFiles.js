@@ -98,11 +98,11 @@ module.exports = function (API) {
       if (targetId==0)
         that.room.librariesMap.gui?.downloadFile(name, contents);
       else{
-        var a = Impl.Stream.w.ha(name.length+contents.byteLength+8, true);
-        a.O(byId);
-        a.mc(name);
-        a.Mg(contents);
-        that.room.sendBinaryCustomEvent(0, a.Sb(), targetId);
+        var writer = Impl.Stream.StreamWriter.create(name.length+contents.byteLength+8, true);
+        writer.writeInt32(byId);
+        writer.writeString(name);
+        writer.writeArrayBuffer(contents);
+        that.room.sendBinaryCustomEvent(0, writer.toUint8Array(), targetId);
       }
     }, (playerId, data)=>{
       console.log("Rejected");
@@ -126,10 +126,10 @@ module.exports = function (API) {
     var {type, data, byId} = msg;
     if (type!=1 || byId==0)
       return true;
-    var b = new Impl.Stream.F(new DataView(data.buffer, data.byteOffset, data.byteLength), true), targetId = b.M();
+    var b = new Impl.Stream.StreamReader(new DataView(data.buffer, data.byteOffset, data.byteLength), true), targetId = b.readInt32();
     if (!fsEnabled[targetId] || !that.room.getPlayer(targetId))
       return false;
-    var name = b.ic(), contents = b.sb();
+    var name = b.readString(), contents = b.readUint8Array();
     that.room.librariesMap.userInteractions?.activateInteraction(targetId, fileInteraction, {
       targetId,
       byId,

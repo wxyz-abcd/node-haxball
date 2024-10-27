@@ -57,7 +57,7 @@ module.exports = function (API) {
       if (!s)
         return;
       that.room.stopGame();
-      that.room.setCurrentStadium(s, ()=>{});
+      that.room.setCurrentStadium(s);
       that.room.startGame();
     });
   };

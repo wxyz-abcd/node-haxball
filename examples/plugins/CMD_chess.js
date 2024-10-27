@@ -2111,10 +2111,13 @@ module.exports = function(API){
     v = 48000;
   	pieceData = [];
   	lastPlayerIdxs = [];
-    var stadium = Utils.parseStadium(JSON.stringify(stadiumJson), (e)=>{console.log(stadiumJson, e.toString())});
+    var stadium;
+    try{
+      stadium = Utils.parseStadium(JSON.stringify(stadiumJson));
+    }catch(e){}
     if (!stadium)
       return;
-    that.room.setCurrentStadium(stadium, console.log);
+    that.room.setCurrentStadium(stadium);
     that.room.setTeamColors(1, 0, "000000", "ffffff");
     that.room.setTeamColors(2, 0, "ffffff", "000000");
     if (stopgame){

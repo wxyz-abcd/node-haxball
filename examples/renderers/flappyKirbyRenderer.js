@@ -11,6 +11,18 @@ module.exports = function(API, params){
 
   // parameters are exported so that they can be edited outside this class.
   this.defineVariable({
+    name: "extrapolation",
+    description: "The desired extrapolation value in milliseconds", 
+    type: VariableType.Integer,
+    value: 0,
+    range: {
+      min: -1000,
+      max: 10000,
+      step: 5
+    }
+  });
+
+  this.defineVariable({
     name: "showPlayerIds",
     description: "Show player ids?", 
     type: VariableType.Boolean,
@@ -730,7 +742,8 @@ module.exports = function(API, params){
     imgs = null;
   };
 
-  this.render = function(extrapolatedRoomState){ // render logic here. called inside requestAnimationFrame callback
+  this.render = function(){ // render logic here. called inside requestAnimationFrame callback
+    var extrapolatedRoomState = thisRenderer.room.extrapolate(thisRenderer.extrapolation);
     if (!params.paintGame || !extrapolatedRoomState.gameState)
       return;
     rendererObj.render(extrapolatedRoomState);

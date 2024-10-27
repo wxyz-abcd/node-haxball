@@ -53,7 +53,6 @@ module.exports = function(API){
   this.onPositionsReset = function(customData){};
   this.onGameStop = function(byId, customData){};
   this.onPingData = function(array, customData){};
-  this.onExtrapolationChange = function(value, customData){};
   this.onHandicapChange = function(value, customData){};
   this.onBansClear = function(customData){};
   this.onBanClear = function(id, customData){};

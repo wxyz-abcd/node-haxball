@@ -235,7 +235,7 @@ window.onload = ()=>{
         }
       };
       var renderer = new renderers.defaultRenderer(API, rendererParams);
-      var { Team } = API.Impl.Core, {F: Reader} = API.Impl.Stream;
+      var { Team } = API.Impl.Core, { Reader } = API.Impl.Stream;
       function by(playerObj){
         return (null == playerObj ? "" : " by [" + playerObj.id + "]" + playerObj.name);
       }
@@ -304,7 +304,7 @@ window.onload = ()=>{
         },
         onStadiumChange: function (stadium, byId, customData) {
           var byPlayerObj = roomState.players.find((x)=>x.id==byId);
-          var checksum = API.Utils.stadiumChecksum(stadium);
+          var checksum = stadium.calculateChecksum();
           if (checksum)
             chatApi.receiveNotice('Stadium "' + stadium.name + '" (' + checksum + ") loaded" + by(byPlayerObj));
           updateGUI();
@@ -366,7 +366,7 @@ window.onload = ()=>{
       };
       socket.onmessage = (e)=>{
         var d = e.data, reader = new Reader(new DataView(d));
-        var type = reader.B();
+        var type = reader.readUint8();
         switch (type){
           case 0:{
             room.readStream(reader);
@@ -377,9 +377,9 @@ window.onload = ()=>{
           case 1:{
             if (room)
               return;
-            var clientId = reader.Ob();
+            var clientId = reader.readUint16();
             console.log("client id:", clientId);
-            onInit(pako.inflateRaw(new Uint8Array(d, reader.a)));
+            onInit(pako.inflateRaw(new Uint8Array(d, reader.offset)));
             break;
           }
           case 2:{

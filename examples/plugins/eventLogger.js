@@ -164,10 +164,6 @@ module.exports = function(API){
     //console.log("onPingData...", array, customData);
   };
 
-  this.onExtrapolationChange = function(value, customData){
-    console.log("onExtrapolationChange...", value, customData);
-  };
-
   this.onHandicapChange = function(value, customData){
     console.log("onHandicapChange...", value, customData);
   };

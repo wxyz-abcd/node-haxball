@@ -161,7 +161,7 @@ function analyzeChatCommand(msg){
     return false;
   if (msg.length==1)
     return true;
-  var {K, q} = API.Impl.Utils;
+  var {parseHexInt} = API.Utils;
   msg = msg.substring(1).split(" ");
   switch (msg[0]) {
     case "avatar":
@@ -171,7 +171,7 @@ function analyzeChatCommand(msg){
       }
       break;
     case "checksum":
-      var cs = API.Utils.stadiumChecksum(room.stadium);
+      var cs = room.stadium.calculateChecksum();
       if (!cs)
         chatApi.receiveNotice('Current stadium is original: "' + room.stadium.name + '"')
       else
@@ -219,14 +219,12 @@ function analyzeChatCommand(msg){
           msg.splice(0, 3);
         room.setTeamColors(teamId, angle, ...msg);
       } catch (g) {
-        msg = g instanceof q ? g.Ta : g;
-        if (msg.toString != null)
-          chatApi.receiveNotice(msg.toString());
+        chatApi.receiveNotice(msg.toString());
       }
       break;
     case "extrapolation":
       if (msg.length==2){
-        msg = K.parseInt(msg[1]);
+        msg = parseHexInt(msg[1]);
         if (msg!=null){ // && -200 <= msg && 200 >= msg
           room.setExtrapolation(msg),
           chatApi.receiveNotice("Extrapolation set to " + msg + " msec");
@@ -239,7 +237,7 @@ function analyzeChatCommand(msg){
       break;
     case "handicap":
       if (msg.length==2){
-        msg = K.parseInt(msg[1]);
+        msg = parseHexInt(msg[1]);
         if (msg!=null){ // && 0 <= msg && 300 >= msg
           room.setHandicap(msg);
           chatApi.receiveNotice("Ping handicap set to " + msg + " msec");
@@ -254,8 +252,8 @@ function analyzeChatCommand(msg){
       if (msg.length<4)
         chatApi.receiveNotice("Usage: /kick_ratelimit <min> <rate> <burst>");
       else {
-        var d = K.parseInt(msg[1]), e = K.parseInt(msg[2]);
-        msg = K.parseInt(msg[3]);
+        var d = parseHexInt(msg[1]), e = parseHexInt(msg[2]);
+        msg = parseHexInt(msg[3]);
         if (d==null || e==null || msg==null)
           chatApi.receiveNotice("Invalid arguments");
         else
@@ -276,11 +274,13 @@ function analyzeChatCommand(msg){
                 e = true;
                 break;
               default:
-                throw new q(null);
+                throw null;
             }
             room.setRecaptcha(e);
             chatApi.receiveNotice("Room join Recaptcha " + (e ? "enabled" : "disabled"));
-          } else throw new q(null);
+          }
+          else
+            throw null;
         } catch (g) {
           chatApi.receiveNotice("Usage: /recaptcha <on|off>");
         }
@@ -548,7 +548,7 @@ window.onload = ()=>{
     };
     room.onAfterStadiumChange = function (stadium, byId, customData) {
       var byPlayerObj = roomState.players.find((x)=>x.id==byId);
-      var checksum = API.Utils.stadiumChecksum(stadium);
+      var checksum = stadium.calculateChecksum();
       if (checksum)
         chatApi.receiveNotice('Stadium "' + stadium.name + '" (' + checksum + ") loaded" + by(byPlayerObj));
       updateGUI();

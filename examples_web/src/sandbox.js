@@ -350,7 +350,7 @@ function initToolbars(){
     API.Utils.getDefaultStadiums().forEach((stadium)=>{
       addContextMenuItem(ctxMenu, stadium.name, true, ()=>{
         room.stopGame(0);
-        room.setCurrentStadium(stadium, 0, console.warn);
+        room.setCurrentStadium(stadium, 0);
         room.startGame(0);
       });
     });
@@ -364,11 +364,14 @@ function initToolbars(){
           return;
         var fr = new FileReader();
         fr.onload = function () {
-          var x = API.Utils.parseStadium(fr.result, console.warn);
+          var x;
+          try{
+            x = API.Utils.parseStadium(fr.result);
+          }catch(e){}
           if (!x)
             return;
           room.stopGame(0);
-          room.setCurrentStadium(x, 0, console.warn);
+          room.setCurrentStadium(x, 0);
           room.startGame(0);
         };
         fr.readAsText(f.item(0));
@@ -4775,9 +4778,12 @@ function onload(){
     event.target.selectedIndex = 0;
   };
 
+  document.getElementById("extrapolation").onchange = function(event){
+    renderer.extrapolation = parseInt(event.target.value);
+  };
+
   keyHandler = new GameKeysHandler();
   sound = new Sound();
-  var { Team } = API.Impl.Core;
   document.addEventListener("keydown", window.onKeyDown);
   document.addEventListener("keyup", window.onKeyUp);
   document.addEventListener("focusout", keyHandler.reset);

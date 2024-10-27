@@ -62,8 +62,7 @@ function Bot(id, pass, name, avatar, lat, lon, flag, autoPlay){
           lat: lat,
           lon: lon,
           flag: flag
-        },
-        extrapolation: 0
+        }
       }, 
       libraries: [],
       renderer: null, // Don't render anything while we are trying to join multiple rooms simultaneously. :)

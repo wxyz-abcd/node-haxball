@@ -3,7 +3,7 @@ module.exports = function(API){
   
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "CMD_realSoccer", true, { // "CMD_realSoccer" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
-    version: "0.2",
+    version: "0.3",
     author: "abc",
     description: "This plugin sets up a real soccer game.",
     allowFlags: AllowFlags.CreateRoom // We allow this plugin to be activated on CreateRoom only.
@@ -381,10 +381,10 @@ module.exports = function(API){
     var kickOffRadius = Math.min(w, h)*that.kickOffRadiusCoeff;
     goalY = h*that.goalSizeCoeff;
     var sc = that.speedCoeff*diagonal;
-    throwInSpeed = 6*sc-0.5;
-    freeKickSpeed = 7.5*sc-0.5;
-    penaltySpeed = 8*sc-0.5;
-    cornerSpeed = 9*sc-0.5;
+    throwInSpeed = 7*sc-0.5;
+    freeKickSpeed = 9*sc-0.5;
+    penaltySpeed = 9*sc-0.5;
+    cornerSpeed = 10*sc-0.5;
     outSpeed = 12*sc-0.5;
     throwInObstacleRadius = 100*sc;
     freeKickObstacleRadius = 200*sc;
@@ -557,7 +557,7 @@ module.exports = function(API){
       });
       blockChanges = false;
       that.room.stopGame();
-      that.room.setCurrentStadium(Utils.parseStadium(JSON.stringify(mapObj), console.log));
+      that.room.setCurrentStadium(Utils.parseStadium(JSON.stringify(mapObj)));
       that.room.setScoreLimit(0);
       that.room.setTimeLimit(0);
       if (autoStart)
@@ -880,7 +880,7 @@ module.exports = function(API){
     tStats = null;
   };
 
-  function onOperationReceivedCommon(type){
+  function onOperationReceivedCommon(type, msg){
     if (blockChanges && (type==OperationType.SetGamePlayLimit || type==OperationType.SetStadium))
       return false;
     if (type==OperationType.AutoTeams){
@@ -1011,9 +1011,11 @@ module.exports = function(API){
       }
       if (type!=OperationType.SendInput)
         return true;
-      if ((msg.input&(~16))==0)
-        return true;
-      return !(playerArrangements[pMap.get(msg.byId)?.team.id]?.findIndex((playerId)=>(playerId==msg.byId))>=0);
+      if (playerArrangements[pMap.get(msg.byId)?.team.id]?.findIndex((playerId)=>(playerId==msg.byId))>=0)
+        msg.input = 0;
+      else
+        msg.input = msg.input&(~16);
+      return true;
     }
   }, 
   
@@ -1385,7 +1387,16 @@ module.exports = function(API){
         penaltiesSetupNextTurn();
       });
     },
-    onOperationReceived: onOperationReceivedCommon
+    onOperationReceived: function(type, msg, globalFrameNo, clientFrameNo){
+      if (!onOperationReceivedCommon(type))
+        return false;
+      if (type!=OperationType.SendInput)
+        return true;
+      var p = pMap.get(msg.byId)?.disc?.pos;
+      if (isNaN(p?.x)||isNaN(p?.y))
+        return false;
+      return true;
+    }
   }];
   
   function setMode(mode){

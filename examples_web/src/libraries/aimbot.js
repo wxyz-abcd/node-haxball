@@ -254,7 +254,7 @@ module.exports = function(API){
       var ball = gameState.physicsState.discs[0], fpId = thisLibrary.followPlayerId;
       if (!ball || !(fpId>=0))
         return;
-      var newState = gameState.copy(); // gameState.sc()
+      var newState = gameState.copy();
       var followDisc = newState.physicsState.discs.find((x)=>x.playerId==fpId);
       if (!followDisc)
         return;
@@ -267,7 +267,7 @@ module.exports = function(API){
       var p = ball.pos;
       ctx.moveTo(p.x, p.y);
       for (var i=1;i<=thisLibrary.advancedEngineFrameNum;i++){
-        newState.advance(1); // newState.C(1)
+        newState.runSteps(1);
         p = ball.pos;
         ctx.lineTo(p.x, p.y);
       }
