@@ -2484,7 +2484,7 @@ declare namespace MainReturnType {
      * 
      * @param steps The number of game ticks to execute.
      * 
-     * @returns void.
+     * @returns {void}
      */
     runSteps: (steps: int)=>void;
   };
@@ -2659,7 +2659,7 @@ declare namespace MainReturnType {
     geo?: GeoLocation | null,
     playerCount?: int | null,
     maxPlayerCount?: int | null
-  }
+  };
 
   /**
    * These events can only be received by a host room.
@@ -3249,7 +3249,7 @@ declare namespace MainReturnType {
     /**
      * Called just after a team's colors have been changed.
      * 
-     * @param teamId The team whose colors have been changed.
+     * @param teamId The team that colors have been changed.
      * @param value The new team colors value.
      * @param byId Id of the player who has changed the team colors.
      * @param customData the custom data that was returned from the previous callback.
@@ -5216,7 +5216,7 @@ declare namespace MainReturnType {
     /**
      * Do not modify this value. This value is `null` until joinRoom or createRoom operation is successful. After that, a pointer to the created/joined room object is auto-assigned to this variable.
      */
-    readonly room?: Room;
+    readonly room: Room|null;
 
     /**
      * Called just after the `room` object is created, and before the initialization of the addons. This is where you can initialize/add your custom GUI functions to the room object to be used inside the addons.
