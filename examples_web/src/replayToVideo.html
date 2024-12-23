@@ -3,6 +3,7 @@
     <script src="https://cdn.jsdelivr.net/npm/ccapture.js-npmfixed@1.1.0/build/CCapture.all.min.js"></script>
     <script src="./vendor/json5.min.js"></script>
     <script src="./vendor/pako-jszip.min.js"></script>
+    <!--script src="./vendor/api.js"></script-->
     <script src="https://cdn.jsdelivr.net/gh/wxyz-abcd/node-haxball@latest/src/api.js"></script>
     <style>
       .settingsTitle {
@@ -119,8 +120,7 @@
         JSON5: window.JSON5,
         pako: window.pako
       },{
-        noVariableValueChangeEvent: true,
-        noWebRTC: true
+        noVariableValueChangeEvent: true
       }); // if you use our haxballOriginModifier extension, you don't need a proxy server. (But you still have to serve the files, you cannot open the html directly.)
 
       function loadFile(file){
@@ -299,11 +299,6 @@
         });
         loadFile(file.files[0]).then((replayData)=>{
           var fid = checkNumber(roomPlayers.value, true);
-          renderers.forEach((renderer)=>{
-            renderer.room = {};
-            renderer.initialize();
-            renderer.followPlayerId = fid;
-          });
           /*canvas.width = params.cdw;
           canvas.height = params.cdh;*/
           canvas.style = "width: "+params.cws+"px; height: "+params.chs+"px;";
@@ -331,6 +326,11 @@
               capturer.capture(canvas);
               cfn.innerText = "Current Frame No: " + replayReader.getCurrentFrameNo() + " | FPS: " + currentRenderer.fps();
             }
+          });
+          renderers.forEach((renderer)=>{
+            renderer.room = replayReader;
+            renderer.initialize();
+            renderer.followPlayerId = fid;
           });
           replayReader.onEnd = ()=>{ // the end of replay data is reached.
             replayReader.destroy();

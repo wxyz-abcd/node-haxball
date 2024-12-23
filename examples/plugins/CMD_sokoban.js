@@ -1083,8 +1083,8 @@ module.exports = function(API){
     worker = null;
     workerPromise = null;
     workerPromiseResolve = null;
-    that.room.librariesMap?.commands?.remove("skip");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("skip");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
   };

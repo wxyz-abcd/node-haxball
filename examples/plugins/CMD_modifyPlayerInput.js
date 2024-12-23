@@ -52,8 +52,8 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("input");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("input");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     staticInputs = null;
     permissionCtx = null;
     permissionIds = null;

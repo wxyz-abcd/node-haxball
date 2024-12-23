@@ -69,12 +69,11 @@ function init(headless, roomCallback){
           libraries: librariesArray,
           renderer: null,
           plugins: pluginsArray,
-          onSuccess: (room)=>{ roomCallback(room, params); },
-          onRequestRecaptcha: ()=>{
-            alert("Token rejected. Get a fresh token first!");
-            window.close();
+          onOpen: (room)=>{ 
+            console.log("onOpen");
+            roomCallback(room, params); 
           },
-          onLeave: ()=>{
+          onClose: ()=>{
             alert("The room has been closed.");
             window.close();
           }
@@ -92,7 +91,7 @@ function init(headless, roomCallback){
         else
           authPromise = Utils.authFromKey(params.p_ak);
         authPromise.then((x)=>{
-          var authObj, alerted = false;
+          var authObj;
           if (params.p_ak=="")
             [params.p_ak, authObj] = x;
           else
@@ -117,23 +116,9 @@ function init(headless, roomCallback){
             libraries: librariesArray,
             renderer: null,
             plugins: pluginsArray,
-            onSuccess: (room)=>{ roomCallback(room, params); },
-            onRequestRecaptcha: ()=>{
-              alert("Token rejected. Get a fresh token first!");
-              window.close();
-            },
-            onFailure: (x)=>{
-              if (alerted)
-                return;
-              alerted = true;
-              alert(x.toString());
-              window.close();
-            },
-            onLeave: (x)=>{
-              if (alerted)
-                return;
-              alerted = true;
-              alert(x.toString());
+            onOpen: (room)=>{ roomCallback(room, params); },
+            onClose: (x)=>{
+              x && alert(x.toString());
               window.close();
             }
           });

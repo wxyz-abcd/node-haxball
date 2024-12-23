@@ -42,8 +42,8 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("breakKick");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("breakKick");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     connectionShouldBreak = null;
     permissionCtx = null;
     permissionIds = null;

@@ -41,8 +41,8 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       config: null, // example roomConfig usage: new autoPlay_followBall(API) // look at examples/roomConfigs/method2 folder for related examples.
       renderer: null, // example renderer usage: new defaultRenderer(API, {canvas: ..., images: {grass: ..., concrete: ..., concrete2: ..., typing: ...}, paintGame: true}) // look at examples_web folder for usage with room.setRenderer instead.
       plugins: [], // example plugin usage: [new autoPlay_followBall(API)] // look at examples/plugins folder for related examples.
-      onSuccess: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
-      onFailure: () => {
+      onOpen: roomCallbacks, // look at examples/roomConfigs/method1 folder for related examples.
+      onClose: () => {
         joinRoom(id); // try again if failed.
       }
     });

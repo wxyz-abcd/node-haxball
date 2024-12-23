@@ -86,9 +86,9 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("authregister");
-    that.room.librariesMap?.commands?.remove("authban");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("authregister");
+    that.room.librariesMap.commands?.remove("authban");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
   };
@@ -101,7 +101,7 @@ module.exports = function(API){
 
   this.onPlayerJoin = function(playerObj, customData){
     var { id, auth } = playerObj;
-    var {storage} = that.room.config, permissionsLib = that.room.librariesMap?.permissions;
+    var { storage } = that.room.config, permissionsLib = that.room.librariesMap.permissions;
     if (!storage || !permissionsLib)
       return;
     var users = storage.get("users");

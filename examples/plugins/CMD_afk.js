@@ -45,7 +45,7 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("afk");
+    that.room.librariesMap.commands?.remove("afk");
     afks = null;
   };
 

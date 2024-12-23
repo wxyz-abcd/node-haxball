@@ -337,9 +337,14 @@ declare namespace MainReturnType {
   }
 
   /**
-   * These values are used to track the current state of connection while joining a room. (Designed for the `onConnectionStateChange(state, sdp)` callback in the `commonParams` parameter of `Room.join` function.)
+   * These values are used to track the current state of connection while joining a room. (Designed for the `onConnInfo(state, extraInfo)` callback in the `commonParams` parameter of `Room.join` function.)
    */
   export enum ConnectionState {
+
+    /**
+     * "Trying reverse connection"
+     */
+    TryingReverseConnection = -1,
 
     /**
      * "Connecting to master"
@@ -579,289 +584,6 @@ declare namespace MainReturnType {
      * Free
      */
     c3 = 31
-  }
-
-  declare enum ErrorCodes {
-
-    /**
-     * ""
-     */
-    Empty = 0,
-
-    /**
-     * 'Connection closed$1?(" $1":"")'
-     */
-    ConnectionClosed = 1,
-
-    /**
-     * "Game state timeout"
-     */
-    GameStateTimeout = 2,
-
-    /**
-     * "The room was closed."
-     */
-    RoomClosed = 3,
-
-    /**
-     * "The room is full."
-     */
-    RoomFull = 4,
-
-    /**
-     * "Wrong password."
-     */
-    WrongPassword = 5,
-
-    /**
-     * "You are banned from this room."
-     */
-    BannedBefore = 6,
-
-    /**
-     * "Incompatible game version."
-     */
-    IncompatibleVersion = 7,
-
-    /**
-     * "Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues"
-     */
-    FailedHost = 8,
-
-    /**
-     * "An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."
-     */
-    Unknown = 9,
-
-    /**
-     * "Cancelled"
-     */
-    Cancelled = 10,
-
-    /**
-     * "Failed to connect to peer."
-     */
-    FailedPeer = 11,
-
-    /**
-     * 'You were $2?("banned":"kicked")$3?(" by $3":"")$1?(" ($1)":"")'
-     */
-    KickedNow = 12,
-
-    /**
-     * "Failed"
-     */
-    Failed = 13,
-
-    /**
-     * "Master connection error"
-     */
-    MasterConnectionError = 14,
-
-    /**
-     * 'Error in "$1" index: $2'
-     */
-    StadiumParseError = 15,
-
-    /**
-     * "SyntaxError in line: $1"
-     */
-    StadiumParseSyntaxError = 16,
-
-    /**
-     * "Error loading stadium file."
-     */
-    StadiumParseUnknownError = 17,
-
-    /**
-     * "Cannot cast $1 to $2"
-     */
-    ObjectCastError = 18,
-
-    /**
-     * "too many"
-     */
-    TeamColorsReadError = 19,
-
-    /**
-     * "Cannot decode UTF8 character at offset $1: charCode ($2) is invalid"
-     */
-    UTF8CharacterDecodeError = 20,
-
-    /**
-     * "Read too much"
-     */
-    ReadTooMuchError = 21,
-
-    /**
-     * "Actual string length differs from the specified: $1 bytes"
-     */
-    ReadWrongStringLengthError = 22,
-
-    /**
-     * "Cannot encode UTF8 character: charCode ($1) is negative"
-     */
-    EncodeUTF8CharNegativeError = 23,
-
-    /**
-     * "Cannot encode UTF8 character: charCode ($1) is too large (>= 0x80000000)"
-     */
-    EncodeUTF8CharTooLargeError = 24,
-
-    /**
-     * "Cannot calculate length of UTF8 character: charCode ($1) is negative"
-     */
-    CalculateLengthOfUTF8CharNegativeError = 25,
-
-    /**
-     * "Cannot calculate length of UTF8 character: charCode ($1) is too large (>= 0x80000000)"
-     */
-    CalculateLengthOfUTF8CharTooLargeError = 26,
-
-    /**
-     * "Can't resize buffer to a capacity lower than 1"
-     */
-    BufferResizeParameterTooSmallError = 27,
-
-    /**
-     * "Bad color"
-     */
-    BadColorError = 28,
-
-    /**
-     * "Bad team value"
-     */
-    BadTeamError = 29,
-
-    /**
-     * "Error"
-     */
-    StadiumLimitsExceededError = 30,
-
-    /**
-     * "Class doesn't have a config"
-     */
-    MissingActionConfigError = 31,
-
-    /**
-     * "Tried to pack unregistered action"
-     */
-    UnregisteredActionError = 32,
-
-    /**
-     * "missing implementation"
-     */
-    MissingImplementationError = 33,
-
-    /**
-     * "message too long"
-     */
-    AnnouncementActionMessageTooLongError = 34,
-
-    /**
-     * "message too long"
-     */
-    ChatActionMessageTooLongError = 35,
-
-    /**
-     * "string too long"
-     */
-    KickBanReasonTooLongError = 36,
-
-    /**
-     * "Invalid team id"
-     */
-    ChangeTeamColorsInvalidTeamIdError = 37,
-
-    /**
-     * "Recaptcha requested. Either set onRequestRecaptcha or set a working token while creating/joining a room."
-     */
-    MissingRecaptchaCallbackError = 38,
-
-    /**
-     * "The replay data is of a different version"
-     */
-    ReplayFileVersionMismatchError = 39,
-
-    /**
-     * "Couldn't load replay data."
-     */
-    ReplayFileReadError = 40,
-
-    /**
-     * "id and authObj cannot be null. (inside 1st parameter)"
-     */
-    JoinRoomNullIdAuthError = 41,
-
-    /**
-     * "name too long"
-     */
-    PlayerNameTooLongError = 42,
-
-    /**
-     * "country too long"
-     */
-    PlayerCountryTooLongError = 43,
-
-    /**
-     * "avatar too long"
-     */
-    PlayerAvatarTooLongError = 44,
-
-    /**
-     * "Player join not allowed: $3 $4 $5 $1 $2"
-     */
-    PlayerJoinBlockedByMPDError = 45,
-
-    /**
-     * "Player join event blocked by OperationReceived: $1"
-     */
-    PlayerJoinBlockedByORError = 46,
-
-    /**
-     * "Plugin not found at index $1"
-     */
-    PluginNotFoundError = 47,
-
-    /**
-     * "Plugin name should not change"
-     */
-    PluginNameChangeNotAllowedError = 48,
-
-    /**
-     * "Library not found at index $1"
-     */
-    LibraryNotFoundError = 49,
-
-    /**
-     * "Library name should not change"
-     */
-    LibraryNameChangeNotAllowedError = 50,
-    
-    /**
-     * "Invalid id format"
-     */
-    AuthFromKeyInvalidIdFormatError = 51,
-
-    /**
-     * "Bad Actor"
-     */
-    BadActorError = 55,
-
-    /**
-     * "Auth banned: $1"
-     */
-    AuthBannedError = 56,
-
-    /**
-     * "Basro's backend is not compatible with the login system, so the identity token and identity events are disabled."
-     */
-    NoProxyIdentityProblem = 57,
-
-    /**
-     * "Solution: Use a proxy server and handle the login data there."
-     */
-    NoProxyIdentitySolution = 58    
   }
 
   declare type int = number;
@@ -3310,8 +3032,9 @@ declare namespace MainReturnType {
      * @returns 
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
+     *   - `Promise<[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]>`: Modifies the name, flag and avatar values after the promise might be resolved.
      */
-    modifyPlayerData?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: any)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerData?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: any)=>null|[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]|Promise<[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]>,
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -4585,9 +4308,10 @@ declare namespace MainReturnType {
      * 
      * @returns 
      *   - `null`: Blocks the player from joining the room.
-     *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
+     *   - `[[modifiedName: string, modifiedFlag: string, modifiedAvatar: string], customData: any]`: Modifies the name, flag and avatar values.
+     *   - `Promise<[[modifiedName: string, modifiedFlag: string, modifiedAvatar: string], customData: any]>`: Modifies the name, flag and avatar values after the promise might be resolved.
      */
-    modifyPlayerDataBefore?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerDataBefore?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string)=>null|[[modifiedName: string, modifiedFlag: string, modifiedAvatar: string], customData: any]|Promise<[[modifiedName: string, modifiedFlag: string, modifiedAvatar: string], customData: any]>,
 
     /**
      * Called just before the player has joined the room. Using this callback, you may block all players or modify all players' name, flag and avatar properties just before they join the room.
@@ -4603,8 +4327,9 @@ declare namespace MainReturnType {
      * @returns 
      *   - `null`: Blocks the player from joining the room.
      *   - `[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]`: Modifies the name, flag and avatar values.
+     *   - `Promise<[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]>`: Modifies the name, flag and avatar values after the promise might be resolved.
      */
-    modifyPlayerDataAfter?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: any)=>[modifiedName: string, modifiedFlag: string, modifiedAvatar: string],
+    modifyPlayerDataAfter?: (playerId: uint16, name: string, flag: string, avatar: string, conn: string, auth: string, customData?: any)=>null|[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]|Promise<[modifiedName: string, modifiedFlag: string, modifiedAvatar: string]>,
 
     /**
      * If defined, runs for all players except host in a host room. Modifies the `ping` value of the player whose id is `playerId`. 
@@ -4774,13 +4499,14 @@ declare namespace MainReturnType {
   declare interface RendererCallbacks {
 
     /**
-     * This callback should always be defined, since this function holds the main purpose of the Renderer class. All rendering logic is supposed to reside inside this function. The default renderer code renders the given `extrapolatedRoomState` parameter using an outer canvas's Context2D object. The callback is used internally by the game engine inside `window.requestAnimationFrame` callback.
-     * 
-     * @param extrapolatedRoomState The extrapolated state of the room that is about to be rendered.
+     * This callback should always be defined, since this function holds the main purpose of the Renderer class. 
+     * All rendering logic is supposed to reside inside this function. You should use `room.extrapolate` function 
+     * inside this callback with `ignoreMultipleCalls`=`true` for smooth movement of objects. This callback is used 
+     * internally by the game engine inside `window.requestAnimationFrame` callback.
      * 
      * @returns void.
      */
-    render?: (extrapolatedRoomState: RoomState)=>void
+    render?: ()=>void
   }
 
   declare interface CommonlyUsedCallbacks extends HostTriggeredCallbacks, GameCallbacks, CommonCallbacks, RendererCallbacks {}
@@ -4832,6 +4558,24 @@ declare namespace MainReturnType {
     code: int;
     value: string|Error;
   }
+
+  declare type GenerateRoomIdParams = {
+
+    /**
+     * A working room token
+     */
+    token: string, 
+
+    /**
+     * A custom proxy agent to use for the room's connection. This method does not work in browsers. Defaults to `null`.
+     */
+    proxyAgent: ProxyAgentLike
+  };
+
+  declare type GenerateRoomIdReturnValue = {
+    roomId: string, 
+    newToken: string
+  };
 
   /**
    * This object consists of several helper utility functions for developers.
@@ -5072,8 +4816,45 @@ declare namespace MainReturnType {
      * - If `code` = `1`; The token value was rejected and `value` contains the `sitekey` value that is required by Google Recaptcha v2 API to show recaptcha inside a website.
      * - If `code` = `2`; An error occurred while sending request or receiving response and `value` contains the error.
      */
-    export function refreshRoomToken(params: RefreshRoomTokenParams): RefreshRoomTokenReturnValue;
+    export function refreshRoomToken(params: RefreshRoomTokenParams): Promise<RefreshRoomTokenReturnValue>;
+
+    /**
+     * Generates and returns the room id corresponding to the given room `token`. This function also refreshes the room token and returns the new token.
+     * 
+     * @param params An object that might have the following keys:
+     *   - `token: string`: The room token.
+     *   - `proxyAgent: object`: A custom proxy agent to use for the connection. This method does not work in browsers. (Default value is null)
+     * 
+     * @returns A Promise that resolves to an object that contains `roomId` and `newToken` keys. The promise is rejected if an error occurs.
+     */
+    export function generateRoomId(params: GenerateRoomIdParams):Promise<GenerateRoomIdReturnValue>;
   }
+
+  /**
+   * An object that stores information about player preferences.
+   */
+  declare type Storage = {
+
+    /**
+     * If `true`, sets some timeout value to `10` seconds instead of `4` seconds while joining a room.
+     */
+    crappy_router: boolean;
+    
+    /**
+     * Name of the player. Default value is `"abc"`.
+     */
+    player_name: string;
+
+    /**
+     * Avatar of the player. Default value is `null`.
+     */
+    avatar: string;
+
+    /**
+     * Geolocation of the player.
+     */
+    geo: GeoLocation;
+  };
 
   declare type CreateRoomParams = {
 
@@ -5161,7 +4942,7 @@ declare namespace MainReturnType {
     authObj: Auth;
   };
 
-  declare class HaxballClient{
+  declare type CommonNetworkRoomParams = {
 
     /**
      * An object that stores information about the current player preferences.
@@ -5199,11 +4980,6 @@ declare namespace MainReturnType {
     version?: int;
 
     /**
-     * When we kick the ball, it causes us to release kick button by default. This API changes it so that it causes a timeout that makes us automatically press kick button again. We may assign a negative value to disable this feature. Default value is `-1`.
-     */
-    kickTimeout?: int;
-
-    /**
      * A custom proxy agent to use for the room's connection. This method does not work in browsers. Defaults to `null`.
      */
     proxyAgent?: ProxyAgentLike;
@@ -5212,11 +4988,6 @@ declare namespace MainReturnType {
      * A token that represents a user data in a database of a custom proxy/backend server. If successful, room will create and emit an IdentityEvent for this player.
      */
     identityToken?: string;
-
-    /**
-     * Do not modify this value. This value is `null` until joinRoom or createRoom operation is successful. After that, a pointer to the created/joined room object is auto-assigned to this variable.
-     */
-    readonly room: Room|null;
 
     /**
      * Called just after the `room` object is created, and before the initialization of the addons. This is where you can initialize/add your custom GUI functions to the room object to be used inside the addons.
@@ -5234,49 +5005,29 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onSuccess?: (room: Room)=>void;
-
-    /**
-     * Called when Joining a room failed.
-     * 
-     * @param error The error that caused the failure.
-     * 
-     * @returns void.
-     */
-    onFailure?: (error: Errors.HBError)=>void;
+    onOpen?: (room: Room)=>void;
 
     /**
      * Triggered while leaving the room.
      * 
-     * @param msg The reason of leaving the room.
+     * @param reason The reason of leaving the room.
      * 
      * @returns void.
      */
-    onLeave?: (msg: Errors.HBError)=>void;
+    onClose?: (reason: Errors.HBError)=>void;
 
     /**
-     * Triggered when the connection's state changed.
+     * Triggered when the connection's state changed while joining a room.
      * 
      * @param state The new connection state.
-     * @param sdp The session description value for webrtc connection. (only exists if `state` is `ConnectingToPeer` or `AwaitingState`.)
+     * @param extraInfo Contains the sdp value for webrtc connection if `state` is `ConnectingToPeer` or `AwaitingState`; or the error if `state` is `ConnectionFailed`.
      * 
      * @returns void.
      */
-    onConnectionStateChange?: (state: ConnectionState, sdp?: string)=>void;
-    
-    /**
-     * Triggered while starting to try the reverse connection method while joining a room.
-     * 
-     * @returns void.
-     */
-    onReverseConnection?: ()=>void;
+    onConnInfo?: (state: ConnectionState, extraInfo?: string|Errors.HBError)=>void;
+  };
 
-    /**
-     * Triggered when recaptcha is requested from the backend server while joining or creating a room.
-     * 
-     * @returns void.
-     */
-    onRequestRecaptcha?: ()=>void;
+  declare type CommonNetworkRoomReturnType = {
 
     /**
      * This function cancels the process of joining a room. Does nothing if not currently trying to join a room. 
@@ -5286,7 +5037,7 @@ declare namespace MainReturnType {
     cancel: ()=>void;
 
     /**
-     * Should be used to send the recaptcha token after `onRequestRecaptcha` callback is called. Currently only working while creating a room. 
+     * Should be used to send the recaptcha token after the `MissingRecaptchaCallbackError` error code is received. Currently only working while creating a room. 
      * Workaround: In order to send the token to try and join a recaptcha-protected room, clean up old resources and use `Room.join` with the new token.
      * 
      * @param token The recaptcha token.
@@ -5346,9 +5097,9 @@ declare namespace MainReturnType {
      * 
      * @param milliseconds The time to extrapolate the state for in milliseconds.
      * 
-     * @returns void.
+     * @returns The extrapolated room state.
      */
-    extrapolate(milliseconds:number): void;
+    extrapolate(milliseconds: number): RoomState;
 
     /**
      * Changes the speed of the simulation. 
@@ -5641,7 +5392,7 @@ declare namespace MainReturnType {
      *   - `1`: red.
      *   - `2`: blue.
      * @param angle The angle of stripes. (in degrees)
-     * @param colors Minimum 2, maximum 4 parseable(hex-rgb) color strings.
+     * @param colors Minimum 2, maximum 4 numeric (0 <= `integer` <= 16777215) color strings.
      * @param byId Id of the player who set the colors of the team.
      * 
      * @returns void.
@@ -7714,7 +7465,7 @@ declare namespace MainReturnType {
      * 
      * @param teamId Id of the team whose colors are desired to change.
      * @param angle The angle of stripes for the inner colors. Should be between `0` and `180`.
-     * @param colors This array can contain minimum 1, maximum 4 integers; where 0 <= each integer <= 16777215. The first element is the text color and the rest are inner stripe colors.
+     * @param colors This array can contain minimum 2, maximum 4 numeric (0 <= `integer` <= 16777215) values. The first element is the text color and the rest are inner stripe colors.
      * @param byId Id of the player who will look like he/she sent this event.
      * 
      * @returns void.
@@ -7767,7 +7518,7 @@ declare namespace MainReturnType {
      * 
      * @returns void.
      */
-    onSuccess: ()=>void;
+    onOpen: ()=>void;
 
     /**
      * Called when data is received from the streaming backend. 
@@ -7827,11 +7578,6 @@ declare namespace MainReturnType {
      * Session description value of the room's WebRTC connection. (only for client rooms)
      */
     readonly sdp: string;
-
-    /**
-     * Time between releasing and re-pressing the kick key. `kickTimeout` <= `0` means that this feature is disabled. (in milliseconds, defaults to `-1`)
-     */
-    readonly kickTimeout: int;
     
     /**
      * The current roomConfig object.
@@ -8113,11 +7859,11 @@ declare namespace MainReturnType {
      * 
      * @param teamId Id of the team whose colors are desired to be changed. Can either be `1`(red) or `2`(blue).
      * @param angle The desired angle of stripes. Should be between `-180` and `180`.
-     * @param colors Minimum 1, maximum 4 parseable(hex-rgb) color parameters. First parameter is the text color, and the others are stripe colors.
+     * @param colors Minimum 2, maximum 4 numeric (0 <= `integer` <= 16777215) color parameters. First parameter is the text color, and the others are stripe colors.
      * 
      * @returns void.
      */
-    setTeamColors(teamId: int, angle: int, ...colors: string[]): void;
+    setTeamColors(teamId: int, angle: int, ...colors: int[]): void;
 
     /**
      * When a player joins the room, the engine is first checking whether the current player count>=room's maximum player count value. This function enables or disables this check. host-only.
@@ -8429,8 +8175,8 @@ declare namespace MainReturnType {
     /**
      * Returns the ball disc.
      * 
-     * @param extrapolated Defaults to `true`.
-     *   - `true`: return the latest extrapolated version.
+     * @param extrapolated Defaults to `false`.
+     *   - `true`: return the latest extrapolated version if available, otherwise the original version.
      *   - `false`: return the original version.
      * 
      * @returns A Disc object.
@@ -8440,8 +8186,8 @@ declare namespace MainReturnType {
     /**
      * Returns the disc array of the current room.
      * 
-     * @param extrapolated Defaults to `true`.
-     *   - `true`: return the latest extrapolated version.
+     * @param extrapolated Defaults to `false`.
+     *   - `true`: return the latest extrapolated version if available, otherwise the original version.
      *   - `false`: return the original version.
      * 
      * @returns An array that consists of Disc objects.
@@ -8452,8 +8198,8 @@ declare namespace MainReturnType {
      * Returns the disc whose id is `discId`.
      * 
      * @param discId Id of the disc to be returned.
-     * @param extrapolated Defaults to `true`.
-     *   - `true`: return the latest extrapolated version.
+     * @param extrapolated Defaults to `false`.
+     *   - `true`: return the latest extrapolated version if available, otherwise the original version.
      *   - `false`: return the original version.
      * 
      * @returns A Disc object.
@@ -8464,8 +8210,8 @@ declare namespace MainReturnType {
      * Returns the disc that belongs to the player whose id is `playerId`.
      * 
      * @param playerId Id of the player whose disc is to be returned.
-     * @param extrapolated Defaults to `true`.
-     *   - `true`: return the latest extrapolated version.
+     * @param extrapolated Defaults to `false`.
+     *   - `true`: return the latest extrapolated version if available, otherwise the original version.
      *   - `false`: return the original version.
      * 
      * @returns A Disc object.
@@ -8533,11 +8279,12 @@ declare namespace MainReturnType {
      * original objects to their newly calculated extrapolated states. Normally
      * designed to be used in renderers.
      * 
-     * @param milliseconds The time to extrapolate the state for in milliseconds.
+     * @param milliseconds The time to extrapolate the state for in milliseconds. Defaults to 0.
+     * @param ignoreMultipleCalls Whether to allow multiple calls in the same game tick. Should be `true` only while using it inside a renderer's `render` function. Defaults to `false`.
      * 
-     * @returns void.
+     * @returns The extrapolated room state.
      */
-    extrapolate(milliseconds:number): void;
+    extrapolate(milliseconds: number, ignoreMultipleCalls: boolean): RoomState;
 
     /**
      * Sets the `RoomConfig` object that contains all the main callbacks of this room.
@@ -8615,11 +8362,33 @@ declare namespace MainReturnType {
      *   - `fakePassword: boolean | null`: If set to `true` or `false`, the room will set its password-protected status to your value. Passing `null` disables this behaviour.
      *   - `showInRoomList: boolean`: Whether to show this room in the room list or not.
      *   - `onError: Function(error: HBError, playerId: int)`: Called when a exception is thrown by one of the client connections. playerId is the id of the player that caused the exception. The player's connection will be closed just after this callback is executed.
-     * @param commonParams A `HaxballClient`-like object.
+     * @param commonParams An object that might have the following keys:
+     *   - `storage`: An object that stores information about the current player preferences. It may consist of these keys:
+     *     - `crappy_router`: if `true`, sets some timeout value to `10` seconds instead of `4` seconds while joining a room.
+     *     - `player_name`: name of the player. default value is `"abc"`.
+     *     - `avatar`: avatar of the player. default value is `null`.
+     *     - `geo`: geolocation of the player. it may consist of these keys:
+     *       - `lat`: latitude value (number, default value is `40`).
+     *       - `lon`: longitude value (number, default value is `40`).
+     *       - `flag`: 2 letter country code (string, default value is `"tr"`).
+     *   - `noPluginMechanism`: whether the plugin mechanism will be passive or not. (default value is `false`)
+     *   - `config`: A `RoomConfig` object. (default value is `null`)
+     *   - `renderer`: A `Renderer` object. (default value is `null`)
+     *   - `plugins`: An array of `Plugin`s to activate. (default value is `[]`)
+     *   - `libraries`: An array of `Library`s to activate. (default value is `[]`)
+     *   - `version`: The version of this room. (default value is `9`)
+     *   - `proxyAgent`:  A custom proxy agent to use for the room's connection. (default value is `null`)
+     *   - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. (default value is `null`)
+     *   - `preInit(room: Room)=>void`: A callback that is called just after the room is created, and before the initialization of the addons.. (default value is `null`)
+     *   - `onOpen(room: Room)=>void`: A callback that is called when joining or creating a room was successful. (default value is `null`)
+     *   - `onClose(reason: Errors.HBError)=>void`: A callback that is called while leaving the room. (default value is `null`)
+     *   - `onConnInfo(state: ConnectionState, extraInfo?: string|Errors.HBError)=>void`: A callback that is called whenever the connection's state changed while joining a room. (default value is `null`)
      * 
-     * @returns An instance of `HaxballClient`.
+     * @returns An object that has the following triggers:
+     *  - cancel(): This function can be called to cancel the process of creating a room, or also to close the room later.
+     *  - useRecaptchaToken(token): This function can be called to try the process of creating a room again whenever the recaptcha token was rejected.
      */
-    static create(createParams: CreateRoomParams, commonParams: HaxballClient): HaxballClient;
+    static create(createParams: CreateRoomParams, commonParams: CommonNetworkRoomParams): CommonNetworkRoomReturnType;
 
     /**
      * Tries to join a room using the given parameters.
@@ -8629,11 +8398,33 @@ declare namespace MainReturnType {
      *   - `password: string | null`: A password value to join the room if the room is password-protected.
      *   - `token: string | null`: If the room is recaptcha-protected, you have to use a client token. Currently there is not any other clean way of generating this token for Haxball's original backend except using the NW.js token generator project, so you might want to look at it.
      *   - `authObj: Auth`: An auth object that has to be initialized by `Utils.generateAuth()` or `Utils.authFromKey()` before being used here.
-     * @param commonParams A `HaxballClient`-like object.
+     * @param commonParams An object that might have the following keys:
+     *   - `storage`: An object that stores information about the current player preferences. It may consist of these keys:
+     *     - `crappy_router`: if `true`, sets some timeout value to `10` seconds instead of `4` seconds while joining a room.
+     *     - `player_name`: name of the player. default value is `"abc"`.
+     *     - `avatar`: avatar of the player. default value is `null`.
+     *     - `geo`: geolocation of the player. it may consist of these keys:
+     *       - `lat`: latitude value (number, default value is `40`).
+     *       - `lon`: longitude value (number, default value is `40`).
+     *       - `flag`: 2 letter country code (string, default value is `"tr"`).
+     *   - `noPluginMechanism`: whether the plugin mechanism will be passive or not. (default value is `false`)
+     *   - `config`: A `RoomConfig` object. (default value is `null`)
+     *   - `renderer`: A `Renderer` object. (default value is `null`)
+     *   - `plugins`: An array of `Plugin`s to activate. (default value is `[]`)
+     *   - `libraries`: An array of `Library`s to activate. (default value is `[]`)
+     *   - `version`: The version of this room. (default value is `9`)
+     *   - `proxyAgent`:  A custom proxy agent to use for the room's connection. (default value is `null`)
+     *   - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. (default value is `null`)
+     *   - `preInit(room: Room)=>void`: A callback that is called just after the room is created, and before the initialization of the addons.. (default value is `null`)
+     *   - `onOpen(room: Room)=>void`: A callback that is called when joining or creating a room was successful. (default value is `null`)
+     *   - `onClose(reason: Errors.HBError)=>void`: A callback that is called while leaving the room. (default value is `null`)
+     *   - `onConnInfo(state: ConnectionState, extraInfo?: string|Errors.HBError)=>void`: A callback that is called whenever the connection's state changed while joining a room. (default value is `null`)
      * 
-     * @returns An instance of `HaxballClient`.
+     * @returns An object that has the following triggers:
+     *  - cancel(): This function can be called to cancel the process of creating a room, or also to close the room later.
+     *  - useRecaptchaToken(token): This function can be called to try the process of creating a room again whenever the recaptcha token was rejected.
      */
-    static join(joinParams: JoinRoomParams, commonParams: HaxballClient): HaxballClient;
+    static join(joinParams: JoinRoomParams, commonParams: CommonNetworkRoomParams): CommonNetworkRoomReturnType;
 
     /**
      * Creates a sandbox room object.
@@ -9062,9 +8853,9 @@ declare namespace MainReturnType {
      * 
      * @param milliseconds The time to extrapolate the state for in milliseconds.
      * 
-     * @returns void.
+     * @returns The extrapolated room state.
      */
-    declare extrapolate: (milliseconds: number)=>void;
+    declare extrapolate: (milliseconds: number)=>RoomState;
 
     /**
      * Returns the current speed coefficient of this replay reader object.
@@ -9776,7 +9567,293 @@ declare namespace MainReturnType {
     /**
      * Name-to-integer mapping that shortly describes the error codes used in `HBError` class.
      */
-    export const ErrorCodes: TextToNumberMap;
+    export enum ErrorCodes {
+
+      /**
+       * ""
+       */
+      Empty = 0,
+  
+      /**
+       * 'Connection closed$1?(" $1":"")'
+       */
+      ConnectionClosed = 1,
+  
+      /**
+       * "Game state timeout"
+       */
+      GameStateTimeout = 2,
+  
+      /**
+       * "The room was closed."
+       */
+      RoomClosed = 3,
+  
+      /**
+       * "The room is full."
+       */
+      RoomFull = 4,
+  
+      /**
+       * "Wrong password."
+       */
+      WrongPassword = 5,
+  
+      /**
+       * "You are banned from this room."
+       */
+      BannedBefore = 6,
+  
+      /**
+       * "Incompatible game version."
+       */
+      IncompatibleVersion = 7,
+  
+      /**
+       * "Failed to connect to room host. If this problem persists please see the troubleshooting guide: https://github.com/haxball/haxball-issues/wiki/Connection-Issues"
+       */
+      FailedHost = 8,
+  
+      /**
+       * "An error ocurred while attempting to join the room.<br><br>This might be caused by a browser extension, try disabling all extensions and refreshing the site.<br><br>The error has been printed to the inspector console."
+       */
+      Unknown = 9,
+  
+      /**
+       * "Cancelled"
+       */
+      Cancelled = 10,
+  
+      /**
+       * "Failed to connect to peer."
+       */
+      FailedPeer = 11,
+  
+      /**
+       * 'You were $2?("banned":"kicked")$3?(" by $3":"")$1?(" ($1)":"")'
+       */
+      KickedNow = 12,
+  
+      /**
+       * "Failed"
+       */
+      Failed = 13,
+  
+      /**
+       * "Master connection error"
+       */
+      MasterConnectionError = 14,
+  
+      /**
+       * 'Error in "$1" index: $2'
+       */
+      StadiumParseError = 15,
+  
+      /**
+       * "SyntaxError in line: $1"
+       */
+      StadiumParseSyntaxError = 16,
+  
+      /**
+       * "Error loading stadium file."
+       */
+      StadiumParseUnknownError = 17,
+  
+      /**
+       * "Cannot cast $1 to $2"
+       */
+      ObjectCastError = 18,
+  
+      /**
+       * "too many"
+       */
+      TeamColorsReadError = 19,
+  
+      /**
+       * "Cannot decode UTF8 character at offset $1: charCode ($2) is invalid"
+       */
+      UTF8CharacterDecodeError = 20,
+  
+      /**
+       * "Read too much"
+       */
+      ReadTooMuchError = 21,
+  
+      /**
+       * "Actual string length differs from the specified: $1 bytes"
+       */
+      ReadWrongStringLengthError = 22,
+  
+      /**
+       * "Cannot encode UTF8 character: charCode ($1) is negative"
+       */
+      EncodeUTF8CharNegativeError = 23,
+  
+      /**
+       * "Cannot encode UTF8 character: charCode ($1) is too large (>= 0x80000000)"
+       */
+      EncodeUTF8CharTooLargeError = 24,
+  
+      /**
+       * "Cannot calculate length of UTF8 character: charCode ($1) is negative"
+       */
+      CalculateLengthOfUTF8CharNegativeError = 25,
+  
+      /**
+       * "Cannot calculate length of UTF8 character: charCode ($1) is too large (>= 0x80000000)"
+       */
+      CalculateLengthOfUTF8CharTooLargeError = 26,
+  
+      /**
+       * "Can't resize buffer to a capacity lower than 1"
+       */
+      BufferResizeParameterTooSmallError = 27,
+  
+      /**
+       * "Bad color"
+       */
+      BadColorError = 28,
+  
+      /**
+       * "Bad team value"
+       */
+      BadTeamError = 29,
+  
+      /**
+       * "Error"
+       */
+      StadiumLimitsExceededError = 30,
+  
+      /**
+       * "Class doesn't have a config"
+       */
+      MissingActionConfigError = 31,
+  
+      /**
+       * "Tried to pack unregistered action"
+       */
+      UnregisteredActionError = 32,
+  
+      /**
+       * "missing implementation"
+       */
+      MissingImplementationError = 33,
+  
+      /**
+       * "message too long"
+       */
+      AnnouncementActionMessageTooLongError = 34,
+  
+      /**
+       * "message too long"
+       */
+      ChatActionMessageTooLongError = 35,
+  
+      /**
+       * "string too long"
+       */
+      KickBanReasonTooLongError = 36,
+  
+      /**
+       * "Invalid team id"
+       */
+      ChangeTeamColorsInvalidTeamIdError = 37,
+  
+      /**
+       * "Recaptcha requested. Set a working recaptcha token while creating/joining a room."
+       */
+      MissingRecaptchaCallbackError = 38,
+  
+      /**
+       * "The replay data is of a different version"
+       */
+      ReplayFileVersionMismatchError = 39,
+  
+      /**
+       * "Couldn't load replay data."
+       */
+      ReplayFileReadError = 40,
+  
+      /**
+       * "id and authObj cannot be null. (inside 1st parameter)"
+       */
+      JoinRoomNullIdAuthError = 41,
+  
+      /**
+       * "name too long"
+       */
+      PlayerNameTooLongError = 42,
+  
+      /**
+       * "country too long"
+       */
+      PlayerCountryTooLongError = 43,
+  
+      /**
+       * "avatar too long"
+       */
+      PlayerAvatarTooLongError = 44,
+  
+      /**
+       * "Player join not allowed: $3 $4 $5 $1 $2"
+       */
+      PlayerJoinBlockedByMPDError = 45,
+  
+      /**
+       * "Player join event blocked by OperationReceived: $1"
+       */
+      PlayerJoinBlockedByORError = 46,
+  
+      /**
+       * "Plugin not found at index $1"
+       */
+      PluginNotFoundError = 47,
+  
+      /**
+       * "Plugin name should not change"
+       */
+      PluginNameChangeNotAllowedError = 48,
+  
+      /**
+       * "Library not found at index $1"
+       */
+      LibraryNotFoundError = 49,
+  
+      /**
+       * "Library name should not change"
+       */
+      LibraryNameChangeNotAllowedError = 50,
+      
+      /**
+       * "Invalid id format"
+       */
+      AuthFromKeyInvalidIdFormatError = 51,
+  
+      /**
+       * "Bad Actor"
+       */
+      BadActorError = 55,
+  
+      /**
+       * "Auth banned: $1"
+       */
+      AuthBannedError = 56,
+  
+      /**
+       * "Basro's backend is not compatible with the login system, so the identity token and identity events are disabled."
+       */
+      NoProxyIdentityProblem = 57,
+  
+      /**
+       * "Solution: Use a proxy server and handle the login data there."
+       */
+      NoProxyIdentitySolution = 58,
+  
+      /**
+       * "An error ocurred while attempting to create the room. ($1)"
+       */
+      FailedToCreateRoom = 59
+    }
     
   }
 
@@ -10050,11 +10127,6 @@ declare class LibConfig {
    * A custom proxy agent to use for the room's connection. This method does not work in browsers. Defaults to `null`.
    */
   proxyAgent?: ProxyAgentLike;
-
-  /**
-   * If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
-   */
-  noWebRTC?: boolean;
 
   /**
    * The url address of an external stun server that is required for the communication via WebRTC to work correctly. Defaults to: `stun:stun.l.google.com:19302`.

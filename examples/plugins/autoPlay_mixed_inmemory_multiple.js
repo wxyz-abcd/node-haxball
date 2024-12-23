@@ -245,6 +245,9 @@ module.exports = function(API){
     if (!that.botsActive)
       return;
 
+    // ensure extrapolation of the room state before calculating stuff.
+    that.room.extrapolate();
+
     // get the extrapolated game state object
     var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;

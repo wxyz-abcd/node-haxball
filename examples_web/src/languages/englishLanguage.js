@@ -47,7 +47,7 @@ module.exports = function(API){
 			[ErrorCodes.ChatActionMessageTooLongError]: "Message too long",
 			[ErrorCodes.KickBanReasonTooLongError]: "String too long",
 			[ErrorCodes.ChangeTeamColorsInvalidTeamIdError]: "Invalid team id",
-			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha requested. Either set onRequestRecaptcha or set a working token while creating/joining a room.",
+			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha requested. Set a working recaptcha token while creating/joining a room.",
 			[ErrorCodes.ReplayFileVersionMismatchError]: "The replay data is of a different version",
 			[ErrorCodes.ReplayFileReadError]: "Couldn't load replay data.",
 			[ErrorCodes.JoinRoomNullIdAuthError]: "Id and authObj cannot be null. (inside 1st parameter)",
@@ -64,7 +64,8 @@ module.exports = function(API){
 			[ErrorCodes.BadActorError]: "Bad Actor",
 			[ErrorCodes.AuthBannedError]: "Auth banned: $1",
 			[ErrorCodes.NoProxyIdentityProblem]: "Basro's backend is not compatible with the login system, so the identity token and identity events are disabled.",
-			[ErrorCodes.NoProxyIdentitySolution]: "Solution: Use a proxy server and handle the login data there."
+			[ErrorCodes.NoProxyIdentitySolution]: "Solution: Use a proxy server and handle the login data there.",
+			[ErrorCodes.FailedToCreateRoom]: "An error ocurred while attempting to create the room. ($1)"
 		}
 	};
 };

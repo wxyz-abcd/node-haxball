@@ -140,9 +140,9 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("speedHack");
-    that.room.librariesMap?.commands?.remove("speedHackProps");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("speedHack");
+    that.room.librariesMap.commands?.remove("speedHackProps");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     playerProps = null;
     permissionCtx = null;
     permissionIds = null;

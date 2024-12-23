@@ -104,8 +104,8 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("setPlayerBall");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("setPlayerBall");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     ballPlayers.clear();
     that.room.players.forEach((p)=>{
       updatePlayerDisc(p);

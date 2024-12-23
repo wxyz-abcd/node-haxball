@@ -4,7 +4,7 @@ module.exports = function(API, params){
   Object.setPrototypeOf(this, Renderer.prototype);
   Renderer.call(this, { // Every renderer should have a unique name.
     name: "flappyKirby",
-    version: "1.2",
+    version: "1.3",
     author: "basro & abc",
     description: `This is a customized and de-optimized renderer that renders players as flappy kirby animations. Use +, - keys for zoom in-out. Disable followMode to zoom using mouse wheel.`
   });
@@ -150,6 +150,42 @@ module.exports = function(API, params){
     description: "Show/Hide player edges?", 
     type: VariableType.Boolean,
     value: false
+  });
+
+  this.defineVariable({
+    name: "generalLineWidth",
+    description: "The line width of everything except discs and texts on screen.", 
+    type: VariableType.Number,
+    value: 3,
+    range: {
+      min: 0,
+      max: 100,
+      step: 0.01
+    }
+  });
+
+  this.defineVariable({
+    name: "discLineWidth",
+    description: "The line width of discs.", 
+    type: VariableType.Number,
+    value: 2,
+    range: {
+      min: 0,
+      max: 100,
+      step: 0.01
+    }
+  });
+
+  this.defineVariable({
+    name: "textLineWidth",
+    description: "The line width of texts.", 
+    type: VariableType.Number,
+    value: 3,
+    range: {
+      min: 0,
+      max: 100,
+      step: 0.01
+    }
   });
 
   var thisRenderer = this, { Point, Team, TeamColors } = Impl.Core, animData;
@@ -373,34 +409,35 @@ module.exports = function(API, params){
       }
       var viewHeight = this.canvas.height/zoomCoeff;
       this.updateCameraOrigin(gameState, followDisc, viewWidth, viewHeight, deltaTime);
-      var playerObjects = roomState.players;
+      var playerObjects = roomState.players, playerObject, i;
       this.actualZoomCoeff = zoomCoeff;
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.ctx.scale(zoomCoeff, zoomCoeff);
       this.ctx.translate(-this.origin.x, -this.origin.y);
-      this.ctx.lineWidth = 3;
+      this.ctx.lineWidth = thisRenderer.generalLineWidth;
       this.drawBackground(gameState.stadium);
       this.drawAllSegments(gameState.stadium);
       var discs = mapObjects.discs, joints = mapObjects.joints;
-      for (var i=0;i<joints.length;i++)
+      for (i=0;i<joints.length;i++)
         this.drawJoint(joints[i], discs);
       this.indicateAllLocations(roomState, viewWidth, viewHeight);
       if (thisRenderer.currentPlayerDistinction && followDisc)
         this.drawHalo(followDisc.pos);
-      this.ctx.lineWidth = 2;
-      for (var i=0;i<playerObjects.length;i++){
-        var playerObject = playerObjects[i], playerDisc = playerObject.disc;
+      this.ctx.lineWidth = thisRenderer.discLineWidth;
+      for (i=0;i<playerObjects.length;i++){
+        playerObject = playerObjects[i];
+        var playerDisc = playerObject.disc;
         if (!playerDisc)
           continue;
         this.drawPlayer(playerObject, playerDisc);
       }
-      for (var i=0;i<discs.length;i++){
+      for (i=0;i<discs.length;i++){
         var disc = discs[i];
         if (disc.playerId!=null)
           continue;
         this.drawDisc(disc);
       }
-      this.ctx.lineWidth = 3;
+      this.ctx.lineWidth = thisRenderer.textLineWidth;
       this.ctx.resetTransform();
       this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
       this.updateGamePaused(gameState);
@@ -412,14 +449,14 @@ module.exports = function(API, params){
     updateCameraOrigin: function(gameState, followDisc, viewWidth, viewHeight, deltaTime){
       var stadium = gameState.stadium;
       if (thisRenderer.followMode){
-        var x, y;
+        var x, y, pos;
         if (followDisc && stadium.cameraFollow==1){
-          var pos = followDisc.pos; // player's position
+          pos = followDisc.pos; // player's position
           x = pos.x;
           y = pos.y;
         }
         else{
-          var pos = gameState.physicsState.discs[0].pos; // ball's position
+          pos = gameState.physicsState.discs[0].pos; // ball's position
           x = pos.x;
           y = pos.y;
           if (followDisc){
@@ -743,7 +780,7 @@ module.exports = function(API, params){
   };
 
   this.render = function(){ // render logic here. called inside requestAnimationFrame callback
-    var extrapolatedRoomState = thisRenderer.room.extrapolate(thisRenderer.extrapolation);
+    var extrapolatedRoomState = thisRenderer.room.extrapolate(thisRenderer.extrapolation, true);
     if (!params.paintGame || !extrapolatedRoomState.gameState)
       return;
     rendererObj.render(extrapolatedRoomState);

@@ -57,6 +57,10 @@ module.exports = function(API){
   };
 
   this.onGameTick = function(customData){
+
+    // ensure extrapolation of the room state before calculating stuff.
+    that.room.extrapolate();
+
     // do not apply ball follow logic for maybe 150ms.
     // is needed for moveInRandomY() to work
     if (Date.now() - lastPositionsReset < 150) return;

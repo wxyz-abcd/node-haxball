@@ -9,5 +9,5 @@ function getQueriesAsJSON() {
 }
 
 function JSONToQueryParams(json){
-  return Object.keys(json).filter((x)=>(json[x]!=null && json[x]!="")).map((x)=>(encodeURI(x)+"="+encodeURI(json[x]))).join("&");
+  return Object.keys(json).filter((x)=>(json[x]!=null && json[x]!="")).map((x)=>(encodeURIComponent(x)+"="+encodeURIComponent(json[x]))).join("&");
 }

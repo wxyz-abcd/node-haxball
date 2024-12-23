@@ -1,6 +1,6 @@
 {
   "name": "node-haxball",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "The most powerful and lightweight API that allows you to develop your original Haxball(www.haxball.com) host, client, and standalone applications both on node.js and browser environments and also includes every possible hack and functionality that you can imagine.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -37,18 +37,19 @@
     "node": ">=16.9.0"
   },
   "dependencies": {
-    "@koush/wrtc": "^0.5.3",
     "@peculiar/webcrypto": "^1.4.0",
     "json5": "^2.2.1",
+    "node-datachannel": "^0.22.0",
     "pako": "^2.0.4",
     "ws": "^8.9.0",
     "xhr2": "^0.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
-    "esbuild": "^0.23.1",
+    "esbuild": "^0.24.2",
     "eslint": "^9.9.1",
     "globals": "^15.9.0",
+    "https-proxy-agent": "^7.0.5",
     "nago.js": "^0.6.0"
   }
 }

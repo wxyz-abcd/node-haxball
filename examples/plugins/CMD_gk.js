@@ -70,7 +70,7 @@ module.exports = function (API) {
 
 
     this.finalize = function () {
-        that.room.librariesMap?.commands?.remove("gk");
+        that.room.librariesMap.commands?.remove("gk");
         gks = null;
     };
 

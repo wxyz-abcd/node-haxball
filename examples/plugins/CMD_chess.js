@@ -2118,8 +2118,8 @@ module.exports = function(API){
     if (!stadium)
       return;
     that.room.setCurrentStadium(stadium);
-    that.room.setTeamColors(1, 0, "000000", "ffffff");
-    that.room.setTeamColors(2, 0, "ffffff", "000000");
+    that.room.setTeamColors(1, 0, Utils.parseHexInt("0x000000"), Utils.parseHexInt("0xffffff"));
+    that.room.setTeamColors(2, 0, Utils.parseHexInt("0xffffff"), Utils.parseHexInt("0x000000"));
     if (stopgame){
       autoStart = true;
       that.room.startGame();
@@ -2415,10 +2415,10 @@ module.exports = function(API){
     lastPlayerIdxs = null;
     pieceData = null;
     gameState = null;
-    that.room.librariesMap?.commands?.remove("reset");
-    that.room.librariesMap?.commands?.remove("load");
-    that.room.librariesMap?.commands?.remove("fen");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("reset");
+    that.room.librariesMap.commands?.remove("load");
+    that.room.librariesMap.commands?.remove("fen");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
   };

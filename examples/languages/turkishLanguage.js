@@ -47,7 +47,7 @@ module.exports = function(API){
 			[ErrorCodes.ChatActionMessageTooLongError]: "Mesaj çok uzun",
 			[ErrorCodes.KickBanReasonTooLongError]: "Yazı çok uzun",
 			[ErrorCodes.ChangeTeamColorsInvalidTeamIdError]: "Geçersiz takım idsi",
-			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha talep edildi. Oda oluştururken yada odaya girerken ya onRequestRecaptcha callbackine atama yapın yada çalışan bir token ayarlayın.",
+			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha talep edildi. Oda oluştururken/odaya girerken çalışan bir recaptcha token ayarlayın.",
 			[ErrorCodes.ReplayFileVersionMismatchError]: "Tekrarlama verisinin sürümü farklı",
 			[ErrorCodes.ReplayFileReadError]: "Tekrarlama verisi yüklenemedi.",
 			[ErrorCodes.JoinRoomNullIdAuthError]: "id ve authObj null olamaz. (1. parametrede)",
@@ -64,7 +64,8 @@ module.exports = function(API){
 			[ErrorCodes.BadActorError]: "Kötü Aktör",
 			[ErrorCodes.AuthBannedError]: "Auth yasaklandı: $1",
 			[ErrorCodes.NoProxyIdentityProblem]: "Basro'nun backendi üyelik sistemi ile uyumlu değil, bu nedenle kimlik tokeni ve kimlik olayları devre dışı bırakıldı.",
-			[ErrorCodes.NoProxyIdentitySolution]: "Çözüm: Bir vekil sunucu kullanın ve üyelik verilerini orada işleyin."
+			[ErrorCodes.NoProxyIdentitySolution]: "Çözüm: Bir vekil sunucu kullanın ve üyelik verilerini orada işleyin.",
+			[ErrorCodes.FailedToCreateRoom]: "Oda oluşturulmaya çalışılırken bir hata oluştu. (1$)"
 		}
 	};
 };

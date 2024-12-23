@@ -10,7 +10,7 @@
     - plugins, renderers, etc. (they probably need seperate tests. I will probably not automate their tests, because it will cause tests to become too many.)
 */
 
-module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, green, red, magenta, blue}, exit})=>{
+module.exports = ({ Room, Utils, Errors }, roomToken, noPlayer, {log, colors: {yellow, green, red, magenta, blue}, exit})=>{
   const roomPassword = "test123";
   const ratings = [
     {t: 0.50, c: red, n: "TERRIBLE"}, 
@@ -19,7 +19,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
     {t: 0.99, c: green, n: "GOOD"}, 
     {t: 1.01, c: green, n: "PERFECT"}
   ];
-  var stadium1, stadium2;
+  var nonceFunc = ()=>{}, stadium1, stadium2;
   try{
     stadium1 = Utils.parseStadium(`{
       "name" : "abctest6",
@@ -405,17 +405,14 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
 
   var setTeamColors = (room, teamId, angle, colors, expectedFunc) => new Promise((resolve, reject)=>{
     var ret = [];
-    var _angle = (255*Utils.parseHexInt(angle)/360)|0;
-    var text = Utils.parseHexInt("0x" + colors[0]);
-    var inner1 = Utils.parseHexInt("0x" + colors[1]);
-    var inner2 = Utils.parseHexInt("0x" + colors[2]);
-    var inner3 = Utils.parseHexInt("0x" + colors[3]);
+    var _angle = (255*angle/360)|0;
+    colors = colors.map((x)=>Utils.parseHexInt("0x" + x));
     room.onTeamColorsChange = (tId, val)=>{
-      ret[0]=tId==teamId && val.angle==_angle && val.text==text && val.inner[0]==inner1 && val.inner[1]==inner2 && val.inner[2]==inner3;
+      ret[0]=tId==teamId && val.angle==_angle && val.text==colors[0] && val.inner[0]==colors[1] && val.inner[1]==colors[2] && val.inner[2]==colors[3];
       room.onTeamColorsChange = null;
     };
     room.other.onTeamColorsChange = (tId, val)=>{
-      ret[1]=tId==teamId && val.angle==_angle && val.text==text && val.inner[0]==inner1 && val.inner[1]==inner2 && val.inner[2]==inner3;
+      ret[1]=tId==teamId && val.angle==_angle && val.text==colors[0] && val.inner[0]==colors[1] && val.inner[1]==colors[2] && val.inner[2]==colors[3];
       room.other.onTeamColorsChange = null;
     };
     room.setTeamColors(teamId, angle, ...colors);
@@ -885,11 +882,11 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
           reject();
         }, ()=>{
           cRoom.clearBans();
-          expectedFunc(ret) ? (ret ? joinRoom(roomPassword, resolve, ()=>{}, ()=>{}) : resolve()) : reject();
-        }, ()=>{}) : (expectedFunc(ret) ? resolve() : reject());
+          expectedFunc(ret) ? (ret ? joinRoom(roomPassword, resolve, nonceFunc) : resolve()) : reject();
+        }) : (expectedFunc(ret) ? resolve() : reject());
       }
       else
-        expectedFunc(ret) ? (ret ? joinRoom(roomPassword, resolve, ()=>{}, ()=>{}) : resolve()) : reject();
+        expectedFunc(ret) ? (ret ? joinRoom(roomPassword, resolve, nonceFunc) : resolve()) : reject();
     }, 1000);
   });
 
@@ -904,12 +901,12 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
       reject();
     }
     cRoom.requireRecaptcha = true;
-    joinRoom(roomPassword, fReject, ()=>{}, ()=>{
+    joinRoom(roomPassword, fReject, ()=>{
       cRoom.requireRecaptcha = false;
       joinRoom(roomPassword, ()=>{
         cRoom.onRoomRecaptchaModeChange = null;
         expectedFunc(ret) ? resolve() : reject();
-      }, fReject, fReject);
+      }, fReject);
     });
   });
 
@@ -923,7 +920,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
       room.leave();
       setTimeout(()=>{
         cRoom.onPlayerLeave = null;
-        ret ? joinRoom(roomPassword, ()=>{expectedFunc(ret) ? resolve() : reject();}) : reject();
+        ret ? joinRoom(roomPassword, ()=>{expectedFunc(ret) ? resolve() : reject();}, nonceFunc) : reject();
       }, 1000);
     }, 500);
   });
@@ -938,7 +935,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
           setTimeout(()=>{
             joinRoom(roomPassword, ()=>{
               expectedFunc(true) ? resolve() : reject();
-            }, reject, ()=>{});
+            }, reject);
           }, 200);
         });
       }, 200);
@@ -956,7 +953,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
             setTimeout(()=>{
               joinRoom(roomPassword, ()=>{
                 expectedFunc(true) ? resolve() : reject();
-              }, reject, ()=>{});
+              }, reject);
             }, 200);
           });
         }, 200);
@@ -975,7 +972,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
             setTimeout(()=>{
               joinRoom(roomPassword, ()=>{
                 expectedFunc(true) ? resolve() : reject();
-              }, reject, ()=>{});
+              }, reject);
             }, 200);
           });
         }, 200);
@@ -1307,9 +1304,12 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
       f();
   };
 
-  function joinRoom(password, onSuccess, onFailure=(error)=>{console.error("Join room onFailure:", error);exit();}, onRequestRecaptcha=()=>{console.error("Join room: Invalid token.");exit();}){
+  function joinRoom(password, onOpen, onClose=(error)=>{
+    console.error("Join room onClose:", error);
+    exit();
+  }){
     console.warn("trying to join room(", roomId, ") using password:", password);
-    var hb = Room.join({
+    Room.join({
       id: roomId, 
       password: password, 
       authObj: authObj
@@ -1319,22 +1319,15 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
         avatar: "x1",
         geo: {lat:30, lon:30, flag:"jp"}
       },
-      onSuccess: (room)=>{
+      onOpen: (room)=>{
         jRoom = room;
         cRoom.other = jRoom;
         jRoom.other = cRoom;
-        hb.onRequestRecaptcha = null;
-        hb.onFailure = null;
-        onSuccess();
+        onOpen();
       },
-      onRequestRecaptcha: ()=>{
-        onRequestRecaptcha();
-      },
-      onFailure: (error)=>{
-        onFailure(error)
-      },
-      onLeave: (error)=>{
-        log(yellow, "Join room onLeave (" + error.code + ", params: [" + error.params.join(",") + "])\r\n");
+      onClose: (error)=>{
+        onClose(error);
+        //log(yellow, "Join room onClose (" + error.code + ", params: [" + error.params.join(",") + "])\r\n");
       }
     });
   }
@@ -1361,7 +1354,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
       avatar: "x1",
       geo: {lat:30, lon:30, flag:"jp"}
     },
-    onSuccess: (room)=>{
+    onOpen: (room)=>{
       cRoom = room;
       numSucceededRequests++;
       room.onRoomLink = (link)=>{
@@ -1371,7 +1364,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
         var fJ = function(){
           Utils.generateAuth().then(([key, obj])=>{
             authObj = obj;
-            //joinRoom(roomPassword, nextTest);
+            //joinRoom(roomPassword, nextTest, nonceFunc);
             joinRoom(roomPassword, ()=>{
               if (mode==0)
                 numSucceededRequests++;
@@ -1391,16 +1384,8 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
         fJ();
       }
     },
-    onFailure: (error)=>{
-      console.error("Create room:", error);
-      exit();
-    },
-    onLeave: (error)=>{
+    onClose: (error)=>{
       console.warn("Create room:", error);
-      exit();
-    },
-    onRequestRecaptcha: ()=>{
-      console.error("Create room: Invalid token.");
       exit();
     }
   });
@@ -1426,7 +1411,7 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
       avatar: "x1",
       geo: {lat:30, lon:30, flag:"jp"}
     },
-    onSuccess: (room)=>{
+    onOpen: (room)=>{
       cRoom = room;
       room.onRoomLink = (link)=>{
         roomId = link.substring(link.indexOf("=")+1);
@@ -1434,21 +1419,13 @@ module.exports = ({ Room, Utils }, roomToken, noPlayer, {log, colors: {yellow, g
         console.log("room link:", link);
         Utils.generateAuth().then(([key, obj])=>{
           authObj = obj;
-          joinRoom(roomPassword, nextTest);
+          joinRoom(roomPassword, nextTest, nonceFunc);
         });
       }
     },
-    onFailure: (error)=>{
-      console.error("Create room:", error);
-      exit();
-    },
-    onLeave: (error)=>{
+    onClose: (error)=>{
       console.warn("Create room:", error);
-      exit();
-    },
-    onRequestRecaptcha: ()=>{
-      console.error("Create room: Invalid token.");
-      exit();
+      //exit();
     }
   });
 };

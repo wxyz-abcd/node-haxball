@@ -4,6 +4,10 @@ const minCoordAlignDelta = 0.5, minKickDistance = 2, maxDistanceToFollowBallCoef
 
 function roomCallback(room){ // examples start from here.
   room.onGameTick = () => {
+
+    // ensure extrapolation of the room state before calculating stuff.
+    room.extrapolate();
+
     var { state, gameState, gameStateExt } = room;
     gameState = gameStateExt || gameState;
     

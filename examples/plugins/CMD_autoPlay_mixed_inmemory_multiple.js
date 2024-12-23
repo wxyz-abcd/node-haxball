@@ -255,13 +255,13 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("add_bot");
-    that.room.librariesMap?.commands?.remove("remove_bot");
-    that.room.librariesMap?.commands?.remove("max_bot_count");
-    that.room.librariesMap?.commands?.remove("bot_active");
-    that.room.librariesMap?.commands?.remove("bot_type");
-    that.room.librariesMap?.commands?.remove("bots_active");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("add_bot");
+    that.room.librariesMap.commands?.remove("remove_bot");
+    that.room.librariesMap.commands?.remove("max_bot_count");
+    that.room.librariesMap.commands?.remove("bot_active");
+    that.room.librariesMap.commands?.remove("bot_type");
+    that.room.librariesMap.commands?.remove("bots_active");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
   };
@@ -368,6 +368,9 @@ module.exports = function(API){
   this.onGameTick = function(customData){
     if (!that.botsActive)
       return;
+
+    // ensure extrapolation of the room state before calculating stuff.
+    that.room.extrapolate();
 
     // get the extrapolated game state object
     var { state, gameState, gameStateExt } = that.room;

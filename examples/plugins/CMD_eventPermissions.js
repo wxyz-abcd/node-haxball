@@ -44,7 +44,7 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
   };

@@ -47,7 +47,7 @@ module.exports = function(API){
 			[ErrorCodes.ChatActionMessageTooLongError]: "Message too long",
 			[ErrorCodes.KickBanReasonTooLongError]: "String too long",
 			[ErrorCodes.ChangeTeamColorsInvalidTeamIdError]: "Invalid team id",
-			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha requested.Defina onRequestRecaptcha ou defina um token de trabalho ao criar/se juntar a uma sala." ,
+			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha requested. Defina um token de trabalho ao criar/se juntar a uma sala." ,
 			[ErrorCodes.ReplayFileVersionMismatchError]: "Os dados de repetição são de uma versão diferente",
 			[ErrorCodes.ReplayFileReadError]: "Não foi possível carregar dados de reprodução.",
 			[ErrorCodes.JoinRoomNullIdAuthError]: "Id e authObj não podem ser nulos.(Dentro do 1o parâmetro)",
@@ -64,7 +64,8 @@ module.exports = function(API){
 			[ErrorCodes.BadActorError]: "Bad Actor",
 			[ErrorCodes.AuthBannedError]: "Auth banned: $1",
 			[ErrorCodes.NoProxyIdentityProblem]: "O backend do basro não é compatível com o sistema de início de sessão, pelo que o token de identidade e os eventos de identidade estão desactivados.",
-			[ErrorCodes.NoProxyIdentitySolution]: "Solução: Utilizar um servidor proxy e tratar os dados de início de sessão nesse servidor."
+			[ErrorCodes.NoProxyIdentitySolution]: "Solução: Utilizar um servidor proxy e tratar os dados de início de sessão nesse servidor.",
+			[ErrorCodes.FailedToCreateRoom]: "Ocorreu um erro ao tentar criar a sala. ($1)"
 		}
 	};
 };

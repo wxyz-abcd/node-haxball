@@ -45,6 +45,10 @@ module.exports = function(API){
   };
 
   this.onGameTick = function(customData){
+
+    // ensure extrapolation of the room state before calculating stuff.
+    that.room.extrapolate();
+
     // get the original data object of the next bot
     var cp = that.room.getPlayer(65535);
     var playerDisc = cp?.disc?.ext;

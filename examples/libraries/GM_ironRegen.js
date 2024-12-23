@@ -62,7 +62,7 @@ module.exports = function(API){
   };
 
   this.finalizeMode = function(){
-    thisLibrary.room.librariesMap?.commands?.remove("iron");
+    thisLibrary.room.librariesMap.commands?.remove("iron");
     thisLibrary.room.players.forEach(({id})=>{
       thisLibrary.room.setPlayerAvatar(id, null, true);
       setIronmanActive(id, false);

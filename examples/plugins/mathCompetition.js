@@ -192,7 +192,7 @@ module.exports = function(API){
       var window = {}, module = {}, thisWorker = this; // or maybe better: var window = this;
       function init(origin){
         importScripts(origin+"/vendor/api.js"); // We have to re-initialize everything in the Worker context.
-        var API = new abcHaxballAPI(window, { noWebRTC: true }); // Remember that window is empty. Some functions will most likely fail to work correctly.
+        var API = new abcHaxballAPI(window); // Remember that window is empty. Some functions will most likely fail to work correctly.
         importScripts(origin+"/libraries/mathExpr.js"); // Unfortunately, this will only work for default libraries in the development website. Maybe I will add some kind of routing support later for custom codes.
         var {Expression, isInteger} = new module.exports(API);
         function solveProblem({ nums, target }) {

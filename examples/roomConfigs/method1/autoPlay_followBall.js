@@ -4,6 +4,10 @@ const minCoordAlignDelta = 0.5, minKickDistance = 2;
 
 function roomCallback(room){ // examples start from here.
   room.onGameTick = () => {
+
+    // ensure extrapolation of the room state before calculating stuff.
+    room.extrapolate();
+
     // get the extrapolated disc of the data object of the current player
     var cp = that.room.currentPlayer, playerDisc = cp?.disc?.ext;
     if (!playerDisc) // check or else error occurs after changing a player's team to spectators, if the player is not actually in the game, or the game is stopped.

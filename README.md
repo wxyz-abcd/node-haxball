@@ -98,7 +98,7 @@ Utils.generateAuth().then(([authKey, authObj])=>{
       player_name: "wxyz-abcd",
       avatar: "👽"
     }, 
-    onSuccess: (room)=>{
+    onOpen: (room)=>{
       room.sendChat("Hello " + room.name);
     }
   });
@@ -120,7 +120,7 @@ Room.create({
     player_name: "wxyz-abcd",
     avatar: "👽"
   }, 
-  onSuccess: (room)=>{
+  onOpen: (room)=>{
     room.sendChat("Hello " + room.name);
     room.onAfterRoomLink = (roomLink)=>{
       console.log("room link:", roomLink);
@@ -152,7 +152,6 @@ Room.create({
     - `proxyAgent`: a global custom proxy agent for this api object. This method does not work in browsers. Defaults to `null`.
     - `version`: Haxball's expected version number. Defaults to: `9`.
     - `noVariableValueChangeEvent`: if `true`, disables the mechanism that enables variable value change event which in turn improves performance while reaching a variable's value that was defined by any `Addon.defineVariable` function. (Variable will have a directly accessable, actual value; instead of a property that points to the actual variable.) Defaults to: `false`.
-    - `noWebRTC`: If `true`, skips the WebRTC initialization. Needed to be able to use the API functions that are not related to networking in environments without WebRTC support. Defaults to: `false`.
     - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. Defaults to `null`.
 
 - `OperationType`: Different types of operations that are being used by Haxball. Should be used to understand what kind of message we are dealing with inside callback `onOperationReceived`.
@@ -267,11 +266,12 @@ Room.create({
   - `hexStrToNumber(str)`: converts the `playerObject.conn` values to readable ip address string.
   - `byteArrayToIp(uint8Array)`: converts a uint8array that was read from basro's backend into a readable ip address string.
   - `refreshRoomToken({token="", rcr=""})`: generates a new room token from an old token OR a rcr(Google Recaptcha v2 response) value.
+  - `generateRoomId({token, proxyAgent})`: generates the room id using the given `token`, and also a new room token.
 
 - `EventFactory`: Contains static functions to create all kinds of event messages.
 
   - `create(type)`: creates and returns an event message depending on the `type` parameter. returns `null` if `type` is not one of the types defined inside `OperationType` enum.
-  - `createFromStream(reader)`: creates and returns an event message after reading it from a stream `reader`. the `reader` should be of type `Impl.Stream.F`.
+  - `createFromStream(reader)`: creates and returns an event message after reading it from a stream `reader`. the `reader` should be of type `Impl.Stream.Reader`.
   - `checkConsistency(data)`: creates and returns an event message that can be used to trigger a consistency check. `data` should be an `ArrayBuffer`.
   - `sendAnnouncement(msg, color, style, sound)`: creates and returns an event message that can be used to send an announcement message(`msg`) with properties(`color`, `style`, `sound`).
   - `sendChatIndicator(active)`: creates and returns an event message that can be used to set the chat indicator status of a player to `active`.
@@ -294,7 +294,7 @@ Room.create({
   - `setPlayerSync(value)`: creates and returns an event message that can be used to set the synchronization status of a player.
   - `ping(values)`: creates and returns an event message that can be used to set the pings of all players in a room.
   - `setAvatar(value)`: creates and returns an event message that can be used to set the avatar of a player to `value`.
-  - `setTeamColors(teamId, colors)`: creates and returns an event message that can be used to set the colors of a team(`teamId`) to `colors`. `colors` must be an instance of the `Impl.Core.ka`(TeamColors) class.
+  - `setTeamColors(teamId, colors)`: creates and returns an event message that can be used to set the colors of a team(`teamId`) to `colors`. `colors` must be an instance of the `Impl.Core.TeamColors` class.
   - `setKickRateLimit(min, rate, burst)`: creates and returns an event message that can be used to set the kick rate limit of a room.
   - `setDiscProperties(id, data)`: creates and returns an event message that can be used to set the properties of a disc(`id`) to `data`.
   - `setPlayerDiscProperties(id, data)`: creates and returns an event message that can be used to set the properties of the disc of a player(`id`) to `data`.
@@ -331,7 +331,7 @@ Room.create({
         - `unlimitedPlayerCount`: if set to `true`, bypasses the player count controller.
         - `fakePassword`: if set to `true`, the room will show that it is password-protected while in fact it is not.
         - `showInRoomList`: set to `true` if you want this room to show up in the room list.
-        - `onError(error, playerId)`: called when an exception is thrown from the room. playerId is the id of the player that caused the exception. the connection will be closed just after this callback is executed.
+        - `onError(error, playerId)`: called when an exception is thrown from the room. playerId is the id of the player that caused the exception. that player's connection will be closed just after this callback is executed. (most probably, the player will be kicked with the reason 'Bad actor'.)
       - `commonParams`: explained below in `Room.join`.
 
     - `join(joinParams, commonParams)`: try to join the room(`roomId`) with given `password`(or `null`=no password). Returns a custom object.
@@ -350,25 +350,20 @@ Room.create({
             - `lat`: latitude value (number, default value is `40`).
             - `lon`: longitude value (number, default value is `40`).
             - `flag`: 2 letter country code (string, default value is `"tr"`).
-          - `onValueSet(key, value)`: a callback function that is called just after the value of a key of this object has been changed by this library. default value is `null`.
         - `noPluginMechanism`: if `true`, renderer and plugin mechanism will not work. Should only be used for optimal performance. You have to define `Room._onXXXXXX` callbacks by yourself.
         - `libraries`: array of `Library` objects to be used. the objects should be derived from the provided `Library` class. default value is `[]`. (Look at examples/libraries folder for example Library's to use here, or src/libraryTemplate.js for a template Library that contains all callbacks.)
         - `config`: the `RoomConfig` object that contains all the main callbacks of this room. the object should be derived from the provided `RoomConfig` class. default value is `null`. (Look at examples/roomConfigs/method2 folder for example RoomConfigs to use here, or src/roomConfigTemplate_method2.js for a template RoomConfig that contains all callbacks.)
         - `renderer`: the `Renderer` object that can render the game. the object should be derived from the provided `Renderer` class. default value is `null`. (Look at examples/renderers folder for example RoomConfigs to use here, or src/rendererTemplate.js for a template Renderer that contains all callbacks.)
         - `plugins`: array of `Plugin` objects to be used. the objects should be derived from the provided `Plugin` class. default value is `[]`. (Look at examples/plugins folder for example Plugins to use here, or src/pluginTemplate.js for a template Plugin that contains all callbacks.)
         - `version`: Haxball's version number. other clients cannot join this room if their version number is different than this number. default value is `9`.
-        - `kickTimeout`: when you kick the ball, it causes you to release kick button by default. this library changes it so that it causes a timeout that makes you automatically press kick button again. you may assign a negative value to disable this feature. default value is `-1`(msec).
         - `proxyAgent`: a custom proxy agent for the room's connection. This method does not work in browsers. Defaults to `null`.
         - `identityToken`: A token that represents a user data in a database of a custom proxy/backend server. Defaults to `null`.
 
         --- event callbacks section ---
         - `preInit(room)`: this is run as soon as the `room` object is created, just before the initialization of the plugins etc.
-        - `onSuccess(room)`: joined/created `room`.
-        - `onFailure(error)`: join room failed with error(`error`).
-        - `onLeave(msg)`: triggered while leaving the room with reason(`msg`).
-        - `onConnectionStateChange(state, sdp)`: connection state has just changed to (`state`). `sdp` value can be used to get all the information about the webrtc connection when `state` is `1` or `2`. you may use this to block players before they can connect the host, etc.
-        - `onReverseConnection()`: trying reverse connection while joining a room.
-        - `onRequestRecaptcha()`: recaptcha is required while joining or creating a room.
+        - `onOpen(room)`: joined/created `room`.
+        - `onClose(error)`: player has left the room with error(`error`).
+        - `onConnInfo(state, extraInfo)`: connection state has just changed to (`state`). `extraInfo` either contains the sdp if `state` is `ConnectingToPeer` or `AwaitingState` which can be used to get information about the webrtc connection such as ip/port that may used to block players before they can connect to the host etc; or it can contain the fail reason for the connection if `state` is `ConnectionFailed`.
 
       - Returning custom object has the following triggers:
         - `cancel()`: should be used to cancel the process of joining a room.
@@ -443,7 +438,7 @@ Room.create({
           - `autoTeams(byId)`: creates and applies a fake event by player(`byId`) to remove last 2 players from spectators and add them to teams.
           - `setPlayerTeam(playerId, teamId, byId)`: creates and applies a fake event by player(`byId`) to set player(`playerId`)'s team to team(`teamId`).
           - `setKickRateLimit(min, rate, burst, byId)`: creates and applies a fake event by player(`byId`) to set the room's kick rate limit.
-          - `setTeamColors(teamId, angle, colors, byId)`: creates and applies a fake event by player(`byId`) to set the team colors for team(`teamId`). `teamId`: `1`(red) | `2`(blue), `angle`: `integer`, `colors`: maximum 4 parseable(hex-rgb) color parameters.
+          - `setTeamColors(teamId, angle, colors, byId)`: creates and applies a fake event by player(`byId`) to set the team colors for team(`teamId`). `teamId`: `1`(red) | `2`(blue), `angle`: `integer`, `colors`: maximum 4 numeric (0 <= `integer` <= 16777215) color parameters.
           - `setPlayerAdmin(playerId, value, byId)`: creates and applies a fake event by player(`byId`) to set player(`playerId`)'s admin status to `isAdmin`.
           - `kickPlayer(playerId, reason, ban, byId)`: creates and applies a fake event by player(`byId`) to kick/ban a player(`playerId`) with reason(`reason`).
           - `setPlayerSync(value, byId)`: set the sync of player(`byId`) to `value`.
@@ -463,7 +458,6 @@ Room.create({
     - `gameState`: room's game state information. returns null if game is not active. read-only.
     - `gameStateExt`: room's extrapolated game state. returns null if game is not active. read-only.
     - `sdp`: current room's sdp value (only for client rooms). read-only.
-    - `kickTimeout`: time between releasing and re-pressing the kick key (in milliseconds, defaults to `-1`). read-only.
     - `config`: room's current roomConfig object. read-only.
     - `renderer`: room's current renderer object. read-only.
     - `plugins`: array of all available plugins. this is used internally to restore the order of plugins while plugin activation/deactivation. read-only.
@@ -497,7 +491,7 @@ Room.create({
     - `setProperties({ name, password, geo: { lat, lon, flag }, playerCount, maxPlayerCount, fakePassword, unlimitedPlayerCount, showInRoomList })`: sets the room's properties.
     - `setKickRateLimit(min, rate, burst)`: sets the room's kick rate limit.
     - `setHandicap(handicap)`: sets the player's `handicap` value in msecs.
-    - `extrapolate(milliseconds)`: extrapolates the current room state for `milliseconds` milliseconds and stores the results in each object's `ext` key.
+    - `extrapolate(milliseconds=0, ignoreMultipleCalls=false)`: extrapolates the current room state for `milliseconds` milliseconds and stores the results in each object's `ext` key. `ignoreMultipleCalls` is added for safety, and should only be `true` in renderers. Returns the new extrapolated room state.
     - `clearBans()`: clears all bans. host-only.
     - `clearBan(id)`: clears the ban of a player(`id`). host-only.
     - `executeEvent(event, byId)`: executes any event inside this room. host-only.
@@ -505,7 +499,7 @@ Room.create({
     - `setAvatar(avatar)`: sets the current player's client `avatar`.
     - `setPlayerAvatar(id, value, headless)`: sets the avatar of player(`id`) to `avatar`. `headless` is a boolean to determine whether the headless or client avatar is being set. host-only.
     - `setChatIndicatorActive(active)`: sets the current player's chat indicator status. `active`: `true`/`false`.
-    - `setTeamColors(teamId, angle, ...colors)`: sets the team colors for team(`teamId`). `teamId`: `1`(red) | `2`(blue), `angle`: `integer`, `colors`: maximum 4 parseable(hex-rgb) color parameters.
+    - `setTeamColors(teamId, angle, ...colors)`: sets the team colors for team(`teamId`). `teamId`: `1`(red) | `2`(blue), `angle`: `integer`, `colors`: maximum 4 numeric (0 <= `integer` <= 16777215) color parameters.
     - `setUnlimitedPlayerCount(on)`: adds or removes player limit control. host-only. `on`: `true`/`false`.
     - `setFakePassword(fakePwd)`: sets a fake value for room's password status. host-only. `fakePwd`: `true`/`false` or `null` to disable.
     - `sendChat(msg, targetId)`: send chat message(`msg`) to player(`targetId`). `targetId` is `null` -> send to everyone. `targetId` is host-only.
@@ -536,10 +530,10 @@ Room.create({
     - `setPlayerAdmin(playerId, isAdmin)`: set player(`playerId`)'s admin status to `isAdmin`.
     - `kickPlayer(playerId, reason, isBanning)`: kick/ban a player(`playerId`) with reason(`reason`).
     - `getPlayer(id)`: get the original player data object for player(`id`).
-    - `getBall(extrapolated = true)`: get the original ball object.
-    - `getDiscs(extrapolated = true)`: get the original disc object for disc(`discId`).
-    - `getDisc(discId, extrapolated = true)`: get the original disc object for disc(`discId`).
-    - `getPlayerDisc(playerId, extrapolated = true)`: get the original disc object for player(`playerId`).
+    - `getBall(extrapolated = false)`: get the original ball object.
+    - `getDiscs(extrapolated = false)`: get the original disc object for disc(`discId`).
+    - `getDisc(discId, extrapolated = false)`: get the original disc object for disc(`discId`).
+    - `getPlayerDisc(playerId, extrapolated = false)`: get the original disc object for player(`playerId`).
     - `getPlayerDisc_exp(playerId)`: get the original disc object for player(`playerId`). faster than `getPlayerDisc`, but experimental. use at your own risk.
     - `addPlayerBan(playerId)`: bans a player(`playerId`) from joining the room. host-only.
     - `addIpBan(...ips)`: bans all given ip(range)(s) from joining the room. host-only.
@@ -548,7 +542,7 @@ Room.create({
     - `setPluginActive(name, active)`: activate/deactivate the plugin(`name`).
     - `startRecording()`: start recording replay data. returns `true` if succeeded, `false` otherwise. recording should not be started before calling this.
     - `stopRecording()`: stop recording replay data. returns `UIntArray8` data if succeeded, null otherwise. recording should be started before calling this.
-    - `startStreaming({immediate = true, onClientCount, emitData})`: start streaming the game. currently, recording and streaming cannot be run simultaneously. returns `{onSuccess: ()=>void, onDataReceived: (data)=>void, interval: ()=>void}`.
+    - `startStreaming({immediate = true, onClientCount, emitData})`: start streaming the game. currently, recording and streaming cannot be run simultaneously. returns `{onOpen: ()=>void, onDataReceived: (data)=>void, interval: ()=>void}`.
     - `stopStreaming()`: stop streaming the game.
     - `isRecording()`: returns `true` if recording/streaming has started; `false` otherwise.
     - `setConfig(roomConfig)`: sets the `RoomConfig` object that contains all the main callbacks of this room. the `roomConfig` object should be derived from the provided `RoomConfig` class.
@@ -650,9 +644,9 @@ Room.create({
     - `setVariableGUIProps(varName, ...vals)`: Does nothing, returns nothing by default. This function might be used to modify some GUI properties regarding a specific variable called `varName`. This is not done here for optimization purposes. (We do not need these values in a non-GUI environment.) `vals` should contain `{name: propName, value: propValue}` for each property named `name` that is required to set its new `value`. For example; in a GUI environment, `setVariableGUIProps("testVariable", {name: "visible", value: false})` could make the `testVariable` disappear from the GUI.
 
   - `modifier callbacks`:
-    - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. dataArray format should be `[modifiedName, modifiedFlag, modifiedAvatar]`. if `dataArray` is `null`, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
-    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. host-only.
-    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. host-only.
+    - `[dataArray, customData] = modifyPlayerDataBefore(playerId, name, flag, avatar, conn, auth)`: set player's data just before player has joined the room. This callback can also be async, or return a Promise that will return the array. dataArray format should be `[modifiedName, modifiedFlag, modifiedAvatar]`. if `dataArray` is `null`, player is not allowed to join. also prepares a custom data object to send to all plugins. `customData=false` means "don't call callbacks". host-only.
+    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. This callback can also be async, or return a Promise that will return the array. `return null` -> player is not allowed to join. host-only.
+    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerDataAfter(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. This callback can also be async, or return a Promise that will return the array. `return null` -> player is not allowed to join. host-only.
     - `[newPing, customData] = modifyPlayerPingBefore(playerId, ping)`: prepares a custom data object to send to all plugins while setting player's `ping`. `customData=false` means "don't call callbacks". host-only.
     - `newPing = modifyPlayerPing(playerId, ping, customData)`: set player's `ping`. host-only.
     - `newPing = modifyPlayerPingAfter(playerId, ping, customData)`: set player's `ping`. host-only.
@@ -852,7 +846,7 @@ Room.create({
     - `defineVariable({name, value, type, range, description})`: Defines the variable with the given `name` and `value` inside this `Plugin` object. The rest of the properties are not used by default for optimization purposes. (We do not need these values in a non-GUI environment.) This function should be used whenever a variable whose value is changeable from outside will be defined. Fires an `onVariableValueChange` event whenever this variable's value changes, if the global `config.noVariableValueChangeEvent` is not `true`.
 
   - `modifier callbacks`:
-    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. `return null` -> player is not allowed to join. `customData` is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
+    - `[modifiedName, modifiedFlag, modifiedAvatar] = modifyPlayerData(playerId, name, flag, avatar, conn, auth, customData)`: set player's data just before player has joined the room. This callback may also be async, or return a Promise that will return the array. `return null` -> player is not allowed to join. `customData` is an optional data object returned from `room.modifyPlayerDataBefore`. host-only.
     - `newPing = modifyPlayerPing(playerId, ping, customData)`: set player's `ping`. `customData` is an optional data object returned from `room.modifyPlayerPingBefore`. host-only.
     - `newPing = modifyClientPing(ping, customData)`: set current player's `ping`. `customData` is an optional data object returned from `room.modifyClientPingBefore`. client-only.
     - `newFrameNo = modifyFrameNo(frameNo, customData)`: set current player's `frameNo`. causes your player to look laggy to your opponents, especially on extrapolated clients. `customData` is an optional data object returned from `room.modifyFrameNoBefore`. client-only.

@@ -5,7 +5,7 @@ function startStreaming(room){ // this is currently using the interval mode for 
   var socket = new WebSocket("ws://localhost:1935");
   socket.onopen = ()=>{
     int = setInterval(s.interval, 50);
-    s.onSuccess();
+    s.onOpen();
   };
   function clear(){
     clearInterval(int);

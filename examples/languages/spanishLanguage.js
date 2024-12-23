@@ -47,7 +47,7 @@ module.exports = function(API){
 			[ErrorCodes.ChatActionMessageTooLongError]: "Mensaje muy largo",
 			[ErrorCodes.KickBanReasonTooLongError]: "String muy largo",
 			[ErrorCodes.ChangeTeamColorsInvalidTeamIdError]: "Id de equipo inválido",
-			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha solicitado. Utiliza onRequestRecaptcha o establece un token válido al crear/ingresar a la sala.",
+			[ErrorCodes.MissingRecaptchaCallbackError]: "Recaptcha solicitado. Establece un token válido al crear/ingresar a la sala.",
 			[ErrorCodes.ReplayFileVersionMismatchError]: "La información de la replay es de una versión diferente",
 			[ErrorCodes.ReplayFileReadError]: "No se pudo cargar la información de la replay.",
 			[ErrorCodes.JoinRoomNullIdAuthError]: "Id y authObj no pueden ser nulos. (dentro del primer parámetro)",
@@ -64,7 +64,8 @@ module.exports = function(API){
 			[ErrorCodes.BadActorError]: "Bad Actor",
 			[ErrorCodes.AuthBannedError]: "Auth baneada: $1",
 			[ErrorCodes.NoProxyIdentityProblem]: "El backend de basro no es compatible con el sistema de login, por lo que el token de identidad y los eventos de identidad están desactivados.",
-			[ErrorCodes.NoProxyIdentitySolution]: "Solución: Utiliza un servidor proxy y gestiona allí los datos de acceso."
+			[ErrorCodes.NoProxyIdentitySolution]: "Solución: Utiliza un servidor proxy y gestiona allí los datos de acceso.",
+			[ErrorCodes.FailedToCreateRoom]: "Se produjo un error al intentar crear la sala. ($1)"
 		}
 	};
 };

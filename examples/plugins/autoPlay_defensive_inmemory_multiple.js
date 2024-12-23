@@ -107,6 +107,10 @@ module.exports = function(API){
   };
 
   this.onGameTick = function(customData){
+
+    // ensure extrapolation of the room state before calculating stuff.
+    that.room.extrapolate();
+
     var { state, gameState, gameStateExt } = that.room;
     gameState = gameStateExt || gameState;
 

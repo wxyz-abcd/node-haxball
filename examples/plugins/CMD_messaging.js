@@ -296,12 +296,12 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("pm");
-    that.room.librariesMap?.commands?.remove("tm");
-    //that.room.librariesMap?.commands?.remove("ignore");
-    that.room.librariesMap?.commands?.remove("voice");
-    that.room.librariesMap?.commands?.remove("voiceMode");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("pm");
+    that.room.librariesMap.commands?.remove("tm");
+    //that.room.librariesMap.commands?.remove("ignore");
+    that.room.librariesMap.commands?.remove("voice");
+    that.room.librariesMap.commands?.remove("voiceMode");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     playerProps = null;
     permissionCtx = null;
     permissionIds = null;

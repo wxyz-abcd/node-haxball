@@ -3,6 +3,7 @@
 const chatHistoryLimit = 500, gameStateGUIUpdateFrameInterval = 30, scrollBarUpdateInterval = 200;
 var roomFrame, canvasContainer, roomState, chatApi, room, API, sound, rendererParams, renderer, sandboxParams, beginFrameNo, currentFrameNo, endFrameNo;
 var gameTime, redScore, blueScore, gameTime_ot, gameTime_m1, gameTime_m2, gameTime_s1, gameTime_s2, timeScroller;
+const teamNames = ["Spectators", "Red Team", "Blue Team"];
 
 function loadImage(path){
   return new Promise((resolve, reject)=>{
@@ -279,7 +280,7 @@ window.onload = ()=>{
           sound.playSound(sound.goal);
         },
         onGameEnd: function (winningTeamId, customData) {
-          chatApi.receiveNotice("" + Team.byId[winningTeamId].name + " team won the match");
+          chatApi.receiveNotice("" + teamNames[winningTeamId] + " team won the match");
         },
         onGamePauseChange: function (paused, byId, customData) {
           var byPlayerObj = roomState.players.find((x)=>x.id==byId);
@@ -314,9 +315,9 @@ window.onload = ()=>{
           chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " " + (playerObj.sync ? "has desynchronized" : "is back in sync"));
         },
         onPlayerTeamChange: function (id, teamId, byId, customData) {
-          var byPlayerObj = roomState.players.find((x)=>x.id==byId), playerObj = roomState.players.find((x)=>x.id==id), teamObj = Team.byId[teamId];
+          var byPlayerObj = roomState.players.find((x)=>x.id==byId), playerObj = roomState.players.find((x)=>x.id==id);
           if (roomState.gameState!=null)
-            chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " was moved to " + teamObj.name + by(byPlayerObj));
+            chatApi.receiveNotice("[" + playerObj.id + "]" + playerObj.name + " was moved to " + teamNames[teamId] + by(byPlayerObj));
           updateGUI();
         },
         onAutoTeams: function (playerId1, teamId1, playerId2, teamId2, byId, customData) {

@@ -1,5 +1,5 @@
 module.exports = function(API){
-  const { AllowFlags, Plugin, VariableType:{Integer,Color, Void,Team}} = API;
+  const { AllowFlags, Plugin, VariableType:{Integer,Color, Void,Team}, Utils:{parseHexInt}} = API;
 
   Object.setPrototypeOf(this, Plugin.prototype);
   Plugin.call(this, "teamColorPicker", true, { // "teamColorPicker" is plugin's name, "true" means "activated just after initialization". Every plugin should have a unique name.
@@ -66,10 +66,10 @@ module.exports = function(API){
       description:"",
       type:Void,
       value:() => {
-          const colorArray = [this["textColor"], this["color"]];
+          const colorArray = [parseHexInt("0x"+this["textColor"].substring(1)), parseHexInt("0x"+this["color"].substring(1))];
           for(let i = 2; i <= this["colorCount"]; i++)
-              colorArray.push(this["color"+i]);
-          this.room.setTeamColors(this.currentTeam, this["colorAngle"], ...colorArray.map(c=>c.substring(1)));
+              colorArray.push(parseHexInt("0x"+this["color"+i].substring(1)));
+          this.room.setTeamColors(this.currentTeam, this["colorAngle"], ...colorArray);
       }
   })
 
@@ -95,7 +95,7 @@ module.exports = function(API){
                   this.room.sendChat("Enter at least 2 colors.\nUsage: !change [teamID] [angle] [colors]")
                   break;
               }
-              this.room.setTeamColors(Number(team),angle,...colors.map(c => parseInt(c,16)))
+              this.room.setTeamColors(Number(team),angle,...colors.map(c => parseHexInt("0x"+c)))
           default:
               break;
       }

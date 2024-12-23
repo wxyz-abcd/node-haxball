@@ -75,9 +75,9 @@ module.exports = function(API){
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("control");
-    that.room.librariesMap?.commands?.remove("blockControl");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("control");
+    that.room.librariesMap.commands?.remove("blockControl");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     controlSwitch = null;
     controlSwitchBlocked = null;
     permissionCtx = null;

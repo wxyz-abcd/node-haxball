@@ -63,7 +63,7 @@ module.exports = function (API) {
   };
 
   this.finalize = function(){
-    that.room.librariesMap?.commands?.remove("votemap");
+    that.room.librariesMap.commands?.remove("votemap");
     votingInteraction = null;
   };
 

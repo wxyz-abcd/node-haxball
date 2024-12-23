@@ -426,8 +426,8 @@ module.exports = function(API){
 
   this.finalize = function(){
     thisLibrary.removeContext(permissionCtx);
-    thisLibrary.room.librariesMap?.commands?.remove("setPermission");
-    thisLibrary.room.librariesMap?.commands?.remove("permissions");
-    thisLibrary.room.librariesMap?.commands?.remove("permissionsGui");
+    thisLibrary.room.librariesMap.commands?.remove("setPermission");
+    thisLibrary.room.librariesMap.commands?.remove("permissions");
+    thisLibrary.room.librariesMap.commands?.remove("permissionsGui");
   };
 };

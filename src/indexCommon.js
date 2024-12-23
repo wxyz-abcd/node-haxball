@@ -1,4 +1,4 @@
-const { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("@koush/wrtc");
+const { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill"); // require("@koush/wrtc"); 
 const { Crypto } = require("@peculiar/webcrypto");
 const WebSocket = require("ws");
 const XMLHttpRequest = require("xhr2");
@@ -37,7 +37,6 @@ module.exports = function(abcHaxballAPI, window, config){
       stunServer: config?.stunServer,
       version: config?.version,
       noVariableValueChangeEvent: config?.noVariableValueChangeEvent,
-      noWebRTC: config?.noWebRTC,
       identityToken: config?.identityToken
     }
   );

@@ -46,7 +46,6 @@ function Bot(id, pass, name, avatar, lat, lon, flag, autoPlay){
   if (autoPlay) // if we want autoPlay plugin
     pluginsArray.push(new plugins.autoPlay_defensive(API));
   Utils.generateAuth().then(([playerAuthKey, authObj])=>{
-    var alerted = false;
     Room.join({
       id: id, 
       password: pass, 
@@ -67,21 +66,9 @@ function Bot(id, pass, name, avatar, lat, lon, flag, autoPlay){
       libraries: [],
       renderer: null, // Don't render anything while we are trying to join multiple rooms simultaneously. :)
       plugins: [new plugins.autoPlay_defensive(API)],
-      onSuccess: roomCallback,
-      onRequestRecaptcha: ()=>{
-        console.log("This is a recaptcha protected room. You can't use this tool with it!");
-      },
-      onFailure: (x)=>{
-        if (alerted)
-          return;
-        alerted = true;
-        console.log(x.toString());
-      },
-      onLeave: (x)=>{
-        if (alerted)
-          return;
-        alerted = true;
-        console.log(x.toString());
+      onOpen: roomCallback,
+      onClose: (x)=>{
+        x && console.log(x.toString());
       }
     });
   }).catch((ex)=>{

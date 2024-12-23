@@ -22,7 +22,6 @@ var ePickStadium = eSettings.children.item(2).children.item(2);
 var eStartGame = eControls.children.item(0);
 var eStopGame = eControls.children.item(1);
 var ePauseGame = eControls.children.item(2);
-var ePauseGame = eControls.children.item(2);
 var ctxMenu = document.getElementsByClassName("ctxmenu").item(0);
 var inputPopup = document.getElementById("inputpopup");
 
@@ -126,7 +125,6 @@ function makePlayerContainer(elem, player){
 }
 
 function makeTeamContainer(elem, team){
-  elem.classList.add(team.className);
   elem.ondragover = (event)=>{
     if (event.dataTransfer.types.indexOf("player")==-1)
       return;
@@ -272,9 +270,12 @@ function make2Digits(a) {
 window.update = function(_API, _room, _roomState){
   if (API==null){ // if running for the first time
     Team = _API.Impl.Core.Team;
-    makeTeamContainer(eTeams.children.item(1), Team.red);
-    makeTeamContainer(eTeams.children.item(2), Team.spec);
-    makeTeamContainer(eTeams.children.item(3), Team.blue);
+    var t1 = eTeams.children.item(1), t2 = eTeams.children.item(2), t3 = eTeams.children.item(3);
+    makeTeamContainer(t1, Team.red);
+    makeTeamContainer(t2, Team.spec);
+    makeTeamContainer(t3, Team.blue);
+    t1.classList.add("t-red");
+    t3.classList.add("t-blue");
     API = _API;
     room = _room;
     roomState = _roomState;

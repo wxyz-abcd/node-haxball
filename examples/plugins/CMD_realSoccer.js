@@ -866,12 +866,12 @@ module.exports = function(API){
     try{
       reset(false, false);
     }catch(ex){}
-    that.room.librariesMap?.commands?.remove("setMapParams");
-    that.room.librariesMap?.commands?.remove("reset");
-    that.room.librariesMap?.commands?.remove("stats");
-    that.room.librariesMap?.commands?.remove("teamStats");
-    that.room.librariesMap?.commands?.remove("change");
-    that.room.librariesMap?.permissions?.removeContext(permissionCtx);
+    that.room.librariesMap.commands?.remove("setMapParams");
+    that.room.librariesMap.commands?.remove("reset");
+    that.room.librariesMap.commands?.remove("stats");
+    that.room.librariesMap.commands?.remove("teamStats");
+    that.room.librariesMap.commands?.remove("change");
+    that.room.librariesMap.permissions?.removeContext(permissionCtx);
     permissionCtx = null;
     permissionIds = null;
     lastTouchedPlayers = null;

@@ -18,14 +18,11 @@ var joinFunc = function (currentId) {
         avatar: "👽",
         player_auth_key: authKey
       },
-      onSuccess: (room)=>{
+      onOpen: (room)=>{
         roomCallbacks(room);
         joinFunc(currentId+1);
       },
-      onFailure: (error) => {
-        console.log("Unable to join room...", error.toString());
-      },
-      onLeave: (msg)=>{
+      onClose: (msg)=>{
         console.log("Bot has left the room:", msg.toString());
       }
     });
