@@ -5,6 +5,14 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://*.moo-hoo.com/*"],
+      "js": ["main.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
   "host_permissions": [
     "https://*.haxball.com/*",
     "wss://*.haxball.com/*",
@@ -15,7 +23,11 @@
     "https://*.onrender.com/*",
     "wss://*.onrender.com/*",
     "http://*.localhost:*/*",
-    "ws://*.localhost:*/*"
+    "ws://*.localhost:*/*",
+    "https://192.168.1.100:*/*",
+    "wss://192.168.1.100:*/*",
+    "https://*.moo-hoo.com/*",
+    "wss://*.moo-hoo.com/*"
   ],
   "permissions": [
     "declarativeNetRequest",

@@ -1082,9 +1082,10 @@ Room.create({
 
 <div> - Initial testing environment by <a href="https://github.com/mertushka">mertushka <img width="20" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/></a></div>
 <div> - %99 of the bot API features by <a href="https://github.com/wxyz-abcd">abc <img width="20" src="https://avatars1.githubusercontent.com/u/8694183?v=4"/></a></div>
-<div> - Headless script example fixed by <a href="https://github.com/iAmLuks">Luks <img width="20" src="https://avatars.githubusercontent.com/u/43921069?v=4"/></a></div>
 <div> - Lots of testing and various plugins by <a href="https://github.com/mtkcnl">mtkcnl (0x00) <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
-<div> - Lots of testing and various plugins by <a href="https://github.com/jerryoldson">JerryOldson <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a></div>
+<div> - Lots of testing, bug reports and various plugins by <a href="https://github.com/jerryoldson">JerryOldson (la cona guardiola) <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a></div>
+<div> - Lots of testing and bug reports by <a href="https://github.com/danielvieir4">danielvieira <img width="20" src="https://avatars.githubusercontent.com/u/6379843?v=4"/></a></div>
+<div> - Headless script example fixed by <a href="https://github.com/iAmLuks">Luks <img width="20" src="https://avatars.githubusercontent.com/u/43921069?v=4"/></a></div>
 <div> - Lots of testing and Portuguese language translation by <a href="https://github.com/guguxh">Juze <img width="20" src="https://avatars.githubusercontent.com/u/61206153?v=4"/></a></div>
 <div> - Some links fixed by <a href="https://github.com/ChasmSolacer">ChasmSolacer <img width="20" src="https://avatars.githubusercontent.com/u/46286197?v=4"/></a></div>
 <div> - Autoplay bot examples improved by <a href="https://github.com/K0nfy">K0nfy <img width="20" src="https://avatars.githubusercontent.com/u/27099419?v=4"/></a></div>
@@ -1095,6 +1096,19 @@ Room.create({
 </p>
 
 [Back To The Top](#title)
+
+---
+
+<h2 id="community">🤗 Sibling Projects & Community Links</h2>
+
+<div> - The original physics engine of Haxball in pure javascript, <a href="https://github.com/Kirby-org/nago">nago.js</a> by <a href="https://github.com/wxyz-abcd">wxyz-abcd <img width="20" src="https://avatars.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - A NW.js-based custom client for Haxball using node-haxball, <a href="https://github.com/wxyz-abcd/node-haxball-client">node-haxball-client</a> by <a href="https://github.com/wxyz-abcd">wxyz-abcd <img width="20" src="https://avatars.githubusercontent.com/u/8694183?v=4"/></a>, <a href="https://github.com/jerryoldson">jerryoldson <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a> and <a href="https://github.com/mtkcnl">mtkcnl <img width="20" src="https://avatars.githubusercontent.com/u/96322566?v=4"/></a></div>
+<div> - A npm package to easily combine bot codes written for Haxball headless host with node-haxball, <a href="https://www.npmjs.com/package/node-haxball-headless-bridge">node-haxball-headless-bridge</a> by <a href="https://github.com/jerryoldson">jerryoldson <img width="20" src="https://avatars.githubusercontent.com/u/140029469?v=4"/></a></div>
+<div> - The headless API for MooBall which is a game quite similar to Haxball, <a href="https://github.com/wxyz-abcd/mooball">MooBall</a> by <a href="https://github.com/wxyz-abcd">wxyz-abcd <img width="20" src="https://avatars.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - Our new game engine website in which we may later create a lot of different free WebRTC games(currently includes MooBall), <a href="https://moo-hoo.com/">Moo-Hoo Platform</a> by <a href="https://github.com/wxyz-abcd">wxyz-abcd <img width="20" src="https://avatars.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - A backend room server for node-haxball, (will be made public if/when the game engine website is popular enough.) <a href="https://github.com/wxyz-abcd/open-haxball">open-haxball</a> by <a href="https://github.com/wxyz-abcd">wxyz-abcd <img width="20" src="https://avatars.githubusercontent.com/u/8694183?v=4"/></a></div>
+<div> - <a href="https://devilopir.github.io/node-haxball-tr">Turkish documentation</a> <a href="https://github.com/devilopir/node-haxball-tr">repository</a> for node-haxball by <a href="https://github.com/devilopir">devilopir<img width="20" src="https://avatars.githubusercontent.com/u/259058587?v=4"/></a></div>
+<div> - <a href="https://github.com/bugramurat/haxball-curve-bot-v2">Haxball curve bot with slider-bar</a> by <a href="https://github.com/bugramurat">bugramurat <img width="20" src="https://avatars.githubusercontent.com/u/55837598?v=4"/></a></div>
 
 ---
 

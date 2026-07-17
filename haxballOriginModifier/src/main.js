@@ -1,0 +1,1 @@
+window.HAXBALL_ORIGIN_MODIFIER_LOADED = true;
